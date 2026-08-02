@@ -1,0 +1,20 @@
+{
+  "name": "Travel Inbox",
+  "short_name": "Travel Inbox",
+  "description": "여행 예약 확인 메일을 일정으로 정리하고 근거와 함께 답합니다",
+  "lang": "ko",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EDEEF1",
+  "theme_color": "#C2701A",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+# Python 3.13 필요 (3.14에서는 chromadb import가 멈춤)
+openai>=1.60.0
+python-dotenv>=1.0.1
+chromadb>=1.5.0,<2.0.0
+
+# 에이전트 (create_agent는 langchain 1.0+)
+langchain>=1.0.0
+langchain-openai>=0.3.0
+langchain-tavily>=0.2.0
+
+# API 서버 + 웹앱 서빙
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+python-multipart>=0.0.9

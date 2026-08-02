@@ -1,0 +1,18 @@
+# 키. 이미지 레이어에 한 번 들어가면 지워도 남는다.
+.env
+.env.local
+
+# 실제 메일과 인덱스 (개인정보)
+data/
+
+# 빌드에 불필요
+.git/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+reports/
+docs/
+deploy/
+tests/
+.DS_Store

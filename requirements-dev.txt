@@ -1,0 +1,4 @@
+# 개발·평가용. 배포(requirements.txt)에는 포함하지 않는다.
+-r requirements.txt
+pytest>=8.0.0
+httpx>=0.27.0

@@ -1,0 +1,1715 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>Travel Inbox</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icon.svg">
+<meta name="theme-color" content="#C2701A" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0B0D11" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Travel Inbox">
+</head>
+<body>
+
+<style>
+  /* ─────────────────────────────────────────────────────────────
+     토큰. 출발 안내판(split-flap)의 잉크와 호박색에서 가져왔다.
+     ───────────────────────────────────────────────────────────── */
+  :root {
+    --ground:      #EDEEF1;
+    --surface:     #FFFFFF;
+    --surface-2:   #F5F6F8;
+    --ink:         #11141A;
+    --ink-2:       #4C5563;
+    --ink-3:       #838C9B;
+    --line:        #DFE2E7;
+    --accent:      #C2701A;
+    --accent-ink:  #FFFFFF;
+    --accent-wash: #F6EADC;
+
+    --air:   #2F6FA8;
+    --stay:  #1F7F72;
+    --car:   #5B62B0;
+    --tour:  #B4622C;
+
+    --ok:    #1F7F4F;
+    --warn:  #A8700F;
+
+    --chrome:      rgba(255,255,255,.72);
+    --chrome-edge: rgba(255,255,255,.55);
+    --shadow-sheet: 0 -18px 46px rgba(12,16,24,.20);
+    --shadow-push:  -14px 0 40px rgba(12,16,24,.16);
+    --shadow-card:  0 1px 2px rgba(12,16,24,.05), 0 6px 16px rgba(12,16,24,.05);
+
+    --r-card: 14px;
+    --r-sheet: 22px;
+
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
+            "Noto Sans KR", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground:    #0B0D11;
+      --surface:   #171B22;
+      --surface-2: #1E232C;
+      --ink:       #EDEFF3;
+      --ink-2:     #A9B2C0;
+      --ink-3:     #737D8C;
+      --line:      #2A303A;
+      --accent:      #E29B4B;
+      --accent-ink:  #241605;
+      --accent-wash: #2A2118;
+
+      --air:  #6BA6DC;
+      --stay: #52B7A7;
+      --car:  #9298DF;
+      --tour: #DC9260;
+
+      --ok:   #4FB985;
+      --warn: #D9A63F;
+
+      --chrome:      rgba(23,27,34,.74);
+      --chrome-edge: rgba(255,255,255,.07);
+      --shadow-sheet: 0 -18px 46px rgba(0,0,0,.55);
+      --shadow-push:  -14px 0 40px rgba(0,0,0,.5);
+      --shadow-card:  0 1px 2px rgba(0,0,0,.4);
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:    #0B0D11;  --surface:   #171B22;  --surface-2: #1E232C;
+    --ink:       #EDEFF3;  --ink-2:     #A9B2C0;  --ink-3:     #737D8C;
+    --line:      #2A303A;
+    --accent: #E29B4B; --accent-ink: #241605; --accent-wash: #2A2118;
+    --air: #6BA6DC; --stay: #52B7A7; --car: #9298DF; --tour: #DC9260;
+    --ok: #4FB985; --warn: #D9A63F;
+    --chrome: rgba(23,27,34,.74); --chrome-edge: rgba(255,255,255,.07);
+    --shadow-sheet: 0 -18px 46px rgba(0,0,0,.55);
+    --shadow-push: -14px 0 40px rgba(0,0,0,.5);
+    --shadow-card: 0 1px 2px rgba(0,0,0,.4);
+    color-scheme: dark;
+  }
+  :root[data-theme="light"] {
+    --ground: #EDEEF1; --surface: #FFFFFF; --surface-2: #F5F6F8;
+    --ink: #11141A; --ink-2: #4C5563; --ink-3: #838C9B; --line: #DFE2E7;
+    --accent: #C2701A; --accent-ink: #FFFFFF; --accent-wash: #F6EADC;
+    --air: #2F6FA8; --stay: #1F7F72; --car: #5B62B0; --tour: #B4622C;
+    --ok: #1F7F4F; --warn: #A8700F;
+    --chrome: rgba(255,255,255,.72); --chrome-edge: rgba(255,255,255,.55);
+    --shadow-sheet: 0 -18px 46px rgba(12,16,24,.20);
+    --shadow-push: -14px 0 40px rgba(12,16,24,.16);
+    --shadow-card: 0 1px 2px rgba(12,16,24,.05), 0 6px 16px rgba(12,16,24,.05);
+    color-scheme: light;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: var(--font);
+    background: var(--ground);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── 레이아웃 ────────────────────────────────────────────────
+     모바일은 하단 탭바, 데스크톱은 좌측 사이드바. 같은 화면을
+     플랫폼에 맞는 탐색 구조로 감싼다.                          */
+  .app {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    background: var(--ground);
+    overflow: hidden;
+  }
+
+  
+
+
+  /* ── 앱 셸 ───────────────────────────────────────────────────── */
+  .appbar {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 30;
+    padding: 14px 18px 12px;
+    background: var(--chrome);
+    backdrop-filter: blur(22px) saturate(180%);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    border-bottom: 1px solid var(--chrome-edge);
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 10px;
+  }
+  .appbar h2 {
+    margin: 0;
+    font-size: 21px; font-weight: 700; letter-spacing: -.45px;
+  }
+  .appbar .sub {
+    font-size: 12px; color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .viewport { position: absolute; inset: 0; overflow: hidden; }
+
+  .screen {
+    position: absolute; inset: 0;
+    overflow-y: auto; overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 66px 16px calc(84px + env(safe-area-inset-bottom, 0px));
+    opacity: 0; visibility: hidden;
+    will-change: transform, opacity;
+  }
+  .screen.is-active { opacity: 1; visibility: visible; }
+
+  /* ── 탭바 ────────────────────────────────────────────────────── */
+  .tabbar {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 40;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    padding: 7px 6px calc(7px + env(safe-area-inset-bottom, 0px));
+    background: var(--chrome);
+    backdrop-filter: blur(22px) saturate(180%);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    border-top: 1px solid var(--chrome-edge);
+  }
+  .tab {
+    -webkit-tap-highlight-color: transparent;
+    appearance: none; border: 0; background: none;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 6px 2px 4px; border-radius: 12px;
+    color: var(--ink-3); cursor: pointer;
+    font-family: inherit; font-size: 10.5px; font-weight: 600;
+    letter-spacing: .1px;
+    transition: color .16s ease;
+  }
+  .tab svg { width: 23px; height: 23px; }
+  .tab.is-on { color: var(--accent); }
+  .tab:active .ico { transform: scale(.86); }
+  .ico { transition: transform .1s ease-out; display: block; }
+  .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ── 공통 요소 ───────────────────────────────────────────────── */
+  /* 여행에서 제일 먼저 알고 싶은 건 "다음에 뭐가 있나"다.
+     목록보다 앞에 두고, 다른 카드보다 확실히 무겁게 만든다. */
+  .upnext {
+    -webkit-tap-highlight-color: transparent;
+    appearance: none; font-family: inherit; text-align: left;
+    width: 100%; cursor: pointer; color: inherit;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 15px 16px 14px;
+    margin-bottom: 6px;
+    box-shadow: 0 1px 2px rgba(12,16,24,.05), 0 10px 24px rgba(12,16,24,.07);
+    display: block;
+    transition: transform .1s ease-out;
+  }
+  .upnext:active { transform: scale(.985); }
+  .upnext:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .upnext .eyebrow {
+    display: flex; align-items: center; gap: 7px; margin-bottom: 9px;
+  }
+  .upnext .eyebrow .lead {
+    font-size: 11px; font-weight: 700; letter-spacing: .5px;
+    color: var(--accent);
+  }
+  .upnext .eyebrow .when {
+    font-size: 11.5px; color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+  .upnext .who {
+    font-size: 17px; font-weight: 700; letter-spacing: -.35px;
+    margin-bottom: 4px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .upnext .time {
+    font-family: var(--mono); font-size: 24px; font-weight: 600;
+    letter-spacing: -.6px; font-variant-numeric: tabular-nums;
+    line-height: 1.1; margin-bottom: 5px;
+  }
+  .upnext .time .arrow { color: var(--ink-3); margin: 0 6px; font-weight: 400; }
+  .upnext .where {
+    font-size: 12.5px; color: var(--ink-2);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  .listlabel {
+    font-size: 11.5px; font-weight: 650; letter-spacing: .4px;
+    color: var(--ink-3); margin: 24px 3px 4px;
+  }
+  .listlabel + .daymark { margin-top: 10px; }
+
+  .daymark {
+    display: flex; align-items: center; gap: 9px;
+    margin: 18px 2px 9px;
+  }
+  .daymark:first-child { margin-top: 2px; }
+  .daymark .n {
+    font-size: 11px; font-weight: 700; letter-spacing: .8px;
+    color: var(--accent);
+    background: var(--accent-wash);
+    padding: 3px 8px; border-radius: 6px;
+  }
+  .daymark .d {
+    font-size: 12.5px; color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+  .daymark .rule { flex: 1; height: 1px; background: var(--line); }
+
+  .card {
+    -webkit-tap-highlight-color: transparent;
+    width: 100%; text-align: left;
+    appearance: none; font-family: inherit;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--kind, var(--ink-3));
+    border-radius: var(--r-card);
+    padding: 13px 14px;
+    margin-bottom: 9px;
+    box-shadow: var(--shadow-card);
+    display: block; cursor: pointer;
+    color: inherit;
+    transition: transform .1s ease-out;
+  }
+  .card:active { transform: scale(.982); }
+  .card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .card .top {
+    display: flex; align-items: center; gap: 7px; margin-bottom: 7px;
+  }
+  .kindchip {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .3px;
+    color: var(--kind); border: 1px solid currentColor;
+    border-radius: 5px; padding: 1.5px 6px; opacity: .95;
+  }
+  .card .who {
+    font-size: 14.5px; font-weight: 650; letter-spacing: -.2px;
+    flex: 1; min-width: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .card .when {
+    font-family: var(--mono); font-size: 17px; font-weight: 600;
+    letter-spacing: -.4px; font-variant-numeric: tabular-nums;
+    margin-bottom: 3px;
+  }
+  .card .when .arrow { color: var(--ink-3); margin: 0 5px; font-weight: 400; }
+  .card .where {
+    font-size: 12.5px; color: var(--ink-2);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  .pull {
+    position: absolute; top: 62px; left: 0; right: 0;
+    display: grid; place-items: center;
+    pointer-events: none; z-index: 5;
+    opacity: 0;
+  }
+  .pull .ring {
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 2px solid var(--line); border-top-color: var(--accent);
+  }
+  .pull.spin .ring { animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── 드릴다운 상세 ───────────────────────────────────────────── */
+  .detail {
+    position: absolute; inset: 0; z-index: 50;
+    background: var(--ground);
+    transform: translate3d(100%,0,0);
+    visibility: hidden;
+    box-shadow: var(--shadow-push);
+    display: flex; flex-direction: column;
+    will-change: transform;
+  }
+  .detail.is-open { visibility: visible; }
+  .detail .dbar {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 3;
+    padding: 12px 12px 10px;
+    background: var(--chrome);
+    backdrop-filter: blur(22px) saturate(180%);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    border-bottom: 1px solid var(--chrome-edge);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .backbtn {
+    -webkit-tap-highlight-color: transparent;
+    appearance: none; border: 0; background: none;
+    color: var(--accent); font-family: inherit;
+    font-size: 15px; font-weight: 600; letter-spacing: -.2px;
+    display: flex; align-items: center; gap: 2px;
+    padding: 5px 8px 5px 2px; border-radius: 9px; cursor: pointer;
+    transition: transform .1s ease-out;
+  }
+  .backbtn:active { transform: scale(.94); }
+  .backbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .detail .body { flex: 1; overflow-y: auto; padding: 62px 16px 28px; }
+
+  .hero { padding: 8px 2px 16px; }
+  .hero .kindchip { display: inline-block; margin-bottom: 9px; }
+  .hero h3 {
+    margin: 0 0 3px; font-size: 25px; font-weight: 700;
+    letter-spacing: -.7px; line-height: 1.18; text-wrap: balance;
+  }
+  .hero .meta { font-size: 13px; color: var(--ink-3); }
+
+  .rows {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--r-card); overflow: hidden; margin-bottom: 12px;
+  }
+  .row {
+    display: flex; align-items: baseline; gap: 12px;
+    padding: 11px 14px; border-bottom: 1px solid var(--line);
+  }
+  .row:last-child { border-bottom: 0; }
+  .row .k { font-size: 12.5px; color: var(--ink-3); width: 74px; flex: none; }
+  .row .v {
+    font-size: 14px; flex: 1; line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+  .row .v.num {
+    font-family: var(--mono); font-variant-numeric: tabular-nums;
+    letter-spacing: -.2px;
+  }
+
+  .policy {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--r-card); padding: 13px 14px; margin-bottom: 12px;
+  }
+  .policy h4 {
+    margin: 0 0 8px; font-size: 12px; font-weight: 700;
+    letter-spacing: .5px; color: var(--ink-3); text-transform: uppercase;
+  }
+  .policy ul { margin: 0; padding-left: 17px; }
+  .policy li { font-size: 13.5px; line-height: 1.6; margin-bottom: 5px; }
+  .policy li:last-child { margin-bottom: 0; }
+  .policy .free { color: var(--ok); font-weight: 600; }
+  .policy .fee  { color: var(--warn); font-weight: 600; }
+
+  /* ── 채팅 ────────────────────────────────────────────────────── */
+  .thread { display: flex; flex-direction: column; gap: 11px; }
+  .bubble {
+    max-width: 86%; padding: 10px 13px; border-radius: 17px;
+    font-size: 14.5px; line-height: 1.55; white-space: pre-wrap;
+  }
+  .bubble.me {
+    align-self: flex-end; background: var(--accent);
+    color: var(--accent-ink); border-bottom-right-radius: 6px;
+  }
+  .bubble.bot {
+    align-self: flex-start; background: var(--surface);
+    border: 1px solid var(--line); border-bottom-left-radius: 6px;
+  }
+  .bubble.bot.refuse { border-style: dashed; color: var(--ink-2); }
+  .srcbtn {
+    -webkit-tap-highlight-color: transparent;
+    appearance: none; font-family: inherit; cursor: pointer;
+    margin-top: 9px; display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11.5px; font-weight: 650;
+    color: var(--accent); background: var(--accent-wash);
+    border: 0; border-radius: 8px; padding: 5px 9px;
+    transition: transform .1s ease-out;
+  }
+  .srcbtn:active { transform: scale(.94); }
+  .toolline {
+    align-self: flex-start; font-family: var(--mono);
+    font-size: 10.5px; color: var(--ink-3); margin: -4px 0 -2px 3px;
+  }
+  .typing { display: flex; gap: 4px; padding: 13px 15px; }
+  .typing i {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--ink-3); animation: bob 1s infinite;
+  }
+  .typing i:nth-child(2) { animation-delay: .15s; }
+  .typing i:nth-child(3) { animation-delay: .3s; }
+  @keyframes bob { 0%,60%,100% { opacity: .3; } 30% { opacity: 1; } }
+
+  .chips {
+    display: flex; gap: 7px; overflow-x: auto; padding: 12px 0 2px;
+    scrollbar-width: none;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    -webkit-tap-highlight-color: transparent;
+    appearance: none; font-family: inherit; cursor: pointer;
+    flex: none; font-size: 12.5px; font-weight: 550;
+    background: var(--surface); color: var(--ink-2);
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 7px 13px;
+    transition: transform .1s ease-out;
+  }
+  .chip:active { transform: scale(.94); }
+
+  .composer {
+    position: absolute; left: 0; right: 0;
+    bottom: calc(63px + env(safe-area-inset-bottom, 0px));
+    z-index: 35; padding: 9px 12px 10px;
+    background: var(--chrome);
+    backdrop-filter: blur(22px) saturate(180%);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    border-top: 1px solid var(--chrome-edge);
+    display: none; gap: 8px;
+  }
+  .composer.on { display: flex; }
+  .composer input {
+    flex: 1; font-family: inherit; font-size: 15px;
+    background: var(--surface); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 10px 15px; min-width: 0;
+  }
+  .composer input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .send {
+    -webkit-tap-highlight-color: transparent;
+    appearance: none; border: 0; cursor: pointer;
+    width: 40px; height: 40px; flex: none; border-radius: 50%;
+    background: var(--accent); color: var(--accent-ink);
+    display: grid; place-items: center;
+    transition: transform .1s ease-out;
+  }
+  .send:active { transform: scale(.9); }
+
+  /* ── 메일함 ──────────────────────────────────────────────────── */
+  .mailrow {
+    display: flex; align-items: center; gap: 11px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--r-card); padding: 12px 13px; margin-bottom: 8px;
+  }
+  .mailrow .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--kind); flex: none;
+  }
+  .mailrow .name {
+    flex: 1; min-width: 0; font-size: 13.5px; font-weight: 550;
+    font-family: var(--mono); letter-spacing: -.3px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .mailrow .state {
+    font-size: 11px; font-weight: 650; color: var(--ok);
+    background: color-mix(in srgb, var(--ok) 12%, transparent);
+    padding: 3px 7px; border-radius: 6px; flex: none;
+  }
+  .mailrow .state.wait { color: var(--warn); background: color-mix(in srgb, var(--warn) 14%, transparent); }
+
+  .bigbtn {
+    -webkit-tap-highlight-color: transparent;
+    appearance: none; font-family: inherit; cursor: pointer;
+    width: 100%; padding: 14px; border-radius: var(--r-card);
+    background: var(--accent); color: var(--accent-ink);
+    border: 0; font-size: 15px; font-weight: 650; letter-spacing: -.2px;
+    margin-top: 6px;
+    transition: transform .1s ease-out;
+  }
+  .bigbtn:active { transform: scale(.975); }
+  .bigbtn.ghost {
+    background: var(--surface); color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  .bigbtn.danger { background: var(--surface); color: #C0392B; border: 1px solid var(--line); }
+  :root[data-theme="dark"] .bigbtn.danger,
+  :root:not([data-theme="light"]) .bigbtn.danger { }
+
+  /* ── 설정 ────────────────────────────────────────────────────── */
+  .seg { display: flex; gap: 0; background: var(--surface-2); border-radius: 10px; padding: 3px; }
+  .seg button {
+    -webkit-tap-highlight-color: transparent;
+    flex: 1; appearance: none; border: 0; background: none; cursor: pointer;
+    font-family: inherit; font-size: 13px; font-weight: 600; color: var(--ink-2);
+    padding: 7px 4px; border-radius: 8px;
+  }
+  .seg button.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-card); }
+
+  .note {
+    font-size: 12px; color: var(--ink-3); line-height: 1.6;
+    padding: 2px 3px 14px;
+  }
+
+  .grouplabel {
+    font-size: 12px; font-weight: 650; letter-spacing: .3px;
+    color: var(--ink-3); margin: 20px 3px 8px;
+  }
+  .screen[data-screen="settings"] .grouplabel:first-child { margin-top: 2px; }
+
+  .advanced { margin-top: 26px; }
+  .advanced > summary {
+    cursor: pointer; list-style: none;
+    font-size: 13px; font-weight: 600; color: var(--ink-3);
+    padding: 9px 3px; user-select: none;
+  }
+  .advanced > summary::-webkit-details-marker { display: none; }
+  .advanced > summary::before {
+    content: "▸"; display: inline-block; margin-right: 6px;
+    transition: transform .15s ease;
+  }
+  .advanced[open] > summary::before { transform: rotate(90deg); }
+  .advanced > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .dropzone.is-over {
+    border-color: var(--accent); border-style: solid;
+    background: var(--accent-wash);
+  }
+
+  /* ── 시트 + 스크림 ───────────────────────────────────────────── */
+  .scrim {
+    position: absolute; inset: 0; z-index: 55;
+    background: rgba(8,10,14,.42);
+    opacity: 0; visibility: hidden;
+  }
+  .scrim.is-on { visibility: visible; }
+
+  .sheet {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 60;
+    background: var(--surface);
+    border-radius: var(--r-sheet) var(--r-sheet) 0 0;
+    box-shadow: var(--shadow-sheet);
+    transform: translate3d(0,100%,0);
+    visibility: hidden;
+    max-height: 88%;
+    display: flex; flex-direction: column;
+    will-change: transform;
+  }
+  .sheet.is-open { visibility: visible; }
+  .grabber {
+    padding: 9px 0 4px; display: grid; place-items: center;
+    cursor: grab; touch-action: none;
+  }
+  .grabber i {
+    width: 36px; height: 5px; border-radius: 3px;
+    background: var(--line); display: block;
+  }
+  .sheet h3 {
+    margin: 2px 20px 4px; font-size: 19px; font-weight: 700;
+    letter-spacing: -.4px;
+  }
+  .sheet .sbody {
+    padding: 8px 20px calc(22px + env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+  }
+
+  .srcitem {
+    display: flex; gap: 11px; align-items: flex-start;
+    padding: 11px 0; border-bottom: 1px solid var(--line);
+  }
+  .srcitem:last-child { border-bottom: 0; }
+  .srcitem .bar { width: 3px; align-self: stretch; border-radius: 2px; background: var(--kind); flex: none; }
+  .srcitem .t { font-size: 13.5px; font-weight: 600; margin-bottom: 2px; }
+  .srcitem .f {
+    font-family: var(--mono); font-size: 11.5px; color: var(--ink-3);
+    overflow-wrap: anywhere;
+  }
+  .srcitem .sim {
+    font-family: var(--mono); font-size: 11.5px; color: var(--ink-2);
+    font-variant-numeric: tabular-nums; flex: none;
+  }
+
+  .drop {
+    border: 1.5px dashed var(--line); border-radius: var(--r-card);
+    padding: 26px 16px; text-align: center; color: var(--ink-3);
+    font-size: 13px; line-height: 1.6; margin-bottom: 12px;
+  }
+  .drop b { color: var(--ink); display: block; font-size: 14.5px; margin-bottom: 3px; }
+
+  .toast {
+    position: absolute; left: 50%; z-index: 70;
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+    transform: translate(-50%, 14px);
+    background: var(--ink); color: var(--ground);
+    font-size: 13px; font-weight: 550;
+    padding: 10px 16px; border-radius: 999px;
+    opacity: 0; pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease;
+    white-space: nowrap;
+  }
+  .toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+  .edgehint {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 22px; z-index: 51;
+  }
+
+  /* ── 데스크톱: 떠 있는 앱 창 ─────────────────────────────────
+     넓은 화면이라고 대시보드로 펼치지 않는다. 이 앱은 한 손으로 훑는
+     흐름이 중심이라, 창을 하나 띄우고 탐색은 하단 탭바로 유지한다. */
+  @media (min-width: 760px) {
+    body {
+      display: grid; place-items: center;
+      min-height: 100dvh; padding: 26px;
+      background:
+        radial-gradient(1100px 620px at 50% -8%, var(--accent-wash), transparent 62%),
+        var(--ground);
+    }
+    .app {
+      position: relative; inset: auto;
+      width: min(468px, 100%);
+      height: min(884px, calc(100dvh - 52px));
+      border-radius: 26px;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px var(--line),
+        0 28px 70px rgba(12, 16, 24, .17),
+        0 4px 14px rgba(12, 16, 24, .06);
+    }
+    .appbar { border-radius: 26px 26px 0 0; }
+    .sheet { border-radius: 20px 20px 0 0; }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    @media (min-width: 760px) {
+      .app {
+        box-shadow:
+          0 0 0 1px var(--line),
+          0 28px 70px rgba(0, 0, 0, .6);
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .typing i { animation: none; opacity: .6; }
+    .pull.spin .ring { animation: none; }
+  }
+</style>
+
+<div class="app" id="app">
+
+
+
+      <header class="appbar">
+        <h2 id="barTitle">일정</h2>
+        <span class="sub" id="barSub">10.12 – 10.17 · 도쿄</span>
+      </header>
+
+      <div class="viewport" id="viewport">
+
+        <!-- ── 일정 ─────────────────────────────────────────── -->
+        <section class="screen is-active" data-screen="trip" id="scrTrip">
+          <div class="pull" id="pull"><div class="ring"></div></div>
+          <div id="tripList"></div>
+        </section>
+
+        <!-- ── 질문 ─────────────────────────────────────────── -->
+        <section class="screen" data-screen="ask">
+          <div class="thread" id="thread"></div>
+          <div class="chips" id="chips"></div>
+        </section>
+
+        <!-- ── 메일 ─────────────────────────────────────────── -->
+        <section class="screen" data-screen="mail">
+          <div id="mailList"></div>
+          <button class="bigbtn" id="addMail">메일 추가하기</button>
+          <p class="note">
+            메일 1건을 인덱싱할 때 LLM을 한 번 호출합니다. 이미 넣은 메일은
+            본문 해시를 비교해 건너뜁니다.
+          </p>
+        </section>
+
+        <!-- ── 설정 ─────────────────────────────────────────── -->
+        <section class="screen" data-screen="settings">
+          <p class="grouplabel">화면</p>
+          <div class="seg" id="themeSeg">
+            <button data-theme-set="auto" class="on">시스템</button>
+            <button data-theme-set="light">밝게</button>
+            <button data-theme-set="dark">어둡게</button>
+          </div>
+
+          <p class="grouplabel">여행</p>
+          <div class="rows">
+            <div class="row">
+              <span class="k">시작일</span>
+              <span class="v num" id="tripStartValue">—</span>
+            </div>
+            <div class="row">
+              <span class="k">예약</span>
+              <span class="v num" id="bookingCountValue">—</span>
+            </div>
+          </div>
+          <p class="note">
+            "둘째 날", "3일차" 같은 질문은 시작일을 기준으로 계산합니다.
+          </p>
+
+          <p class="grouplabel">데이터</p>
+          <button class="bigbtn ghost" id="installBtn">홈 화면에 추가</button>
+          <button class="bigbtn danger" id="resetBtn">인덱스 비우기</button>
+          <p class="note">
+            저장된 예약과 업로드한 메일 파일을 모두 지웁니다. 되돌릴 수 없습니다.
+          </p>
+
+          <details class="advanced">
+            <summary>고급 설정</summary>
+            <div class="rows" style="margin-top:10px">
+              <div class="row"><span class="k">추출 모델</span><span class="v num">gpt-5-mini</span></div>
+              <div class="row"><span class="k">임베딩</span><span class="v num">text-embedding-3-small</span></div>
+              <div class="row"><span class="k">top_k</span><span class="v num">3</span></div>
+              <div class="row"><span class="k">임계값</span><span class="v num">절대 0.20 · 1위 대비 0.75</span></div>
+            </div>
+            <p class="note">
+              근거를 찾지 못하면 답을 만들지 않고 "예약 내역에서 확인할 수 없습니다"로
+              응답합니다. 임계값을 낮추면 더 많이 답하지만 틀릴 확률도 올라갑니다.
+            </p>
+          </details>
+        </section>
+      </div>
+
+      <div class="edgehint" id="edgehint" aria-hidden="true"></div>
+
+      <!-- ── 드릴다운 ─────────────────────────────────────────── -->
+      <div class="detail" id="detail" role="dialog" aria-label="예약 상세">
+        <div class="dbar">
+          <button class="backbtn" id="backBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+            일정
+          </button>
+        </div>
+        <div class="body" id="detailBody"></div>
+      </div>
+
+      <!-- ── 채팅 입력 ────────────────────────────────────────── -->
+      <form class="composer" id="composer">
+        <input id="qInput" placeholder="예약에 대해 물어보세요" autocomplete="off">
+        <button class="send" type="submit" aria-label="보내기">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 19V5M5 12l7-7 7 7"/>
+          </svg>
+        </button>
+      </form>
+
+      <div class="scrim" id="scrim"></div>
+
+      <!-- ── 시트 ─────────────────────────────────────────────── -->
+      <div class="sheet" id="sheet" role="dialog" aria-label="시트">
+        <div class="grabber" id="grabber"><i></i></div>
+        <h3 id="sheetTitle">근거</h3>
+        <div class="sbody" id="sheetBody"></div>
+      </div>
+
+      <div class="toast" id="toast"></div>
+
+      <nav class="tabbar" id="tabbar">
+        <button class="tab is-on" data-go="trip">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+            stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2.5"/>
+            <path d="M3 10h18M8 3v4M16 3v4"/></svg></span>
+          일정
+        </button>
+        <button class="tab" data-go="ask">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+            stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.4 7.2L3 21l1.8-6.6A8 8 0 1 1 21 12z"/></svg></span>
+          질문
+        </button>
+        <button class="tab" data-go="mail">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+            stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/>
+            <path d="M3.5 7l8.5 6 8.5-6"/></svg></span>
+          메일
+        </button>
+        <button class="tab" data-go="settings">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+            stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/>
+            <path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 7.5 19.4l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 3 15H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 8.5l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 9 5.1V5a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 2.7 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0 1.1 2.7H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg></span>
+          설정
+        </button>
+      </nav>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+
+  /* ── 스프링 ──────────────────────────────────────────────────
+     Apple의 damping / response 두 파라미터를 쓴다. 현재 값에서
+     출발하고, 속도를 이어받고, 언제든 다시 겨눌 수 있다.        */
+  function Spring(value, apply) {
+    let x = value, v = 0, target = value, raf = 0, last = 0;
+    let k = 0, c = 0, onRest = null;
+
+    function step(now) {
+      let dt = (now - last) / 1000;
+      last = now;
+      if (dt > 0.064) dt = 0.064;
+
+      // 안정성을 위해 잘게 적분한다.
+      const n = Math.max(1, Math.ceil(dt / 0.004));
+      const h = dt / n;
+      for (let i = 0; i < n; i++) {
+        const a = -k * (x - target) - c * v;
+        v += a * h;
+        x += v * h;
+      }
+
+      apply(x);
+
+      if (Math.abs(x - target) < 0.12 && Math.abs(v) < 0.6) {
+        x = target; v = 0; apply(x);
+        raf = 0;
+        if (onRest) { const f = onRest; onRest = null; f(); }
+        return;
+      }
+      raf = requestAnimationFrame(step);
+    }
+
+    return {
+      get value() { return x; },
+      get velocity() { return v; },
+      set(next) {                       // 제스처 추적: 즉시 반영
+        if (raf) { cancelAnimationFrame(raf); raf = 0; }
+        x = next; target = next; v = 0; apply(x);
+      },
+      track(next, vel) {                // 손가락 1:1 + 속도 기록
+        if (raf) { cancelAnimationFrame(raf); raf = 0; }
+        x = next; v = vel; apply(x);
+      },
+      to(dest, { damping = 1, response = 0.4, velocity = null, done = null } = {}) {
+        target = dest;
+        if (velocity !== null) v = velocity;
+        onRest = done;
+        if (reduced.matches) {          // 접근성: 즉시 이동
+          x = dest; v = 0; apply(x);
+          if (onRest) { const f = onRest; onRest = null; f(); }
+          return;
+        }
+        const w = (2 * Math.PI) / response;
+        k = w * w;
+        c = 2 * damping * w;
+        if (!raf) { last = performance.now(); raf = requestAnimationFrame(step); }
+      },
+      stop() { if (raf) { cancelAnimationFrame(raf); raf = 0; } v = 0; }
+    };
+  }
+
+  // 관성 투영 — 던진 손가락이 "가려던 곳"을 계산한다.
+  const project = (v, rate = 0.998) => (v / 1000) * rate / (1 - rate);
+
+  // 경계 저항 — 딱 멈추지 않고 점점 뻑뻑해진다.
+  const rubber = (over, dim, cst = 0.55) =>
+    (over * dim * cst) / (dim + cst * Math.abs(over));
+
+  /* ── 데이터 ─────────────────────────────────────────────────── */
+  const KIND = {
+    "항공":  { color: "var(--air)" },
+    "숙소":  { color: "var(--stay)" },
+    "렌터카": { color: "var(--car)" },
+    "투어":  { color: "var(--tour)" }
+  };
+
+  // time 필드는 예약 종류마다 뜻이 다르다. 라벨을 붙여야 오해가 없다.
+  const TIME_LABEL = {
+    "항공": "출발 → 도착",
+    "숙소": "체크인 → 체크아웃",
+    "렌터카": "픽업 → 반납",
+    "투어": "집합"
+  };
+
+  let TRIP_START = "2026-10-12";
+  let BOOKINGS = [];
+  let MAILS = [];
+
+  /* ── API ────────────────────────────────────────────────────── */
+  const api = {
+    async bookings() {
+      const r = await fetch("/api/bookings");
+      if (!r.ok) throw new Error(`서버가 예약 목록을 주지 못했습니다 (${r.status})`);
+      return r.json();
+    },
+    async ask(question, history) {
+      const r = await fetch("/api/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question, history })
+      });
+      if (!r.ok) {
+        const detail = await r.json().catch(() => ({}));
+        throw new Error(detail.detail || `답변을 받지 못했습니다 (${r.status})`);
+      }
+      return r.json();
+    },
+    async index(files) {
+      const form = new FormData();
+      [...files].forEach(f => form.append("files", f));
+      const r = await fetch("/api/index", { method: "POST", body: form });
+      if (r.status === 409) throw new Error("이미 인덱싱이 진행 중입니다");
+      if (!r.ok) throw new Error(`인덱싱을 시작하지 못했습니다 (${r.status})`);
+      return r.json();
+    },
+    async indexStatus() {
+      const r = await fetch("/api/index/status");
+      if (!r.ok) throw new Error(`진행 상황을 받지 못했습니다 (${r.status})`);
+      return r.json();
+    },
+    async clear() {
+      const r = await fetch("/api/index", { method: "DELETE" });
+      if (!r.ok) throw new Error(`인덱스를 비우지 못했습니다 (${r.status})`);
+      return r.json();
+    }
+  };
+
+
+  /* ── 유틸 ────────────────────────────────────────────────────── */
+  const $ = s => document.querySelector(s);
+  const el = (t, c) => { const n = document.createElement(t); if (c) n.className = c; return n; };
+  const dayNum = d =>
+    Math.round((Date.parse(d) - Date.parse(TRIP_START)) / 86400000) + 1;
+  const fmtDay = d => {
+    const dt = new Date(d + "T00:00:00");
+    return `${dt.getMonth() + 1}월 ${dt.getDate()}일 ${"일월화수목금토"[dt.getDay()]}요일`;
+  };
+
+  let toastTimer = 0;
+  function toast(msg) {
+    const t = $("#toast");
+    t.textContent = msg;
+    t.classList.add("on");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove("on"), 1900);
+  }
+
+  /* ── 일정 화면 ───────────────────────────────────────────────── */
+  function renderTrip() {
+    const host = $("#tripList");
+    host.textContent = "";
+
+    if (!BOOKINGS.length) {
+      const empty = el("div", "drop");
+      const b = el("b"); b.textContent = "아직 등록된 예약이 없습니다";
+      empty.append(b, document.createTextNode("메일 탭에서 예약 확인 메일을 넣어주세요"));
+      host.append(empty);
+      return;
+    }
+
+    // 여행 시작 전이면 첫 일정, 여행 중이면 오늘 이후 첫 일정을 앞세운다.
+    const today = new Date().toISOString().slice(0, 10);
+    const upcoming = BOOKINGS.find(b => (b.date_end || b.date) >= today) || BOOKINGS[0];
+
+    if (upcoming) {
+      const kind = KIND[upcoming.kind] || { color: "var(--ink-3)" };
+      const card = el("button", "upnext");
+      card.style.borderLeft = `3px solid ${kind.color}`;
+
+      const eyebrow = el("div", "eyebrow");
+      const lead = el("span", "lead");
+      lead.textContent = upcoming.date >= today ? "다음 일정" : "지난 일정";
+      const when = el("span", "when");
+      when.textContent = upcoming.date
+        ? `${dayNum(upcoming.date)}일차 · ${fmtDay(upcoming.date)}` : "";
+      eyebrow.append(lead, when);
+
+      const who = el("div", "who");
+      who.textContent = `${upcoming.kind || "예약"} · ${upcoming.provider || "제공처 미상"}`;
+
+      const time = el("div", "time");
+      time.append(document.createTextNode(upcoming.time || "시각 미상"));
+      if (upcoming.time_end) {
+        const a = el("span", "arrow"); a.textContent = "→";
+        time.append(a, document.createTextNode(upcoming.time_end));
+      }
+
+      const where = el("div", "where");
+      where.textContent = upcoming.location || "";
+
+      card.append(eyebrow, who, time, where);
+      card.addEventListener("click", () => openDetail(upcoming.id));
+      host.append(card);
+
+      const label = el("p", "listlabel");
+      label.textContent = BOOKINGS.length > 1
+        ? `이후 일정 ${BOOKINGS.length - 1}건` : "이후 일정 없음";
+      host.append(label);
+    }
+
+    let lastDate = null;
+    const rest = upcoming ? BOOKINGS.filter(b => b.id !== upcoming.id) : BOOKINGS;
+    rest.forEach(b => {
+      if (b.date && b.date !== lastDate) {
+        lastDate = b.date;
+        const m = el("div", "daymark");
+        const n = el("span", "n"); n.textContent = `${dayNum(b.date)}일차`;
+        const d = el("span", "d"); d.textContent = fmtDay(b.date);
+        m.append(n, d, el("span", "rule"));
+        host.append(m);
+      }
+
+      const card = el("button", "card");
+      const kind = KIND[b.kind] || { color: "var(--ink-3)" };
+      card.style.setProperty("--kind", kind.color);
+      card.dataset.id = b.id;
+
+      const top = el("div", "top");
+      const chip = el("span", "kindchip"); chip.textContent = b.kind || "예약";
+      const who = el("span", "who"); who.textContent = b.provider || "제공처 미상";
+      top.append(chip, who);
+
+      const when = el("div", "when");
+      when.append(document.createTextNode(b.time || "시각 미상"));
+      if (b.time_end) {
+        const a = el("span", "arrow"); a.textContent = "→";
+        when.append(a, document.createTextNode(b.time_end));
+      }
+
+      const where = el("div", "where");
+      where.textContent = b.location || b.source_file || "";
+      card.append(top, when, where);
+      card.addEventListener("click", () => openDetail(b.id));
+      host.append(card);
+    });
+  }
+
+  /* ── 상세 (드릴다운) ─────────────────────────────────────────── */
+  const detail = $("#detail");
+  const detailSpring = Spring(1, p => {
+    detail.style.transform = `translate3d(${p * 100}%,0,0)`;
+    $("#viewport").style.transform = `translate3d(${(1 - p) * -18}%,0,0)`;
+  });
+  let detailOpen = false;
+
+  function fillDetail(b) {
+    const body = $("#detailBody");
+    body.textContent = "";
+    const kind = KIND[b.kind] || { color: "var(--ink-3)" };
+
+    const hero = el("div", "hero");
+    const chip = el("span", "kindchip");
+    chip.textContent = b.kind || "예약";
+    chip.style.color = kind.color;
+    const h = el("h3"); h.textContent = b.provider || "제공처 미상";
+    const meta = el("div", "meta");
+    meta.textContent = !b.date ? "날짜 미상"
+      : b.date === b.date_end
+        ? `${fmtDay(b.date)} · ${dayNum(b.date)}일차`
+        : `${fmtDay(b.date)} → ${fmtDay(b.date_end)}`;
+    hero.append(chip, h, meta);
+    body.append(hero);
+
+    const rows = el("div", "rows");
+    const put = (k, v, mono) => {
+      if (!v) return;
+      const r = el("div", "row");
+      const kk = el("span", "k"); kk.textContent = k;
+      const vv = el("span", mono ? "v num" : "v"); vv.textContent = v;
+      r.append(kk, vv); rows.append(r);
+    };
+    put("예약번호", b.confirmation_number, true);
+    put(TIME_LABEL[b.kind] || "시각",
+        b.time_end ? `${b.time} → ${b.time_end}` : b.time, true);
+    put("날짜", b.date === b.date_end ? b.date : `${b.date} → ${b.date_end}`, true);
+    put("장소", b.location);
+    if (rows.children.length) body.append(rows);
+
+    if (b.policy && b.policy.length) {
+      const pol = el("div", "policy");
+      const ph = el("h4"); ph.textContent = "취소 · 환불";
+      const ul = el("ul");
+      b.policy.forEach(line => {
+        const li = el("li");
+        const free = /무료|100% 환불|없습니다|없음/.test(line);
+        const fee  = /불가|부과|위약금|수수료|환불되지/.test(line);
+        li.textContent = line;
+        if (free && !fee) li.className = "free";
+        else if (fee) li.className = "fee";
+        ul.append(li);
+      });
+      pol.append(ph, ul);
+      body.append(pol);
+    }
+
+    const ask = el("button", "bigbtn ghost");
+    ask.textContent = "이 예약에 대해 질문하기";
+    ask.addEventListener("click", () => {
+      closeDetail();
+      setTimeout(() => {
+        go("ask");
+        const q = `${b.provider} 환불 규정 알려줘`;
+        pushBubble("me", q); scrollThread(); respond(q);
+      }, 180);
+    });
+    body.append(ask);
+
+    const src = el("p", "note");
+    src.textContent = `근거 메일: ${b.source_file}`;
+    body.append(src);
+  }
+
+  function openDetail(id) {
+    const b = BOOKINGS.find(x => x.id === id);
+    if (!b) return;
+    fillDetail(b);
+    detail.classList.add("is-open");
+    detailOpen = true;
+    detailSpring.set(detailSpring.value);
+    detailSpring.to(0, { damping: 1, response: 0.42 });
+  }
+
+  function closeDetail(vel = null) {
+    if (!detailOpen) return;
+    detailSpring.to(1, {
+      damping: 1, response: 0.36, velocity: vel,
+      done: () => {
+        detail.classList.remove("is-open");
+        detailOpen = false;
+        $("#viewport").style.transform = "";
+      }
+    });
+  }
+
+  $("#backBtn").addEventListener("click", () => closeDetail());
+
+  /* 왼쪽 가장자리에서 스와이프 → 뒤로. 손가락에 1:1로 붙는다. */
+  (() => {
+    const W = () => detail.getBoundingClientRect().width || 393;
+    let active = false, startX = 0, hist = [];
+
+    function down(e) {
+      if (!detailOpen) return;
+      if (e.clientX > 26) return;
+      active = true; startX = e.clientX; hist = [[e.clientX, performance.now()]];
+      detail.setPointerCapture(e.pointerId);
+      detailSpring.stop();
+    }
+    function move(e) {
+      if (!active) return;
+      e.preventDefault();
+      const w = W();
+      let p = (e.clientX - startX) / w;
+      if (p < 0) p = rubber(p, 1);
+      hist.push([e.clientX, performance.now()]);
+      if (hist.length > 6) hist.shift();
+      detailSpring.track(Math.max(0, Math.min(1.2, p)), velocity() / w);
+    }
+    function velocity() {
+      if (hist.length < 2) return 0;
+      const [x0, t0] = hist[0], [x1, t1] = hist[hist.length - 1];
+      const dt = (t1 - t0) / 1000;
+      return dt > 0 ? (x1 - x0) / dt : 0;
+    }
+    function up() {
+      if (!active) return;
+      active = false;
+      const w = W(), v = velocity();
+      const projected = detailSpring.value + project(v) / w;
+      if (projected > 0.42 || v > 420) closeDetail(v / w);
+      else detailSpring.to(0, { damping: 1, response: 0.34, velocity: v / w });
+    }
+
+    $("#edgehint").addEventListener("pointerdown", down);
+    detail.addEventListener("pointerdown", down);
+    detail.addEventListener("pointermove", move);
+    detail.addEventListener("pointerup", up);
+    detail.addEventListener("pointercancel", up);
+  })();
+
+  /* ── 탭 전환 ─────────────────────────────────────────────────── */
+  const TITLES = {
+    trip:     ["일정", "10.12 – 10.17 · 도쿄"],
+    ask:      ["질문", "근거와 함께 답합니다"],
+    mail:     ["메일", "5건 인덱싱됨"],
+    settings: ["설정", ""]
+  };
+  const ORDER = ["trip", "ask", "mail", "settings"];
+  let current = "trip";
+  let transition = null;
+  let finishTransition = null;
+
+  function go(name) {
+    if (name === current) return;
+    const from = $(`.screen[data-screen="${current}"]`);
+    const to   = $(`.screen[data-screen="${name}"]`);
+    const dir  = ORDER.indexOf(name) > ORDER.indexOf(current) ? 1 : -1;
+
+    // 전환이 겹칠 수 있다. 시작 시점에 나가는 두 화면 외에는 모두 정리한다.
+    document.querySelectorAll(".screen.is-active").forEach(s => {
+      if (s !== from && s !== to) {
+        s.classList.remove("is-active");
+        s.style.transform = ""; s.style.opacity = "";
+      }
+    });
+
+    // 진행도 하나로 두 화면을 함께 움직인다. 스프링을 둘로 나누면
+    // 나가는 화면이 완전히 사라지기 전에 멈춰 잔상이 남는다.
+    to.classList.add("is-active");
+
+    // 이전 전환이 남아 있으면 정리까지 끝내고 시작한다. 스프링만 멈추면
+    // 완료 콜백이 실행되지 않아 이전 화면이 활성 상태로 남는다.
+    if (transition) transition.stop();
+    if (finishTransition) finishTransition();
+
+    const SHIFT = 22;
+    transition = Spring(0, p => {
+      const eased = Math.max(0, Math.min(1, p));
+      from.style.transform = `translate3d(${-dir * SHIFT * eased}px,0,0)`;
+      from.style.opacity = String(1 - eased);
+      to.style.transform = `translate3d(${dir * SHIFT * (1 - eased)}px,0,0)`;
+      to.style.opacity = String(eased);
+    });
+
+    // 정리는 애니메이션 성공에 기대지 않는다. 중간에 끊기거나 탭이
+    // 백그라운드로 가서 rAF가 멈춰도 화면 상태는 항상 정확해야 한다.
+    finishTransition = () => {
+      finishTransition = null;
+      transition = null;
+      document.querySelectorAll(".screen").forEach(s => {
+        s.style.transform = ""; s.style.opacity = "";
+        s.classList.toggle("is-active", s === to);
+      });
+    };
+
+    transition.to(1, { damping: 1, response: 0.32, done: () => finishTransition?.() });
+
+    current = name;
+    $("#barTitle").textContent = TITLES[name][0];
+    $("#barSub").textContent = TITLES[name][1];
+    $("#composer").classList.toggle("on", name === "ask");
+    document.querySelectorAll(".tab").forEach(el =>
+      el.classList.toggle("is-on", el.dataset.go === name));
+  }
+
+  // 탭은 누를 때 눌린 표시(CSS :active)를 주고, 손을 뗄 때 확정한다.
+  // 누르자마자 확정하면 손가락을 밀어 취소할 방법이 없다.
+  // 탭이 백그라운드로 가면 rAF가 멈춘다. 애니메이션 도중이면 즉시 끝내
+  // 화면 상태를 확정해 둔다. 돌아왔을 때 반쯤 사라진 화면이 남지 않는다.
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden && finishTransition) {
+      transition?.stop();
+      finishTransition();
+    }
+  });
+
+  $("#tabbar").addEventListener("click", e => {
+    const t = e.target.closest(".tab");
+    if (t) go(t.dataset.go);
+  });
+  $("#tabbar").addEventListener("keydown", e => {
+    const t = e.target.closest(".tab");
+    if (t && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); go(t.dataset.go); }
+  });
+
+  /* ── 아래로 당겨 새로고침 ────────────────────────────────────── */
+  (() => {
+    const scr = $("#scrTrip"), ind = $("#pull");
+    let active = false, startY = 0, dist = 0, busy = false;
+
+    scr.addEventListener("pointerdown", e => {
+      if (busy || scr.scrollTop > 0) return;
+      active = true; startY = e.clientY; dist = 0;
+    });
+    scr.addEventListener("pointermove", e => {
+      if (!active) return;
+      const raw = e.clientY - startY;
+      if (raw <= 0) { dist = 0; ind.style.opacity = 0; return; }
+      dist = rubber(raw, 260);                       // 당길수록 뻑뻑하게
+      ind.style.opacity = String(Math.min(1, dist / 52));
+      ind.style.transform = `translateY(${dist * .55}px) rotate(${dist * 2.6}deg)`;
+    });
+    function end() {
+      if (!active) return;
+      active = false;
+      if (dist > 58) {
+        busy = true;
+        ind.classList.add("spin");
+        ind.style.opacity = 1;
+        ind.style.transform = "translateY(30px)";
+        setTimeout(() => {
+          ind.classList.remove("spin");
+          ind.style.opacity = 0; ind.style.transform = "";
+          busy = false;
+          toast("최신 상태입니다 · 5건");
+        }, 1100);
+      } else {
+        ind.style.opacity = 0; ind.style.transform = "";
+      }
+    }
+    scr.addEventListener("pointerup", end);
+    scr.addEventListener("pointercancel", end);
+  })();
+
+  /* ── 시트 ────────────────────────────────────────────────────── */
+  const sheet = $("#sheet"), scrim = $("#scrim");
+  const sheetH = () => sheet.getBoundingClientRect().height || 320;
+  const sheetSpring = Spring(1, p => {
+    sheet.style.transform = `translate3d(0,${p * 100}%,0)`;
+    scrim.style.opacity = String(Math.max(0, 1 - p));
+  });
+  let sheetOpen = false;
+
+  function openSheet(title, build) {
+    $("#sheetTitle").textContent = title;
+    const body = $("#sheetBody");
+    body.textContent = "";
+    build(body);
+    sheet.classList.add("is-open");
+    scrim.classList.add("is-on");
+    sheetOpen = true;
+    sheetSpring.set(1);
+    // 던져 올린 게 아니라 올라오는 표면이므로 아주 살짝만 튕긴다.
+    sheetSpring.to(0, { damping: 0.86, response: 0.34 });
+  }
+  function closeSheet(vel = null) {
+    if (!sheetOpen) return;
+    sheetSpring.to(1, {
+      damping: 1, response: 0.3, velocity: vel,
+      done: () => {
+        sheet.classList.remove("is-open");
+        scrim.classList.remove("is-on");
+        sheetOpen = false;
+      }
+    });
+  }
+  scrim.addEventListener("click", () => closeSheet());
+
+  (() => {
+    const grab = $("#grabber");
+    let active = false, startY = 0, hist = [];
+    grab.addEventListener("pointerdown", e => {
+      active = true; startY = e.clientY; hist = [[e.clientY, performance.now()]];
+      grab.setPointerCapture(e.pointerId);
+      sheetSpring.stop();
+    });
+    grab.addEventListener("pointermove", e => {
+      if (!active) return;
+      e.preventDefault();
+      const h = sheetH();
+      let p = (e.clientY - startY) / h;
+      if (p < 0) p = rubber(p, 1);          // 위로는 저항
+      hist.push([e.clientY, performance.now()]);
+      if (hist.length > 6) hist.shift();
+      sheetSpring.track(Math.max(-0.06, p), vel() / h);
+    });
+    function vel() {
+      if (hist.length < 2) return 0;
+      const [y0, t0] = hist[0], [y1, t1] = hist[hist.length - 1];
+      const dt = (t1 - t0) / 1000;
+      return dt > 0 ? (y1 - y0) / dt : 0;
+    }
+    function up() {
+      if (!active) return;
+      active = false;
+      const h = sheetH(), v = vel();
+      const projected = sheetSpring.value + project(v) / h;
+      if (projected > 0.4 || v > 520) closeSheet(v / h);
+      else sheetSpring.to(0, { damping: 1, response: 0.32, velocity: v / h });
+    }
+    grab.addEventListener("pointerup", up);
+    grab.addEventListener("pointercancel", up);
+  })();
+
+  /* ── 질문 화면 ───────────────────────────────────────────────── */
+  const SUGGEST = [
+    "체크아웃 시간 언제야?",
+    "3일차 일정 뭐야?",
+    "투어 환불 되나?",
+    "귀국편 몇 시야?",
+    "렌터카 픽업 시간은?",
+    "내 여권 번호 뭐야?"
+  ];
+
+  const thread = $("#thread");
+  const history = [];
+
+  function pushBubble(who, text, cls = "") {
+    const b = el("div", `bubble ${who} ${cls}`);
+    b.textContent = text;
+    thread.append(b);
+    return b;
+  }
+  function scrollThread() {
+    const s = $('.screen[data-screen="ask"]');
+    s.scrollTop = s.scrollHeight;
+  }
+
+  async function respond(q) {
+    const typing = el("div", "bubble bot typing");
+    typing.append(el("i"), el("i"), el("i"));
+    thread.append(typing);
+    scrollThread();
+
+    try {
+      const res = await api.ask(q, history.slice(-8));
+      typing.remove();
+
+      if (res.tools_used && res.tools_used.length) {
+        const tl = el("div", "toolline");
+        tl.textContent = `[${res.tools_used.join(" → ")}]`;
+        thread.append(tl);
+      }
+
+      const refused = /확인할 수 없|찾을 수 없|정보가 없/.test(res.answer);
+      const bubble = pushBubble("bot", res.answer, refused ? "refuse" : "");
+
+      if (res.sources && res.sources.length) {
+        const btn = el("button", "srcbtn");
+        btn.textContent = `근거 ${res.sources.length}건 보기`;
+        btn.addEventListener("click", () => showSources(res.sources));
+        bubble.append(document.createElement("br"), btn);
+      }
+
+      history.push({ role: "user", content: q });
+      history.push({ role: "assistant", content: res.answer });
+    } catch (err) {
+      typing.remove();
+      pushBubble("bot", `${err.message}\n잠시 후 다시 시도해 주세요.`, "refuse");
+    }
+    scrollThread();
+  }
+
+  function showSources(list) {
+    openSheet("이 답변의 근거", body => {
+      list.forEach(s => {
+        const it = el("div", "srcitem");
+        const kind = KIND[s.type] || { color: "var(--ink-3)" };
+        it.style.setProperty("--kind", kind.color);
+        const bar = el("div", "bar");
+        const mid = el("div"); mid.style.flex = "1"; mid.style.minWidth = "0";
+        const t = el("div", "t");
+        t.textContent = s.confirmation_number
+          ? `${s.provider} · ${s.confirmation_number}` : (s.provider || "출처 미상");
+        const f = el("div", "f"); f.textContent = s.source_file || "";
+        mid.append(t, f);
+        const sim = el("div", "sim");
+        sim.textContent = typeof s.similarity === "number" ? s.similarity.toFixed(3) : "";
+        it.append(bar, mid, sim);
+        body.append(it);
+      });
+      const n = el("p", "note");
+      n.style.padding = "12px 0 0";
+      n.textContent = "유사도가 임계값(절대 0.20 · 1위 대비 0.75)을 넘은 근거만 답변에 사용합니다.";
+      body.append(n);
+    });
+  }
+
+  $("#composer").addEventListener("submit", e => {
+    e.preventDefault();
+    const input = $("#qInput");
+    const q = input.value.trim();
+    if (!q) return;
+    input.value = "";
+    pushBubble("me", q);
+    scrollThread();
+    respond(q);
+  });
+
+  (() => {
+    const host = $("#chips");
+    SUGGEST.forEach(s => {
+      const c = el("button", "chip");
+      c.type = "button";
+      c.textContent = s;
+      c.addEventListener("click", () => {
+        pushBubble("me", s); scrollThread(); respond(s);
+      });
+      host.append(c);
+    });
+  })();
+
+  /* ── 메일 화면 ───────────────────────────────────────────────── */
+  function renderMail() {
+    const host = $("#mailList");
+    host.textContent = "";
+    if (!MAILS.length) {
+      const n = el("p", "note");
+      n.textContent = "인덱싱된 메일이 없습니다.";
+      host.append(n);
+      return;
+    }
+    MAILS.forEach(m => {
+      const r = el("div", "mailrow");
+      const kind = KIND[m.kind] || { color: "var(--ink-3)" };
+      r.style.setProperty("--kind", kind.color);
+      const d = el("div", "dot");
+      const n = el("div", "name"); n.textContent = m.file;
+      const s = el("div", "state"); s.textContent = "인덱싱됨";
+      r.append(d, n, s);
+      host.append(r);
+    });
+  }
+
+  const filePicker = document.createElement("input");
+  filePicker.type = "file";
+  filePicker.accept = ".txt,.eml";
+  filePicker.multiple = true;
+  filePicker.style.display = "none";
+  document.body.appendChild(filePicker);
+
+  filePicker.addEventListener("change", async () => {
+    if (!filePicker.files.length) return;
+    const count = filePicker.files.length;
+    closeSheet();
+    toast(`${count}건 인덱싱 중… 메일당 LLM 1회`);
+    try {
+      const started = await api.index(filePicker.files);
+      if (started.state === "done") {
+        toast(started.rejected.length ? "지원하지 않는 형식입니다" : "새로운 메일이 없습니다");
+      } else {
+        await pollIndexing(started.total);
+      }
+    } catch (err) {
+      toast(err.message);
+    }
+    filePicker.value = "";
+  });
+
+  // 데스크톱에서는 끌어다 놓기가 자연스럽다. 메일 화면 전체를 놓는 곳으로 쓴다.
+  (() => {
+    const screen = document.querySelector('.screen[data-screen="mail"]');
+    const stop = e => { e.preventDefault(); e.stopPropagation(); };
+
+    ["dragenter", "dragover"].forEach(type =>
+      screen.addEventListener(type, e => {
+        stop(e);
+        screen.querySelector(".dropzone")?.classList.add("is-over");
+      }));
+    ["dragleave", "drop"].forEach(type =>
+      screen.addEventListener(type, e => {
+        stop(e);
+        screen.querySelector(".dropzone")?.classList.remove("is-over");
+      }));
+
+    screen.addEventListener("drop", async e => {
+      const files = [...(e.dataTransfer?.files || [])];
+      if (!files.length) return;
+      toast(`${files.length}건 인덱싱 중… 메일당 LLM 1회`);
+      try {
+        const started = await api.index(files);
+        if (started.state === "done") toast("새로운 메일이 없습니다");
+        else await pollIndexing(started.total);
+      } catch (err) { toast(err.message); }
+    });
+  })();
+
+  // 인덱싱은 오래 걸린다. 상태를 주기적으로 물어 진행 상황을 알린다.
+  async function pollIndexing(total) {
+    const started = Date.now();
+    while (Date.now() - started < 10 * 60 * 1000) {
+      await new Promise(r => setTimeout(r, 2500));
+      let s;
+      try { s = await api.indexStatus(); } catch { continue; }
+
+      if (s.state === "running") {
+        toast(`인덱싱 중… ${total}건`);
+        continue;
+      }
+      if (s.state === "error") { toast(`인덱싱 실패: ${s.error}`); return; }
+
+      await loadBookings();
+      const added = (s.indexed || []).length;
+      toast(added ? `${added}건 인덱싱 완료` : "새로운 메일이 없습니다");
+      return;
+    }
+    toast("인덱싱이 오래 걸립니다. 잠시 후 새로고침해 주세요");
+  }
+
+  $("#addMail").addEventListener("click", () => {
+    openSheet("메일 추가", body => {
+      const d = el("button", "drop dropzone");
+      d.style.width = "100%";
+      d.style.cursor = "pointer";
+      d.style.background = "none";
+      d.style.fontFamily = "inherit";
+      const b = el("b"); b.textContent = "눌러서 파일 선택";
+      d.append(b, document.createTextNode(".txt 또는 .eml · 여러 개 한 번에"));
+      d.addEventListener("click", () => filePicker.click());
+      const n = el("p", "note");
+      n.style.padding = "12px 0 0";
+      n.textContent = "본문 해시를 비교해 이미 넣은 메일은 건너뜁니다.";
+      body.append(d, n);
+    });
+  });
+
+  /* ── 설정 ────────────────────────────────────────────────────── */
+  $("#themeSeg").addEventListener("click", e => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    document.querySelectorAll("#themeSeg button").forEach(x => x.classList.remove("on"));
+    b.classList.add("on");
+    const v = b.dataset.themeSet;
+    if (v === "auto") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", v);
+  });
+
+  $("#resetBtn").addEventListener("click", () => {
+    openSheet("인덱스를 비울까요?", body => {
+      const p = el("p", "note");
+      p.style.padding = "0 0 14px";
+      p.textContent = "저장된 예약과 업로드한 메일이 모두 삭제됩니다. 되돌릴 수 없습니다.";
+      const yes = el("button", "bigbtn danger");
+      yes.textContent = "비우기";
+      yes.addEventListener("click", async () => {
+        closeSheet();
+        try { await api.clear(); await loadBookings(); toast("인덱스를 비웠습니다"); }
+        catch (err) { toast(err.message); }
+      });
+      const no = el("button", "bigbtn ghost");
+      no.textContent = "취소";
+      no.addEventListener("click", () => closeSheet());
+      body.append(p, yes, no);
+    });
+  });
+
+  /* ── PWA ─────────────────────────────────────────────────────── */
+  if ("serviceWorker" in navigator) {
+    // 루트에서 서빙되므로 사이트 전체를 제어한다.
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  }
+
+  let installPrompt = null;
+  window.addEventListener("beforeinstallprompt", e => {
+    e.preventDefault();
+    installPrompt = e;
+  });
+  $("#installBtn").addEventListener("click", async () => {
+    if (installPrompt) { installPrompt.prompt(); installPrompt = null; }
+    else toast("브라우저 메뉴 → 홈 화면에 추가");
+  });
+
+  /* ── 부팅 ────────────────────────────────────────────────────── */
+  async function loadBookings() {
+    try {
+      const data = await api.bookings();
+      BOOKINGS = data.items;
+      MAILS = data.items.map(b => ({ file: b.source_file, kind: b.kind }));
+      if (data.trip_start) TRIP_START = data.trip_start;
+
+      TITLES.trip[1] = data.trip_start
+        ? `${data.trip_start.slice(5).replace("-", ".")} – ${(data.trip_end || "").slice(5).replace("-", ".")}`
+        : "예약 없음";
+      TITLES.mail[1] = `${data.count}건 인덱싱됨`;
+      if (current === "trip") $("#barSub").textContent = TITLES.trip[1];
+      if (current === "mail") $("#barSub").textContent = TITLES.mail[1];
+
+      document.getElementById("tripStartValue").textContent = data.trip_start || "—";
+      document.getElementById("bookingCountValue").textContent =
+        data.count ? `${data.count}건` : "없음";
+
+      renderTrip();
+      renderMail();
+      return data;
+    } catch (err) {
+      const host = $("#tripList");
+      host.textContent = "";
+      const box = el("div", "drop");
+      const b = el("b"); b.textContent = "서버에 연결할 수 없습니다";
+      box.append(b, document.createTextNode(err.message));
+      host.append(box);
+      throw err;
+    }
+  }
+
+  detailSpring.set(1);
+  sheetSpring.set(1);
+
+  loadBookings()
+    .then(data => {
+      pushBubble("bot", data.count
+        ? `예약 ${data.count}건을 읽었습니다. 일정·시간·환불 규정을 물어보세요.\n답할 근거가 없으면 지어내지 않고 없다고 답합니다.`
+        : "아직 인덱싱된 예약이 없습니다. 메일 탭에서 예약 확인 메일을 넣어주세요.");
+    })
+    .catch(() => {
+      pushBubble("bot", "서버에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.", "refuse");
+    });
+})();
+</script>
+
+</body>
+</html>

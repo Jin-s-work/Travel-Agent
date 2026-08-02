@@ -1,0 +1,15 @@
+# Render 블루프린트. 대시보드에서 이 저장소를 연결하면 자동으로 읽힙니다.
+# 키는 여기 적지 않습니다. sync: false 는 "대시보드에서 직접 입력" 표시입니다.
+
+services:
+  - type: web
+    name: travel-inbox-rag
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: TAVILY_API_KEY
+        sync: false
