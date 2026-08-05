@@ -276,6 +276,22 @@ def test_index_emails_uses_seed_without_calling_llm(monkeypatch):
     assert [m["type"] for m in store.added] == ["렌터카", "투어"]
 
 
+def test_deploy_image_includes_seed_and_its_emails():
+    """이미지에 시드나 원본 메일이 빠지면 배포 환경에서만 조용히 실패한다.
+
+    실제로 seed/와 tests/를 빠뜨려 데모 링크가 빈 화면이 된 적이 있다.
+    """
+    dockerfile = Path("Dockerfile").read_text(encoding="utf-8")
+    dockerignore = Path(".dockerignore").read_text(encoding="utf-8")
+
+    for path in ("seed/", "tests/sample_emails/", "tests/demo_emails/"):
+        assert f"COPY --chown=user {path}" in dockerfile, f"{path}가 이미지에 복사되지 않습니다"
+
+    # tests/ 전체를 제외하고 있으므로 두 디렉터리는 되살려 놓아야 한다.
+    for path in ("tests/sample_emails/", "tests/demo_emails/"):
+        assert f"!{path}" in dockerignore, f"{path}가 .dockerignore에서 되살아나지 않습니다"
+
+
 def _seed_entries() -> list[dict]:
     assert SEED_FILE.is_file(), f"시드 파일이 없습니다: {SEED_FILE}"
     return json.loads(SEED_FILE.read_text(encoding="utf-8"))["emails"]
