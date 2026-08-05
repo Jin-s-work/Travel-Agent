@@ -133,6 +133,35 @@ class VectorStore:
             return None, None
         return min(starts), max(ends)
 
+    def reservations_on_date(self, day: str) -> list[dict]:
+        """그 날짜에 걸치는 예약을 모두 반환한다.
+
+        의미 검색이 아니라 메타데이터 범위 필터를 쓴다. "둘째 날 일정" 같은
+        질문에서 날짜 문자열은 청크 본문과 유사도가 낮아 검색으로는 누락된다.
+        숙박처럼 기간이 있는 예약도 중간 날짜에 걸리도록 시작·종료를 함께 본다.
+        """
+        target = _to_int(day)
+        if target is None or self.count() == 0:
+            return []
+
+        records = self._collection.get(
+            where={
+                "$and": [
+                    {"date_start_int": {"$lte": target}},
+                    {"date_end_int": {"$gte": target}},
+                ]
+            },
+            include=["metadatas", "documents"],
+        )
+
+        by_source: dict[str, dict] = {}
+        for index, metadata in enumerate(records["metadatas"]):
+            source = metadata.get("source_file")
+            if source and source not in by_source:
+                by_source[source] = {**metadata, "document": records["documents"][index]}
+
+        return sorted(by_source.values(), key=lambda m: (m.get("time") or "99:99"))
+
     def all_reservations(self) -> list[dict]:
         """인덱싱된 예약을 날짜순으로 반환한다(요약 카드용).
 
@@ -172,6 +201,14 @@ class VectorStore:
             configuration={"hnsw": {"space": DISTANCE_METRIC}},
             embedding_function=None,
         )
+
+
+def _to_int(day: str | None) -> int | None:
+    """'2026-10-13' → 20261013. 형식이 다르면 None."""
+    if not day:
+        return None
+    digits = day.replace("-", "").strip()
+    return int(digits) if len(digits) == 8 and digits.isdigit() else None
 
 
 def _apply_threshold(hits: list[dict], min_similarity: float | None) -> list[dict]:

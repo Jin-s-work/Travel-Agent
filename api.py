@@ -8,7 +8,9 @@ from __future__ import annotations
 
 import mimetypes
 import re
+import sys
 import threading
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import BackgroundTasks, FastAPI, File, HTTPException, UploadFile
@@ -16,7 +18,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from src.config import EMAILS_DIR, PROJECT_ROOT, SUPPORTED_EXTENSIONS
+from src.config import EMAILS_DIR, PROJECT_ROOT, SEED_ON_EMPTY, SUPPORTED_EXTENSIONS
 
 WEB_DIR = PROJECT_ROOT / "web"
 
@@ -25,7 +27,24 @@ WEB_DIR = PROJECT_ROOT / "web"
 mimetypes.add_type("application/javascript", ".js")
 mimetypes.add_type("application/manifest+json", ".webmanifest")
 
-app = FastAPI(title="Travel Inbox RAG", docs_url="/api/docs", openapi_url="/api/openapi.json")
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    """기동 직후 인덱스가 비어 있으면 데모 예약으로 채운다.
+
+    Render 무료 티어는 디스크가 영구 저장이 아니라 재시작하면 인덱스가 사라진다.
+    서버 기동을 막지 않도록 별도 스레드에서 돌린다.
+    """
+    if SEED_ON_EMPTY:
+        threading.Thread(target=_run_seeding, name="seed", daemon=True).start()
+    yield
+
+
+app = FastAPI(
+    title="Travel Inbox RAG",
+    docs_url="/api/docs",
+    openapi_url="/api/openapi.json",
+    lifespan=lifespan,
+)
 
 
 # ---------------------------------------------------------------- 지연 로딩
@@ -38,6 +57,10 @@ _agent = None
 # (KeyError in shared_system_client). 초기화 구간을 한 번만 통과시킨다.
 _store_lock = threading.Lock()
 _agent_lock = threading.Lock()
+
+# 인덱싱은 한 번에 하나만 돈다. 기동 시 시딩과 사용자 업로드가 겹치면
+# 같은 메일을 두 번 임베딩하게 된다.
+_index_lock = threading.Lock()
 
 # 인덱싱 작업 상태. 워커 1개를 전제로 프로세스 메모리에 둔다.
 # 여러 워커로 늘리면 외부 저장소(Redis 등)로 옮겨야 한다.
@@ -211,12 +234,30 @@ def ask(body: AskRequest) -> dict:
     }
 
 
+def _run_seeding() -> None:
+    """인덱스가 비어 있으면 시드로 채운다. 실패해도 서버는 계속 뜬다."""
+    from src.seed import seed_if_empty
+
+    try:
+        with _index_lock:
+            result = seed_if_empty(store=store())
+    except Exception as error:  # 키 누락·네트워크 오류 등
+        print(f"시드 실패: {type(error).__name__}: {error}", file=sys.stderr, flush=True)
+        return
+
+    if result["seeded"]:
+        print(f"시드 완료: 청크 {result['total_chunks']}개", file=sys.stderr, flush=True)
+    else:
+        print(f"시드 건너뜀: {result['reason']}", file=sys.stderr, flush=True)
+
+
 def _run_indexing(filenames: list[str]) -> None:
     """백그라운드에서 인덱싱을 수행하고 진행 상황을 기록한다."""
     from src.indexer import index_emails
 
     try:
-        summary = index_emails(store=store())
+        with _index_lock:
+            summary = index_emails(store=store())
         with _job_lock:
             _job.update(
                 state="done",

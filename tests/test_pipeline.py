@@ -3,17 +3,18 @@
 LLM이나 임베딩 API를 호출하지 않으므로 빠르고 비용이 들지 않는다.
 """
 
+import json
 from pathlib import Path
 
 import pytest
 
-from src.config import MIN_SIMILARITY, RESERVATION_TYPES
+from src.config import MIN_SIMILARITY, RESERVATION_TYPES, SEED_FILE
 from src.evaluate import _is_refusal
-from src.indexer import _chunk, _split_date_range, _to_int, build_metadata, build_search_text
+from src.indexer import _chunk, _hash, _split_date_range, _to_int, build_metadata, build_search_text
 from src.loader import read_email_file
 from src.parser import _coerce_time, _correct_type, _normalize, infer_type, FIELDS
 from src.rag import detect_reservation_type
-from src.store import _apply_threshold, _clean_metadata
+from src.store import _apply_threshold, _clean_metadata, _to_int as _date_to_int
 
 
 # --------------------------------------------------------------- parser
@@ -178,6 +179,106 @@ def test_apply_threshold_keeps_close_second_place():
 def test_apply_threshold_disabled_returns_all():
     hits = [_hit("a", 0.40), _hit("b", 0.01)]
     assert _apply_threshold(hits, None) == hits
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        ("2026-10-13", 20261013),
+        ("20261013", 20261013),
+        ("2026-10", None),      # 자릿수가 모자라면 범위 비교가 어긋난다
+        ("내일", None),
+        ("", None),
+        (None, None),
+    ],
+)
+def test_store_to_int(value, expected):
+    assert _date_to_int(value) == expected
+
+
+# --------------------------------------------------------------- 시드
+def test_seed_file_covers_every_demo_email():
+    """시드에 빠진 메일이 있으면 기동 시 그 메일만 LLM 파싱이 일어난다."""
+    entries = {item["filename"]: item for item in _seed_entries()}
+    assert set(entries) == set(EXPECTED_TYPES)
+
+
+def test_seed_hashes_match_current_emails():
+    """메일을 고치고 시드를 다시 만들지 않으면 해시가 어긋나 시드가 무시된다."""
+    for item in _seed_entries():
+        path = next(d / item["filename"] for d in EMAIL_DIRS
+                    if (d / item["filename"]).exists())
+        assert item["content_hash"] == _hash(read_email_file(str(path))), (
+            f"{item['filename']}의 시드가 낡았습니다. python -m src.seed --build 를 실행하세요."
+        )
+
+
+def test_seed_entries_are_usable():
+    """시드 값이 그대로 인덱싱되므로 종류와 날짜는 채워져 있어야 한다."""
+    for item in _seed_entries():
+        parsed = item["parsed"]
+        assert parsed["type"] == EXPECTED_TYPES[item["filename"]]
+        assert parsed["provider"], f"{item['filename']}에 provider가 없습니다"
+        assert _split_date_range(parsed["date"])[0], f"{item['filename']}에 날짜가 없습니다"
+
+
+def test_load_seed_keys_by_content_hash():
+    """인덱서는 해시로 시드를 찾는다. 파일명이 아니라 내용이 기준이다."""
+    from src.seed import load_seed
+
+    cache = load_seed()
+    assert cache, "시드가 비어 있습니다"
+    for item in _seed_entries():
+        assert cache[item["content_hash"]] == item["parsed"]
+
+
+class _FakeStore:
+    """index_emails가 쓰는 최소 인터페이스만 흉내낸다."""
+
+    def __init__(self):
+        self.added: list[dict] = []
+
+    def indexed_sources(self):
+        return {}
+
+    def delete_by_source(self, source_file):
+        pass
+
+    def add(self, ids, documents, embeddings, metadatas):
+        self.added = list(metadatas)
+        return len(ids)
+
+    def count(self):
+        return len(self.added)
+
+
+def test_index_emails_uses_seed_without_calling_llm(monkeypatch):
+    """시드 해시가 맞으면 LLM 파싱이 일어나면 안 된다.
+
+    기동할 때마다 파싱하면 비용이 들고 값이 또 흔들린다. 시드를 두는 이유가 없어진다.
+    """
+    import src.indexer as indexer
+    from src.seed import load_seed
+
+    def explode(*_args, **_kwargs):
+        raise AssertionError("시드가 있는데 LLM 파싱이 호출됐습니다")
+
+    monkeypatch.setattr(indexer, "parse_reservation", explode)
+    # 임베딩도 네트워크를 타므로 차단한다. 차원은 아무 값이나 상관없다.
+    monkeypatch.setattr(indexer, "embed_texts", lambda texts: [[0.0] for _ in texts])
+
+    store = _FakeStore()
+    summary = indexer.index_emails(
+        directory=Path("tests/demo_emails"), store=store, parse_cache=load_seed()
+    )
+
+    assert summary["indexed"] == ["06_hakone_rentcar.eml", "07_asakusa_tour.eml"]
+    assert [m["type"] for m in store.added] == ["렌터카", "투어"]
+
+
+def _seed_entries() -> list[dict]:
+    assert SEED_FILE.is_file(), f"시드 파일이 없습니다: {SEED_FILE}"
+    return json.loads(SEED_FILE.read_text(encoding="utf-8"))["emails"]
 
 
 def test_clean_metadata_drops_none_and_empty():

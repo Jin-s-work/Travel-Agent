@@ -1472,9 +1472,13 @@
         it.append(bar, mid, sim);
         body.append(it);
       });
+      // 날짜로 뽑은 근거에는 유사도가 없다. 그때까지 임계값 설명을 띄우면 틀린 말이 된다.
+      const scored = list.some(s => typeof s.similarity === "number");
       const n = el("p", "note");
       n.style.padding = "12px 0 0";
-      n.textContent = "유사도가 임계값(절대 0.20 · 1위 대비 0.75)을 넘은 근거만 답변에 사용합니다.";
+      n.textContent = scored
+        ? "유사도가 임계값(절대 0.20 · 1위 대비 0.75)을 넘은 근거만 답변에 사용합니다."
+        : "해당 날짜에 걸치는 예약을 전부 가져왔습니다. 유사도로 거르지 않습니다.";
       body.append(n);
     });
   }

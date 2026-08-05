@@ -27,12 +27,18 @@ SYSTEM_PROMPT = f"""너는 사용자의 여행 예약을 관리하는 어시스�
 - 예약 메일에 있을 리 없는 **일반 여행 정보**(현지 날씨, 환율, 관광지 추천,
   일반적인 수하물 규정, 교통편 안내) → web_search 를 쓴다.
 - "둘째 날", "3일차"처럼 **여행 N일차**가 나오면 먼저 resolve_trip_day 로
-  실제 날짜를 구한 뒤, 그 날짜로 search_bookings 를 호출한다.
+  실제 날짜를 구한다.
+- **하루치 일정 전체**를 묻는 질문("둘째 날 일정 뭐야", "10월 13일에 뭐 있어")
+  → bookings_on_date 를 쓴다. search_bookings 는 상위 몇 건만 돌려주므로
+  그날 예약이 누락된다. 특정 항목 하나("그날 숙소 체크인 몇 시")를 물을
+  때만 search_bookings 를 쓴다.
 - 단순 인사나 잡담 → 도구 없이 바로 답한다.
 
 답변 규칙:
-- search_bookings 결과에 없는 내용을 지어내지 않는다. 도구가
+- 도구 결과에 없는 내용을 지어내지 않는다. 도구가
   "{NO_INFO_MESSAGE}"라고 하면 그대로 전달하고, 아는 척 보충하지 않는다.
+- bookings_on_date 가 여러 건을 돌려주면 **하나도 빼놓지 않고** 전한다.
+  "숙박 정보만 있다"처럼 목록에 있는 항목을 누락한 채 단정하지 않는다.
 - 여권번호·비자·결제카드 정보처럼 예약 확인 메일에 없는 개인정보는
   절대 추측하지 않는다.
 - search_bookings 로 답했으면 도구가 준 출처 표시를 답변에 유지한다.
@@ -76,6 +82,48 @@ def search_bookings(query: str) -> str:
     if not result["used_context"]:
         return NO_INFO_MESSAGE
     return result["answer"]
+
+
+@tool
+def bookings_on_date(day: str) -> str:
+    """특정 날짜의 예약을 빠짐없이 모두 나열한다.
+
+    "그날 일정", "둘째 날 뭐 있어" 처럼 **날짜 기준으로 전체 목록**이 필요할 때
+    쓴다. search_bookings 는 의미가 가까운 상위 몇 건만 돌려주므로 하루치
+    일정을 묻는 질문에는 빠지는 예약이 생긴다.
+
+    Args:
+        day: 'YYYY-MM-DD' 형식의 날짜. resolve_trip_day 결과를 그대로 넣는다.
+    """
+    global _last_sources
+
+    records = _store().reservations_on_date(day)
+    _last_sources = [
+        {
+            "source_file": record.get("source_file"),
+            "type": record.get("type"),
+            "provider": record.get("provider"),
+            "confirmation_number": record.get("confirmation_number"),
+            "similarity": None,  # 유사도가 아니라 날짜 필터로 뽑은 결과다
+        }
+        for record in records
+    ]
+
+    if not records:
+        return f"{day}에 해당하는 예약이 없습니다."
+
+    lines = [f"{day} 예약 {len(records)}건:"]
+    for record in records:
+        span = record.get("date")
+        if record.get("date_end") and record["date_end"] != record.get("date"):
+            span = f"{record['date']} ~ {record['date_end']}"
+        lines.append(
+            f"- [{record.get('type') or '미상'}] {record.get('provider') or '제공처 미상'}"
+            f" / 기간 {span} / 시각 {record.get('time') or '미상'}"
+            f" / 장소 {record.get('location') or '미상'}"
+            f" / 예약번호 {record.get('confirmation_number') or '없음'}"
+        )
+    return "\n".join(lines)
 
 
 @tool
@@ -157,10 +205,10 @@ def _store() -> VectorStore:
 
 @lru_cache(maxsize=1)
 def build_agent():
-    """도구 3개를 가진 에이전트를 만든다."""
+    """도구 4개를 가진 에이전트를 만든다."""
     return create_agent(
         model=f"openai:{AGENT_MODEL}",
-        tools=[search_bookings, web_search, resolve_trip_day],
+        tools=[search_bookings, bookings_on_date, web_search, resolve_trip_day],
         system_prompt=SYSTEM_PROMPT,
     )
 
