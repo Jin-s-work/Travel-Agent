@@ -1,9 +1,10 @@
-.PHONY: help install run index ask eval test clean
+.PHONY: help install run index seed ask eval test clean
 
 help:
 	@echo "make install   의존성 설치"
 	@echo "make serve     웹앱 실행 (http://localhost:8000)"
 	@echo "make index     샘플 메일 인덱싱"
+	@echo "make seed      데모 메일을 다시 파싱해 시드 갱신 (LLM 호출)"
 	@echo "make ask Q=... 질문 하나 던지기"
 	@echo "make eval      평가 실행"
 	@echo "make test      테스트 실행"
@@ -17,6 +18,9 @@ serve:
 
 index:
 	python -m src.indexer --sample
+
+seed:
+	python -m src.seed --build
 
 ask:
 	@python -m src.agent "$(Q)"

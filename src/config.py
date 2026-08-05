@@ -11,7 +11,17 @@ load_dotenv()
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 EMAILS_DIR = PROJECT_ROOT / "data" / "emails"
 SAMPLE_EMAILS_DIR = PROJECT_ROOT / "tests" / "sample_emails"
+DEMO_EMAILS_DIR = PROJECT_ROOT / "tests" / "demo_emails"
 CHROMA_DIR = PROJECT_ROOT / "data" / "chroma"
+
+# --- 시드 ---
+# 배포 환경(Render 무료 티어)은 디스크가 영구 저장이 아니라 재시작하면 인덱스가
+# 사라진다. 데모 링크가 빈 화면이 되지 않도록, 인덱스가 비어 있으면 미리 파싱해 둔
+# 결과로 자동으로 채운다. 파싱 결과를 저장소에 넣어 두므로 기동 시 LLM 호출은 없고
+# 임베딩만 한다.
+SEED_FILE = PROJECT_ROOT / "seed" / "parsed.json"
+SEED_SOURCE_DIRS = (SAMPLE_EMAILS_DIR, DEMO_EMAILS_DIR)
+SEED_ON_EMPTY = os.getenv("SEED_ON_EMPTY", "1").lower() not in ("0", "false", "no")
 
 # --- LLM ---
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")

@@ -29,11 +29,15 @@ def index_emails(
     directory: str | Path | None = None,
     store: VectorStore | None = None,
     force: bool = False,
+    parse_cache: dict[str, dict] | None = None,
 ) -> dict:
     """디렉터리의 메일을 인덱싱한다.
 
     이미 인덱싱된 메일은 건너뛴다. 파일 내용이 바뀌면(해시 불일치) 다시 인덱싱한다.
     force=True면 전부 다시 인덱싱한다.
+
+    parse_cache는 content_hash를 키로 하는 추출 결과다. 해시가 맞으면 LLM을
+    호출하지 않고 그대로 쓴다(시드 인덱싱에 쓰인다).
     """
     store = store or VectorStore()
     emails = load_emails(directory)
@@ -52,8 +56,12 @@ def index_emails(
             skipped.append(filename)
             continue
 
-        print(f"  파싱 중: {filename}", file=sys.stderr, flush=True)
-        parsed = parse_reservation(email["raw_text"])
+        parsed = (parse_cache or {}).get(content_hash)
+        if parsed is None:
+            print(f"  파싱 중: {filename}", file=sys.stderr, flush=True)
+            parsed = parse_reservation(email["raw_text"])
+        else:
+            print(f"  시드 사용: {filename}", file=sys.stderr, flush=True)
         metadata = build_metadata(parsed, filename, content_hash)
         chunks = _chunk(build_search_text(parsed))
 
