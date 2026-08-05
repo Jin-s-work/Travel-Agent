@@ -139,7 +139,8 @@ def parse_reservation(raw_text: str, model: str = EXTRACTION_MODEL) -> dict:
             },
         },
     )
-    return _normalize(json.loads(response.choices[0].message.content))
+    parsed = _normalize(json.loads(response.choices[0].message.content))
+    return _correct_type(parsed, raw_text)
 
 
 # \b는 '11:00까지'처럼 뒤에 한글이 붙으면 경계로 잡히지 않으므로 숫자 룩어라운드를 쓴다.
@@ -161,6 +162,68 @@ def _coerce_time(value: str | None) -> str | None:
     if len(times) == 1:
         return times[0]
     return f"{times[0]} ~ {times[-1]}"
+
+
+# 원문에서 예약 종류를 가리키는 신호. LLM 분류가 흔들릴 때 바로잡는 데 쓴다
+# (같은 메일이 실행마다 '투어'와 '항공'을 오가는 일이 실제로 있었다).
+# 각 그룹은 서로 겹치지 않는 표현으로만 구성한다.
+_TYPE_SIGNALS: dict[str, tuple[re.Pattern, ...]] = {
+    "항공": (
+        re.compile(r"\b[A-Z]{2}\s?\d{2,4}\b"),          # 편명 KE703, NH 867
+        re.compile(r"e-?ticket|항공권|탑승|boarding|PNR", re.I),
+        re.compile(r"\b(ICN|NRT|HND|GMP|KIX|CTS|FUK)\b"),
+        re.compile(r"위탁\s*수하물|checked\s*baggage", re.I),
+    ),
+    "숙소": (
+        re.compile(r"체크인|check-?in", re.I),
+        re.compile(r"체크아웃|check-?out", re.I),
+        re.compile(r"\d\s*박|\d\s*nights?\b", re.I),
+        re.compile(r"객실|room\s*type|숙박세", re.I),
+    ),
+    "렌터카": (
+        re.compile(r"렌터카|렌트카|car\s*rental", re.I),
+        re.compile(r"픽업.*반납|반납.*픽업", re.S),
+        re.compile(r"면책보상|CDW|국제운전면허", re.I),
+        re.compile(r"차종|만탱크|주행거리", re.I),
+    ),
+    "투어": (
+        re.compile(r"투어|tour\b", re.I),
+        re.compile(r"집합\s*(시간|장소)"),
+        re.compile(r"가이드|guide\b", re.I),
+        re.compile(r"바우처|voucher|액티비티", re.I),
+    ),
+}
+
+
+def infer_type(raw_text: str) -> tuple[str | None, int]:
+    """원문에서 예약 종류를 추정한다. (종류, 일치한 신호 수)를 반환한다.
+
+    1위가 단독이 아니면 판단을 보류한다. 동점을 사전 순으로 깨면 근거 없이
+    한쪽 종류로 쏠린다.
+    """
+    scores = sorted(
+        (
+            (sum(1 for pattern in patterns if pattern.search(raw_text)), kind)
+            for kind, patterns in _TYPE_SIGNALS.items()
+        ),
+        reverse=True,
+    )
+    (top, kind), (runner_up, _) = scores[0], scores[1]
+    return (kind, top) if top > runner_up else (None, 0)
+
+
+def _correct_type(parsed: dict, raw_text: str) -> dict:
+    """LLM이 매긴 종류를 원문 신호와 대조해 필요하면 바로잡는다.
+
+    신호가 2개 이상 잡히고 LLM 결과와 다를 때만 덮어쓴다. 하나만 걸리는 것은
+    지나가는 단어일 수 있어 근거로 삼지 않는다.
+    """
+    inferred, score = infer_type(raw_text)
+    if not inferred:
+        return parsed
+    if parsed.get("type") is None or (score >= 2 and parsed["type"] != inferred):
+        parsed["type"] = inferred
+    return parsed
 
 
 def _normalize(data: dict) -> dict:
