@@ -3,12 +3,15 @@
 LLM이나 임베딩 API를 호출하지 않으므로 빠르고 비용이 들지 않는다.
 """
 
+from pathlib import Path
+
 import pytest
 
 from src.config import MIN_SIMILARITY, RESERVATION_TYPES
 from src.evaluate import _is_refusal
 from src.indexer import _chunk, _split_date_range, _to_int, build_metadata, build_search_text
-from src.parser import _coerce_time, _normalize, FIELDS
+from src.loader import read_email_file
+from src.parser import _coerce_time, _correct_type, _normalize, infer_type, FIELDS
 from src.rag import detect_reservation_type
 from src.store import _apply_threshold, _clean_metadata
 
@@ -47,6 +50,53 @@ def test_normalize_fills_all_fields_and_rejects_unknown_type():
 def test_normalize_truncates_long_snippet():
     result = _normalize({"raw_snippet": "가" * 500})
     assert len(result["raw_snippet"]) <= 301
+
+
+# --------------------------------------------------- 종류 보정 (규칙 기반)
+EMAIL_DIRS = (Path("tests/sample_emails"), Path("tests/demo_emails"))
+EXPECTED_TYPES = {
+    "01_korean_air_outbound.txt": "항공",
+    "02_ana_return.eml": "항공",
+    "03_shinjuku_hotel.txt": "숙소",
+    "04_hakone_ryokan.txt": "숙소",
+    "05_fuji_day_tour.txt": "투어",
+    "06_hakone_rentcar.eml": "렌터카",
+    "07_asakusa_tour.eml": "투어",
+}
+
+
+@pytest.mark.parametrize("filename,expected", sorted(EXPECTED_TYPES.items()))
+def test_infer_type_matches_every_sample_email(filename, expected):
+    """규칙만으로 7건 전부를 맞혀야 LLM 오분류를 되돌릴 근거가 된다."""
+    path = next(d / filename for d in EMAIL_DIRS if (d / filename).exists())
+    assert infer_type(read_email_file(str(path)))[0] == expected
+
+
+def test_correct_type_overrides_confident_misclassification():
+    """실제로 관측된 사례. ANA 귀국편이 '투어'로 분류돼 검색에서 누락됐다."""
+    ana = read_email_file("tests/sample_emails/02_ana_return.eml")
+    assert _correct_type({"type": "투어"}, ana)["type"] == "항공"
+
+
+def test_correct_type_fills_null():
+    tour = read_email_file("tests/demo_emails/07_asakusa_tour.eml")
+    assert _correct_type({"type": None}, tour)["type"] == "투어"
+
+
+def test_correct_type_keeps_llm_answer_without_evidence():
+    """근거가 없으면 LLM 판단을 존중한다. 규칙은 뒤집을 때만 개입한다."""
+    assert _correct_type({"type": "숙소"}, "예약이 확정되었습니다.")["type"] == "숙소"
+
+
+def test_infer_type_abstains_on_tie():
+    """1위가 단독이 아니면 판단을 보류한다. 숙소 1점, 투어 1점."""
+    assert infer_type("체크인 후 투어 안내")[0] is None
+
+
+def test_correct_type_ignores_single_incidental_keyword():
+    """신호가 하나뿐이면 지나가는 단어일 수 있어 뒤집지 않는다."""
+    text = "투어 일정 안내입니다."  # '투어' 하나만 걸린다
+    assert _correct_type({"type": "숙소"}, text)["type"] == "숙소"
 
 
 # --------------------------------------------------------------- indexer

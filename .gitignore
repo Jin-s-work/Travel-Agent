@@ -32,3 +32,5 @@ reports/agent_*.txt
 .DS_Store
 .idea/
 .vscode/
+.claude/
+.cursor/
