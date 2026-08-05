@@ -18,6 +18,11 @@ COPY --chown=user api.py .
 COPY --chown=user src/ ./src/
 COPY --chown=user web/ ./web/
 
+# 인덱스 자동 복구용. 추출 결과와 그 근거가 되는 데모 메일이 함께 있어야 한다.
+COPY --chown=user seed/ ./seed/
+COPY --chown=user tests/sample_emails/ ./tests/sample_emails/
+COPY --chown=user tests/demo_emails/ ./tests/demo_emails/
+
 # 업로드한 메일과 벡터 인덱스가 쌓이는 곳. 영구 저장은 아니다.
 RUN mkdir -p data/emails data/chroma
 

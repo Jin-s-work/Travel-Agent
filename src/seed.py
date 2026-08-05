@@ -47,6 +47,17 @@ def seed_if_empty(store: VectorStore | None = None) -> dict:
         return {"seeded": False, "reason": f"시드 파일이 없습니다: {SEED_FILE}"}
 
     copied = _copy_demo_emails()
+    if not copied:
+        # 배포 이미지에 데모 메일을 넣는 것을 빠뜨리면 여기에 걸린다.
+        # 조용히 넘어가면 데모 링크가 빈 화면이 된 이유를 찾기 어렵다.
+        return {
+            "seeded": False,
+            "reason": (
+                "시드는 있는데 원본 메일을 찾을 수 없습니다: "
+                f"{', '.join(str(d) for d in SEED_SOURCE_DIRS)}"
+            ),
+        }
+
     summary = index_emails(store=store, parse_cache=parse_cache)
 
     # 시드에 없는 메일이 섞여 있으면 LLM 파싱이 일어난다. 그런 경우를 드러낸다.

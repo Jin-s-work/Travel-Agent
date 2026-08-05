@@ -16,3 +16,8 @@ docs/
 deploy/
 tests/
 .DS_Store
+
+# 시드가 참조하는 데모 메일은 이미지에 있어야 한다. 없으면 기동 시
+# 인덱스 자동 복구가 조용히 건너뛰어진다.
+!tests/sample_emails/
+!tests/demo_emails/
