@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from datetime import date, timedelta
 from functools import lru_cache
 
@@ -35,8 +36,11 @@ SYSTEM_PROMPT = f"""너는 사용자의 여행 예약을 관리하는 어시스�
 - 단순 인사나 잡담 → 도구 없이 바로 답한다.
 
 답변 규칙:
+- **도구 이름을 답변에 쓰지 않는다.** "search_bookings 결과:" 같은 말머리를
+  붙이지 않는다. 어떤 도구를 썼는지는 화면이 따로 보여준다.
 - 도구 결과에 없는 내용을 지어내지 않는다. 도구가
-  "{NO_INFO_MESSAGE}"라고 하면 그대로 전달하고, 아는 척 보충하지 않는다.
+  "{NO_INFO_MESSAGE}"라고 하면 **그 문장만** 전한다. 어디서 찾아보라는 조언이나
+  일반적인 설명을 덧붙이지 않는다.
 - bookings_on_date 가 여러 건을 돌려주면 **하나도 빼놓지 않고** 전한다.
   "숙박 정보만 있다"처럼 목록에 있는 항목을 누락한 채 단정하지 않는다.
 - 여권번호·비자·결제카드 정보처럼 예약 확인 메일에 없는 개인정보는
@@ -209,6 +213,28 @@ def build_agent():
     )
 
 
+# 프롬프트로 "도구 이름을 쓰지 마라"라고 해도 모델이 말머리를 붙이는 경우가 있다
+# (실제로 "search_bookings 결과: ..."가 화면에 그대로 나왔다). 지시에만 기대지 않는다.
+_TOOL_NAMES = r"(?:search_bookings|bookings_on_date|web_search|resolve_trip_day)"
+_LABEL = r"(?:\s*(?:결과|응답|출력|result|output))?"
+_TOOL_PREFIX_RE = re.compile(
+    # 괄호로 감싼 형태는 콜론이 없어도 말머리다. 맨 앞의 대괄호는 본문에 쓸 일이 없다.
+    rf"^\s*(?:[\[(]\s*{_TOOL_NAMES}\s*[\])]{_LABEL}\s*[:：]?"
+    # 괄호가 없으면 콜론이 있어야 한다. '시각: 15:00'처럼 멀쩡한 문장을 자르지 않는다.
+    rf"|{_TOOL_NAMES}{_LABEL}\s*[:：])\s*",
+    re.IGNORECASE,
+)
+
+
+def _strip_tool_mentions(answer: str) -> str:
+    """답변 앞에 붙은 도구 이름 말머리를 걷어낸다."""
+    previous = None
+    while previous != answer:                 # "web_search 결과: search_bookings 결과:"
+        previous = answer
+        answer = _TOOL_PREFIX_RE.sub("", answer, count=1)
+    return answer.strip()
+
+
 def ask(question: str, history: list[dict] | None = None) -> dict:
     """질문 하나를 처리하고 답변·사용한 도구·근거를 함께 반환한다.
 
@@ -226,7 +252,7 @@ def ask(question: str, history: list[dict] | None = None) -> dict:
             tools_used.append(call["name"])
 
     return {
-        "answer": result["messages"][-1].content,
+        "answer": _strip_tool_mentions(result["messages"][-1].content),
         "tools_used": tools_used,
         "sources": get_last_sources(),
         "messages": result["messages"],

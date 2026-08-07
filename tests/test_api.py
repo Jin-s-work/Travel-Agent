@@ -142,6 +142,29 @@ def test_fast_path_routing(question, fast):
     assert _can_answer_directly(question) is fast
 
 
+@pytest.mark.parametrize(
+    "raw,expected",
+    [
+        # 실제로 화면에 나왔던 답변이다.
+        ("search_bookings 결과: 예약 내역에서 확인할 수 없습니다.",
+         "예약 내역에서 확인할 수 없습니다."),
+        ("[bookings_on_date] 2026-10-13 예약 2건", "2026-10-13 예약 2건"),
+        ("web_search 결과: search_bookings 결과: 없습니다.", "없습니다."),
+        ("resolve_trip_day: 둘째 날은 2026-10-13입니다.", "둘째 날은 2026-10-13입니다."),
+        # 멀쩡한 답변은 건드리지 않는다.
+        ("체크아웃은 11:00입니다.\n출처: Hotel (예약번호 1)",
+         "체크아웃은 11:00입니다.\n출처: Hotel (예약번호 1)"),
+        # 본문 중간의 콜론은 말머리가 아니다.
+        ("시각: 15:00 ~ 11:00", "시각: 15:00 ~ 11:00"),
+    ],
+)
+def test_strip_tool_mentions(raw, expected):
+    """도구 이름이 사용자에게 보이면 안 된다. 프롬프트만으로는 막히지 않았다."""
+    from src.agent import _strip_tool_mentions
+
+    assert _strip_tool_mentions(raw) == expected
+
+
 def test_ask_rejects_empty_question():
     res = client.post("/api/ask", json={"question": ""})
     assert res.status_code == 422
