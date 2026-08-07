@@ -235,6 +235,20 @@ def _strip_tool_mentions(answer: str) -> str:
     return answer.strip()
 
 
+def _trim_after_refusal(answer: str, tools_used: list[str]) -> str:
+    """거절로 시작하면 그 문장만 남긴다.
+
+    "예약 내역에서 확인할 수 없습니다" 뒤에 "여권 원본이나 정부 사이트에서
+    확인하세요" 같은 조언이 붙는 일이 있었다. 프롬프트로 막아도 계속 나온다.
+    근거가 없다고 답하는 자리에 일반 지식을 얹으면 거절의 의미가 흐려진다.
+
+    웹 검색을 썼다면 뒤 내용이 실제 검색 결과일 수 있어 건드리지 않는다.
+    """
+    if "web_search" in tools_used or not answer.startswith(NO_INFO_MESSAGE):
+        return answer
+    return NO_INFO_MESSAGE
+
+
 def ask(question: str, history: list[dict] | None = None) -> dict:
     """질문 하나를 처리하고 답변·사용한 도구·근거를 함께 반환한다.
 
@@ -252,7 +266,9 @@ def ask(question: str, history: list[dict] | None = None) -> dict:
             tools_used.append(call["name"])
 
     return {
-        "answer": _strip_tool_mentions(result["messages"][-1].content),
+        "answer": _trim_after_refusal(
+            _strip_tool_mentions(result["messages"][-1].content), tools_used
+        ),
         "tools_used": tools_used,
         "sources": get_last_sources(),
         "messages": result["messages"],
