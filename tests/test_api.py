@@ -165,6 +165,34 @@ def test_strip_tool_mentions(raw, expected):
     assert _strip_tool_mentions(raw) == expected
 
 
+def test_trim_after_refusal_drops_appended_advice():
+    """실제로 붙었던 답변이다. 거절 자리에 일반 지식을 얹으면 의미가 흐려진다."""
+    from src.agent import _trim_after_refusal
+    from src.config import NO_INFO_MESSAGE
+
+    answer = (
+        f"{NO_INFO_MESSAGE}\n\n여권번호는 예약서에 없으니 실제 여권을 확인하거나 "
+        "항공사에 문의하세요."
+    )
+    assert _trim_after_refusal(answer, ["search_bookings"]) == NO_INFO_MESSAGE
+
+
+def test_trim_after_refusal_keeps_web_search_results():
+    """웹 검색을 썼다면 뒤 내용이 실제 검색 결과다."""
+    from src.agent import _trim_after_refusal
+    from src.config import NO_INFO_MESSAGE
+
+    answer = f"{NO_INFO_MESSAGE}\n\n다만 도쿄 10월 평균 기온은 18도입니다."
+    assert _trim_after_refusal(answer, ["search_bookings", "web_search"]) == answer
+
+
+def test_trim_after_refusal_leaves_normal_answers():
+    from src.agent import _trim_after_refusal
+
+    answer = "체크아웃은 11:00입니다.\n출처: Hotel Gracery Shinjuku (예약번호 1)"
+    assert _trim_after_refusal(answer, ["search_bookings"]) == answer
+
+
 def test_ask_rejects_empty_question():
     res = client.post("/api/ask", json={"question": ""})
     assert res.status_code == 422
