@@ -52,6 +52,33 @@ def test_index_rejects_unsupported_extension():
     assert body["state"] == "done"
 
 
+def test_index_rejects_oversized_file():
+    """업로드 본문을 통째로 메모리에 읽는다. 512MB 인스턴스에서는 상한이 필요하다."""
+    from src.config import MAX_UPLOAD_BYTES
+
+    huge = b"x" * (MAX_UPLOAD_BYTES + 1024)
+    res = client.post("/api/index", files={"files": ("huge.txt", huge, "text/plain")})
+    assert res.status_code == 202
+    body = res.json()
+    assert body["uploaded"] == []
+    assert "huge.txt" in body["rejected"]
+
+
+def test_upload_limit_leaves_room_for_real_emails():
+    """상한이 실제 예약 메일보다 훨씬 커야 한다. 데모 메일 중 가장 큰 것의 100배 이상."""
+    from pathlib import Path
+
+    from src.config import MAX_UPLOAD_BYTES
+
+    largest = max(
+        path.stat().st_size
+        for directory in ("tests/sample_emails", "tests/demo_emails")
+        for path in Path(directory).iterdir()
+        if path.is_file()
+    )
+    assert MAX_UPLOAD_BYTES > largest * 100
+
+
 def test_index_status_shape():
     res = client.get("/api/index/status")
     assert res.status_code == 200

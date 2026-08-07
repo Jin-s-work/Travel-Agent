@@ -12,7 +12,7 @@ from pathlib import Path
 
 from src.config import NO_INFO_MESSAGE, PROJECT_ROOT, TOP_K
 from src.rag import answer_question
-from src.store import VectorStore
+from src.store import VectorStore, get_store
 
 EVAL_SET_PATH = PROJECT_ROOT / "tests" / "eval_set.json"
 
@@ -38,7 +38,7 @@ def evaluate(
     verbose: bool = True,
 ) -> dict:
     """평가셋 전체를 돌려 검색·생성 지표를 계산한다."""
-    store = store or VectorStore()
+    store = store or get_store()
     items = eval_set if eval_set is not None else load_eval_set()
 
     rows = []

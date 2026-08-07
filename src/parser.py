@@ -140,26 +140,34 @@ def parse_reservation(raw_text: str, model: str = EXTRACTION_MODEL) -> dict:
         },
     )
     parsed = _normalize(json.loads(response.choices[0].message.content))
-    return _correct_type(parsed, raw_text)
+    parsed = _correct_type(parsed, raw_text)
+    # 시각 정리 규칙이 종류에 따라 다르므로 종류가 확정된 뒤 한 번 더 손본다.
+    parsed["time"] = _coerce_time(parsed["time"], parsed["type"])
+    return _restore_time_range(parsed, raw_text)
 
 
 # \b는 '11:00까지'처럼 뒤에 한글이 붙으면 경계로 잡히지 않으므로 숫자 룩어라운드를 쓴다.
 _TIME_RE = re.compile(r"(?<!\d)([01]?\d|2[0-4]):([0-5]\d)(?!\d)")
 
 
-def _coerce_time(value: str | None) -> str | None:
+def _coerce_time(value: str | None, reservation_type: str | None = None) -> str | None:
     """time 값을 'HH:MM' 또는 'HH:MM ~ HH:MM'으로 강제한다.
 
     스키마 설명만으로는 모델이 원문을 그대로 옮겨 적는 경우가 있어
     (예: '체크인 ... 15:00 - 24:00; 체크아웃 ... 11:00까지'),
     HH:MM 토큰만 뽑아 처음과 마지막을 시작/종료로 재구성한다.
+
+    투어는 집합 시각 하나만 쓴다. '집합 07:40 (출발 08:00)'처럼 시각이 둘
+    적힌 메일에서 모델이 둘 다 담아 '07:40 ~ 08:00'이 되면, 화면에 투어가
+    08:00에 끝나는 것처럼 보인다. 같은 형식의 다른 투어 메일은 하나만
+    담아 결과가 메일마다 달라지기도 했다.
     """
     if not value:
         return None
     times = [f"{int(hour):02d}:{minute}" for hour, minute in _TIME_RE.findall(value)]
     if not times:
         return None
-    if len(times) == 1:
+    if len(times) == 1 or reservation_type == "투어":
         return times[0]
     return f"{times[0]} ~ {times[-1]}"
 
@@ -210,6 +218,49 @@ def infer_type(raw_text: str) -> tuple[str | None, int]:
     )
     (top, kind), (runner_up, _) = scores[0], scores[1]
     return (kind, top) if top > runner_up else (None, 0)
+
+
+# 종류별로 시작·끝을 가리키는 줄 라벨. 시각이 둘 필요한 종류만 넣는다.
+# (투어는 집합 시각 하나만 쓰므로 여기 없다.)
+_RANGE_LABELS: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] = {
+    "항공": (("출발", "departure", "depart"), ("도착", "arrival", "arrive")),
+    "숙소": (("체크인", "check-in", "check in", "checkin"),
+             ("체크아웃", "check-out", "check out", "checkout")),
+    "렌터카": (("픽업", "대여", "pick-up", "pickup"), ("반납", "return")),
+}
+
+
+def _labelled_time(raw_text: str, keywords: tuple[str, ...]) -> str | None:
+    """라벨이 붙은 줄에서 첫 HH:MM을 찾는다. 시각이 없는 줄은 건너뛴다."""
+    for line in raw_text.splitlines():
+        lowered = line.lower()
+        if not any(keyword in lowered for keyword in keywords):
+            continue
+        found = _TIME_RE.search(line)
+        if found:
+            return f"{int(found.group(1)):02d}:{found.group(2)}"
+    return None
+
+
+def _restore_time_range(parsed: dict, raw_text: str) -> dict:
+    """시각을 하나만 뽑았을 때 원문에서 나머지 한쪽을 찾아 채운다.
+
+    ANA 귀국편이 어떤 실행에서는 '18:55 ~ 21:35', 다른 실행에서는 '18:55'로
+    나왔다. 원문에는 Departure와 Arrival이 모두 적혀 있다.
+
+    규칙이 찾은 시작 시각이 모델이 준 값과 같을 때만 채운다. 서로 다르면
+    규칙이 엉뚱한 줄을 본 것일 수 있어 모델 판단을 그대로 둔다.
+    """
+    labels = _RANGE_LABELS.get(parsed.get("type"))
+    value = parsed.get("time")
+    if not labels or not value or "~" in value:
+        return parsed
+
+    start = _labelled_time(raw_text, labels[0])
+    end = _labelled_time(raw_text, labels[1])
+    if start and end and start == value and end != start:
+        parsed["time"] = f"{start} ~ {end}"
+    return parsed
 
 
 def _correct_type(parsed: dict, raw_text: str) -> dict:

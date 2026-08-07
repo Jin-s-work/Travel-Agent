@@ -5,7 +5,7 @@ from __future__ import annotations
 from functools import lru_cache
 
 from src.config import ANSWER_MODEL, NO_INFO_MESSAGE, OPENAI_API_KEY, TOP_K
-from src.store import VectorStore
+from src.store import VectorStore, get_store
 
 # 질문이 특정 예약 종류를 지목했는지 판단하는 키워드.
 # 프롬프트로 "종류가 다르면 답하지 마라"고 지시해봤지만 모델이 무시했다
@@ -59,7 +59,7 @@ def answer_question(
 
     반환: {"answer", "sources", "hits", "used_context"}
     """
-    store = store or VectorStore()
+    store = store or get_store()
 
     # 질문이 예약 종류를 명시했으면 그 종류로 좁힌다. 해당 종류의 예약이
     # 아예 없으면 여기서 0건이 되어 LLM을 부르지 않고 거절한다.
