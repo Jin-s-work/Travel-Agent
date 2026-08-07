@@ -5,13 +5,13 @@
       "content_hash": "7e06ddd41e689e76",
       "parsed": {
         "type": "항공",
-        "provider": "대한항공",
+        "provider": "Korean Air",
         "confirmation_number": "8KX2QP",
         "date": "2026-10-12",
         "time": "09:20 ~ 11:45",
-        "location": "인천(ICN) 출발: 인천국제공항 제2여객터미널 → 도쿄 나리타(NRT) 도착: 나리타국제공항 제1터미널",
+        "location": "인천(ICN) → 도쿄 나리타(NRT); 인천국제공항 제2여객터미널 → 나리타국제공항 제1터미널",
         "refund_policy": "- 출발 91일 전까지 환불 시 위약금이 부과되지 않습니다.\n- 출발 90일 이내 ~ 출발 전 환불: 위약금 KRW 120,000\n- 출발 이후 환불: 위약금 KRW 200,000\n- 일정 변경 수수료: 회당 KRW 50,000 (운임 차액 별도)\n- 환불 접수 후 카드 취소까지 영업일 기준 5~7일이 소요됩니다.\n- No-show 시 위약금이 추가로 부과되며, 잔여 운임에서 차감됩니다.",
-        "raw_snippet": "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n예약번호(PNR)   : 8KX2QP\n항공권 번호      : 180-2447891023\n결제 금액        : KRW 612,400 (성인 1명)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n[여정]\nKE703  인천(ICN) → 도쿄 나리타(NRT)\n출발  2026년 10월 12일 (월) 09:20  인천국제공항 제2여객터미널\n도착  2026년 10월 12일 (월) 11:45  나리타국제공항 제1터미널"
+        "raw_snippet": "예약번호(PNR)   : 8KX2QP\n\n[여정]\nKE703  인천(ICN) → 도쿄 나리타(NRT)\n출발  2026년 10월 12일 (월) 09:20  인천국제공항 제2여객터미널\n도착  2026년 10월 12일 (월) 11:45  나리타국제공항 제1터미널\n좌석  32A (이코노미, 예약등급 M)"
       }
     },
     {
@@ -25,7 +25,7 @@
         "time": "18:55 ~ 21:35",
         "location": "TOKYO HANEDA (HND) -> SEOUL GIMPO (GMP)",
         "refund_policy": "- This is a semi-flexible fare (ANA Value 1).\n- Cancellation before departure: refund fee JPY 6,000 per passenger.\n- Cancellation after scheduled departure (no-show): refund fee JPY 15,000\n  and the ticket becomes non-reissuable.\n- Date change is permitted once free of charge up to 24 hours before\n  departure; subsequent changes incur JPY 5,000 plus any fare difference.\n- Refunds are processed to the original card within 10 business days.\n- Name changes are not permitted under any circumstances.",
-        "raw_snippet": "NH867  TOKYO HANEDA (HND) -> SEOUL GIMPO (GMP)\nDeparture : 17 OCT 2026 (SAT)  18:55   Haneda Airport Terminal 3\nArrival   : 17 OCT 2026 (SAT)  21:35   Gimpo Airport International Terminal"
+        "raw_snippet": "BOOKING REFERENCE : PQ7T4M\nFLIGHT DETAILS\nNH867  TOKYO HANEDA (HND) -> SEOUL GIMPO (GMP)\nDeparture : 17 OCT 2026 (SAT)  18:55   Haneda Airport Terminal 3"
       }
     },
     {
@@ -37,9 +37,9 @@
         "confirmation_number": "4471938265",
         "date": "2026-10-12 ~ 2026-10-15",
         "time": "15:00 ~ 11:00",
-        "location": "Hotel Gracery Shinjuku, 1-19-1 Kabukicho, Shinjuku-ku, Tokyo 160-8466, Japan",
-        "refund_policy": "- 2026년 10월 5일 23:59 (숙소 현지 시간)까지 무료 취소 가능합니다.\n- 2026년 10월 6일 00:00 이후 취소하거나 노쇼인 경우, 첫 1박 요금 JPY 32,100이 부과됩니다.\n- 체크인 이후 조기 퇴실 시 잔여 숙박분은 환불되지 않습니다.\n- 예약 변경(날짜/인원)은 무료 취소 기한 내에만 가능합니다.",
-        "raw_snippet": "확인번호  : 4471938265\n체크인   2026년 10월 12일 (월)  15:00 - 24:00\n체크아웃 2026년 10월 15일 (목)  11:00까지\n숙박     3박, 성인 2명\n객실     Superior Twin Room (금연, 22㎡, 조식 불포함)\n[취소 규정]\n- 2026년 10월 5일 23:59 (숙소 현지 시간)까지 무료 취소 가능합니다."
+        "location": "Hotel Gracery Shinjuku\n1-19-1 Kabukicho, Shinjuku-ku, Tokyo 160-8466, Japan\n전화: +81 3-6833-1111\n지하철 JR 신주쿠역 동쪽 출구에서 도보 5분",
+        "refund_policy": "[취소 규정]\n- 2026년 10월 5일 23:59 (숙소 현지 시간)까지 무료 취소 가능합니다.\n- 2026년 10월 6일 00:00 이후 취소하거나 노쇼인 경우, 첫 1박 요금\n  JPY 32,100이 부과됩니다.\n- 체크인 이후 조기 퇴실 시 잔여 숙박분은 환불되지 않습니다.\n- 예약 변경(날짜/인원)은 무료 취소 기한 내에만 가능합니다.",
+        "raw_snippet": "Hotel Gracery Shinjuku\n1-19-1 Kabukicho, Shinjuku-ku, Tokyo 160-8466, Japan\n확인번호  : 4471938265\n체크인   2026년 10월 12일 (월)  15:00 - 24:00\n체크아웃 2026년 10월 15일 (목)  11:00까지"
       }
     },
     {
@@ -52,8 +52,8 @@
         "date": "2026-10-15 ~ 2026-10-17",
         "time": "15:00 ~ 10:00",
         "location": "Yumotoso Hakone (箱根 湯本荘), 256-1 Yumoto, Hakone-machi, Ashigarashimo-gun, Kanagawa 250-0311",
-        "refund_policy": "10 days before arrival or earlier : no charge\n9 to 3 days before arrival        : 30% of total\n2 days / 1 day before arrival     : 50% of total\nOn the day of arrival             : 80% of total\nNo-show without contact           : 100% of total\nCancellation must be made by phone or e-mail before 18:00 JST. Requests\nreceived after 18:00 are treated as the following day.",
-        "raw_snippet": "RESERVATION NUMBER : HK-26-10884\n\nProperty : Yumotoso Hakone (箱根 湯本荘)\nAddress  : 256-1 Yumoto, Hakone-machi, Ashigarashimo-gun, Kanagawa 250-0311\n\nCheck-in  : 15 October 2026 (Thu)  from 15:00 (latest arrival 19:00)\nCheck-out : 17 October 2026 (Sat)  by 10:00\nNights    : 2 nights, 2 guests\nRoom…"
+        "refund_policy": "CANCELLATION POLICY / キャンセル規定\n  10 days before arrival or earlier : no charge\n  9 to 3 days before arrival        : 30% of total\n  2 days / 1 day before arrival     : 50% of total\n  On the day of arrival             : 80% of total\n  No-show without contact           : 100% of total\nCancellation must be made by phone or e-mail before 18:00 JST. Requests\nreceived after 18:00 are treated as the following day.",
+        "raw_snippet": "RESERVATION NUMBER : HK-26-10884\n\nProperty : Yumotoso Hakone (箱根 湯本荘)\nAddress  : 256-1 Yumoto, Hakone-machi, Ashigarashimo-gun, Kanagawa 250-0311\n\nCheck-in  : 15 October 2026 (Thu)  from 15:00 (latest arrival 19:00)\nCheck-out : 17 October 2026 (Sat)  by 10:00\nNights    : 2 nights, 2 guests"
       }
     },
     {
@@ -64,10 +64,10 @@
         "provider": "Japan Highlight Travel Co., Ltd.",
         "confirmation_number": "KLK-9930274",
         "date": "2026-10-14",
-        "time": "07:40 ~ 08:00",
+        "time": "07:40",
         "location": "신주쿠역 서쪽 출구 스미토모 빌딩 1층 버스 정류장 앞 (도쿄도 신주쿠구 니시신주쿠 2-6-1, 노란색 Klook 깃발)",
-        "refund_policy": "- 이용일 7일 전(2026년 10월 7일 23:59 KST)까지 취소 시 100% 환불됩니다.\n- 이용일 6일 전 ~ 3일 전 취소 시 50% 환불됩니다.\n- 이용일 2일 전부터는 환불이 불가하며, 노쇼도 동일하게 처리됩니다.\n- 환불은 취소 승인 후 영업일 기준 7~14일 내 원결제수단으로 처리됩니다.\n- 기상 악화(태풍·폭설 등)로 운영사가 투어를 취소할 경우 전액 환불됩니다.\n  단, 5합목 도로 통제로 인한 4합목 대체 운행은 취소 사유에 해당하지 않습니다.",
-        "raw_snippet": "예약번호  KLK-9930274\n이용일    2026년 10월 14일 (수)\n집합 시간 07:40 (출발 08:00 정시, 지각 시 대기 없이 출발)\n집합 장소 신주쿠역 서쪽 출구 스미토모 빌딩 1층 버스 정류장 앞\n종료 예정 19:30경 신주쿠역 서쪽 출구 해산"
+        "refund_policy": "[취소 및 환불 정책]\n- 이용일 7일 전(2026년 10월 7일 23:59 KST)까지 취소 시 100% 환불됩니다.\n- 이용일 6일 전 ~ 3일 전 취소 시 50% 환불됩니다.\n- 이용일 2일 전부터는 환불이 불가하며, 노쇼도 동일하게 처리됩니다.\n- 환불은 취소 승인 후 영업일 기준 7~14일 내 원결제수단으로 처리됩니다.\n- 기상 악화(태풍·폭설 등)로 운영사가 투어를 취소할 경우 전액 환불됩니다.\n  단, 5합목 도로 통제로 인한 4합목 대체 운행은 취소 사유에 해당하지 않습니다.",
+        "raw_snippet": "액티비티  후지산 5합목 & 가와구치코 단풍 당일 투어 (한국어 가이드 동행)\n운영사    Japan Highlight Travel Co., Ltd.\n예약번호  KLK-9930274\n이용일    2026년 10월 14일 (수)\n집합 시간 07:40 (출발 08:00 정시, 지각 시 대기 없이 출발)\n집합 장소 신주쿠역 서쪽 출구 스미토모 빌딩 1층 버스 정류장 앞"
       }
     },
     {
@@ -79,9 +79,9 @@
         "confirmation_number": "TCR-8842190",
         "date": "2026-10-15 ~ 2026-10-17",
         "time": "13:00 ~ 09:30",
-        "location": "하코네유모토역점 (箱根湯本駅前店)\n神奈川県足柄下郡箱根町湯本703-1\n동일 지점 반납",
+        "location": "하코네유모토역점 (箱根湯本駅前店), 神奈川県足柄下郡箱根町湯本703-1 (동일 지점 반납)",
         "refund_policy": "- 대여일 7일 전까지 취소: 수수료 없음\n- 대여일 6일 전 ~ 2일 전 취소: 대여료의 20%\n- 대여일 전날 취소: 대여료의 30%\n- 대여 당일 취소 또는 노쇼: 대여료의 100%\n- 반납 예정 시각보다 일찍 반납해도 차액은 환불되지 않습니다.",
-        "raw_snippet": "예약번호   : TCR-8842190\n\n[대여 정보]\n차종       : 토요타 아쿠아 (하이브리드) 또는 동급\n픽업       : 2026년 10월 15일 (목) 13:00\n             하코네유모토역점 (箱根湯本駅前店)\n             神奈川県足柄下郡箱根町湯本703-1\n반납       : 2026년 10월 17일 (토) 09:30\n             동일 지점 반납"
+        "raw_snippet": "예약번호   : TCR-8842190\n예약자     : SANGWOO JIN\n[대여 정보]\n차종       : 토요타 아쿠아 (하이브리드) 또는 동급\n픽업       : 2026년 10월 15일 (목) 13:00\n             하코네유모토역점 (箱根湯本駅前店)\n             神奈川県足柄下郡箱根町湯本703-1\n반납       : 2026년 10월 17일 (토) 09:30\n             동일 지점 반납"
       }
     },
     {
@@ -93,9 +93,9 @@
         "confirmation_number": "VTR-55182904",
         "date": "2026-10-13",
         "time": "16:30",
-        "location": "아사쿠사역 4번 출구 앞 스타벅스, 도쿄도 다이토구 아사쿠사 1-1-1",
+        "location": "아사쿠사역 4번 출구 앞 스타벅스\n           도쿄도 다이토구 아사쿠사 1-1-1",
         "refund_policy": "[취소 및 환불 정책]\n- 이용일 24시간 전까지 취소 시 전액 환불됩니다.\n- 이용일 24시간 이내 취소 시 환불이 불가합니다.\n- 노쇼는 환불 대상이 아닙니다.\n- 태풍·호우 경보로 운영사가 취소할 경우 전액 환불되며,\n  이슬비 수준의 강우는 취소 사유에 해당하지 않습니다.\n- 환불은 승인 후 영업일 기준 5~10일 내 원결제수단으로 처리됩니다.",
-        "raw_snippet": "액티비티   아사쿠사 & 스미다강 야경 워킹투어 (한국어 가이드)\n운영사     Tokyo Local Walks Inc.\n예약번호   VTR-55182904\n바우처     https://www.viator.com/voucher/VTR-55182904\n\n이용일     2026년 10월 13일 (화)\n집합 시간  16:30 (16:45 정시 출발)\n집합 장소  아사쿠사역 4번 출구 앞 스타벅스\n           도쿄도 다이토구 아사쿠사 1-1-1"
+        "raw_snippet": "액티비티   아사쿠사 & 스미다강 야경 워킹투어 (한국어 가이드)\n운영사     Tokyo Local Walks Inc.\n예약번호   VTR-55182904\n이용일     2026년 10월 13일 (화)\n집합 시간  16:30 (16:45 정시 출발)\n집합 장소  아사쿠사역 4번 출구 앞 스타벅스\n           도쿄도 다이토구 아사쿠사 1-1-1\n종료 예정  20:00경 아사쿠사역 해산"
       }
     }
   ]

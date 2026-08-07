@@ -20,7 +20,7 @@ from pathlib import Path
 from src.config import EMAILS_DIR, SEED_FILE, SEED_SOURCE_DIRS
 from src.indexer import _hash, index_emails
 from src.loader import load_emails
-from src.store import VectorStore
+from src.store import VectorStore, get_store
 
 
 def load_seed() -> dict[str, dict]:
@@ -37,7 +37,7 @@ def seed_if_empty(store: VectorStore | None = None) -> dict:
     사용자가 올린 메일이 하나라도 있으면 인덱스가 비어 있지 않으므로, 이 함수가
     사용자 데이터를 덮어쓰는 일은 없다.
     """
-    store = store or VectorStore()
+    store = store or get_store()
 
     if store.count() > 0:
         return {"seeded": False, "reason": "인덱스에 이미 데이터가 있습니다."}

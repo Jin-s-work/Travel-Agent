@@ -16,7 +16,7 @@ from src.config import (
     WEB_SEARCH_MAX_RESULTS,
 )
 from src.rag import answer_question
-from src.store import VectorStore
+from src.store import get_store
 
 SYSTEM_PROMPT = f"""너는 사용자의 여행 예약을 관리하는 어시스턴트다.
 
@@ -97,7 +97,7 @@ def bookings_on_date(day: str) -> str:
     """
     global _last_sources
 
-    records = _store().reservations_on_date(day)
+    records = get_store().reservations_on_date(day)
     _last_sources = [
         {
             "source_file": record.get("source_file"),
@@ -171,8 +171,9 @@ def set_trip_start(value: str | None) -> None:
 def resolve_trip_day(day_number: int) -> str:
     """여행 N일차가 실제로 몇 월 며칠인지 계산한다.
 
-    "둘째 날", "3일차" 같은 표현이 나오면 먼저 이 도구로 날짜를 구한 뒤
-    그 날짜로 search_bookings 를 호출한다. 여행 시작일은 인덱싱된 예약 중
+    "둘째 날", "3일차" 같은 표현이 나오면 먼저 이 도구로 날짜를 구한다.
+    이어서 그날 일정 전체가 필요하면 bookings_on_date 를, 특정 항목 하나만
+    필요하면 search_bookings 를 호출한다. 여행 시작일은 인덱싱된 예약 중
     가장 빠른 날짜를 쓴다.
 
     Args:
@@ -181,7 +182,7 @@ def resolve_trip_day(day_number: int) -> str:
     if day_number < 1:
         return "일차는 1 이상이어야 합니다. 첫날이 1일차입니다."
 
-    start, end = _store().trip_date_range()
+    start, end = get_store().trip_date_range()
     if _trip_start_override:
         start = _trip_start_override
     if not start:
@@ -196,11 +197,6 @@ def resolve_trip_day(day_number: int) -> str:
     if end and target > date.fromisoformat(end):
         message += f" 다만 마지막 예약이 {end}에 끝나므로 여행 기간을 벗어납니다."
     return message
-
-
-@lru_cache(maxsize=1)
-def _store() -> VectorStore:
-    return VectorStore()
 
 
 @lru_cache(maxsize=1)

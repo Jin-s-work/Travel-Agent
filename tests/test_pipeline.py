@@ -12,7 +12,15 @@ from src.config import MIN_SIMILARITY, RESERVATION_TYPES, SEED_FILE
 from src.evaluate import _is_refusal
 from src.indexer import _chunk, _hash, _split_date_range, _to_int, build_metadata, build_search_text
 from src.loader import read_email_file
-from src.parser import _coerce_time, _correct_type, _normalize, infer_type, FIELDS
+from src.parser import (
+    _coerce_time,
+    _correct_type,
+    _labelled_time,
+    _normalize,
+    _restore_time_range,
+    infer_type,
+    FIELDS,
+)
 from src.rag import detect_reservation_type
 from src.store import _apply_threshold, _clean_metadata, _to_int as _date_to_int
 
@@ -38,6 +46,19 @@ def test_coerce_time(value, expected):
 def test_coerce_time_handles_korean_suffix():
     """'11:00까지'처럼 뒤에 한글이 붙으면 \\b가 경계로 잡히지 않는다."""
     assert _coerce_time("체크아웃 11:00까지") == "11:00"
+
+
+def test_coerce_time_keeps_only_meeting_time_for_tours():
+    """투어는 집합 시각 하나만 쓴다.
+
+    '집합 07:40 (출발 08:00)'을 범위로 두면 화면에 투어가 08:00에 끝나는 것처럼
+    보인다. 같은 형식의 다른 투어 메일은 하나만 담아 결과가 메일마다 갈렸다.
+    """
+    assert _coerce_time("집합 07:40 (출발 08:00 정시)", "투어") == "07:40"
+    assert _coerce_time("07:40 ~ 08:00", "투어") == "07:40"
+    # 다른 종류는 범위를 유지한다.
+    assert _coerce_time("07:40 ~ 08:00", "항공") == "07:40 ~ 08:00"
+    assert _coerce_time("07:40 ~ 08:00") == "07:40 ~ 08:00"
 
 
 def test_normalize_fills_all_fields_and_rejects_unknown_type():
@@ -82,6 +103,36 @@ def test_correct_type_overrides_confident_misclassification():
 def test_correct_type_fills_null():
     tour = read_email_file("tests/demo_emails/07_asakusa_tour.eml")
     assert _correct_type({"type": None}, tour)["type"] == "투어"
+
+
+def test_restore_time_range_fills_dropped_arrival():
+    """실제로 관측된 사례. ANA 귀국편에서 도착 시각이 실행에 따라 빠졌다."""
+    ana = read_email_file("tests/sample_emails/02_ana_return.eml")
+    assert _restore_time_range({"type": "항공", "time": "18:55"}, ana)["time"] == "18:55 ~ 21:35"
+
+
+def test_restore_time_range_leaves_complete_values_alone():
+    ana = read_email_file("tests/sample_emails/02_ana_return.eml")
+    complete = {"type": "항공", "time": "18:55 ~ 21:35"}
+    assert _restore_time_range(dict(complete), ana) == complete
+
+
+def test_restore_time_range_abstains_when_rule_disagrees():
+    """규칙이 찾은 시작 시각이 모델 값과 다르면 엉뚱한 줄을 봤을 수 있다."""
+    ana = read_email_file("tests/sample_emails/02_ana_return.eml")
+    assert _restore_time_range({"type": "항공", "time": "07:00"}, ana)["time"] == "07:00"
+
+
+def test_restore_time_range_skips_tours():
+    """투어는 집합 시각 하나뿐이라 채울 짝이 없다."""
+    tour = read_email_file("tests/demo_emails/07_asakusa_tour.eml")
+    assert _restore_time_range({"type": "투어", "time": "16:30"}, tour)["time"] == "16:30"
+
+
+def test_labelled_time_skips_lines_without_a_clock():
+    """'closes 60 minutes before departure'처럼 라벨만 있고 시각이 없는 줄이 많다."""
+    text = "Cancellation before departure: fee JPY 6,000\nDeparture : 17 OCT 2026 18:55 HND"
+    assert _labelled_time(text, ("departure",)) == "18:55"
 
 
 def test_correct_type_keeps_llm_answer_without_evidence():
@@ -295,6 +346,24 @@ def test_deploy_image_includes_seed_and_its_emails():
 def _seed_entries() -> list[dict]:
     assert SEED_FILE.is_file(), f"시드 파일이 없습니다: {SEED_FILE}"
     return json.loads(SEED_FILE.read_text(encoding="utf-8"))["emails"]
+
+
+def test_get_store_returns_one_shared_instance():
+    """계층마다 스토어를 따로 만들면 인덱스를 비운 뒤 서로 어긋난다.
+
+    실제로 에이전트가 삭제된 컬렉션 핸들을 들고 있어 "인덱스 비우기" 다음
+    N일차 질문이 NotFoundError로 죽었다.
+    """
+    import api
+    import src.rag as rag
+    import src.seed as seed
+    from src.store import get_store
+
+    assert get_store() is get_store()
+    assert api.store() is get_store()
+    # rag·seed가 기본값으로 쓰는 스토어도 같은 인스턴스여야 한다.
+    assert rag.get_store() is get_store()
+    assert seed.get_store() is get_store()
 
 
 def test_clean_metadata_drops_none_and_empty():

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import threading
 from pathlib import Path
 
 from src.config import (
@@ -13,6 +14,26 @@ from src.config import (
     TOP_K,
 )
 from src.embedder import embed_query
+
+
+# 프로세스 전체가 같은 VectorStore를 쓴다.
+#
+# 예전에는 API 계층·에이전트·rag가 각자 VectorStore를 만들었다. 두 가지가 문제였다.
+# 하나는 reset() 이후 다른 인스턴스가 삭제된 컬렉션 핸들을 그대로 들고 있어
+# "인덱스 비우기" 뒤 N일차 질문이 NotFoundError로 죽었다. 다른 하나는 도구를
+# 호출할 때마다 chromadb 클라이언트를 새로 만들어 느렸다.
+_shared: VectorStore | None = None
+_shared_lock = threading.Lock()
+
+
+def get_store() -> VectorStore:
+    """프로세스 공용 VectorStore를 돌려준다. 처음 호출할 때 만든다."""
+    global _shared
+    if _shared is None:
+        with _shared_lock:
+            if _shared is None:          # 락을 기다리는 동안 만들어졌을 수 있다
+                _shared = VectorStore()
+    return _shared
 
 
 class VectorStore:

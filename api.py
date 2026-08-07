@@ -18,7 +18,13 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from src.config import EMAILS_DIR, PROJECT_ROOT, SEED_ON_EMPTY, SUPPORTED_EXTENSIONS
+from src.config import (
+    EMAILS_DIR,
+    MAX_UPLOAD_BYTES,
+    PROJECT_ROOT,
+    SEED_ON_EMPTY,
+    SUPPORTED_EXTENSIONS,
+)
 
 WEB_DIR = PROJECT_ROOT / "web"
 
@@ -49,13 +55,11 @@ app = FastAPI(
 
 # ---------------------------------------------------------------- 지연 로딩
 # chromadb와 langchain은 로딩이 무겁다. 서버 기동을 막지 않도록 첫 요청에서 만든다.
-_store = None
 _agent = None
 
 # FastAPI는 동기 엔드포인트를 스레드풀에서 실행한다. 콜드 스타트 중 요청이 겹치면
 # 두 스레드가 동시에 초기화를 시도해 chromadb 내부 상태가 깨진다
 # (KeyError in shared_system_client). 초기화 구간을 한 번만 통과시킨다.
-_store_lock = threading.Lock()
 _agent_lock = threading.Lock()
 
 # 인덱싱은 한 번에 하나만 돈다. 기동 시 시딩과 사용자 업로드가 겹치면
@@ -75,14 +79,14 @@ _job: dict = {
 
 
 def store():
-    global _store
-    if _store is None:
-        with _store_lock:
-            if _store is None:                # 락을 기다리는 동안 만들어졌을 수 있다
-                from src.store import VectorStore
+    """프로세스 공용 스토어. 에이전트·rag도 같은 인스턴스를 쓴다.
 
-                _store = VectorStore()
-    return _store
+    각자 만들면 인덱스를 비운 뒤 다른 인스턴스가 삭제된 컬렉션 핸들을 들고
+    있어 이후 질문이 NotFoundError로 죽는다.
+    """
+    from src.store import get_store    # chromadb 로딩을 첫 요청까지 미룬다
+
+    return get_store()
 
 
 def agent():
@@ -295,7 +299,15 @@ async def index(
         if not name or Path(name).suffix.lower() not in SUPPORTED_EXTENSIONS:
             rejected.append(upload.filename)
             continue
-        (EMAILS_DIR / name).write_bytes(await upload.read())
+
+        content = await upload.read(MAX_UPLOAD_BYTES + 1)
+        if len(content) > MAX_UPLOAD_BYTES:
+            # 예약 메일은 1~2KB다. 큰 파일은 받아도 쓸 데가 없고,
+            # 512MB 인스턴스에서는 몇 개만으로도 프로세스가 죽는다.
+            rejected.append(upload.filename)
+            continue
+
+        (EMAILS_DIR / name).write_bytes(content)
         saved.append(name)
 
     if not saved:

@@ -11,7 +11,7 @@ from src.config import CHUNK_OVERLAP, CHUNK_SIZE, MAX_SINGLE_CHUNK_CHARS
 from src.embedder import embed_texts
 from src.loader import load_emails
 from src.parser import parse_reservation
-from src.store import VectorStore
+from src.store import VectorStore, get_store
 
 _DATE_RE = re.compile(r"(\d{4})-(\d{2})-(\d{2})")
 
@@ -39,7 +39,7 @@ def index_emails(
     parse_cache는 content_hash를 키로 하는 추출 결과다. 해시가 맞으면 LLM을
     호출하지 않고 그대로 쓴다(시드 인덱싱에 쓰인다).
     """
-    store = store or VectorStore()
+    store = store or get_store()
     emails = load_emails(directory)
     already = store.indexed_sources()
 

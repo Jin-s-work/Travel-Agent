@@ -30,6 +30,9 @@ EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
 
 # --- 로딩 ---
 SUPPORTED_EXTENSIONS = (".txt", ".eml")
+# 예약 확인 메일은 1~2KB다. 업로드 본문을 통째로 메모리에 읽으므로 상한을 둔다.
+# 배포 인스턴스가 512MB라 큰 파일 몇 개로도 프로세스가 죽는다.
+MAX_UPLOAD_BYTES = 1 * 1024 * 1024
 
 # --- 임베딩 ---
 # OpenAI 임베딩 API의 요청당 입력 개수 상한보다 넉넉히 낮게 잡는다.
