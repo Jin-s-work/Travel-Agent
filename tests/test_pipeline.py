@@ -366,6 +366,61 @@ def test_get_store_returns_one_shared_instance():
     assert seed.get_store() is get_store()
 
 
+@pytest.fixture(scope="module")
+def seeded_store(tmp_path_factory):
+    """시드 7건을 임시 스토어에 넣는다. 임베딩은 가짜로 넣어 API를 부르지 않는다.
+
+    날짜 조회는 유사도를 쓰지 않으므로 벡터 값이 무엇이든 결과가 같다.
+    """
+    import src.indexer as indexer
+    from src.seed import load_seed
+    from src.store import VectorStore
+
+    real_embed = indexer.embed_texts
+    indexer.embed_texts = lambda texts: [[0.0] * 8 for _ in texts]
+    try:
+        store = VectorStore(persist_dir=tmp_path_factory.mktemp("dates"), collection_name="date_lookup")
+        for directory in EMAIL_DIRS:
+            indexer.index_emails(directory=directory, store=store, parse_cache=load_seed())
+        yield store
+    finally:
+        indexer.embed_texts = real_embed
+
+
+@pytest.mark.parametrize(
+    "day,expected",
+    [
+        # 하루에 여러 건이 겹치고, 기간이 있는 예약은 중간 날짜에도 걸려야 한다.
+        ("2026-10-12", {"대한항공", "Korean Air", "Hotel Gracery Shinjuku"}),
+        ("2026-10-13", {"Hotel Gracery Shinjuku", "Tokyo Local Walks Inc."}),
+        ("2026-10-14", {"Hotel Gracery Shinjuku", "Japan Highlight Travel Co., Ltd."}),
+    ],
+)
+def test_reservations_on_date_includes_everything_that_day(seeded_store, day, expected):
+    """'둘째 날 일정'이 그날 투어를 빠뜨렸던 버그를 결정적으로 막는다.
+
+    의미 검색은 상위 몇 건만 주므로 누락이 생겼다. 날짜 필터는 전부 가져와야 한다.
+    """
+    found = {r.get("provider") for r in seeded_store.reservations_on_date(day)}
+    assert found <= expected, f"{day}에 엉뚱한 예약이 걸렸습니다: {found - expected}"
+    assert len(found) == 2, f"{day}에 예약 2건이 나와야 하는데 {found}"
+
+
+def test_reservations_on_date_catches_overlapping_stays(seeded_store):
+    """체크아웃하는 날과 체크인하는 날이 겹치면 셋 다 나와야 한다."""
+    found = {r.get("provider") for r in seeded_store.reservations_on_date("2026-10-15")}
+    assert found == {
+        "Hotel Gracery Shinjuku",          # 이날 체크아웃
+        "Yumotoso Hakone (箱根 湯本荘)",     # 이날 체크인
+        "Times CAR RENTAL",                # 이날 픽업
+    }
+
+
+def test_reservations_on_date_returns_nothing_outside_the_trip(seeded_store):
+    assert seeded_store.reservations_on_date("2026-10-20") == []
+    assert seeded_store.reservations_on_date("내일") == []
+
+
 def test_store_recovers_when_collection_is_recreated_elsewhere(tmp_path):
     """다른 프로세스가 컬렉션을 다시 만들어도 살아남아야 한다.
 
