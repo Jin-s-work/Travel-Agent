@@ -4,7 +4,13 @@ from __future__ import annotations
 
 from functools import lru_cache
 
-from src.config import ANSWER_MODEL, NO_INFO_MESSAGE, OPENAI_API_KEY, TOP_K
+from src.config import (
+    ANSWER_MODEL,
+    NO_INFO_MESSAGE,
+    OPENAI_API_KEY,
+    REASONING_EFFORT,
+    TOP_K,
+)
 from src.store import VectorStore, get_store
 
 # 질문이 특정 예약 종류를 지목했는지 판단하는 키워드.
@@ -59,6 +65,28 @@ def answer_question(
 
     반환: {"answer", "sources", "hits", "used_context"}
     """
+    hits = retrieve(question, top_k=top_k, where=where, store=store)
+
+    # 임계값을 넘는 근거가 하나도 없으면 LLM을 부르지 않는다.
+    # 부르지 않는 것이 환각을 막는 가장 확실한 방법이다.
+    if not hits:
+        return {"answer": NO_INFO_MESSAGE, "sources": [], "hits": [], "used_context": False}
+
+    return {
+        "answer": generate(question, hits),
+        "sources": [_source_label(hit["metadata"]) for hit in hits],
+        "hits": hits,
+        "used_context": True,
+    }
+
+
+def retrieve(
+    question: str,
+    top_k: int = TOP_K,
+    where: dict | None = None,
+    store: VectorStore | None = None,
+) -> list[dict]:
+    """질문에 맞는 근거를 찾는다. 1초 안에 끝나므로 답변보다 먼저 보여줄 수 있다."""
     store = store or get_store()
 
     # 질문이 예약 종류를 명시했으면 그 종류로 좁힌다. 해당 종류의 예약이
@@ -68,26 +96,31 @@ def answer_question(
         if detected:
             where = {"type": detected}
 
-    hits = store.search(question, top_k=top_k, where=where)
+    return store.search(question, top_k=top_k, where=where)
 
-    # 임계값을 넘는 근거가 하나도 없으면 LLM을 부르지 않는다.
-    # 부르지 않는 것이 환각을 막는 가장 확실한 방법이다.
-    if not hits:
-        return {"answer": NO_INFO_MESSAGE, "sources": [], "hits": [], "used_context": False}
 
+def generate(question: str, hits: list[dict]) -> str:
+    """검색된 근거만 가지고 답변을 만든다. 여기서 시간의 대부분이 쓰인다."""
     response = _client().chat.completions.create(
         model=ANSWER_MODEL,
+        reasoning_effort=REASONING_EFFORT,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": f"[예약 정보]\n{format_context(hits)}\n\n[질문]\n{question}"},
         ],
     )
+    return response.choices[0].message.content.strip()
 
+
+def source_of(hit: dict) -> dict:
+    """검색 결과 하나를 UI가 쓰는 출처 형태로 바꾼다."""
+    metadata = hit["metadata"]
     return {
-        "answer": response.choices[0].message.content.strip(),
-        "sources": [_source_label(hit["metadata"]) for hit in hits],
-        "hits": hits,
-        "used_context": True,
+        "source_file": metadata.get("source_file"),
+        "type": metadata.get("type"),
+        "provider": metadata.get("provider"),
+        "confirmation_number": metadata.get("confirmation_number"),
+        "similarity": hit.get("similarity"),
     }
 
 

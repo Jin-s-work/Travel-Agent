@@ -366,6 +366,27 @@ def test_get_store_returns_one_shared_instance():
     assert seed.get_store() is get_store()
 
 
+def test_store_recovers_when_collection_is_recreated_elsewhere(tmp_path):
+    """다른 프로세스가 컬렉션을 다시 만들어도 살아남아야 한다.
+
+    실제로 평가 스크립트가 인덱스를 지우자 떠 있던 서버가 옛 UUID를 들고
+    NotFoundError로 죽었다. 그 뒤 모든 요청이 실패했다.
+    """
+    from src.store import VectorStore
+
+    kwargs = {"persist_dir": tmp_path, "collection_name": "heal"}
+    server = VectorStore(**kwargs)
+    server.add(["x::0"], ["[숙소] 테스트"], [[0.1] * 8], [{"source_file": "x", "type": "숙소"}])
+    assert server.count() == 1
+
+    VectorStore(**kwargs).reset()          # 다른 프로세스가 지우고 다시 만든다
+
+    assert server.count() == 0             # 예전에는 여기서 NotFoundError
+    assert server.all_reservations() == []
+    server.add(["y::0"], ["[항공] 테스트"], [[0.2] * 8], [{"source_file": "y", "type": "항공"}])
+    assert server.count() == 1
+
+
 def test_clean_metadata_drops_none_and_empty():
     cleaned = _clean_metadata({"a": 1, "b": None, "c": "", "d": "ok"})
     assert cleaned == {"a": 1, "d": "ok"}

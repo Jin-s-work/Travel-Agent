@@ -1,6 +1,6 @@
 /* 앱 셸만 캐시한다. 예약 데이터는 매번 서버에서 받아야 하므로 캐시하지 않는다. */
 
-const CACHE = "travel-inbox-shell-v2";
+const CACHE = "travel-inbox-shell-v3";
 const SHELL = ["/", "/index.html", "/manifest.webmanifest", "/icon.svg"];
 
 self.addEventListener("install", event => {

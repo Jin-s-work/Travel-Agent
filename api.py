@@ -6,6 +6,7 @@ src/의 로직을 그대로 호출하고, web/의 정적 파일을 같은 프로
 
 from __future__ import annotations
 
+import json
 import mimetypes
 import re
 import sys
@@ -14,7 +15,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import BackgroundTasks, FastAPI, File, HTTPException, UploadFile
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -236,6 +237,57 @@ def ask(body: AskRequest) -> dict:
         "tools_used": result["tools_used"],
         "sources": result["sources"],
     }
+
+
+def _sse(payload: dict) -> str:
+    return f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
+
+
+def _ask_events(body: AskRequest):
+    """질문 처리 과정을 이벤트로 흘려보낸다.
+
+    답변 생성이 전체 시간의 대부분이고, 추론 모델은 추론이 끝나야 첫 글자가
+    나온다. 토큰을 흘려봐도 첫 글자까지의 시간은 줄지 않는다. 대신 1초면
+    끝나는 검색 결과를 먼저 보내 무엇을 찾았는지 바로 보여준다.
+    """
+    question = body.question
+
+    try:
+        if not body.history and _can_answer_directly(question):
+            from src.rag import NO_INFO_MESSAGE, generate, retrieve, source_of
+
+            hits = retrieve(question, store=store())
+            sources = [source_of(hit) for hit in hits]
+            yield _sse({"type": "sources", "sources": sources})
+
+            if hits:
+                yield _sse({
+                    "type": "answer",
+                    "answer": generate(question, hits),
+                    "tools_used": ["search_bookings"],
+                    "sources": sources,
+                })
+                return
+            # 근거를 못 찾았으면 다른 도구가 필요하다. 에이전트로 넘긴다.
+
+        history = [{"role": m.role, "content": m.content} for m in body.history]
+        for event in agent().ask_stream(question, history=history):
+            yield _sse(event)
+
+    except RuntimeError as error:      # API 키 누락 등 설정 문제
+        yield _sse({"type": "error", "detail": str(error)})
+    except Exception as error:
+        yield _sse({"type": "error", "detail": f"{type(error).__name__}: {error}"})
+
+
+@app.post("/api/ask/stream")
+def ask_stream(body: AskRequest) -> StreamingResponse:
+    return StreamingResponse(
+        _ask_events(body),
+        media_type="text/event-stream",
+        # 중간 프록시가 버퍼링하면 스트리밍이 무의미해진다.
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 
 def _run_seeding() -> None:

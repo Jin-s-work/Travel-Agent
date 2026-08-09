@@ -916,17 +916,43 @@
       if (!r.ok) throw new Error(`서버가 예약 목록을 주지 못했습니다 (${r.status})`);
       return r.json();
     },
-    async ask(question, history) {
-      const r = await fetch("/api/ask", {
+    // 답변 생성이 전체 시간의 대부분이라 끝날 때까지 화면이 비어 있었다.
+    // 1초면 끝나는 검색 결과와 도구 진행을 먼저 받아 무엇을 하는 중인지 보여준다.
+    async ask(question, history, onEvent) {
+      const r = await fetch("/api/ask/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question, history })
       });
-      if (!r.ok) {
+      if (!r.ok || !r.body) {
         const detail = await r.json().catch(() => ({}));
         throw new Error(detail.detail || `답변을 받지 못했습니다 (${r.status})`);
       }
-      return r.json();
+
+      const reader = r.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let answer = null;
+
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        // SSE는 빈 줄로 이벤트를 구분한다. 마지막 조각은 다음 청크와 이어붙인다.
+        const parts = buffer.split("\n\n");
+        buffer = parts.pop();
+        for (const part of parts) {
+          const line = part.split("\n").find(l => l.startsWith("data:"));
+          if (!line) continue;
+          const event = JSON.parse(line.slice(5));
+          if (event.type === "error") throw new Error(event.detail);
+          if (event.type === "answer") answer = event;
+          else onEvent?.(event);
+        }
+      }
+      if (!answer) throw new Error("답변이 완성되지 않았습니다");
+      return answer;
     },
     async index(files) {
       const form = new FormData();
@@ -1256,6 +1282,14 @@
       });
     };
 
+    // 숨겨진 탭에서는 rAF가 돌지 않아 스프링이 중간에 멈춘다. 그 상태로 다시
+    // 보이면 두 화면이 반쯤 겹쳐 있다. 보이지 않을 때는 애니메이션 없이 끝낸다.
+    if (document.hidden) {
+      transition.stop();
+      finishTransition();
+      return;
+    }
+
     transition.to(1, { damping: 1, response: 0.32, done: () => finishTransition?.() });
 
     current = name;
@@ -1419,15 +1453,35 @@
     s.scrollTop = s.scrollHeight;
   }
 
+  // 도구 이름 대신 무엇을 하는 중인지 쓴다. 기다리는 사람에게는 이쪽이 정보다.
+  const WORKING = {
+    search_bookings: "예약을 찾는 중",
+    bookings_on_date: "그날 일정을 모으는 중",
+    resolve_trip_day: "날짜를 계산하는 중",
+    web_search: "웹에서 찾는 중",
+  };
+
   async function respond(q) {
+    const progress = el("div", "toolline");
+    progress.textContent = "예약을 찾는 중";
     const typing = el("div", "bubble bot typing");
     typing.append(el("i"), el("i"), el("i"));
-    thread.append(typing);
+    thread.append(progress, typing);
     scrollThread();
 
     try {
-      const res = await api.ask(q, history.slice(-8));
+      const res = await api.ask(q, history.slice(-8), event => {
+        if (event.type === "tool") {
+          progress.textContent = WORKING[event.name] || event.name;
+        } else if (event.type === "sources" && event.sources.length) {
+          // 검색은 1초면 끝난다. 답변을 기다리는 동안 무엇이 걸렸는지 먼저 보여준다.
+          const names = event.sources.map(s => s.provider).filter(Boolean);
+          progress.textContent = `근거 ${event.sources.length}건 · ${names.join(", ")}`;
+        }
+        scrollThread();
+      });
       typing.remove();
+      progress.remove();
 
       if (res.tools_used && res.tools_used.length) {
         const tl = el("div", "toolline");
@@ -1449,6 +1503,7 @@
       history.push({ role: "assistant", content: res.answer });
     } catch (err) {
       typing.remove();
+      progress.remove();
       pushBubble("bot", `${err.message}\n잠시 후 다시 시도해 주세요.`, "refuse");
     }
     scrollThread();

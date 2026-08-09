@@ -13,6 +13,7 @@ from src.config import (
     AGENT_MODEL,
     NO_INFO_MESSAGE,
     TAVILY_API_KEY,
+    REASONING_EFFORT,
     TOP_K,
     WEB_SEARCH_MAX_RESULTS,
 )
@@ -205,9 +206,15 @@ def resolve_trip_day(day_number: int) -> str:
 
 @lru_cache(maxsize=1)
 def build_agent():
-    """도구 4개를 가진 에이전트를 만든다."""
+    """도구 4개를 가진 에이전트를 만든다.
+
+    에이전트 경로는 LLM을 최소 3번 부른다(도구 선택 → 도구 안의 답변 생성 →
+    최종 정리). 세 번 모두 추론 강도를 낮춰야 체감이 달라진다.
+    """
+    from langchain_openai import ChatOpenAI
+
     return create_agent(
-        model=f"openai:{AGENT_MODEL}",
+        model=ChatOpenAI(model=AGENT_MODEL, reasoning_effort=REASONING_EFFORT),
         tools=[search_bookings, bookings_on_date, web_search, resolve_trip_day],
         system_prompt=SYSTEM_PROMPT,
     )
@@ -272,6 +279,39 @@ def ask(question: str, history: list[dict] | None = None) -> dict:
         "tools_used": tools_used,
         "sources": get_last_sources(),
         "messages": result["messages"],
+    }
+
+
+def ask_stream(question: str, history: list[dict] | None = None):
+    """ask()와 같은 일을 하되 진행 상황을 도중에 내보낸다.
+
+    에이전트 경로는 LLM을 세 번 부르므로 끝날 때까지 화면에 아무것도 못 띄운다.
+    어떤 도구를 쓰는지라도 먼저 보내면 기다리는 동안 상태를 알 수 있다.
+    """
+    global _last_sources
+    _last_sources = []
+
+    messages = [*(history or []), {"role": "user", "content": question}]
+    tools_used: list[str] = []
+    final = None
+
+    for update in build_agent().stream({"messages": messages}, stream_mode="updates"):
+        for payload in update.values():
+            for message in (payload or {}).get("messages", []) or []:
+                for call in getattr(message, "tool_calls", None) or []:
+                    tools_used.append(call["name"])
+                    yield {"type": "tool", "name": call["name"]}
+                if getattr(message, "content", None):
+                    final = message
+
+    answer = _trim_after_refusal(
+        _strip_tool_mentions(final.content if final else ""), tools_used
+    )
+    yield {
+        "type": "answer",
+        "answer": answer,
+        "tools_used": tools_used,
+        "sources": get_last_sources(),
     }
 
 

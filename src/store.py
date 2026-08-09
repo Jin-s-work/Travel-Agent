@@ -57,13 +57,31 @@ class VectorStore:
             path=str(self.persist_dir),
             settings=Settings(anonymized_telemetry=False),
         )
+        self._collection = self._open_collection()
+
+    def _open_collection(self):
         # embedding_function=None: 임베딩은 embedder.py에서 직접 만들어 넣는다.
         # 생략하면 Chroma가 기본 ONNX 모델을 내려받으려 한다.
-        self._collection = self._client.get_or_create_collection(
-            name=collection_name,
+        return self._client.get_or_create_collection(
+            name=self.collection_name,
             configuration={"hnsw": {"space": DISTANCE_METRIC}},
             embedding_function=None,
         )
+
+    def _run(self, operation):
+        """컬렉션 작업을 실행하되, 핸들이 죽어 있으면 다시 잡고 한 번 더 시도한다.
+
+        컬렉션을 지우고 다시 만들면 새 UUID가 생긴다. 그 일이 다른 프로세스에서
+        일어나면(평가 스크립트, 인덱싱 CLI 등) 오래 떠 있는 서버는 옛 UUID를
+        계속 들고 있어 이후 모든 요청이 NotFoundError로 죽는다. 실제로 겪었다.
+        """
+        try:
+            return operation(self._collection)
+        except Exception as error:
+            if "does not exist" not in str(error):
+                raise
+            self._collection = self._open_collection()
+            return operation(self._collection)
 
     def add(
         self,
@@ -78,12 +96,12 @@ class VectorStore:
         if not (len(ids) == len(documents) == len(embeddings) == len(metadatas)):
             raise ValueError("ids/documents/embeddings/metadatas 길이가 서로 다릅니다.")
 
-        self._collection.upsert(
+        self._run(lambda c: c.upsert(
             ids=ids,
             documents=documents,
             embeddings=embeddings,
             metadatas=[_clean_metadata(m) for m in metadatas],
-        )
+        ))
         return len(ids)
 
     def search(
@@ -103,12 +121,12 @@ class VectorStore:
         if self.count() == 0:
             return []
 
-        result = self._collection.query(
+        result = self._run(lambda c: c.query(
             query_embeddings=[embed_query(query)],
             n_results=min(top_k, self.count()),
             where=where or None,
             include=["documents", "metadatas", "distances"],
-        )
+        ))
 
         hits = []
         for index, chunk_id in enumerate(result["ids"][0]):
@@ -127,13 +145,13 @@ class VectorStore:
         return _apply_threshold(hits, min_similarity)
 
     def count(self) -> int:
-        return self._collection.count()
+        return self._run(lambda c: c.count())
 
     def indexed_sources(self) -> dict[str, str]:
         """이미 인덱싱된 {source_file: content_hash} 매핑."""
         if self.count() == 0:
             return {}
-        records = self._collection.get(include=["metadatas"])
+        records = self._run(lambda c: c.get(include=["metadatas"]))
         return {
             metadata["source_file"]: metadata.get("content_hash", "")
             for metadata in records["metadatas"]
@@ -147,7 +165,7 @@ class VectorStore:
         """
         if self.count() == 0:
             return None, None
-        records = self._collection.get(include=["metadatas"])
+        records = self._run(lambda c: c.get(include=["metadatas"]))
         starts = [m["date"] for m in records["metadatas"] if m.get("date")]
         ends = [m.get("date_end") or m["date"] for m in records["metadatas"] if m.get("date")]
         if not starts:
@@ -165,7 +183,7 @@ class VectorStore:
         if target is None or self.count() == 0:
             return []
 
-        records = self._collection.get(
+        records = self._run(lambda c: c.get(
             where={
                 "$and": [
                     {"date_start_int": {"$lte": target}},
@@ -173,7 +191,7 @@ class VectorStore:
                 ]
             },
             include=["metadatas", "documents"],
-        )
+        ))
 
         by_source: dict[str, dict] = {}
         for index, metadata in enumerate(records["metadatas"]):
@@ -191,7 +209,7 @@ class VectorStore:
         if self.count() == 0:
             return []
         # 환불 규정 같은 본문 정보는 메타데이터가 아니라 청크에 들어 있다.
-        records = self._collection.get(include=["metadatas", "documents"])
+        records = self._run(lambda c: c.get(include=["metadatas", "documents"]))
 
         by_source: dict[str, dict] = {}
         for index, metadata in enumerate(records["metadatas"]):
@@ -212,16 +230,12 @@ class VectorStore:
 
     def delete_by_source(self, source_file: str) -> None:
         """한 메일에서 나온 청크를 모두 지운다(재인덱싱용)."""
-        self._collection.delete(where={"source_file": source_file})
+        self._run(lambda c: c.delete(where={"source_file": source_file}))
 
     def reset(self) -> None:
         """컬렉션을 통째로 비운다."""
         self._client.delete_collection(self.collection_name)
-        self._collection = self._client.get_or_create_collection(
-            name=self.collection_name,
-            configuration={"hnsw": {"space": DISTANCE_METRIC}},
-            embedding_function=None,
-        )
+        self._collection = self._open_collection()
 
 
 def _to_int(day: str | None) -> int | None:

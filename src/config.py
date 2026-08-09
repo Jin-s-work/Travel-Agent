@@ -62,6 +62,11 @@ RELATIVE_SIMILARITY_RATIO = 0.75
 # --- 답변 생성 ---
 ANSWER_MODEL = os.getenv("ANSWER_MODEL", "gpt-5-mini")
 AGENT_MODEL = os.getenv("AGENT_MODEL", "gpt-5-mini")
+
+# 추론 강도. 응답 시간의 대부분이 추론 토큰 생성에 쓰인다(출력 736토큰 중 640이
+# 추론이던 적도 있다). "low"로 낮추면 2배 이상 빨라지고 평가 지표는 그대로다.
+# "minimal"은 쓰지 않는다. 근거가 있는데도 거절하고 문구까지 망가진다.
+REASONING_EFFORT = os.getenv("REASONING_EFFORT", "low")
 NO_INFO_MESSAGE = "예약 내역에서 확인할 수 없습니다."
 
 # --- 웹 검색 ---
