@@ -1,6 +1,6 @@
 # 배포 전 체크리스트
 
-Hugging Face Spaces에 올리기 전에 순서대로 확인하세요.
+배포 전에 순서대로 확인하세요. 현재 배포처는 Render이며, 절차는 [RENDER.md](RENDER.md)에 있습니다.
 **1번 항목은 되돌릴 수 없습니다** — 키가 한 번 공개되면 폐기 외에 방법이 없습니다.
 
 ---
@@ -41,7 +41,8 @@ Hugging Face Spaces에 올리기 전에 순서대로 확인하세요.
   → 결과가 있으면 **해당 키를 즉시 폐기하고 재발급**하세요. 히스토리 정리보다
   키 교체가 먼저입니다.
 
-- [ ] Spaces Secrets 등록 (Settings → Variables and secrets)
+- [ ] Render 환경변수 등록 (Dashboard → Environment). `render.yaml`은
+  `sync: false`로 두어 값이 저장소에 들어가지 않습니다
   - `OPENAI_API_KEY` (필수)
   - `TAVILY_API_KEY` (선택, 없으면 웹 검색만 비활성)
   - Secrets는 **Variables가 아니라 Secrets**로 등록해야 로그에 안 찍힙니다.
@@ -64,7 +65,7 @@ Hugging Face Spaces에 올리기 전에 순서대로 확인하세요.
 - [ ] `reports/`에 실제 메일 내용이나 개인정보가 남아 있지 않은지 확인
   (샘플 메일은 가짜 데이터이므로 무방)
 
-- [ ] 공개 Space에는 **실제 예약 메일을 올리지 마세요.** 인덱스가 전역이라
+- [ ] 공개 배포본에는 **실제 예약 메일을 올리지 마세요.** 인덱스가 전역이라
   다른 방문자의 질문에 내 예약이 검색될 수 있습니다.
 
 ---
@@ -90,17 +91,14 @@ Hugging Face Spaces에 올리기 전에 순서대로 확인하세요.
 
 ---
 
-## 4. Spaces 설정 파일
+## 4. 배포 설정 파일
 
-- [ ] `deploy/README_SPACES.md`를 Space 저장소 루트에 **`README.md`로** 복사
-  (HF는 루트 README.md의 YAML frontmatter로 SDK·버전을 읽습니다)
-  ```bash
-  cp deploy/README_SPACES.md README.md   # Space 저장소에서만
-  ```
-  GitHub 저장소의 포트폴리오용 README와 내용이 다르므로 섞이지 않게 주의하세요.
-
-- [ ] `sdk: docker` 와 `app_port: 7860` 이 `Dockerfile`의 `EXPOSE`·`CMD` 포트와
-  일치하는지 확인
+- [ ] `render.yaml`의 `healthCheckPath`가 `/api/health`인지 확인
+- [ ] `Dockerfile`의 `CMD`가 셸 형식인지 확인 (Render가 주입하는 `$PORT`가
+  확장되어야 합니다)
+- [ ] `seed/`와 `tests/sample_emails/`·`tests/demo_emails/`가 이미지에 들어가는지
+  확인. 빠지면 기동 시 인덱스 자동 복구가 조용히 건너뛰어집니다
+  (`tests/`는 `.dockerignore`가 제외하므로 `!` 규칙으로 되살립니다)
 - [ ] 로컬에서 이미지가 빌드되는지 확인
   ```bash
   docker build -t travel-inbox . && docker run --rm -p 7860:7860 --env-file .env travel-inbox
@@ -131,10 +129,11 @@ Hugging Face Spaces에 올리기 전에 순서대로 확인하세요.
 
 ## 6. 배포 후
 
-- [ ] Space 로그에 키가 찍히지 않는지 확인
+- [ ] 배포 로그에 키가 찍히지 않는지 확인
 - [ ] 첫 질문 응답 시간 확인 (무거운 모듈을 지연 로딩하므로 첫 요청만 느립니다)
 - [ ] `/api/docs`가 열리는지 확인. 공개하고 싶지 않으면 `docs_url=None`으로 끕니다
-- [ ] Space 재시작 후 인덱스가 사라지는 것을 문서에 명시했는지 확인
+- [ ] 재시작 후 인덱스가 시드로 다시 채워지는지 확인
+  (로그에 `시드 완료: 청크 7개`)
 - [ ] OpenAI 사용량 대시보드에서 예상 밖의 호출이 없는지 확인
 
 ---
@@ -143,4 +142,5 @@ Hugging Face Spaces에 올리기 전에 순서대로 확인하세요.
 
 메일 1건 인덱싱 = LLM 호출 1회 + 임베딩 1회.
 질문 1건 = 임베딩 1~3회 + LLM 호출 1~2회(에이전트는 도구 호출마다 추가).
-공개 Space는 누구나 쓸 수 있으므로 **사용량 상한(usage limit)을 걸어두세요.**
+공개 배포본은 누구나 쓸 수 있으므로 **사용량 상한(usage limit)을 걸어두세요.**
+기동 시 자동 복구는 미리 파싱해 둔 결과를 쓰므로 LLM 호출이 없고 임베딩만 합니다.
