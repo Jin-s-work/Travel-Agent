@@ -9,10 +9,14 @@ load_dotenv()
 
 # --- 경로 ---
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-EMAILS_DIR = PROJECT_ROOT / "data" / "emails"
 SAMPLE_EMAILS_DIR = PROJECT_ROOT / "tests" / "sample_emails"
 DEMO_EMAILS_DIR = PROJECT_ROOT / "tests" / "demo_emails"
-CHROMA_DIR = PROJECT_ROOT / "data" / "chroma"
+
+# 저장 위치는 환경변수로 바꿀 수 있다. 테스트가 실제 인덱스를 지우는 일을 막고
+# (인덱스 비우기 엔드포인트를 검사하다 개발 중이던 데이터를 날린 적이 있다),
+# 배포에서 별도 디스크를 붙일 때도 쓴다.
+EMAILS_DIR = Path(os.getenv("EMAILS_DIR") or PROJECT_ROOT / "data" / "emails")
+CHROMA_DIR = Path(os.getenv("CHROMA_DIR") or PROJECT_ROOT / "data" / "chroma")
 
 # --- 시드 ---
 # 배포 환경(Render 무료 티어)은 디스크가 영구 저장이 아니라 재시작하면 인덱스가

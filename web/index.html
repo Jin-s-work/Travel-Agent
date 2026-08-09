@@ -907,6 +907,7 @@
 
   let TRIP_START = "2026-10-12";
   let BOOKINGS = [];
+  let PREPARING = false;    // 서버가 인덱스를 자동 복구하는 중
   let MAILS = [];
 
   /* ── API ────────────────────────────────────────────────────── */
@@ -919,6 +920,29 @@
     // 답변 생성이 전체 시간의 대부분이라 끝날 때까지 화면이 비어 있었다.
     // 1초면 끝나는 검색 결과와 도구 진행을 먼저 받아 무엇을 하는 중인지 보여준다.
     async ask(question, history, onEvent) {
+      try {
+        return await this.askStreaming(question, history, onEvent);
+      } catch (err) {
+        if (err.__fromServer) throw err;
+        // 스트리밍이 막히는 환경(버퍼링하는 프록시 등)에서도 답은 나와야 한다.
+        return this.askOnce(question, history);
+      }
+    },
+    async askOnce(question, history) {
+      const r = await fetch("/api/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question, history })
+      });
+      if (!r.ok) {
+        const detail = await r.json().catch(() => ({}));
+        const err = new Error(detail.detail || `답변을 받지 못했습니다 (${r.status})`);
+        err.__fromServer = true;
+        throw err;
+      }
+      return r.json();
+    },
+    async askStreaming(question, history, onEvent) {
       const r = await fetch("/api/ask/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -926,7 +950,9 @@
       });
       if (!r.ok || !r.body) {
         const detail = await r.json().catch(() => ({}));
-        throw new Error(detail.detail || `답변을 받지 못했습니다 (${r.status})`);
+        const err = new Error(detail.detail || `답변을 받지 못했습니다 (${r.status})`);
+        err.__fromServer = r.ok === false;
+        throw err;
       }
 
       const reader = r.body.getReader();
@@ -946,7 +972,11 @@
           const line = part.split("\n").find(l => l.startsWith("data:"));
           if (!line) continue;
           const event = JSON.parse(line.slice(5));
-          if (event.type === "error") throw new Error(event.detail);
+          if (event.type === "error") {
+            const err = new Error(event.detail);
+            err.__fromServer = true;      // 서버가 원인을 알려준 것이므로 재시도하지 않는다
+            throw err;
+          }
           if (event.type === "answer") answer = event;
           else onEvent?.(event);
         }
@@ -1001,8 +1031,16 @@
 
     if (!BOOKINGS.length) {
       const empty = el("div", "drop");
-      const b = el("b"); b.textContent = "아직 등록된 예약이 없습니다";
-      empty.append(b, document.createTextNode("메일 탭에서 예약 확인 메일을 넣어주세요"));
+      const b = el("b");
+      // 배포 환경은 재시작이 잦고, 그때마다 인덱스를 다시 채운다. 그 사이에
+      // 화면을 열면 "예약 없음"으로 보였다. 준비 중이면 그렇게 말하고 기다린다.
+      if (PREPARING) {
+        b.textContent = "예약을 불러오는 중입니다";
+        empty.append(b, document.createTextNode("잠시만 기다려 주세요"));
+      } else {
+        b.textContent = "아직 등록된 예약이 없습니다";
+        empty.append(b, document.createTextNode("메일 탭에서 예약 확인 메일을 넣어주세요"));
+      }
       host.append(empty);
       return;
     }
@@ -1758,8 +1796,30 @@
   detailSpring.set(1);
   sheetSpring.set(1);
 
+  // 인덱스가 비어 있어도 서버가 자동 복구 중일 수 있다. 끝날 때까지 기다렸다가
+  // 안내 문구를 정한다. 사용자가 직접 새로고침하게 만들 이유가 없다.
+  async function waitForSeeding() {
+    for (let n = 0; n < 40; n++) {                 // 최대 2분
+      let status;
+      try { status = await api.indexStatus(); } catch { return false; }
+      if (!status.seeding) return false;
+      PREPARING = true;
+      renderTrip();
+      await new Promise(r => setTimeout(r, 3000));
+      const data = await loadBookings().catch(() => null);
+      if (data && data.count) return true;
+    }
+    return false;
+  }
+
   loadBookings()
-    .then(data => {
+    .then(async data => {
+      if (!data.count) {
+        const recovered = await waitForSeeding();
+        PREPARING = false;
+        if (recovered) data = await loadBookings();
+        else renderTrip();
+      }
       pushBubble("bot", data.count
         ? `예약 ${data.count}건을 읽었습니다. 일정·시간·환불 규정을 물어보세요.\n답할 근거가 없으면 지어내지 않고 없다고 답합니다.`
         : "아직 인덱싱된 예약이 없습니다. 메일 탭에서 예약 확인 메일을 넣어주세요.");

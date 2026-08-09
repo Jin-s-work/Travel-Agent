@@ -36,6 +36,13 @@ SYSTEM_PROMPT = f"""너는 사용자의 여행 예약을 관리하는 어시스�
   때만 search_bookings 를 쓴다.
 - 단순 인사나 잡담 → 도구 없이 바로 답한다.
 
+검색어 만들기:
+- "그거", "거기", "아까 그 예약"처럼 앞 대화를 가리키는 말은 **검색어에 그대로
+  넣지 않는다.** 앞 대화에서 무엇을 가리키는지 찾아 구체적인 이름으로 바꾼다.
+  예: 직전에 Hotel Gracery Shinjuku 얘기를 했고 "그거 환불돼?"라고 물으면
+  검색어는 "Hotel Gracery Shinjuku 환불 규정"이다.
+- 앞 대화에도 대상이 분명하지 않으면 추측해서 검색하지 말고 무엇을 말하는지 되묻는다.
+
 답변 규칙:
 - **도구 이름을 답변에 쓰지 않는다.** "search_bookings 결과:" 같은 말머리를
   붙이지 않는다. 어떤 도구를 썼는지는 화면이 따로 보여준다.
@@ -298,10 +305,14 @@ def ask_stream(question: str, history: list[dict] | None = None):
     for update in build_agent().stream({"messages": messages}, stream_mode="updates"):
         for payload in update.values():
             for message in (payload or {}).get("messages", []) or []:
-                for call in getattr(message, "tool_calls", None) or []:
+                calls = getattr(message, "tool_calls", None) or []
+                for call in calls:
                     tools_used.append(call["name"])
                     yield {"type": "tool", "name": call["name"]}
-                if getattr(message, "content", None):
+                # 도구 결과(ToolMessage)에도 content가 있다. 그것을 답변으로
+                # 삼으면 도구 출력이 그대로 화면에 나간다. 도구를 부르지 않는
+                # 모델 메시지만 최종 답변이 될 수 있다.
+                if getattr(message, "type", None) == "ai" and not calls and message.content:
                     final = message
 
     answer = _trim_after_refusal(

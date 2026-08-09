@@ -143,6 +143,86 @@ def test_fast_path_routing(question, fast):
 
 
 @pytest.mark.parametrize(
+    "question",
+    [
+        "그거 환불 되나?",
+        "그 호텔 체크아웃 몇 시야?",
+        "아까 말한 예약 취소하면 얼마야?",
+        "거기 몇 시까지 가야 해?",
+        "방금 그 투어 집합 장소 어디야?",
+    ],
+)
+def test_referential_questions_go_to_agent(question):
+    """앞 대화를 가리키면 검색어만으로 뜻이 서지 않는다. 맥락을 아는 쪽이 처리해야 한다."""
+    from api import _can_answer_directly
+
+    assert _can_answer_directly(question) is False
+
+
+def test_fast_path_survives_conversation_history():
+    """대화가 이어져도 스스로 뜻이 서는 질문은 빠른 경로를 타야 한다.
+
+    예전에는 history가 있으면 무조건 에이전트로 보내서 두 번째 질문부터
+    같은 질문도 LLM을 세 번 불렀다.
+    """
+    import inspect
+
+    import api
+
+    source = inspect.getsource(api._ask_events) + inspect.getsource(api.ask)
+    assert "not body.history and _can_answer_directly" not in source
+
+
+def test_index_status_reports_seeding():
+    """기동 직후 자동 복구 중에는 화면이 '예약 없음'이 아니라 '준비 중'이어야 한다."""
+    body = client.get("/api/index/status").json()
+    assert "seeding" in body
+    assert isinstance(body["seeding"], bool)
+
+
+def test_seeding_flag_is_on_while_running_and_off_after(monkeypatch):
+    """복구가 도는 동안에만 켜져 있어야 한다. 끝나고도 켜져 있으면 화면이 멈춘다."""
+    import threading
+
+    import api
+    import src.seed as seed_module
+
+    started, release = threading.Event(), threading.Event()
+
+    def slow_seed(store=None):
+        started.set()
+        release.wait(timeout=5)
+        return {"seeded": False, "reason": "테스트"}
+
+    monkeypatch.setattr(seed_module, "seed_if_empty", slow_seed)
+    monkeypatch.setattr(api, "store", lambda: None)
+
+    worker = threading.Thread(target=api._run_seeding)
+    worker.start()
+    assert started.wait(timeout=5)
+    assert client.get("/api/index/status").json()["seeding"] is True
+
+    release.set()
+    worker.join(timeout=5)
+    assert client.get("/api/index/status").json()["seeding"] is False
+
+
+def test_seeding_flag_clears_even_when_seeding_fails(monkeypatch):
+    """실패해도 플래그를 내려야 한다. 남으면 화면이 영영 '준비 중'이 된다."""
+    import api
+    import src.seed as seed_module
+
+    def boom(store=None):
+        raise RuntimeError("OPENAI_API_KEY가 없습니다")
+
+    monkeypatch.setattr(seed_module, "seed_if_empty", boom)
+    monkeypatch.setattr(api, "store", lambda: None)
+
+    api._run_seeding()
+    assert client.get("/api/index/status").json()["seeding"] is False
+
+
+@pytest.mark.parametrize(
     "raw,expected",
     [
         # 실제로 화면에 나왔던 답변이다.

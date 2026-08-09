@@ -76,6 +76,8 @@ _job: dict = {
     "uploaded": [], "rejected": [],
     "indexed": [], "already_indexed": [],
     "total_chunks": 0, "error": None,
+    # 기동 직후 자동 복구가 도는 중인지. 화면이 "예약 없음"으로 보이지 않게 한다.
+    "seeding": False,
 }
 
 
@@ -186,13 +188,24 @@ _BOOKING_RE = re.compile(
 )
 
 
+# 앞선 대화를 가리키는 표현. 이런 질문은 검색어만으로 뜻이 서지 않아
+# 대화 맥락을 함께 넣는 에이전트가 필요하다.
+_REFERS_BACK_RE = re.compile(
+    r"(그것|그거|그건|그게|그때|그날|그\s*예약|그\s*호텔|그\s*항공|그\s*투어|"
+    r"거기|저기|아까|방금|앞서|이전에|위에서|말한|같은\s*거)"
+)
+
+
 def _can_answer_directly(question: str) -> bool:
     """에이전트 없이 예약 검색만으로 답할 수 있는 질문인지 본다.
 
     'N일차'는 날짜 계산 도구가, 날씨·환율 같은 일반 정보는 웹 검색이 필요하다.
+    "그거 환불돼?"처럼 앞 대화를 가리키면 맥락이 필요하다.
     그 외에 예약을 가리키는 표현이 있으면 바로 처리한다.
     """
     if _DAY_REF_RE.search(question) or _GENERAL_RE.search(question):
+        return False
+    if _REFERS_BACK_RE.search(question):
         return False
     return bool(_BOOKING_RE.search(question))
 
@@ -202,7 +215,7 @@ def ask(body: AskRequest) -> dict:
     question = body.question
 
     # 빠른 경로. 근거를 못 찾으면 에이전트로 넘겨 다른 도구를 쓰게 한다.
-    if not body.history and _can_answer_directly(question):
+    if _can_answer_directly(question):
         from src.rag import answer_question
 
         try:
@@ -253,8 +266,11 @@ def _ask_events(body: AskRequest):
     question = body.question
 
     try:
-        if not body.history and _can_answer_directly(question):
-            from src.rag import NO_INFO_MESSAGE, generate, retrieve, source_of
+        # 대화가 이어져도 스스로 뜻이 서는 질문이면 빠른 경로를 쓴다.
+        # 예전에는 history가 있으면 무조건 에이전트로 보내서, 두 번째 질문부터
+        # 같은 질문도 LLM을 세 번 부르며 느려졌다.
+        if _can_answer_directly(question):
+            from src.rag import generate, retrieve, source_of
 
             hits = retrieve(question, store=store())
             sources = [source_of(hit) for hit in hits]
@@ -294,12 +310,18 @@ def _run_seeding() -> None:
     """인덱스가 비어 있으면 시드로 채운다. 실패해도 서버는 계속 뜬다."""
     from src.seed import seed_if_empty
 
+    # 복구가 끝나기 전에 화면을 열면 예약이 0건으로 보인다. 진행 중임을 알린다.
+    with _job_lock:
+        _job.update(seeding=True)
     try:
         with _index_lock:
             result = seed_if_empty(store=store())
     except Exception as error:  # 키 누락·네트워크 오류 등
         print(f"시드 실패: {type(error).__name__}: {error}", file=sys.stderr, flush=True)
         return
+    finally:
+        with _job_lock:
+            _job.update(seeding=False)
 
     if result["seeded"]:
         print(f"시드 완료: 청크 {result['total_chunks']}개", file=sys.stderr, flush=True)
