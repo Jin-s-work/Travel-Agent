@@ -62,24 +62,26 @@ class DiscoveryService:
             output['visit']['timezone']=trip['stops'][0]['timezone']
         return output
     def get_conditions(self,actor,trip_id):
-        trip=self.repo.get_trip(actor.id,trip_id)
-        with self.db.connect() as con:row=con.execute('SELECT * FROM discovery_conditions WHERE trip_id=? AND owner_id=?',(trip_id,actor.id)).fetchone()
-        saved=json.loads(row['conditions_json']) if row else self._default_conditions(trip)
-        stays=[{'stop_id':s['id'],'city':city_key(s['city']),'label':s['city'],
-                'start_date':s['start_date'],'end_date':s['end_date'],
-                'timezone':s['timezone']} for s in trip['stops'] if city_key(s['city'])]
+        from .context import load, resolve
+        with self.db.connect() as con:
+            trip=self.repo._trip_dto(con,self._owner(con,actor,trip_id))
+            row=con.execute('SELECT * FROM discovery_conditions WHERE trip_id=? AND owner_id=?',(trip_id,actor.id)).fetchone()
+            overrides,stop_id,basis=load(con,trip_id,row)
+        resolved=resolve(trip,overrides,stop_id,basis)
+        # Preserve legacy no-stop defaults for the old condition editor, but require confirmation.
+        if not trip['stops'] and not row:
+            resolved['conditions']=self._default_conditions(trip)
+        stays=[{'stop_id':s['id'],'city':city_key(s['city']),'label':s['city'],'start_date':s['start_date'],'end_date':s['end_date'],'timezone':s['timezone']} for s in trip['stops'] if city_key(s['city'])]
         unsupported=bool(trip['stops'] and not stays)
-        issue=self.context_issue(trip,saved)
+        issue=resolved['validation']
         confirmed=not issue and bool(row or trip['stops'])
-        return {'version':row['version'] if row else 0,'trip_version':trip['version'],
+        return {**resolved,'version':row['version'] if row else 0,'trip_version':trip['version'],
             'saved_trip_version':row['trip_version'] if row else trip['version'],'trip_snapshot':trip,
             'city_needs_confirmation':not confirmed,
-            'context_state':'unsupported_city' if unsupported else 'outdated' if issue else 'ready' if confirmed else 'selection_required',
-            'stay_options':stays,
-            'catalog_availability':self.availability(saved.get('city')),
-            'city_metadata':CITIES.get(saved.get('city')),
-            'unsupported_cities':[s['city'] for s in trip['stops'] if not city_key(s['city'])],
-            'conditions':saved}
+            'context_state':'unsupported_city' if unsupported else 'selection_required' if not trip['stops'] and not row else 'outdated' if issue else 'ready',
+            'stay_options':stays,'catalog_availability':self.availability(resolved['conditions'].get('city')),
+            'city_metadata':CITIES.get(resolved['conditions'].get('city')),
+            'unsupported_cities':[s['city'] for s in trip['stops'] if not city_key(s['city'])]}
 
     @staticmethod
     def context_issue(trip,conditions):
@@ -102,6 +104,7 @@ class DiscoveryService:
             if body['expected_version']!=(old['version'] if old else 0):deny('VERSION_CONFLICT','다른 화면에서 조건이 바뀌었습니다. 입력을 보존한 채 최신 조건을 확인해 주세요.')
             issue=self.context_issue(trip,conditions)
             if issue:raise DomainError('VALIDATION_FAILED',issue['message'],422,[issue])
+            con.execute('DELETE FROM discovery_contexts WHERE trip_id=?',(trip_id,))
             con.execute('INSERT INTO discovery_conditions VALUES(?,?,?,?,?,?,?) ON CONFLICT(trip_id) DO UPDATE SET version=excluded.version,trip_version=excluded.trip_version,snapshot_json=excluded.snapshot_json,conditions_json=excluded.conditions_json,updated_at=excluded.updated_at',
                 (trip_id,actor.id,body['expected_version']+1,trip['version'],encode(trip),encode(conditions),now()))
         return self.get_conditions(actor,trip_id)

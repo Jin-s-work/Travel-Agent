@@ -22,14 +22,14 @@ function submitContext(api) {
   const state={trip:{id:'trip-a',version:2},discovery:{conditions:{version:3}},recommendations:{},session:{authenticated:true,user:{id:'a'}},epoch:1,intents:new Map()};
   const node=()=>({reportValidity:()=>true,append(){},textContent:'',hidden:false});
   const errors=[];
-  const context=load(['applyRecommendations'],{state,$:id=>{if(!dom.has(id))dom.set(id,node());return dom.get(id);},notice(){},showError(el,msg){el.textContent=msg||'';},recommendationInput:()=>({trip_version:2,conditions_version:3,limit:6}),uid:()=> 'stable-intent',renderRecommendationResults(){},make:()=>node(),api,tripPath:trip=>'/trips/'+trip.id,loadRecommendations:async()=>{},loadJobs:async()=>{},fail:e=>errors.push(e),discoveryMessage(){},button:()=>node()});
+  const context=load(['applyRecommendations'],{state,$:id=>{if(!dom.has(id))dom.set(id,node());return dom.get(id);},notice(){},showError(el,msg){el.textContent=msg||'';},discoveryIntentPayload:()=>({expected_trip_version:2,expected_conditions_version:3,visit_date:'2026-11-06',stop_id:'stop-a',overrides:{},filters:{limit:6}}),loadDiscovery:async()=>{},uid:()=> 'stable-intent',rememberDiscoveryKey:async(_name,key)=>key,renderRecommendationResults(){},make:()=>node(),api,tripPath:trip=>'/trips/'+trip.id,loadRecommendations:async()=>{},loadJobs:async()=>{},fail:e=>errors.push(e),discoveryMessage(){},button:()=>node()});
   return {context,state,errors,dom};
 }
 test('apply posts the captured trip and versions once while a request is pending', async()=>{
   let resolve; const calls=[]; const {context,state}=submitContext((...args)=>{calls.push(args);return new Promise(r=>resolve=r);});
   const first=context.applyRecommendations(); await context.applyRecommendations();
-  assert.equal(calls.length,1); assert.equal(calls[0][0],'/trips/trip-a/recommendations');
-  assert.equal(calls[0][1].body.conditions_version,3);assert.equal(calls[0][1].headers['Idempotency-Key'],'stable-intent');
+  assert.equal(calls.length,1); assert.equal(calls[0][0],'/trips/trip-a/discovery-intents');
+  assert.equal(calls[0][1].body.expected_conditions_version,3);assert.equal(calls[0][1].headers['Idempotency-Key'],'stable-intent');
   resolve({run_id:'run-a',state:'queued'});await first;
   assert.equal(state.recommendations.active.run_id,'run-a');assert.equal(state.recommendations.submitting,false);
 });
@@ -40,7 +40,7 @@ test('unknown submit outcome preserves the idempotency key for an explicit retry
 });
 test('late submit response cannot activate results in another trip scope', async()=>{
   let resolve;const {context,state}=submitContext(()=>new Promise(r=>resolve=r));
-  const pending=context.applyRecommendations();state.epoch++;state.trip={id:'trip-b'};state.recommendations={};
+  const pending=context.applyRecommendations();await new Promise(done=>setImmediate(done));state.epoch++;state.trip={id:'trip-b'};state.recommendations={};
   resolve({run_id:'run-a',state:'succeeded'});await pending;
   assert.equal(state.recommendations.active,undefined);assert.equal(state.trip.id,'trip-b');
 });
@@ -154,3 +154,20 @@ test('calendar dates reject zero and six-digit years while allowing leap dates',
   assert.notEqual(context.calendarDate('2028-02-29'),null);
   assert.notEqual(context.calendarDate('0001-01-01'),null);
 });
+
+ test('response to an older draft preserves filters edited during submission', async()=>{
+  let resolve;const {context,state}=submitContext(()=>new Promise(r=>resolve=r));
+  const pending=context.applyRecommendations();await new Promise(done=>setImmediate(done));
+  state.discovery.draftRevision=1;state.discovery.dirty=true;state.discovery.draft={conditions:{party:{adults:5}}};
+  state.recommendations.filterRevision=1;state.recommendations.optionsDirty=true;
+  resolve({run_id:'older-run',state:'queued',conditions_version:4});await pending;
+  assert.equal(state.discovery.dirty,true);assert.equal(state.discovery.draft.conditions.party.adults,5);
+  assert.equal(state.recommendations.optionsDirty,true);
+ });
+ test('sparse changes preserve explicit null and omit unchanged inherited values',()=>{
+  const context=load(['sparseChanges','mergeDraft'],{structuredClone});
+  const next=context.sparseChanges({party:{adults:1,children:[]},origin:{label:'old'}},{party:{adults:2,children:[]},origin:null});
+  assert.equal(JSON.stringify(next),JSON.stringify({party:{adults:2},origin:null}));
+  const merged=context.mergeDraft({required:{dietary:['vegan']}},next);
+  assert.equal(merged.required.dietary[0],'vegan');assert.equal(merged.origin,null);
+ });

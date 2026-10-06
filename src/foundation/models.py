@@ -53,9 +53,20 @@ class Child(StrictModel):
 class Party(StrictModel):
     adults: int = Field(default=1, ge=1, le=50)
     children: list[Child] = Field(default_factory=list, max_length=30)
+    children_status: Literal['unknown','none','present'] = 'unknown'
+
+    @model_validator(mode='after')
+    def child_status(self):
+        if self.children:
+            if self.children_status == 'none': raise ValueError('아동 없음과 아동 인원을 함께 지정할 수 없습니다.')
+            self.children_status = 'present'
+        elif self.children_status == 'present': raise ValueError('아동 인원과 나이를 입력해 주세요. 나이는 미확인으로 둘 수 있습니다.')
+        return self
+
 
 
 class StopInput(StrictModel):
+    id: str | None = Field(default=None, max_length=100)
     city: str = Field(min_length=1, max_length=120)
     sequence: int = Field(ge=1, le=100)
     start_date: str

@@ -10,11 +10,11 @@
 <meta name="theme-color" content="#245C4F">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Travel Inbox">
-<link rel="stylesheet" href="/css/foundation.css?v=92ef05884fc4">
+<link rel="stylesheet" href="/css/foundation.css?v=3b1c57cc38c1">
 <script src="/js/offline-store.js?v=f2e23f13122c" defer></script>
 <script src="/js/product.js?v=a8fe8457aace" defer></script>
 <script src="/js/travel-tools.js?v=babbf4751245" defer></script>
-<script src="/js/foundation.js?v=49e028d95669" defer></script>
+<script src="/js/foundation.js?v=7799ae6dcd8e" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">본문으로 이동</a>
@@ -42,15 +42,17 @@
     <a class="brand" href="/" aria-label="Travel Inbox 홈"><span aria-hidden="true">↗</span> Travel Inbox</a>
     <nav aria-label="주 메뉴">
       <p class="nav-label">MY JOURNEY</p>
-      <button type="button" data-tab="trip" class="nav-primary" aria-current="page"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h16v11H4z M8 9V5h8v4 M9 13v3 M15 13v3"/></svg><span class="nav-text">여행</span></button>
+      <button type="button" data-tab="trip" class="nav-primary" aria-current="page"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h16v11H4z M8 9V5h8v4 M9 13v3 M15 13v3"/></svg><span class="nav-text">홈</span></button>
       <button type="button" data-tab="explore" class="nav-primary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18 M16 8l-2.5 5.5L8 16l2.5-5.5z"/></svg><span class="nav-text">탐색</span></button>
       <button type="button" data-tab="itinerary" class="nav-primary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3v4 M18 3v4 M3 10h18 M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2 M7 14h3 M7 17h7"/></svg><span class="nav-text">일정</span></button>
-      <button type="button" data-tab="today" class="nav-primary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v2 M12 20v2 M2 12h2 M20 12h2 M5 5l1.5 1.5 M17.5 17.5L19 19 M5 19l1.5-1.5 M17.5 6.5L19 5 M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0"/></svg><span class="nav-text">오늘</span></button>
+
+      <button type="button" data-tab="mail" class="nav-primary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18v14H3z M3 6l9 7 9-7"/></svg><span class="nav-text">예약</span></button>
+      <button type="button" data-tab="today" class="nav-secondary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v2 M12 20v2 M2 12h2 M20 12h2 M5 5l1.5 1.5 M17.5 17.5L19 19 M5 19l1.5-1.5 M17.5 6.5L19 5 M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0"/></svg><span class="nav-text">오프라인</span></button>
       <p class="nav-label nav-tools-label">여행 도구</p>
-      <button type="button" data-tab="preparation" class="nav-secondary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4H5v17h14V4h-3 M8 2h8v5H8z M8 13l2.5 2.5L16 10"/></svg><span class="nav-text">예약 준비</span></button>
+      <button type="button" data-tab="preparation" class="nav-secondary nav-alias"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4H5v17h14V4h-3 M8 2h8v5H8z M8 13l2.5 2.5L16 10"/></svg><span class="nav-text">예약 준비</span></button>
       <button type="button" data-tab="product" class="nav-secondary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14v18l-3-2-4 2-4-2-3 2z M9 7h6 M9 11h6 M9 15h2"/></svg><span class="nav-text">기록·지출</span></button>
       <button type="button" data-tab="ask" class="nav-secondary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11a8 8 0 0 1-8 8H8l-5 3 1.5-6A8 8 0 1 1 21 11 M8 10h8 M8 14h4"/></svg><span class="nav-text">질문</span></button>
-      <button type="button" data-tab="mail" class="nav-secondary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18v14H3z M3 6l9 7 9-7"/></svg><span class="nav-text">메일</span></button>
+
       <button type="button" data-tab="reviews" class="nav-secondary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v6c0 5-8 9-8 9s-8-4-8-9V7z M8 12l3 3 5-6"/></svg><span class="nav-text">리뷰 근거</span></button>
       <button type="button" data-tab="settings" class="nav-secondary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16 M4 17h16 M8 4v6 M16 14v6"/></svg><span class="nav-text">설정</span></button>
       <button type="button" id="openMore" class="nav-more" aria-haspopup="dialog"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16 M4 12h16 M4 18h16"/></svg><span class="nav-text">더보기</span></button>
@@ -65,18 +67,15 @@
     </header>
     <main id="main" class="main" tabindex="-1">
       <div id="pageError" class="banner error" role="alert" hidden></div>
+      <div class="section-switch" data-sections="mail,preparation" hidden role="group" aria-label="예약 보기"><button type="button" data-tab="mail">예약·메일</button><button type="button" data-tab="preparation">예약 준비 할 일</button></div>
+      <div class="section-switch" data-sections="itinerary,today" hidden role="group" aria-label="일정 보기"><button type="button" data-tab="itinerary">전체 일정</button><button type="button" data-tab="today">오늘·오프라인</button></div>
       <section id="view-trip" class="view" aria-labelledby="tripTitle">
         <div class="trip-overview">
         <div class="page-heading"><div><p class="eyebrow">YOUR JOURNEY</p><h1 id="tripTitle">나의 여행</h1><p id="tripSubtitle" class="muted"></p></div><div class="actions"><button id="editTrip" class="secondary" type="button">여행 수정</button><button id="refreshBookings" class="icon-button" type="button" aria-label="예약 새로고침">↻</button></div></div>
         <div id="tripSummary" class="summary-grid"></div></div>
         <div id="homePlaces" class="panel home-places" hidden></div>
         <div id="noTrip" class="empty panel" hidden><span aria-hidden="true">↗</span><h2>첫 여행을 만들어 보세요</h2><p>예약 메일이 없어도 괜찮아요.<br>날짜와 도시를 정하고 예약을 직접 추가할 수 있어요.</p><button type="button" id="emptyCreateTrip" class="primary">여행 만들기</button></div>
-        <div id="bookingArea">
-          <div class="section-heading"><h2>예약 모아보기 <span id="bookingCount" class="count"></span></h2><button id="addBooking" class="secondary" type="button">＋ 예약 직접 추가</button></div>
-          <div id="bookingDays" class="day-strip" role="group" aria-label="여행 날짜별 예약"></div>
-          <details id="bookingFilterOptions" class="booking-filter-options"><summary>날짜·종류 필터 <span id="bookingFilterBrief" class="hint"></span></summary><form id="bookingFilters" class="filters" aria-label="예약 필터"><div><label for="dateFilter">날짜</label><input type="date" id="dateFilter" min="0001-01-01" max="9999-12-31"></div><div><label for="kindFilter">예약 종류</label><select id="kindFilter"><option value="">전체 종류</option><option>항공</option><option>숙소</option><option>렌터카</option><option>투어</option><option>음식점</option><option>기타</option></select></div><label class="check"><input type="checkbox" id="needsReview"> 확인 필요만</label><button id="clearFilters" class="text-button" type="button">필터 초기화</button></form>
-          </details><div id="bookingList" aria-live="polite"></div>
-        </div>
+
       </section>
       <section id="view-preparation" class="view" hidden aria-labelledby="preparationTitle">
         <div class="page-heading"><div><p class="eyebrow">BEFORE YOU GO</p><h1 id="preparationTitle">예약 준비</h1><p class="muted scope-text"></p></div><button id="newPreparation" class="primary" type="button">준비할 예약 추가</button></div>
@@ -106,8 +105,10 @@
       </section>
       <section id="view-explore" class="view" aria-labelledby="exploreTitle" hidden>
         <div class="page-heading"><div><p class="eyebrow">YOUR PLACES, WITH CONTEXT</p><h1 id="exploreTitle">여행지 탐색</h1><p class="muted scope-text"></p></div><button id="addBookmark" type="button" class="primary">＋ 장소 저장</button></div>
+        <div class="section-switch" role="group" aria-label="탐색 보기"><button type="button" data-explore-view="recommend" aria-pressed="true">추천 찾기</button><button type="button" data-explore-view="saved" aria-pressed="false">저장한 장소</button></div>
+        <div id="discoveryQuick" class="panel discovery-quick"></div>
         <p id="discoveryError" class="banner error" role="alert" hidden></p>
-        <details class="panel discovery-conditions disclosure"><summary><span>방문 조건</span><span id="discoveryConditionBrief" class="disclosure-description"></span></summary><div class="section-heading"><h2 id="discoveryConditionsTitle">적용한 방문 조건</h2><button id="editDiscoveryConditions" type="button" class="secondary">조건 편집</button></div><div id="discoveryConditions"></div><p class="hint">입력 중인 조건은 저장한 조건과 구분합니다. 조건을 바꾸는 동안 장소를 자동 검색하거나 리뷰를 수집하지 않습니다.</p></details><div id="discoveryAvailability"></div>
+<div id="discoveryAvailability"></div>
         <div id="discoveryMessage" class="form-note" role="status" hidden></div>
         <section id="recommendationWorkspace" class="recommendation-workspace" aria-labelledby="recommendationTitle">
           <div class="section-heading"><h2 id="recommendationTitle">이 조건으로 장소 찾기</h2><button id="applyRecommendations" type="button" class="primary">추천 보기</button></div>
@@ -126,9 +127,12 @@
           <div id="exploreItinerarySelection" class="form-note" hidden></div>
           <section id="comparisonTray" class="panel comparison-tray" aria-label="비교할 장소" aria-live="polite" hidden></section>
         </section>
+        <details class="panel discovery-conditions disclosure"><summary><span>조건 자세히 보기</span><span id="discoveryConditionBrief" class="disclosure-description"></span></summary><div class="section-heading"><h2 id="discoveryConditionsTitle">적용한 방문 조건</h2><button id="editDiscoveryConditions" type="button" class="secondary">필터 변경</button></div><div id="discoveryConditions"></div><p class="hint">입력 중인 조건은 저장한 조건과 구분합니다. 조건을 바꾸는 동안 장소를 자동 검색하거나 리뷰를 수집하지 않습니다.</p></details>
+        <section id="bookmarkWorkspace" hidden>
         <div class="section-heading"><h2>장소 보관함 <span id="bookmarkCount" class="count"></span></h2><button id="refreshBookmarks" class="text-button" type="button">보관함 새로고침</button></div>
         <div class="filters"><div><label for="bookmarkFilter">보관함 표시</label><select id="bookmarkFilter"><option value="all">모든 장소</option><option value="resolved">지점 확인 완료</option><option value="needs_confirmation">지점 확인 필요</option><option value="excluded">추천에서 제외한 장소</option></select></div></div>
         <div id="bookmarkList" aria-live="polite"></div>
+        </section>
         <details id="discoveryAdmin" class="discovery-admin disclosure" hidden><summary>운영자 도구 <span class="disclosure-description">도시 후보·출처 검수</span></summary>
           <div class="section-heading"><h2 id="discoveryAdminTitle">관리자 · 도시 후보 검수</h2><button id="importDiscoveryPack" type="button" class="secondary">후보 자료 가져오기</button></div>
           <p class="hint">도시·지점·출처·사용 범위를 확인한 자료만 승인하세요. 합성팩은 계산과 화면 시험용이며 실제 여행지 조사 결과가 아닙니다.</p>
@@ -142,9 +146,16 @@
         <form id="questionForm" class="composer panel"><label for="question">여행 질문</label><textarea id="question" rows="2" maxlength="1000" placeholder="2일차 예약을 전부 알려줘" required></textarea><div class="composer-footer"><span class="hint">현재 여행의 예약과 출처를 확인해 답합니다.</span><button id="sendQuestion" class="primary" type="submit">질문하기 ↑</button></div><p id="questionError" class="error" role="alert" hidden></p></form>
       </section>
       <section id="view-mail" class="view" aria-labelledby="mailTitle" hidden>
-        <div class="page-heading"><div><p class="eyebrow">YOUR RESERVATIONS, TOGETHER</p><h1 id="mailTitle">예약 메일</h1><p class="muted scope-text"></p></div></div>
+
+        <div class="page-heading"><div><p class="eyebrow">YOUR RESERVATIONS, TOGETHER</p><h1 id="mailTitle">예약</h1><p class="muted scope-text"></p></div></div>
         <p class="form-note">처음 사용하시나요? <a href="/examples/mail-test-pack.zip" download>테스트 메일 12개 받기</a> · 합성 자료와 확인 안내가 들어 있어요. 무료 운영에서는 AI 분석이 제한될 수 있습니다.</p>
-        <form id="uploadForm" class="panel upload-panel"><label id="dropzone" for="mailFiles" class="dropzone"><span aria-hidden="true">↥</span><strong>예약 메일을 여기에 추가하세요</strong><span>.txt 또는 .eml · 파일당 최대 1 MiB · 한 번에 10개</span><input id="mailFiles" name="files" type="file" accept=".txt,.eml,text/plain,message/rfc822" multiple></label><p class="hint">메일 안의 링크나 첨부 파일은 실행하지 않습니다. 같은 여행에 이미 넣은 메일은 중복으로 알려드려요.</p><div id="selectedFiles"></div><button id="uploadButton" type="submit" class="primary">선택한 메일 분석</button><p id="uploadError" class="error" role="alert" hidden></p></form>
+                <div id="bookingArea">
+          <div class="section-heading"><h2>예약 모아보기 <span id="bookingCount" class="count"></span></h2><button id="addBooking" class="secondary" type="button">＋ 예약 직접 추가</button></div>
+          <div id="bookingDays" class="day-strip" role="group" aria-label="여행 날짜별 예약"></div>
+          <details id="bookingFilterOptions" class="booking-filter-options"><summary>날짜·종류 필터 <span id="bookingFilterBrief" class="hint"></span></summary><form id="bookingFilters" class="filters" aria-label="예약 필터"><div><label for="dateFilter">날짜</label><input type="date" id="dateFilter" min="0001-01-01" max="9999-12-31"></div><div><label for="kindFilter">예약 종류</label><select id="kindFilter"><option value="">전체 종류</option><option>항공</option><option>숙소</option><option>렌터카</option><option>투어</option><option>음식점</option><option>기타</option></select></div><label class="check"><input type="checkbox" id="needsReview"> 확인 필요만</label><button id="clearFilters" class="text-button" type="button">필터 초기화</button></form>
+          </details><div id="bookingList" aria-live="polite"></div>
+        </div>
+<form id="uploadForm" class="panel upload-panel"><label id="dropzone" for="mailFiles" class="dropzone"><span aria-hidden="true">↥</span><strong>예약 메일을 여기에 추가하세요</strong><span>.txt 또는 .eml · 파일당 최대 1 MiB · 한 번에 10개</span><input id="mailFiles" name="files" type="file" accept=".txt,.eml,text/plain,message/rfc822" multiple></label><p class="hint">메일 안의 링크나 첨부 파일은 실행하지 않습니다. 같은 여행에 이미 넣은 메일은 중복으로 알려드려요.</p><div id="selectedFiles"></div><button id="uploadButton" type="submit" class="primary">선택한 메일 분석</button><p id="uploadError" class="error" role="alert" hidden></p></form>
         <div id="uploadResults" class="upload-results" aria-live="polite"></div>
         <div class="section-heading"><h2>저장된 메일</h2><button id="refreshDocuments" class="text-button" type="button">새로고침</button></div><div id="documentList"></div>
       </section>

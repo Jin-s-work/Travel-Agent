@@ -96,6 +96,7 @@ class Itineraries:
             return self._receipt(row['id'],existing)
         envelope=self.discovery.get_conditions(actor,trip_id)
         if envelope['version']!=body['conditions_version']:error('VERSION_CONFLICT','방문 조건이 변경되었습니다. 최신 조건을 확인해 주세요.')
+        if envelope.get('city_needs_confirmation'):error('CITY_CONFIRMATION_REQUIRED','여행 도시와 날짜를 확인해 주세요.',422)
         conditions=Conditions.model_validate(envelope['conditions']).model_dump(mode='json')
         trip=envelope['trip_snapshot']
         if not trip['start_date']<=body['start_date']<=body['end_date']<=trip['end_date']:error('DATE_OUTSIDE_TRIP','여행 기간 안의 날짜를 선택해 주세요.',422)
@@ -132,7 +133,7 @@ class Itineraries:
         with self.db.connect() as con:
             con.execute('BEGIN IMMEDIATE');current=self._scope(con,actor,trip_id)
             cv=con.execute('SELECT version FROM discovery_conditions WHERE trip_id=?',(trip_id,)).fetchone()
-            if current['version']!=body['trip_version'] or not cv or cv['version']!=body['conditions_version']:error('VERSION_CONFLICT','여행 또는 방문 조건이 변경되었습니다.')
+            if current['version']!=body['trip_version'] or (cv['version'] if cv else 0)!=body['conditions_version']:error('VERSION_CONFLICT','여행 또는 방문 조건이 변경되었습니다.')
             data=self._data(con,actor,trip_id,snapshot)
             if data['missing_place_ids']:error('NOT_FOUND','사용 가능한 선택 장소를 찾을 수 없습니다.',404)
             ident=new_id('itinerary')
@@ -163,7 +164,7 @@ class Itineraries:
             con.execute('BEGIN IMMEDIATE');ctx.guard(con=con,require_version=True)
             current=self._get(con,actor,trip_id,ident)
             cv=con.execute('SELECT version FROM discovery_conditions WHERE trip_id=?',(trip_id,)).fetchone()
-            if not cv or cv['version']!=row['conditions_version']:error('VERSION_CONFLICT','생성 중 방문 조건이 변경되었습니다. 현재 조건으로 다시 만들어 주세요.')
+            if (cv['version'] if cv else 0)!=row['conditions_version']:error('VERSION_CONFLICT','생성 중 방문 조건이 변경되었습니다. 현재 조건으로 다시 만들어 주세요.')
             self._data_guard(con,actor,trip_id,snapshot,data,row['input_manifest']);self._leg_guard(result)
             if current['active_revision_id']:return {'itinerary_id':ident,'revision_id':current['active_revision_id']}
             rid=self._revision(con,current,actor,'generation',[],result,data,version=1)
@@ -231,7 +232,7 @@ class Itineraries:
         job=self.jobs.get(row['job_id'],actor.id,actor.session_id)
         return {'id':ident,'itinerary_id':ident,'version':row['version'],'job_id':row['job_id'],'job':job,'state':job['state'],
             'active_revision_id':row['active_revision_id'],'validation_status':result.get('validation_status',row['validation_status']),
-            'input_status':'current' if trip['version']==row['trip_version'] and cv and cv['version']==row['conditions_version'] else 'stale',
+            'input_status':'current' if trip['version']==row['trip_version'] and (cv['version'] if cv else 0)==row['conditions_version'] else 'stale',
             'data_status':'stale' if stale else 'current' if revision else 'pending','snapshot':snapshot,
             'revisions':history,'can_undo':bool(json.loads(row['undo_stack_json'])),'created_at':row['created_at'],'updated_at':row['updated_at'],
             **{name:result.get(name,[]) for name in ('items','legs','conflicts','unplaced','unresolved_conditions','assumptions')},
@@ -245,7 +246,7 @@ class Itineraries:
             snapshot=json.loads(row['snapshot_json']);olddata=json.loads(revision['input_data_json'])
             data=self._data(con,actor,trip_id,snapshot,self._extra(olddata)+list(extra))
             trip=self._scope(con,actor,trip_id);cv=con.execute('SELECT version FROM discovery_conditions WHERE trip_id=?',(trip_id,)).fetchone()
-            if trip['version']!=row['trip_version'] or not cv or cv['version']!=row['conditions_version']:
+            if trip['version']!=row['trip_version'] or (cv['version'] if cv else 0)!=row['conditions_version']:
                 error('INPUT_SNAPSHOT_STALE','여행·예약 또는 방문 조건이 변경되었습니다. 현재 조건으로 새 일정을 만들어 주세요.',details={'current_url':f'/api/v2/trips/{trip_id}/itineraries/{ident}','regenerate_required':True})
         return row,snapshot,data,json.loads(revision['result_json']),trip['version'],cv['version'] if cv else 0
 
@@ -280,7 +281,7 @@ class Itineraries:
         with self.db.connect() as con:
             con.execute('BEGIN IMMEDIATE');current=self._get(con,actor,trip_id,row['id']);self._version(current,row['version'])
             trip=self._scope(con,actor,trip_id);saved=con.execute('SELECT version FROM discovery_conditions WHERE trip_id=?',(trip_id,)).fetchone()
-            if trip['version']!=tv or not saved or saved['version']!=cv:error('VERSION_CONFLICT','여행이나 방문 조건이 변경되었습니다. 새 미리보기를 확인해 주세요.')
+            if trip['version']!=tv or (saved['version'] if saved else 0)!=cv:error('VERSION_CONFLICT','여행이나 방문 조건이 변경되었습니다. 새 미리보기를 확인해 주세요.')
             self._data_guard(con,actor,trip_id,snapshot,data,digest(data));self._leg_guard(result)
             con.execute('INSERT INTO itinerary_previews VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
                 (ident,row['id'],trip_id,actor.id,row['version'],tv,cv,kind,dump(commands),dump(result),digest(data),dump(data),steps,None,stamp,expires))
@@ -327,8 +328,8 @@ class Itineraries:
             if p['base_version']!=row['version']:error('VERSION_CONFLICT','미리보기 이후 일정이 변경되었습니다.')
             if p['expires_at']<=utcnow():error('PREVIEW_EXPIRED','미리보기가 만료되었습니다. 입력을 유지하고 다시 확인해 주세요.')
             trip=self._scope(con,actor,trip_id);cv=con.execute('SELECT version FROM discovery_conditions WHERE trip_id=?',(trip_id,)).fetchone()
-            if trip['version']!=p['trip_version'] or not cv or cv['version']!=p['conditions_version']:error('VERSION_CONFLICT','여행이나 방문 조건이 변경되었습니다. 새 미리보기가 필요합니다.')
-            if trip['version']!=row['trip_version'] or cv['version']!=row['conditions_version']:error('INPUT_SNAPSHOT_STALE','현재 여행 조건으로 일정을 다시 만들어 주세요.')
+            if trip['version']!=p['trip_version'] or (cv['version'] if cv else 0)!=p['conditions_version']:error('VERSION_CONFLICT','여행이나 방문 조건이 변경되었습니다. 새 미리보기가 필요합니다.')
+            if trip['version']!=row['trip_version'] or (cv['version'] if cv else 0)!=row['conditions_version']:error('INPUT_SNAPSHOT_STALE','현재 여행 조건으로 일정을 다시 만들어 주세요.')
             snapshot=json.loads(row['snapshot_json']);data=json.loads(p['input_data_json']);result=json.loads(p['result_json'])
             data=self._data_guard(con,actor,trip_id,snapshot,data,p['data_manifest']);self._leg_guard(result)
             if p['kind']=='plan_b':

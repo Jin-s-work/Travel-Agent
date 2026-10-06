@@ -42,7 +42,7 @@ class MealWindow(Input):
 
 class Generation(Input):
     trip_version:int=Field(ge=1)
-    conditions_version:int=Field(ge=1)
+    conditions_version:int=Field(ge=0)
     itinerary_request_version:Literal[1]=1
     recommendation_run_id:str|None=Field(default=None,max_length=100)
     start_date:date

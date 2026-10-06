@@ -335,3 +335,25 @@ def test_client_origin_place_id_is_not_proof_of_zero_travel(planning):
     assert result['snapshot']['origin']['place_id'] is None
     assert not any(i.get('place_id')==selected for i in result['items'])
     assert result['unplaced'] and planning.routes.calls==0
+
+
+def test_inherited_conditions_support_preview_apply_and_undo(planning):
+    from tests.test_discovery_intents import trip_for
+    pack=import_pack(planning);trip=trip_for(planning.client)
+    selected=pack['places'][0]['place_id']
+    result,path=done(planning,trip,submit(planning,trip,selected,conditions_version=0,allow_provisional=True))
+    item=next(i for i in result['items'] if i.get('place_id')==selected)
+    proposal=preview(planning,path,1,[{'op':'lock','item_id':item['item_id']}])
+    assert proposal['can_apply'],proposal
+    committed=apply(planning,path,proposal)
+    assert committed.status_code==200,committed.text
+    assert committed.json()['version']==2
+    assert next(i for i in committed.json()['items'] if i['item_id']==item['item_id'])['locked']
+    undo=planning.client.post(path+'/undo-previews',json={'expected_version':2,'steps':1})
+    assert undo.status_code==200,undo.text
+    restored=apply(planning,path,undo.json())
+    assert restored.status_code==200,restored.text
+    assert restored.json()['version']==3
+    assert not next(i for i in restored.json()['items'] if i['item_id']==item['item_id'])['locked']
+    with planning.app.state.db.connect() as con:
+        assert con.execute('SELECT COUNT(*) FROM discovery_conditions WHERE trip_id=?',(trip['id'],)).fetchone()[0]==0

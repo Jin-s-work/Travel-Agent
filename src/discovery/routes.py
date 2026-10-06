@@ -3,7 +3,20 @@ from fastapi import APIRouter,Depends,Request
 from src.foundation.auth import require_actor
 from .models import ConditionsPatch,BookmarkInput,BookmarkPatch,VersionInput,Selection,PackInput,Approval,SourceReview,FactInput
 
+from .intents import DiscoveryIntent
+
 router=APIRouter(prefix='/api/v2')
+
+@router.post('/trips/{trip_id}/discovery-intents',status_code=202)
+def discovery_intent(trip_id:str,body:DiscoveryIntent,request:Request,actor=Depends(require_actor)):
+    from .intents import submit
+    return submit(request.app.state.recommendations,actor,trip_id,body.model_dump(mode='json'),request.headers.get('Idempotency-Key'))
+
+@router.get('/trips/{trip_id}/discovery-intents/{ident}')
+def discovery_intent_get(trip_id:str,ident:str,request:Request,actor=Depends(require_actor)):
+    from .intents import get
+    return get(request.app.state.recommendations,actor,trip_id,ident)
+
 def service(request):return request.app.state.discovery
 
 @router.get('/cities')

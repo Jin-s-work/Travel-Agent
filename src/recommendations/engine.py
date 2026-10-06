@@ -423,6 +423,10 @@ def _candidate(snapshot, candidate, kind, current, config):
             check(field, "unknown", "PARTY_LIMIT_CONFLICT" if conflict == "FACT_CONFLICT" else field.upper() + "_UNKNOWN")
         else:
             check(field, "confirmed" if compare(value) else "failed", field.upper() + ("_MATCH" if compare(value) else "_MISMATCH"), facts.refs(rows))
+    if party.get("children_status") == "unknown" and not party.get("children"):
+        child_rule, child_rows, _ = facts.get("children_rule")
+        if isinstance(child_rule, dict) and (child_rule.get("allowed") is False or (child_rule.get("minimum_age") or 0) > 0):
+            check("children", "unknown", "CHILD_PARTY_UNKNOWN", facts.refs(child_rows))
     if party.get("children"):
         rule, rows, _ = facts.get("children_rule")
         refs = facts.refs(rows)

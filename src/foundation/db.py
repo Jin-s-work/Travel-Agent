@@ -8,7 +8,7 @@ import sqlite3
 import fcntl
 
 
-SCHEMA_VERSION = 10
+SCHEMA_VERSION = 11
 SCHEMA = """
 CREATE TABLE users (
  id TEXT PRIMARY KEY, email TEXT NOT NULL, auth_provider TEXT NOT NULL,
@@ -180,6 +180,11 @@ COMMIT;''')
             if version == 9:
                 from src.product.schema import SCHEMA as product_schema
                 connection.executescript('BEGIN IMMEDIATE;\n' + product_schema + '\nPRAGMA user_version=10;\nCOMMIT;')
+
+                version = 10
+            if version == 10:
+                from src.discovery.intent_schema import SCHEMA as intent_schema
+                connection.executescript('BEGIN IMMEDIATE;\n' + intent_schema + '\nPRAGMA user_version=11;\nCOMMIT;')
 
     @contextmanager
     def connect(self):

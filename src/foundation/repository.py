@@ -154,17 +154,30 @@ class Repository:
             stop['recommendation_supported'] = bool(city_key(stop['city']))
             stop['recommendation_coverage'] = 'checked_per_request'
         return {'id': row['id'], 'title': row['title'], 'start_date': row['start_date'], 'end_date': row['end_date'],
-                'party': conditions.get('party', {'adults': 1, 'children': []}), 'stops': stops,
+                'party': {**conditions.get('party', {'adults': 1, 'children': []}), 'children_status': conditions.get('party', {}).get('children_status', 'present' if conditions.get('party', {}).get('children') else 'unknown')}, 'stops': stops,
                 'active_index_id': row['active_index_id'],
                 'version': row['version'], 'created_at': row['created_at'], 'updated_at': row['updated_at']}
 
     def _write_stops(self, con, trip_id, stops):
-        con.execute('DELETE FROM trip_stops WHERE trip_id=?', (trip_id,))
+        from src.destinations import city_key
+        old = {r['id']: dict(r) for r in con.execute('SELECT * FROM trip_stops WHERE trip_id=?', (trip_id,))}
+        used = set()
+        assignments = []
         for stop in stops:
-            from src.destinations import city_key
-            supported = bool(city_key(stop['city']))
-            con.execute('INSERT INTO trip_stops(id,trip_id,sequence,city,start_date,end_date,timezone,base_location,recommendation_supported) VALUES (?,?,?,?,?,?,?,?,?)',
-                        (new_id('stop'), trip_id, stop['sequence'], stop['city'], stop['start_date'], stop['end_date'], stop['timezone'], stop.get('base_location'), int(supported)))
+            ident = stop.get('id')
+            if ident and ident not in old: _not_found()
+            if not ident:
+                # Older clients omit IDs: preserve only an unambiguous same-city/same-sequence row.
+                matches = [r['id'] for r in old.values() if r['id'] not in used and r['sequence'] == stop['sequence'] and (city_key(r['city']) or r['city']) == (city_key(stop['city']) or stop['city'])]
+                ident = matches[0] if len(matches) == 1 else new_id('stop')
+            if ident in used: raise DomainError('VALIDATION_FAILED', '같은 도시 구간을 중복 제출할 수 없습니다.')
+            used.add(ident); assignments.append((ident, stop))
+        # Preserve IDs while allowing reordering under the (trip,sequence) unique constraint.
+        con.execute('UPDATE trip_stops SET sequence=sequence+1000 WHERE trip_id=?', (trip_id,))
+        for ident, stop in assignments:
+            con.execute('INSERT INTO trip_stops(id,trip_id,sequence,city,start_date,end_date,timezone,base_location,recommendation_supported) VALUES (?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET sequence=excluded.sequence,city=excluded.city,start_date=excluded.start_date,end_date=excluded.end_date,timezone=excluded.timezone,base_location=excluded.base_location,recommendation_supported=excluded.recommendation_supported',
+                (ident, trip_id, stop['sequence'], stop['city'], stop['start_date'], stop['end_date'], stop['timezone'], stop.get('base_location'), int(bool(city_key(stop['city'])))))
+        for ident in old.keys() - used: con.execute('DELETE FROM trip_stops WHERE id=? AND trip_id=?', (ident, trip_id))
 
     def create_trip(self, user_id, payload):
         value = _validate(TripCreate, payload)
@@ -196,10 +209,16 @@ class Repository:
             _version(row['version'], patch['expected_version'])
             current = self._trip_dto(con, row)
             candidate = {key: current[key] for key in TripCreate.model_fields}
-            candidate['stops'] = [{key: stop[key] for key in ('city', 'sequence', 'start_date', 'end_date', 'timezone', 'base_location')} for stop in current['stops']]
+            candidate['stops'] = [{key: stop[key] for key in ('id', 'city', 'sequence', 'start_date', 'end_date', 'timezone', 'base_location')} for stop in current['stops']]
             for key in TripCreate.model_fields:
                 if key in submitted:
                     candidate[key] = patch[key]
+            if 'stops' not in submitted and len(candidate['stops']) == 1:
+                stop = candidate['stops'][0]
+                if stop['start_date'] == current['start_date'] and stop['end_date'] == current['end_date']:
+                    stop['start_date'], stop['end_date'] = candidate['start_date'], candidate['end_date']
+                    if stop['start_date'] != current['start_date'] or stop['end_date'] != current['end_date']:
+                        submitted['stops'] = candidate['stops']
             validated = _validate(TripCreate, candidate)
             con.execute('UPDATE trips SET title=?,start_date=?,end_date=?,conditions_json=?,version=version+1,updated_at=? WHERE id=?',
                         (validated['title'], validated['start_date'], validated['end_date'], dump({'party': validated['party']}), utcnow(), trip_id))

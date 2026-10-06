@@ -54,3 +54,21 @@ Chrome/macOS, 로컬 합성 OIDC/공급자 서버(`tests/browser_discovery_fixtu
 - 기존 실제 인증 세션으로 운영 탐색 화면에서 등록된 Madrid 조건/기간/인원 상속, 자료0 안내, 추천 버튼을 확인. 운영 여행 생성 모달 datalist100개, date min0001-01-01/max9999-12-31 확인. 사용자의 실제 여행/예약을 임의 수정하거나 테스트 예약을 추가하지 않음.
 - 무료 호스트의 기동 대기 화면을 실제 관측한 뒤 정상으로 회복. 무중단·즉시 응답 서비스라고 주장하지 않음.
 - SMTP 형식 eml의 의도된CRLF는 `git -c core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol diff --cached --check`로 검사했다. 일반 whitespace 검사가 CRLF를 trailing whitespace로 표시한 점은 코드 오류와 구분했다.
+
+
+## 2026-10-06 — V3 1단계: 여행에서 장소 저장까지
+
+앞의 ‘후속 1단계’ 계획을 실제 저장/API/화면으로 구현했다. **2단계 숙소 지점·거리/경로는 미구현**이다. 상세 변경/Before·After·Why/실행 명령/브라우저 범위는 [검증 보고서](reports/stage1-validation.md), 이관은 [MIGRATION_11](MIGRATION_11.md)에 기록했다.
+
+- 홈·탐색·일정·예약4메뉴, 더보기의 기존 기능, 탐색 안의 보관함. 도시/시작/종료일3필수입력,100도시 검색, adult1/아동미확인, 한 도시 기간 상속, 날짜 칩, 필터 모달에서 한 번 추천.
+- 여행 기본값과 sparse override/provenance 분리. 기존 명시 조건 보존, stop ID 유지/재방문 구분, 도시·날짜 변경 시 낡은 좌표 무효화. 기존 예약을 자동 변경하지 않음.
+- 인증된 discovery-intents POST202/GET, 조건·snapshot·job·receipt 원자적 저장. 중복key 재사용, 버전409, 타인/삭제404. 새로고침 복구/늦은 응답 보호.
+- SQLite/Postgres schema11 additive migration. 새 두 테이블 삭제 scrub 포함. 별도 조건 저장 없는 일정 version0 생성·preview·apply·undo 연결.
+- 최종 Python **770 passed/11 skipped/2 warnings(107.45s)**, Node **38 passed**, 별도 PostgreSQL **42 passed/1 skipped/2 warnings(48.29s)**. PG skip1인 실제 SQLite kill 시험은 SQLite에서 통과. Asset/JS/diff 검사 통과.
+- Chrome/macOS 합성 계정으로 여행→추천→상세→저장→새로고침→서버 재시작 복원. Madrid0후보/이름 저장,390px 및319/321px·글자200%·키보드/포커스 확인. OS 달력 팝업 내부 선택과 실물 모바일/실공급자 품질은 미검증.
+- 배포 전 실제 schema10 암호화 snapshot+checkpoint 및 격리 복원 확인. 운영 디스크 밖 로컬 사본, integrity ok, 여행/예약 건수 일치. 비밀과 백업본문은 저장소에서 제외.
+- 현행0원/엄격 리뷰OFF 유지.100도시 메타데이터 지원과 실제 추천 자료 확보는 구분한다.
+
+### 이번 운영 반영
+
+배포 준비/백업/회귀 검증 완료. 실제 runtime revision/health는 배포 확인 뒤 아래에 기록한다.

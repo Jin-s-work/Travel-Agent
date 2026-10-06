@@ -222,14 +222,15 @@ def test_schema9_upgrade_preserves_trips_and_excludes_legacy_events(discovery):
     pack,trip,path,run=prepared(discovery)
     db=discovery.app.state.db
     with db.connect() as con:
-        for table in ('feedback_changes','fact_report_actions','visit_feedback','fact_reports','expense_overrides','product_run_metrics','product_preferences'):con.execute('DROP TABLE '+table)
+        for table in ('discovery_intents','discovery_contexts','feedback_changes','fact_report_actions','visit_feedback','fact_reports','expense_overrides','product_run_metrics','product_preferences'):con.execute('DROP TABLE '+table)
         con.execute('DROP INDEX product_event_period')
         for column in ('schema_version','detail_json','client_at','exclusion_reason'):con.execute('ALTER TABLE discovery_events DROP COLUMN '+column)
         con.execute('UPDATE schema_version SET version=9' if hasattr(db,'pool') else 'PRAGMA user_version=9')
         owner=con.execute('SELECT owner_id FROM trips WHERE id=?',(trip['id'],)).fetchone()[0]
         con.execute('INSERT INTO discovery_events VALUES(?,?,?,?,?,?,?)',('old-event',owner,trip['id'],'recommendation_view',pack['places'][0]['place_id'],run,datetime.now(timezone.utc).isoformat()))
     db._migrate()
-    assert db.schema_version()==10
+    from src.foundation.db import SCHEMA_VERSION
+    assert db.schema_version()==SCHEMA_VERSION
     assert discovery.client.get(path).status_code==200
     with db.connect() as con:assert con.execute("SELECT schema_version FROM discovery_events WHERE id='old-event'").fetchone()[0]==0
     assert discovery.client.get('/api/v2/admin/product-report?synthetic=true').json()['excluded_events']['legacy_semantics']==1

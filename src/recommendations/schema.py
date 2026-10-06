@@ -20,6 +20,7 @@ CREATE TABLE discovery_events (
 
 
 def scrub_trip(con, trip_id):
+    con.execute('DELETE FROM discovery_intents WHERE trip_id=?',(trip_id,))
     con.execute('DELETE FROM comparison_sets WHERE trip_id=?', (trip_id,))
     con.execute('DELETE FROM discovery_events WHERE trip_id=?', (trip_id,))
     con.execute("UPDATE recommendation_runs SET snapshot_json='{}',candidates_json=NULL,result_json=NULL,data_status='deleted' WHERE trip_id=?", (trip_id,))

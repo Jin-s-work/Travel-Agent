@@ -19,6 +19,7 @@ actor = SimpleNamespace(id=user['id'], session_id=session['id'], role='admin')
 # Setup exercises the same service validation as the administrator HTTP API.
 # Both synthetic packs must stay labelled synthetic in every consumer view.
 for city in ('tokyo', 'barcelona'):
+    if any(p['city']==city for p in app.state.discovery.list_packs(actor)):continue
     result = app.state.discovery.import_pack(actor, pack(city))
     imported = next(item for item in app.state.discovery.list_packs(actor) if item['id'] == result['pack_id'])
     for place in imported['places']:

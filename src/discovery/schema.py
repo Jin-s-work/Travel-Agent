@@ -62,6 +62,8 @@ CREATE TABLE discovery_audit (
 
 
 def scrub_trip(con,trip_id):
+    con.execute('DELETE FROM discovery_intents WHERE trip_id=?',(trip_id,))
+    con.execute('DELETE FROM discovery_contexts WHERE trip_id=?',(trip_id,))
     con.execute('DELETE FROM discovery_conditions WHERE trip_id=?',(trip_id,))
     con.execute('DELETE FROM discovery_exclusions WHERE trip_id=?',(trip_id,))
     con.execute('DELETE FROM bookmarks WHERE trip_id=?',(trip_id,))
