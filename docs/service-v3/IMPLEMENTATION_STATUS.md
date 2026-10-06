@@ -134,10 +134,20 @@ Chrome/macOS, 로컬 합성 OIDC/공급자 서버(`tests/browser_discovery_fixtu
 
 ## 2026-10-06 — Airbnb 참고 디자인과 실제 식당 사진
 
-- DESIGN.md와 emil-design-eng 기준으로 흰 배경/잉크 선택/코랄CTA, 사진 우선 카드·여백·다크모드·모바일을 정리했다. PWA아이콘/theme/cachev17까지 일치. [디자인 계약·Before/After/Why](DESIGN_SYSTEM.md).
+- DESIGN.md와 emil-design-eng 기준으로 흰 배경/잉크 선택/코랄CTA, 사진 우선 카드·여백·다크모드·모바일을 정리했다. PWA아이콘/theme/cachev18까지 일치. [디자인 계약·Before/After/Why](DESIGN_SYSTEM.md).
 - 실제9곳중7곳13장, 카드·상세 최대2장. 독립된 지점/라이선스검수, 출처·저작자·촬영일·잘림표시, 실패/없음 상태. 나머지2곳 사진은미확보. [사진 출처](reports/restaurant-photo-sources.md).
 - 기존추천을읽을때 현재 허용사진만붙인다. 사진이 순위/snapshot/job/Chroma/오프라인에혼입되지않는다. DBschema12·개인여행자료·유료설정변경없음.
 - 카드 중복문구와0/3내부표현을줄이고 검증된음식태그·자료확인일과 상세/저장/비교를앞에둔다. 필수미확인은유지. 홈/상단100도시한국어표시.
 - 최종Python922passed/12skipped/2warnings,Node77passed,임시PG85passed/2warnings. 초기배포파일경로실패1개를수정후전체재검증. [명령·검증범위·복구](reports/airbnb-photo-validation.md).
 - Chrome합성로그인→추천진행→사진전환/키보드→상세→저장/비교→새로고침확인.390/319px가로넘침0,200%글자·다크·모달Escape포커스확인. 실물모바일/Safari미검증.
-- 기존 무료 환경에 배포 중. 첫 실행 commit `60fedf8`의 두 배포는 서버 기동 단계에서 실패했다. 기존 서비스는 정상이며 신규 디자인 배포 성공과는 구분한다. 후속 결과는 아래에 기록한다.
+- 기존 무료 환경에 최종 배포 완료. 최초 기동 실패와 후속 진단·수정 결과를 아래에 구분해 기록한다.
+
+### 디자인·사진 최종 운영 반영 — 2026-10-07
+
+- 실행 commit `801922dfcce6db0513f1023a689931a971cc2f25`, 수동 배포 `dep-db2h59p42hec73aol2og`. **00:26:13 KST Deploy succeeded|Live**. [실제 서비스](https://travel-inbox-rag.onrender.com). Render Free/Supabase Free 및 유료 공급자 OFF 유지.
+- HTTPS live/ready200, 비로그인 개인API401, 실제 JS/CSS/SW5자산 해시 일치. schema12 유지, 모든 비공개 테이블 RLS 활성, anon/authenticated의 스키마 USAGE 없음. [검증 JSON](reports/airbnb-photo-live-verification.json).
+- 사용자1·여행2·구간2·원문6·예약1·숙소3·삭제tombstone2·후보9 유지. 운영 검증용 추천1회로 run8→9만 증가했다. 여행 제목·도시·숙소를 임의 변경하지 않았다.
+- 기존 실제 세션에서 추천 완료→마드리드3곳→사진1/2(naturalWidth960)→상세의 사진·원출처→재배포·새로고침 후 같은 결과 복원 확인. 브라우저 console error0. 신규 Google 로그인 왕복과 실물 모바일/Safari는 이번에 검증하지 않았다. 저장/비교·390/319px·큰 글자·다크 모드는 앞선 합성 브라우저 흐름으로 검증했다.
+- 완료job과 결과 조회 시점이 엇갈리는 경우 같은run GET만 최대3회 자동 복구한다. 복구 중 진행 표시·중복 제출 차단, 자료 만료·여행/탭/요청 변경 중단. 최종 Node82통과.
+- 진단을 통해 후속 배포의 기존 RLS 재적용 DDL 교착(40P01)을 확인했다. 모든 DDL 전에 WRITE→MIGRATION 잠금을 확보하고 이미 활성화된 RLS의 불필요한 ALTER를 생략했다. 새/누락 테이블 RLS 및 권한 회수는 유지한다. 실제 PostgreSQL 동시성·저장·이관·사진59시험 통과. 최초 두 기동 실패의 상세 원인은 당시 진단이 없어 동일 원인으로 단정하지 않는다.
+- 사진은 3도시9곳 중7곳13장부터 적용하며 미확보2곳은 빈 상태로 안내한다. 나머지97도시의 실제 후보, 실시간 식당 검색, 엄격 리뷰 검증은 별도 범위다. 운영 추천 처리1회49.7초로 추가 속도 개선 여지가 있다.

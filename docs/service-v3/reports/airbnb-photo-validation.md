@@ -63,3 +63,7 @@ Chrome/macOS, 합성 OIDC 계정·여행 + 공식 공개 식당 자료를 사용
 - 후속 UI commit `cece6ad`의 `dep-db2h1h2jnfac73cr7670`는 `DeadlockDetected` / `40P01` / `postgres.py:_migrate:218`로 실패했다. 새 진단으로 기존 테이블에 매번 RLS를 다시 적용하는 DDL과 이전 서버 작업의 잠금 충돌임을 확인했다. 앞선 두 실패가 동일 원인이었는지는 당시 상세 진단이 없어 확정하지 않는다. 권한을 완화하지 않고 불필요한 RLS DDL을 건너뛰며, 필요한 DDL은 기존 쓰기 작업과 직렬화하는 후속 수정을 검증한다.
 
 - 수정 후 임시 PostgreSQL에서 기존 writer와 동시 기동3시험(2.39초), 클라우드 저장/안전 진단22시험(9.69초), 실제 schema11→12/사진34시험(5.72초) 모두 통과. 총59개는 앞선 시험 일부와 중복된다. 기동은 WRITE→MIGRATION 잠금을 DDL 전에 확보하며, 이미 RLS가 켜진 테이블의 ALTER는 생략한다. 새/누락 테이블 RLS와 브라우저 역할 권한 회수는 그대로 검증했다. 전용 임시 컨테이너는 삭제했고 운영 DSN은 시험에 사용하지 않았다.
+
+## 최종 운영 확인
+
+2026-10-07 00:26:13 KST, runtime `801922d` / `dep-db2h59p42hec73aol2og`가 Live다. 서버 기동 성공, ready/live200, 개인API401, 최신 자산 해시5종 일치. 모든 비공개 테이블 RLS 활성 및 anon/authenticated의 schema USAGE 차단을 실제 읽기 전용 쿼리로 확인했다. 자료 건수는 검증 추천1건(8→9) 외 동일하다. 실제 세션을 새로고침해 추천3곳을 재실행 없이 복원하고 두 사진 전환을 확인했다. [최종 집계 검증](airbnb-photo-live-verification.json). 임시 HTTP 서버·테스트 DB 컨테이너는 정리했다.
