@@ -115,8 +115,18 @@ Chrome/macOS, 로컬 합성 OIDC/공급자 서버(`tests/browser_discovery_fixtu
 - 결과 수는 서로 다른 지점 기준으로 조건 충족 추천 / 방문 전 확인 / 참고 후보를 구분한다. 점수 null·영업·인원·가격·거리 미확인을 억지로 채우거나 필터를 완화하지 않는다. 3도시의 이번 기초 자료는 각 3곳 표시 가능·조건 충족 추천 0곳이다.
 - 추천 클릭 즉시 상태, 실제 job 단계·처리 수, SSE/새로고침 복원, 이전 결과 보존, 연결·취소·예산·실패별 행동을 적용했다. 가짜 진행률·운영 지연은 없다. 로컬 UI fixture만 실제 단계 기록 직후 테스트용 지연을 넣어 관측했다.
 - toss.md를 주 시각 참고, yeogi.md를 여행 문맥 참고로 적용했다. [초록 디자인 시스템과 Before/After/Why](DESIGN_SYSTEM.md). 숙소/거리 선택은 접힌 옵션, 핵심 미확인은 카드에 유지하고 추가 항목만 접는다. 영업시간은 한국어 요일·다음 날 종료로 표시한다.
-- 전체 Python **889 passed / 12 skipped / 2 warnings / 98.34s**. 임시 PostgreSQL **114 passed / 1 skipped / 2 warnings / 54.94s**. 마지막 UI·asset 검증은 별도 보고서에 기록한다. 이 집합은 중복이므로 합산하지 않는다. skip은 실공급자 미실행 및 특정 저장환경/프로세스시험을 구분한다.
+- 전체 Python **889 passed / 12 skipped / 2 warnings / 98.34s**. 임시 PostgreSQL **114 passed / 1 skipped / 2 warnings / 54.94s**. 마지막 UI·asset 검증은 별도 보고서에 기록한다. 이 집합은 중복이므로 합산하지 않는다. 기본 실행 skip12는 PostgreSQL cloud11개·upgrade1개, PostgreSQL 집합 skip1은 SQLite 프로세스 종료 시험이다.
 - Chrome/macOS 로컬 합성 로그인·여행 + 실제 공개 식당 사실로 추천/진행/새로고침/상세를 확인했다. 390px와319px·200%글자에서 가로 넘침0, 상세 모달252px 안에 내용 유지, Escape 포커스 복귀, 실제 다크 테마 초록 토큰 확인. 실물 모바일/Safari는 미검증.
 - 운영 schema12를 읽기 전용으로 암호화 백업(17.06초)하고 격리 복원(0.05초)했다. users1/trips2/stops2/docs6/bookings1/recommendations5/itineraries0, 무결성·FK 정상, 삭제 부활0, 복원 세션0. 저장소에 백업·비밀을 넣지 않았다.
 - 실제 카탈로그 등록은 승인 팩3·지점9·출처10·공급자 호출0. 위치/경로·엄격 리뷰·유료 외부 발굴은OFF이며 100개 도시 입력 지원과 실제3도시 기초자료를 구분한다. 다른97도시를 합성 카드로 채우지 않는다.
 - 실행 커밋·배포·운영 화면 결과는 배포 확인 후 아래에 추가한다.
+
+
+### 식당·디자인 운영 반영 완료
+
+- 실행 commit `3a78fdf12c65d845e3c5a3de0364ca9de05f9bae`, 수동 배포 `dep-db2c8e4s728c73bubcj0`. **2026-10-06 18:50:50 KST Live**, Render Deploy succeeded|Live(1분05초). 주요 구현 commit3037ada와 후속 UI 보완을 포함한다.
+- HTTPS ready/live200, schema/storage/dispatcher/identity/restore 모두true, 비로그인 개인API401, 실제 JS/CSS/SW5자산 해시 일치. [검증 보고서](reports/green-recommendation-validation.md).
+- 운영 실제 세션에서 기존 여행의 식당 추천 → 마드리드3곳(조건충족0/확인필요3) → 공식 상세 → 재배포·새로고침 결과 유지. 마지막 코드의 새 요청 시작 시 이전 취소 버튼/오류가 없는 것까지 확인했다. 실제 Google 로그인 신규 왕복은 이번에 수행하지 않았다.
+- 현재 제목은 바르셀로나지만 여행 도시가Madrid인 입력 상태를 안내했다. 제목·숙소 주소만으로 사용자의 여행 도시를 자동 변경하지 않았다.
+- 마지막 Node **62 passed**, 배포 전 백엔드889/임시PG114 결과 유지. 실제 외부 식당 검색은미구현, 기본자료3도시9곳, 나머지97도시는 자료없음이며 유료 지도/엄격언어/검색OFF 유지.
+- 보존 비교에서 여행·구간·예약·교정은 모든 값 동일. 문서6건은 원본해시·메타데이터 동일하고 백업의격리파일경로로변환되는 opaque_path만 별개다. 원문변경으로보고하지않았다. [비교JSON](reports/green-live-preservation.json).
