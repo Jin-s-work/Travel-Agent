@@ -83,3 +83,48 @@ test('public discovery progress describes the actual provider stage, without a g
 });
 
 test('public map tag formatting labels raw hours as unconfirmed source material',()=>{const c=hoursFormatter();const text=c.discoveryFactValue({tags:{cuisine:'french',opening_hours:'Mo-Fr 12:00-22:00'},address_status:'missing'},'public_map_tags');assert.match(text,/음식 종류: french/);assert.match(text,/통상 영업 안내 원문/);assert.match(text,/방문일 적용 및 최신 정보 확인 필요/);assert.doesNotMatch(text,/address_status|예약 가능|검증 완료/);});
+
+function delayedResultContext(){
+  let release,reject;const response=new Promise((resolve,fail)=>{release=resolve;reject=fail;});
+  const calls=[],timers=[],progress=[],state={session:{authenticated:true},trip:{id:'t'},epoch:1,tab:'explore',jobs:new Map(),uploads:[],recommendations:{serial:0,active:{run_id:'r',job_id:'j',state:'running',result:null}}};
+  const context=load(['recommendationCounts','recommendationProgressModel','loadRecommendations','mergeJob','applyRecommendations'],{state,budgetCodes:budgets,terminal:job=>['succeeded','partial','failed','cancelled'].includes(job.state),recommendationPollTimer:null,clearTimeout(){},setTimeout(fn,ms){timers.push({fn,ms});return timers.length;},tripPath:()=>'/trips/t',allPages:async path=>{calls.push([path,'GET']);return [{run_id:'r',state:'running'}];},api:async(path,options)=>{calls.push([path,options?.method||'GET']);return response;},restoreRecommendationOptions(){},renderRecommendationResults(){},renderRecommendationProgress(){progress.push(context.recommendationProgressModel(state.recommendations));},renderJobs(){},renderUploads(){},watchJob(){},notice(){}});
+  return {context,state,calls,timers,progress,release,reject};
+}
+test('terminal event keeps a delayed same-run GET busy and deduplicates refresh and submission',async()=>{
+  const {context,state,calls,progress,release}=delayedResultContext();
+  const pending=context.loadRecommendations({runId:'r'});await new Promise(setImmediate);
+  assert.equal(calls.filter(([path])=>path==='/trips/t/recommendations/r').length,1);
+  context.mergeJob({job_id:'j',state:'succeeded',stage:'recommendation_complete'});
+  assert.equal(progress.at(-1).state,'finalizing');assert.equal(progress.at(-1).busy,true);
+  assert.equal(state.recommendations.resultRecoveryPending,true);
+  await context.loadRecommendations({runId:'r'});await context.applyRecommendations();
+  assert.equal(state.recommendations.serial,1);assert.equal(calls.length,2);assert(calls.every(([,method])=>method==='GET'));
+  const complete={run_id:'r',job_id:'j',state:'succeeded',result:result({needs_confirmation:[{place_id:'p'}]})};release(complete);await pending;
+  assert.equal(state.recommendations.displayed,complete);assert.equal(state.recommendations.resultRecoveryPending,false);assert.equal(state.recommendations.resultLoad,null);assert.equal(progress.at(-1).busy,false);
+});
+test('an older running GET cannot undo a terminal event and schedules the bounded result recovery',async()=>{
+  const {context,state,timers,release}=delayedResultContext();
+  const pending=context.loadRecommendations({runId:'r'});await new Promise(setImmediate);
+  context.mergeJob({job_id:'j',state:'succeeded',stage:'recommendation_complete'});
+  release({run_id:'r',job_id:'j',state:'running',job:{stage:'source_revalidation'},result:null});await pending;
+  assert.equal(state.recommendations.active.state,'succeeded');assert.equal(state.recommendations.active.job.stage,'recommendation_complete');
+  assert.equal(state.recommendations.resultRecoveryPending,true);assert.equal(state.recommendations.resultLoad,null);assert.equal(timers.length,1);assert.equal(timers[0].ms,1200);
+});
+test('failed or cancelled terminal events clear the loader even when an older GET is pending',async()=>{
+  for(const terminalState of ['failed','cancelled']){
+    const {context,state,timers,progress,release}=delayedResultContext();
+    const pending=context.loadRecommendations({runId:'r'});await new Promise(setImmediate);
+    context.mergeJob({job_id:'j',state:terminalState,error_code:terminalState==='failed'?'SOURCE_DATA_CHANGED':null});
+    assert.equal(state.recommendations.resultRecoveryPending,false);assert.equal(progress.at(-1).busy,false);
+    release({run_id:'r',job_id:'j',state:'running',result:null});await pending;
+    assert.equal(state.recommendations.active.state,terminalState);assert.equal(state.recommendations.resultLoad,null);assert.equal(timers.length,0);
+  }
+});
+test('manual terminal refresh shows loading before its response and an old trip read cannot change the new scope',async()=>{
+  const {context,state,progress,release}=delayedResultContext();state.recommendations.active.state='succeeded';
+  const old=state.recommendations,pending=context.loadRecommendations({runId:'r'});
+  assert.equal(old.resultRecoveryPending,true);assert.equal(progress.at(-1).state,'finalizing');
+  await new Promise(setImmediate);state.epoch++;state.trip={id:'other'};state.recommendations={serial:0,active:null,resultRecoveryPending:false};
+  const before=progress.length;release({run_id:'r',state:'succeeded',result:result({items:[{place_id:'old'}]})});await pending;
+  assert.equal(state.recommendations.active,null);assert.equal(state.recommendations.resultRecoveryPending,false);assert.equal(old.resultLoad,null);assert.equal(progress.length,before);
+});

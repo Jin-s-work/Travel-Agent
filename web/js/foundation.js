@@ -535,6 +535,7 @@
     const active=state.recommendations.active;
     if(active&&(active.job_id||active.job?.job_id)===j.job_id){
       const finished=terminal(j)&&!terminal(active);active.job=j;active.state=j.state;state.recommendations.connectionError=null;
+      if(finished)state.recommendations.resultRecoveryPending=['succeeded','partial'].includes(j.state)&&!active.result&&active.data_status!=='stale';
       renderRecommendationProgress();
       if(finished&&state.tab==='explore')loadRecommendations({runId:active.run_id}).catch(()=>{});
     }
@@ -880,14 +881,24 @@
   function restoreRecommendationOptions(run){const request=run?.request||{};if(state.recommendations.optionsDirty)return;if(request.review_language_filter)$('#reviewStrictFilter').checked=request.review_language_filter.required===true;if(request.rating_filter){$('#ratingFilterEnabled').checked=request.rating_filter.enabled===true;$('#recommendationMinRating').value=request.rating_filter.min_rating??'4.2';$('#recommendationMinCount').value=request.rating_filter.min_count??'200';}if(request.limit)$('#recommendationLimit').value=request.limit;}
   function recommendationStale(run){return run&&(run.input_status==='stale'||run.conditions_version!=null&&run.conditions_version!==state.discovery.conditions?.version||run.request?.conditions_version!=null&&run.request.conditions_version!==state.discovery.conditions?.version||run.trip_version!=null&&run.trip_version!==state.trip?.version);}
   async function loadRecommendations({runId=null,resultAttempt=0}={}){
-    clearTimeout(recommendationPollTimer);if(!state.session?.authenticated||!state.trip){renderRecommendationResults();return;}
-    const epoch=state.epoch,serial=++state.recommendations.serial,path=tripPath();
+    if(!state.session?.authenticated||!state.trip){clearTimeout(recommendationPollTimer);renderRecommendationResults();return;}
+    const r=state.recommendations,requestedId=runId||r.active?.run_id||null;
+    // A job event or repeated refresh must not supersede the same in-flight read.
+    if(r.resultLoad?.epoch===state.epoch&&r.resultLoad.runId===requestedId)return;
+    clearTimeout(recommendationPollTimer);
+    const epoch=state.epoch,serial=++r.serial,path=tripPath(),read={epoch,serial,runId:requestedId};r.resultLoad=read;
+    if(r.active?.run_id===requestedId&&['succeeded','partial'].includes(r.active.state)&&!r.active.result&&r.active.data_status!=='stale')r.resultRecoveryPending=true;
+    renderRecommendationProgress();
     try{
       const history=await allPages(path+'/recommendations');
       if(epoch!==state.epoch||serial!==state.recommendations.serial)return;state.recommendations.runs=history;
       const id=runId||state.recommendations.active?.run_id||history[0]?.run_id||history[0]?.id;
       if(!id){state.recommendations.loaded=true;state.recommendations.connectionError=null;state.recommendations.resultRecoveryPending=false;renderRecommendationResults();return;}
+      read.runId=id;
       const active=await api(path+'/recommendations/'+encodeURIComponent(id));if(epoch!==state.epoch||serial!==state.recommendations.serial)return;
+      // An older GET can arrive after a terminal job event; do not regress that state.
+      const known=state.recommendations.active;
+      if(known?.run_id===id&&['succeeded','partial','failed','cancelled'].includes(known.state)&&!['succeeded','partial','failed','cancelled'].includes(active.state)){active.state=known.state;active.job=known.job;active.error_code=known.error_code||known.job?.error_code;}
       state.recommendations.active=active;state.recommendations.loaded=true;state.recommendations.connectionError=null;restoreRecommendationOptions(active);
       // The job can finish after the API read its result row. Re-read that run, never submit another job.
       const resultPending=['succeeded','partial'].includes(active.state)&&!active.result&&active.data_status!=='stale';
@@ -910,6 +921,8 @@
       if(state.tab==='explore'&&['queued','running'].includes(state.recommendations.active?.state))recommendationPollTimer=setTimeout(()=>loadRecommendations({runId:runId||state.recommendations.active?.run_id}).catch(()=>{}),4000);
       else if(state.tab==='explore'&&recoverResult)recommendationPollTimer=setTimeout(()=>{if(epoch!==state.epoch||serial!==state.recommendations.serial||state.tab!=='explore')return;return loadRecommendations({runId:runId||state.recommendations.active?.run_id,resultAttempt:resultAttempt+1}).catch(()=>{});},4000);
       throw error;
+    }finally{
+      if(r.resultLoad===read){r.resultLoad=null;if(epoch===state.epoch&&r===state.recommendations)renderRecommendationProgress();}
     }
   }
   async function applyRecommendations(){
