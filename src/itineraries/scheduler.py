@@ -81,9 +81,11 @@ def booking_items(bookings, snapshot):
     return sorted(items, key=lambda item: (item.get('start_instant') or '9999', item['item_id'])), unresolved
 
 
-def endpoint(item, snapshot):
+def endpoint(item, snapshot, departure=None):
     if item is None:
-        value = deepcopy(snapshot.get('origin') or (snapshot.get('conditions') or {}).get('origin') or {})
+        from .origins import origin_for
+        local=utc(departure).astimezone(ZoneInfo(snapshot['timezone'])) if departure else None
+        value=origin_for(snapshot,local.date().isoformat() if local else snapshot['start_date'],local.strftime('%H:%M') if local else None)
         value.setdefault('id', 'origin'); value.setdefault('label', '출발점 미확인')
     else:
         value = deepcopy(item.get('location') or {})
@@ -93,6 +95,7 @@ def endpoint(item, snapshot):
     value.setdefault('city', snapshot['city']); value.setdefault('timezone', snapshot['timezone'])
     value.setdefault('latitude', None); value.setdefault('longitude', None)
     value.setdefault('coordinate_permitted', False)
+    value['accessibility_constraints']=sorted((snapshot.get('conditions') or {}).get('required',{}).get('accessibility',[]))
     return value
 
 
@@ -116,7 +119,7 @@ def _buffer(previous, following, snapshot):
 
 def travel(previous, following, departure, snapshot, route_lookup, now):
     """A planning reservation is separate from an unconfirmed travel duration."""
-    source, destination = endpoint(previous, snapshot), endpoint(following, snapshot)
+    source, destination = endpoint(previous, snapshot, departure), endpoint(following, snapshot, departure)
     response = ({'basis': 'unknown', 'duration_minutes': None, 'reason_codes': ['PLACE_UNAVAILABLE']}
                 if source.get('unavailable') or destination.get('unavailable') else
                 route_lookup(source, destination, utc(departure).isoformat(), snapshot.get('transport', 'walking')))
@@ -169,7 +172,21 @@ def rebuild_legs(items, snapshot, route_lookup, now):
                 previous = item; continue
             legs.append(travel(previous, item, departure, snapshot, route_lookup, now))
             previous = item
+    # A walking-limit condition is measured from that day's origin, independently
+    # of the actual previous appointment. Constraint-only legs never reserve time.
+    if (snapshot.get('conditions',{}).get('distance_filter') or {}).get('kind')=='walking':
+        for item in blocking:
+            if item.get('item_type')=='place':
+                legs.append(distance_leg(item,snapshot,route_lookup,now))
     return legs
+
+
+def distance_leg(item,snapshot,route_lookup,now):
+    local=utc(item['start_instant']).astimezone(ZoneInfo(snapshot['timezone']))
+    source=endpoint(None,snapshot,item['start_instant']);destination=endpoint(item,snapshot,item['start_instant'])
+    response=route_lookup(source,destination,utc(item['start_instant']).isoformat(),'walking')
+    return {**deepcopy(response),'filter_only':True,'from_item_id':None,'to_item_id':item['item_id'],'from_endpoint':source,'to_endpoint':destination,
+        'mode':'walking','departure_instant':item['start_instant'],'constraint':'origin_walking_limit'}
 
 
 def _place_item(candidate, selection, start, end, snapshot):
@@ -318,7 +335,8 @@ def generate(snapshot, bookings, candidates, route_lookup, now):
                                 outgoing = travel(item, following, end, snapshot, route_lookup, current)
                             if outgoing.get('reserved_minutes') is None or reserved_end+timedelta(minutes=outgoing['reserved_minutes']+outgoing['buffer_minutes']) > utc(following['start_instant']):
                                 failed_codes.append('NO_TIME_WINDOW'); continue
-                    checks = assess_visit(item, candidate, snapshot, current)
+                    distance_evidence=distance_leg(item,snapshot,route_lookup,current) if (snapshot.get('conditions',{}).get('distance_filter') or {}).get('kind')=='walking' else None
+                    checks = assess_visit(item, candidate, snapshot, current, distance_evidence)
                     if any(check['state'] == 'violated' or check['state'] == 'unknown' and not snapshot.get('allow_provisional', False) for check in checks):
                         failed_codes.extend(check['code'] for check in checks if check['state'] != 'satisfied'); failed_checks.extend(checks); continue
                     if 'ROUTE_IMPOSSIBLE' in incoming['reason_codes'] or outgoing and 'ROUTE_IMPOSSIBLE' in outgoing['reason_codes']:

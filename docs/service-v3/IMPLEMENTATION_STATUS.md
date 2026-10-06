@@ -81,3 +81,18 @@ Chrome/macOS, 로컬 합성 OIDC/공급자 서버(`tests/browser_discovery_fixtu
 - 운영 Google OAuth 신규 로그인/로그아웃 왕복을 이번 배포에서 다시 수행하지 않았다. 기존 실세션 인증과 보존 데이터 조회, 로컬 합성 OIDC 전체 흐름을 구분한다.
 - Render Free의 기동 대기 화면을 관측했다. 항상 즉시 응답/무중단 보장은 아니다. 전체 운영용 Supabase 복원 재주입과 실제 공급자 품질은 미검증.
 - 운영 화면 캡처는 개인 여행이 포함되어 로컬 출력 폴더에만 보관했다. 저장소 보고서 스크린샷은 합성 로컬 자료만 포함한다.
+
+
+## 2026-10-06 — V3 2단계: 숙소에서 거리 추천·일정 편집까지
+
+앞 절의 ‘2단계 미구현’은 당시 기록이다. 현재는 개인 숙소 저장/지점 후보 선택, 날짜별 출발점, 거리와 경로 분리, v2 추천, 일정 preview/apply/undo 연결을 구현했다. [전체 검증/Before·After·Why](reports/stage2-validation.md), [schema12 이관·복구](MIGRATION_12.md), [공급자 공식 계약 조사](reports/stage2-provider-research.md).
+
+- SQLite/PostgreSQL schema12 additive migration, label-only 기존 숙소 이관, private payload/receipt 삭제 및 restore tombstone 재적용. 임시 PostgreSQL 실제11→12시험에서 기존 행/교정/소유권 보존, RLS·인덱스·반복이관 확인.
+- 숙소 이름/링크 한 필드, 후보 직접 선택, 체크아웃/겹침/공백, 숙소 근처 저녁과 명시적 거리 필터, 오래된 결과 안내. 새로고침 완료 job 경쟁과 초기 탭 복원 경쟁도 수정.
+- 거리 계산 v2/immutable snapshot, provider OFF/fake/Google 어댑터, 개인 캐시/비용 wrapper/receipt, itinerary 양끝 이동·출발점 version·아동 unknown·통화별 가격 변화 검증. 운영 fake fallback 없음.
+- 최종 전체 Python **878 passed/12 skipped/2 warnings(127.81s)**, Node **44 passed**. 임시 PostgreSQL **144 passed/3 skipped(116.39s)**, 마지막 보완 후 일정 PG **17 passed(9.25s)**. 스킵/경고/명령은 보고서에 구분.
+- Chrome/macOS 합성 로그인→숙소 저장→후보 선택→저녁 추천→상세/비교→일정 생성/preview/apply→새로고침→undo 새version3, 다른 탭의 숙소 변경 후 apply409 원본/입력 보존.390px와320경계 양쪽,200%글자·Escape/포커스 확인. 실물 모바일과 실제 공급자 품질 미검증.
+- 합성 geocoding1회·route8회10elements, 시험ledger11microUSD settled. **실제 Maps/신규 유료 호출0**.
+- 실제 schema11 운영 백업을 READ ONLY로 암호화해 운영 디스크 밖에 보관,13.12초. 격리복원0.04초, integrity/FK/소유권 정상, 기존 건수 동일. 실제 운영 복원 재주입은 하지 않았다.
+- 등록100도시의 실제 검수 후보는 각각0곳. 0원·지도/경로·엄격 리뷰OFF 유지. 기본 기능 구현과 공급자 활성화/실제 자료 확보는 별도다.
+- 배포는 아래 실제 결과를 추가하기 전까지 미완료 상태다.

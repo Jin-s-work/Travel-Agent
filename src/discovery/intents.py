@@ -7,7 +7,7 @@ from src.foundation.repository import DomainError, dump, new_id, utcnow
 from src.foundation.models import valid_date
 from src.recommendations.models import Input, LanguageFilter, RatingFilter
 from src.recommendations.service import VERSIONS, digest
-from .context import load, resolve
+from .context import load, resolve, enrich_origin
 
 
 class Filters(Input):
@@ -82,6 +82,7 @@ def submit(service, actor, trip_id, body, key):
             resolved=resolve(trip,overrides,body['stop_id'],basis)
         if resolved['validation']:
             raise DomainError('VALIDATION_FAILED',resolved['validation'][0]['message'],422,resolved['validation'])
+        resolved=enrich_origin(con,service.repo,actor,trip_id,resolved)
         # SQL ownership checks precede all persistence and all work is within this transaction.
         cv=version+1; stamp=utcnow(); ident=new_id('intent'); run=new_id('rec')
         conditions=resolved['conditions']
@@ -92,7 +93,7 @@ def submit(service, actor, trip_id, body, key):
         from src.product.events import consented
         snapshot={**body['filters'],'trip_version':trip['version'],'conditions_version':cv,'conditions':conditions,
             'trip':{k:trip[k] for k in ('id','version','start_date','end_date','stops')},'resolved_context':resolved,'intent_id':ident,
-            'pipeline_version':'discovery_pipeline_v1','ranker_versions':VERSIONS,'explanation_version':'server_templates_v1','evaluation_at':stamp,
+            'pipeline_version':'discovery_pipeline_v2','movement_version':'v2','origin_context':resolved['origin_context'],'ranker_versions':VERSIONS,'explanation_version':'server_templates_v1','evaluation_at':stamp,
             'analytics_opt_in':consented(con,actor.id),'feedback_policy_version':'soft_avoid_half_v1',
             'soft_avoid_place_ids':[r['place_id'] for r in con.execute('SELECT place_id,payload_json FROM visit_feedback WHERE owner_id=? AND trip_id=? AND withdrawn_at IS NULL',(actor.id,trip_id)) if json.loads(r['payload_json']).get('reflect_preference')]}
         job=service.jobs.enqueue(actor.id,actor.session_id,'personal_trip',trip_id,'recommendations',{'run_id':run},trip['version'],'discovery-intent:'+key_hash,request_fingerprint=fingerprint,con=con)

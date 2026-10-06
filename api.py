@@ -58,7 +58,7 @@ class BoundedBody:
 
 def create_app(settings=None, *, parser=None, embedder=None, vector_factory=None, answer_generator=None,
                budget_policy=None, chroma_client=None, fault_hook=None, review_provider=None, review_detector=None,
-               route_provider=None, storage_transport=None):
+               route_provider=None, geocoding_provider=None, storage_transport=None):
     settings=settings or Settings()
     if settings.storage_backend not in {'local','supabase'}:
         raise ValueError('Unsupported STORAGE_BACKEND')
@@ -153,8 +153,21 @@ def create_app(settings=None, *, parser=None, embedder=None, vector_factory=None
     app.state.reviews=ReviewService(app.state.db,app.state.repo,app.state.jobs,app.state.gateway,provider=review_provider,detector=review_detector,fault_hook=fault_hook)
     from src.discovery.service import DiscoveryService
     app.state.discovery=DiscoveryService(app.state.db,app.state.repo,app.state.jobs,app.state.reviews,allow_synthetic=settings.environment=='development')
+    from src.location import build_location_providers, MatrixService
+    location_config={}
+    if settings.location_provider_config:
+        import json
+        try:
+            location_config=json.loads(Path(settings.location_provider_config).read_text())
+        except (OSError,ValueError):
+            location_config={}  # Invalid optional provider configuration stays closed.
+    geocoder, configured_route=build_location_providers(location_config,api_key=settings.google_maps_api_key)
+    route_provider=route_provider or configured_route
+    app.state.location_matrix=MatrixService(app.state.gateway,app.state.jobs,provider=route_provider if hasattr(route_provider,'matrix') else None)
+    from src.accommodations.service import Accommodations
+    app.state.accommodations=Accommodations(app.state.db,app.state.repo,app.state.jobs,geocoder=geocoding_provider or geocoder,gateway=app.state.gateway,allow_synthetic=settings.environment=='development')
     from src.recommendations.service import Recommendations
-    app.state.recommendations=Recommendations(app.state.db,app.state.repo,app.state.jobs,app.state.discovery,app.state.reviews)
+    app.state.recommendations=Recommendations(app.state.db,app.state.repo,app.state.jobs,app.state.discovery,app.state.reviews,matrix=app.state.location_matrix)
     from src.itineraries.travel_time import TravelTime
     from src.itineraries.service import Itineraries
     app.state.travel_time=TravelTime(app.state.gateway,app.state.jobs,provider=route_provider)
@@ -171,6 +184,8 @@ def create_app(settings=None, *, parser=None, embedder=None, vector_factory=None
     def dispatch(job,ctx):
         if job['operation']=='review_collection':
             return app.state.reviews.execute(job,ctx)
+        if job['operation']=='accommodation_resolve':
+            return app.state.accommodations.execute_resolution(job,ctx)
         if job['operation']=='bookmark_resolve':
             return app.state.discovery.execute(job,ctx)
         if job['operation']=='recommendations':
@@ -252,6 +267,8 @@ def create_app(settings=None, *, parser=None, embedder=None, vector_factory=None
     app.include_router(review_router)
     from src.discovery.routes import router as discovery_router
     app.include_router(discovery_router)
+    from src.accommodations.routes import router as accommodations_router
+    app.include_router(accommodations_router)
     from src.http.recommendations import router as recommendation_router
     app.include_router(recommendation_router)
     from src.product.routes import router as product_router

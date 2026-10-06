@@ -38,6 +38,7 @@ def flatten(value, prefix=''):
 
 def resolve(trip, overrides, stop_id=None, basis=None):
     basis = basis or {}
+    legacy_explicit_origin = bool("legacy_trip" in basis and (overrides.get("origin") or {}).get("latitude") is not None)
     stops = trip['stops']
     stop = next((s for s in stops if s['id'] == stop_id), None)
     errors = []
@@ -89,4 +90,31 @@ def resolve(trip, overrides, stop_id=None, basis=None):
     for key, val in flatten(value).items():
         origin_type = 'user_override' if key in overridden or any(key.startswith(k+'.') for k,v in overridden.items() if v is None) else 'trip_default' if key.startswith(('party.', 'visit.')) or key in ('city',) or key.startswith('origin.') and base.get('origin') else 'planning_default'
         provenance[key] = {'origin': origin_type if val is not None or origin_type=='user_override' else 'unknown', 'validation': 'needs_confirmation' if any(e['field'] == key or key.startswith(e['field']+'.') for e in errors+warnings) else 'valid'}
-    return {'conditions': value, 'overrides': deepcopy(overrides), 'trip_context': {'trip_id': trip['id'], 'trip_version': trip['version'], 'stop_id': current_basis['stop_id'], 'city_id': city, 'visit_date': day, 'party': trip['party'], 'timezone': visit.get('timezone')}, 'provenance': provenance, 'validation': errors, 'warnings': warnings, 'basis': current_basis, 'resolver_version': VERSION, 'origin_version': hashlib.sha256(json.dumps({'origin':value.get('origin'),'basis':current_basis},sort_keys=True,ensure_ascii=False).encode()).hexdigest()[:24]}
+    return {'legacy_explicit_origin':legacy_explicit_origin, 'conditions': value, 'overrides': deepcopy(overrides), 'trip_context': {'trip_id': trip['id'], 'trip_version': trip['version'], 'stop_id': current_basis['stop_id'], 'city_id': city, 'visit_date': day, 'party': trip['party'], 'timezone': visit.get('timezone')}, 'provenance': provenance, 'validation': errors, 'warnings': warnings, 'basis': current_basis, 'resolver_version': VERSION, 'origin_version': hashlib.sha256(json.dumps({'origin':value.get('origin'),'basis':current_basis},sort_keys=True,ensure_ascii=False).encode()).hexdigest()[:24]}
+
+
+def enrich_origin(con, repo, actor, trip_id, resolved, clock=None, *, allow_deleted_selection=False):
+    """Resolve only owned stay references; preserve sparse user input separately."""
+    from src.accommodations.origin import context_in_connection
+    visit={**resolved['conditions']['visit'], 'stop_id':resolved['trip_context']['stop_id'], 'city':resolved['conditions']['city']}
+    overrides=deepcopy(resolved.get('overrides') or {})
+    # Previously invalidated manually entered coordinates must not reappear.
+    if resolved.get('basis',{}).get('origin_invalidated'):
+        overrides['origin']=deepcopy(resolved['conditions'].get('origin'))
+    if resolved.get('legacy_explicit_origin') and (overrides.get('origin_selection') or {}).get('kind')=='automatic':
+        overrides.pop('origin_selection',None)
+    context=context_in_connection(con,repo,actor,trip_id,visit,overrides,clock,allow_deleted_selection=allow_deleted_selection)
+    resolved['origin_context']=context
+    resolved['origin_version']=context['origin_version']
+    origin=context.get('origin')
+    if origin and origin.get('source')=='explicit_origin':
+        resolved['conditions']['origin_selection']={'kind':'manual','accommodation_id':None,'expected_version':None}
+    if origin:
+        resolved['conditions']['origin']={key:origin.get(key) for key in ('label','latitude','longitude','place_id')}
+    else:
+        prior=resolved['conditions'].get('origin') or {}
+        label=context.get('label') or prior.get('label')
+        resolved['conditions']['origin']={'label':label,'latitude':None,'longitude':None,'place_id':None} if label else None
+    for key in ('label','latitude','longitude','place_id'):
+        resolved['provenance']['origin.'+key]={'origin':'accommodation' if origin and origin.get('accommodation_id') else 'user_override' if origin else 'unknown','validation':'valid' if context['status']=='ready' else 'needs_confirmation'}
+    return resolved

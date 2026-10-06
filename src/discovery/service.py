@@ -62,12 +62,14 @@ class DiscoveryService:
             output['visit']['timezone']=trip['stops'][0]['timezone']
         return output
     def get_conditions(self,actor,trip_id):
-        from .context import load, resolve
+        from .context import load, resolve, enrich_origin
         with self.db.connect() as con:
             trip=self.repo._trip_dto(con,self._owner(con,actor,trip_id))
             row=con.execute('SELECT * FROM discovery_conditions WHERE trip_id=? AND owner_id=?',(trip_id,actor.id)).fetchone()
             overrides,stop_id,basis=load(con,trip_id,row)
-        resolved=resolve(trip,overrides,stop_id,basis)
+            resolved=resolve(trip,overrides,stop_id,basis)
+            if not resolved['validation']:
+                resolved=enrich_origin(con,self.repo,actor,trip_id,resolved,allow_deleted_selection=True)
         # Preserve legacy no-stop defaults for the old condition editor, but require confirmation.
         if not trip['stops'] and not row:
             resolved['conditions']=self._default_conditions(trip)
@@ -104,6 +106,8 @@ class DiscoveryService:
             if body['expected_version']!=(old['version'] if old else 0):deny('VERSION_CONFLICT','다른 화면에서 조건이 바뀌었습니다. 입력을 보존한 채 최신 조건을 확인해 주세요.')
             issue=self.context_issue(trip,conditions)
             if issue:raise DomainError('VALIDATION_FAILED',issue['message'],422,[issue])
+            from src.accommodations.origin import context_in_connection
+            context_in_connection(con,self.repo,actor,trip_id,{**conditions['visit'],'city':conditions['city']},conditions)
             con.execute('DELETE FROM discovery_contexts WHERE trip_id=?',(trip_id,))
             con.execute('INSERT INTO discovery_conditions VALUES(?,?,?,?,?,?,?) ON CONFLICT(trip_id) DO UPDATE SET version=excluded.version,trip_version=excluded.trip_version,snapshot_json=excluded.snapshot_json,conditions_json=excluded.conditions_json,updated_at=excluded.updated_at',
                 (trip_id,actor.id,body['expected_version']+1,trip['version'],encode(trip),encode(conditions),now()))

@@ -222,7 +222,7 @@ def test_schema9_upgrade_preserves_trips_and_excludes_legacy_events(discovery):
     pack,trip,path,run=prepared(discovery)
     db=discovery.app.state.db
     with db.connect() as con:
-        for table in ('discovery_intents','discovery_contexts','feedback_changes','fact_report_actions','visit_feedback','fact_reports','expense_overrides','product_run_metrics','product_preferences'):con.execute('DROP TABLE '+table)
+        for table in ('accommodation_resolutions','trip_accommodations','discovery_intents','discovery_contexts','feedback_changes','fact_report_actions','visit_feedback','fact_reports','expense_overrides','product_run_metrics','product_preferences'):con.execute('DROP TABLE '+table)
         con.execute('DROP INDEX product_event_period')
         for column in ('schema_version','detail_json','client_at','exclusion_reason'):con.execute('ALTER TABLE discovery_events DROP COLUMN '+column)
         con.execute('UPDATE schema_version SET version=9' if hasattr(db,'pool') else 'PRAGMA user_version=9')

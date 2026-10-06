@@ -124,4 +124,4 @@ class Expense(Input):
         if self.included_by and self.price is not None:raise ValueError('다른 항목에 포함된 비용에 별도 가격을 입력하지 마세요.')
         return self
 class Evaluation(Input):
-    candidate_version:Literal['diversity-v2','distance-v2']='diversity-v2'
+    candidate_version:Literal['diversity-v2','distance-v2','movement-v2']='diversity-v2'

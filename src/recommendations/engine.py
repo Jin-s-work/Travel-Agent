@@ -22,6 +22,9 @@ WEIGHTS = {
     "iconic_v1": {"iconic_evidence": .30, "preference": .25, "movement": .20, "visit_fit": .15, "price": .10},
     "local_observed_v1": {"language": .25, "local_evidence": .20, "preference": .20, "movement": .15, "quality": .10, "visit_fit": .10},
 }
+# v1 remains reproducible; v2 uses raw geometry for boundaries and may score a
+# verified walking route when the user explicitly prefers nearby places.
+WEIGHTS.update({key.replace('_v1','_v2'):dict(value) for key,value in list(WEIGHTS.items())})
 DAYS = ("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
 
 
@@ -32,10 +35,13 @@ class RankerConfig:
     neighborhood_limit: int = 3
     category_limit: int = 4
     distance_scale_m: int = 5000
+    walking_scale_minutes: int = 60
+    movement_version: str = "v1"
 
     def __post_init__(self):
-        if any(type(x) is not int or x < 1 for x in (self.chain_limit, self.neighborhood_limit, self.category_limit, self.distance_scale_m)):
+        if any(type(x) is not int or x < 1 for x in (self.chain_limit, self.neighborhood_limit, self.category_limit, self.distance_scale_m, self.walking_scale_minutes)):
             raise ValueError("Ranker limits must be positive integers")
+        if self.movement_version not in ("v1","v2"):raise ValueError("Unknown movement version")
 
 
 def _stamp(value):
@@ -294,6 +300,66 @@ def movement(candidate, conditions):
     return {"kind": "estimate", "method": "haversine_straight_line", "distance_m": round(meters, 1), "provider": None, "duration_minutes": None}
 
 
+
+def straight_line_distance(origin, destination):
+    """Unrounded great-circle meters. No implied path or walking speed."""
+    from src.location.geometry import coordinate_pair,haversine_straight_line
+    return haversine_straight_line(coordinate_pair(origin.get('latitude'),origin.get('longitude')),coordinate_pair(destination.get('latitude'),destination.get('longitude')))
+
+
+def endpoint_version(candidate):
+    # Public place coordinates must be bound to the exact candidate snapshot.
+    import hashlib
+    return hashlib.sha256(json.dumps({key:candidate.get(key) for key in ('place_id','latitude','longitude','sources')},sort_keys=True,separators=(',',':')).encode()).hexdigest()[:24]
+
+
+def movement_v2(candidate, conditions, snapshot, current):
+    origin=conditions.get('origin') or {}
+    context=snapshot.get('origin_context') or {}
+    selected=context.get('origin') or origin
+    meters=straight_line_distance(origin,candidate)
+    raw=deepcopy((snapshot.get('route_evidence') or {}).get(candidate['place_id']) or {})
+    route={**raw,'status':'unknown','distance_m':None,'duration_seconds':None,'mode':conditions.get('transport','walking'),'reason_codes':raw.get('reason_codes') or ['ROUTE_NOT_CHECKED']}
+    try:
+        route_clock=_stamp(snapshot.get('route_evaluation_at') or current)
+        distance,duration=raw.get('distance_m'),raw.get('duration_seconds')
+        same=bool(raw.get('origin_identity',{}).get('place_id')) and raw['origin_identity']['place_id']==raw.get('destination_identity',{}).get('place_id') or bool(raw.get('origin_identity',{}).get('id')) and raw.get('origin_identity')==raw.get('destination_identity')
+        valid_numbers=all(type(value) in (int,float) and isfinite(value) and value>=0 and (value>0 or same) for value in (distance,duration))
+        origin_id=selected.get('accommodation_id') or origin.get('place_id') or 'manual-origin'
+        origin_version=str(context.get('origin_version') or snapshot.get('origin_version') or 'manual-v1')
+        identities=(raw.get('origin_identity',{}).get('id')==origin_id and str(raw.get('origin_identity',{}).get('version'))==origin_version and raw.get('destination_identity',{}).get('id')==candidate['place_id'] and str(raw.get('destination_identity',{}).get('version'))==endpoint_version(candidate))
+        accessible=not (conditions.get('required') or {}).get('accessibility') or raw.get('accessibility_status')=='satisfied'
+        permission=raw.get('usage_permission')
+        permitted=permission is True or isinstance(permission,dict) and permission.get('display') is True and permission.get('durable_storage') is True
+        if raw.get('status')=='ok' and raw.get('mode')==conditions.get('transport','walking') and valid_numbers and identities and permitted and _stamp(raw['checked_at'])<=route_clock<_stamp(raw['expires_at']) and accessible:
+            route={**raw,'status':'ok','reason_codes':[]}
+        elif raw.get('status')=='ok':
+            route['reason_codes']=['ROUTE_CONTEXT_OR_FRESHNESS_UNCONFIRMED'] if accessible else ['ROUTE_ACCESSIBILITY_UNKNOWN']
+    except (KeyError,TypeError,ValueError):
+        route['reason_codes']=['ROUTE_DATA_INVALID']
+    return {'kind':'provider' if route['status']=='ok' else 'estimate' if meters is not None else 'unknown',
+        'method':'provider_route' if route['status']=='ok' else 'haversine_straight_line' if meters is not None else None,
+        'distance_m':route['distance_m'] if route['status']=='ok' else meters,'straight_line_m':meters,
+        'duration_minutes':route['duration_seconds']/60 if route['status']=='ok' else None,
+        'provider':route.get('provider') if route['status']=='ok' else None,
+        'origin':{key:selected.get(key) for key in ('label','accommodation_id','version')},
+        'origin_version':context.get('origin_version'), 'route':route}
+
+
+def route_candidates(snapshot,candidates,now,limit):
+    """Deterministic cheap prefilter, before any external matrix request."""
+    eligible=[]
+    config=RankerConfig(movement_version='v2',version='movement-v2')
+    for candidate in candidates:
+        kinds=set(candidate.get('recommendation_types',[]))&set(snapshot['conditions']['recommendation_types'])
+        if not kinds:continue
+        output=_candidate(snapshot,candidate,sorted(kinds)[0],_stamp(now),config)
+        if any(check['state']=='failed' for check in output['visit_fit']['checks']):continue
+        distance=straight_line_distance(snapshot['conditions'].get('origin') or {},candidate)
+        if distance is not None:eligible.append((distance,candidate['place_id'],candidate))
+    eligible.sort(key=lambda item:(item[0],item[1]))
+    return [row[2] for row in eligible[:limit]]
+
 def _price(facts, conditions):
     price, rows, reason = facts.get("price")
     budget = conditions.get("budget")
@@ -449,10 +515,18 @@ def _candidate(snapshot, candidate, kind, current, config):
                 value = rules.get(name) if isinstance(rules, dict) else None
                 state = "confirmed" if value is True else "failed" if value is False else "unknown"
                 check(field + ":" + name, state, field.upper() + ("_MATCH" if state == "confirmed" else "_MISMATCH" if state == "failed" else "_UNKNOWN"), facts.refs(rows))
-    travel = movement(candidate, conditions)
+    travel = movement_v2(candidate, conditions, snapshot, current) if config.movement_version=="v2" else movement(candidate, conditions)
+    straight=travel.get("straight_line_m",travel["distance_m"])
     if conditions.get("radius_m"):
-        state = "unknown" if travel["distance_m"] is None else "confirmed" if travel["distance_m"] <= conditions["radius_m"] else "failed"
+        state = "unknown" if straight is None else "confirmed" if straight <= conditions["radius_m"] else "failed"
         check("radius", state, "RADIUS_UNKNOWN" if state == "unknown" else "RADIUS_MATCH" if state == "confirmed" else "OUTSIDE_RADIUS")
+    distance_filter=conditions.get('distance_filter')
+    if distance_filter:
+        walking=distance_filter['kind']=='walking'
+        actual=travel.get('duration_minutes') if walking and (travel.get('route') or {}).get('mode')=='walking' else None if walking else straight_line_distance(conditions.get('origin') or {},candidate)
+        maximum=distance_filter['max_duration_minutes'] if walking else distance_filter['max_distance_m']
+        state='unknown' if actual is None else 'confirmed' if actual<=maximum else 'failed'
+        check('walking_duration' if walking else 'straight_line_distance',state,('WALKING_TIME_' if walking else 'STRAIGHT_LINE_')+('UNKNOWN' if state=='unknown' else 'MATCH' if state=='confirmed' else 'LIMIT_EXCEEDED'))
     price, price_state, price_reason, price_refs, price_score = _price(facts, conditions)
     if conditions.get("budget") and any(conditions["budget"].get(k) is not None for k in ("amount_min", "amount_max")):
         check("budget", price_state, price_reason, price_refs)
@@ -462,6 +536,7 @@ def _candidate(snapshot, candidate, kind, current, config):
     strict = language_applies and language_filter.get("required") is True
     optional_observed = language_applies and language_filter.get("apply_only_if_qualified") is True and qualified
     model = "iconic_v1" if kind == "landmark" else "local_observed_v1" if strict or optional_observed else "local_editorial_v1"
+    if config.movement_version=="v2":model=model.replace("_v1","_v2")
     if strict and not qualified:
         failed = (review.get("evaluation") or {}).get("decision") == "fail" and review.get("state") == "available"
         check("review_language", "failed" if failed else "unknown", "REVIEW_LANGUAGE_FAILED" if failed else "REVIEW_REQUIRED_UNSUPPORTED")
@@ -490,9 +565,10 @@ def _candidate(snapshot, candidate, kind, current, config):
         component("preference", len(requested.intersection(candidate.get("tags", []))) / len(requested))
     else:
         component("preference", None, codes=["PREFERENCE_UNKNOWN"])
-    distance = travel["distance_m"]
-    component("movement", max(0.0, 1 - distance / config.distance_scale_m) if distance is not None else None,
-              codes=["DISTANCE_ESTIMATE"] if distance is not None else ["ORIGIN_OR_COORDINATES_UNKNOWN"])
+    distance = straight
+    use_walking=config.movement_version=='v2' and conditions.get('prefer_nearby') and (travel.get('route') or {}).get('status')=='ok' and (travel.get('route') or {}).get('mode')=='walking'
+    component('movement',max(0.0,1-travel['duration_minutes']/config.walking_scale_minutes) if use_walking else max(0.0,1-distance/config.distance_scale_m) if distance is not None else None,
+              codes=['VERIFIED_WALKING_ROUTE'] if use_walking else ['DISTANCE_ESTIMATE'] if distance is not None else ['ORIGIN_OR_COORDINATES_UNKNOWN'])
     confirmed = sum(item["state"] == "confirmed" for item in checks)
     component("visit_fit", confirmed / len(checks) if checks else None, [r for item in checks for r in item["source_ids"]])
     if "price" in WEIGHTS[model]:
@@ -558,7 +634,7 @@ def recommend(snapshot: Mapping[str, Any], candidates: list[dict], now=None, con
     Untrusted or malformed candidate facts fail closed rather than becoming fit.
     """
     current = _stamp(now or datetime.now(timezone.utc))
-    config = config or RankerConfig()
+    config = config or RankerConfig(movement_version=snapshot.get("movement_version","v1"),version="ranker-movement-v2" if snapshot.get("movement_version")=="v2" else "ranker-hypotheses-v1")
     if isinstance(config, dict):
         config = RankerConfig(**config)
     from src.discovery.models import Conditions
@@ -601,4 +677,5 @@ def recommend(snapshot: Mapping[str, Any], candidates: list[dict], now=None, con
             "engine_version": ENGINE_VERSION, "config_version": config.version, "config": asdict(config),
             "computed_at": current.isoformat(), "requested_constraints": deepcopy(snapshot),
             "applied_constraints": {"conditions": deepcopy(snapshot["conditions"]), "rating_filter": deepcopy(snapshot.get("rating_filter", {})), "review_language_filter": deepcopy(snapshot.get("review_language_filter", {}))},
+            "distance_exclusions": {code:sum(code in item["reason_codes"] for groups in sections.values() for name in ("excluded","needs_confirmation") for item in groups[name]) for code in ("WALKING_TIME_UNKNOWN","WALKING_TIME_LIMIT_EXCEEDED","STRAIGHT_LINE_UNKNOWN","STRAIGHT_LINE_LIMIT_EXCEEDED","OUTSIDE_RADIUS","RADIUS_UNKNOWN")},
             "unsupported_constraints": sorted({code for groups in sections.values() for key in ("needs_confirmation", "insufficient_data") for item in groups[key] for code in item["reason_codes"]})}

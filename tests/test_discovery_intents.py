@@ -170,14 +170,14 @@ def test_schema10_upgrade_and_readonly_inventory_preserve_data(discovery):
     db=discovery.app.state.db
     with db.connect() as con:
         saved=con.execute('SELECT conditions_json FROM discovery_conditions WHERE trip_id=?',(t['id'],)).fetchone()[0]
-        con.execute('DROP TABLE discovery_intents');con.execute('DROP TABLE discovery_contexts')
+        con.execute('DROP TABLE accommodation_resolutions');con.execute('DROP TABLE trip_accommodations');con.execute('DROP TABLE discovery_intents');con.execute('DROP TABLE discovery_contexts')
         con.execute('UPDATE schema_version SET version=10' if db.backend=='postgres' else 'PRAGMA user_version=10')
     if db.backend=='sqlite':
         import sqlite3
         with sqlite3.connect(db.path) as con:
             report=inventory(con);assert report['writes']==0 and report['database_schema']==10
     db._migrate()
-    assert db.schema_version()==11
+    assert db.schema_version()==12
     with db.connect() as con:
         assert con.execute('SELECT conditions_json FROM discovery_conditions WHERE trip_id=?',(t['id'],)).fetchone()[0]==saved
         assert con.execute('SELECT id FROM trip_stops WHERE trip_id=?',(t['id'],)).fetchone()[0]==t['stops'][0]['id']

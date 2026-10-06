@@ -590,3 +590,20 @@ body:has(#auth:not([hidden])) .toast { bottom:24px; }
 #view-explore>.page-heading .scope-text,#view-explore>.page-heading .eyebrow{display:none}
 #view-explore>.page-heading{margin-bottom:18px}
 @media(max-width:600px){.quick-context .quick-city{flex-basis:auto;margin-bottom:0}.quick-context .compact{padding:8px 11px}.discovery-dates{margin:14px 0}.quick-filters{gap:10px}.discovery-quick>.hint{margin-bottom:0}.section-switch{margin-bottom:14px}}
+
+/* One departure point, progressive stay details; no animation on repeated filter changes. */
+.stay-summary{padding:20px 24px;margin-bottom:20px;background:var(--surface);border-left:3px solid var(--stay)}
+.stay-summary-row{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.stay-summary-copy{min-width:0;flex:1}.stay-summary h3{font-size:18px;line-height:1.5;margin:4px 0 6px;overflow-wrap:anywhere}
+.stay-summary .eyebrow{color:var(--stay);margin:0}.stay-summary .hint{margin:4px 0;max-width:60ch}
+.stay-summary .actions{flex-shrink:0;flex-wrap:wrap}.stay-explore-controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.stay-explore-controls label{display:grid;gap:6px;font-size:13px;color:var(--ink-2)}.stay-explore-controls select{width:100%;min-width:0;min-height:44px}
+.stay-draft-note{font-size:13px;color:var(--stay);margin:12px 0 0}
+.stay-card{padding:18px 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere}.stay-card h3{margin:0 0 6px;line-height:1.5}.stay-card .actions{margin-top:12px}.stay-card>.primary{margin-top:12px}.stay-card a{display:block;margin:8px 0}
+.stay-state{display:inline-block;font-size:12px;color:var(--stay);background:var(--surface-2);border-radius:6px;padding:4px 8px;margin:2px 0 6px}
+.stay-more{margin:16px 0}.stay-more summary{cursor:pointer;padding:12px 0;min-height:44px;color:var(--ink-2)}.stay-more .form-grid{padding-top:8px}
+.stay-confirmation{display:flex;align-items:flex-start;gap:10px;grid-column:1/-1;font-size:14px;line-height:1.6;cursor:pointer}.stay-confirmation input{width:18px;height:18px;min-height:18px;flex-shrink:0;margin-top:4px}
+.stay-booking-suggestions{padding:12px;background:var(--surface-2);border-radius:10px;margin-bottom:18px;display:flex;gap:8px;flex-wrap:wrap}.stay-booking-suggestions .hint{width:100%;margin:0 0 4px}
+.recommendation-basis,.recommendation-card h3{overflow-wrap:anywhere}
+@media(max-width:720px){.stay-summary{padding:16px}.stay-summary-row{align-items:stretch;flex-direction:column;gap:12px}.stay-summary .actions{display:grid;grid-template-columns:1fr 1fr}.stay-summary button{white-space:normal;min-height:44px}.stay-explore-controls{grid-template-columns:1fr;gap:12px}.stay-summary h3{font-size:17px}}
+@media(prefers-reduced-motion:reduce){.stay-summary *,.stay-card *{animation:none!important;transition:none!important}}

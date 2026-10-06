@@ -66,7 +66,17 @@ class Itineraries:
             bookings.append({'booking_id':row['id'],'id':row['id'],'version':row['version'],
                 'kind':value.get('kind'),'status':value.get('status'),'name':value.get('provider') or value.get('kind') or '예약',
                 'date':value.get('date'),'date_end':value.get('date_end'),'events':events})
-        return {'candidates':list(candidates.values()),'bookings':bookings,'missing_place_ids':sorted(ids-candidates.keys()),'route_policy':self._route_policy(con)}
+        data={'candidates':list(candidates.values()),'bookings':bookings,'missing_place_ids':sorted(ids-candidates.keys()),'route_policy':self._route_policy(con)}
+        if 'origin_contexts' in snapshot:
+            from src.accommodations.origin import context_in_connection
+            contexts={}
+            for day,old in snapshot['origin_contexts'].items():
+                try:contexts[day]=context_in_connection(con,self.repo,actor,trip_id,old['visit'],old.get('overrides') or {},utcnow())
+                except DomainError as exc:
+                    if exc.status!=404:raise
+                    contexts[day]={'status':'unknown','origin_version':None,'reason_codes':['ORIGIN_DELETED'],'origin':None}
+            data['origin_contexts']=contexts
+        return data
 
     @staticmethod
     def _extra(data):return [p['place_id'] for p in data.get('candidates',[])]+data.get('missing_place_ids',[])
@@ -78,9 +88,41 @@ class Itineraries:
         return missing
 
     def _data_guard(self,con,actor,trip_id,snapshot,data,expected):
+        self._origin_guard(con,actor,trip_id,snapshot)
         fresh=self._data(con,actor,trip_id,snapshot,self._extra(data))
         if digest(fresh)!=expected:error('SOURCE_DATA_CHANGED','예약·장소·이동 근거가 변경되었습니다. 새 미리보기를 확인해 주세요.')
         return fresh
+
+    def _origin_guard(self,con,actor,trip_id,snapshot):
+        from src.accommodations.origin import snapshot_is_current
+        if any(not snapshot_is_current(con,self.repo,actor,trip_id,context,utcnow()) for context in snapshot.get('origin_contexts',{}).values()):
+            error('ORIGIN_CONTEXT_CHANGED','숙소·출발점 또는 좌표 확인 기한이 바뀌었습니다. 현재 숙소로 일정을 다시 만들어 주세요.',details={'regenerate_required':True})
+
+    def _attach_origins(self,con,actor,trip_id,snapshot,envelope):
+        from src.accommodations.origin import context_in_connection
+        from src.accommodations.service import dto
+        trip=self.repo._trip_dto(con,self.repo._trip(con,actor.id,trip_id))
+        overrides={k:v for k,v in envelope.get('overrides',{}).items() if k in ('origin','origin_selection')}
+        # Old full condition envelopes may contain a default automatic selection.
+        # A legacy manual point retains its user-entered provenance.
+        effective_origin=(envelope.get('origin_context') or {}).get('origin') or {}
+        if effective_origin.get('source')=='explicit_origin':
+            overrides['origin']={key:effective_origin.get(key) for key in ('label','latitude','longitude')}
+            overrides['origin']['place_id']=None  # A client ID is not server-verified identity.
+            overrides['origin_selection']={'kind':'manual'}
+        elif not trip.get('stops') and (envelope.get('conditions') or {}).get('origin'):
+            overrides.setdefault('origin',envelope['conditions']['origin'])
+            overrides['origin_selection']={'kind':'manual'}
+        contexts={w['date']:context_in_connection(con,self.repo,actor,trip_id,{'date':w['date'],'local_time':w['start'],'stop_id':snapshot['stop_id'],'city':snapshot['city'],'timezone':snapshot['timezone']},overrides,utcnow()) for w in snapshot['activity_windows']}
+        stays=[]
+        for row in con.execute('SELECT * FROM trip_accommodations WHERE trip_id=? AND owner_id=? ORDER BY id',(trip_id,actor.id)):
+            value=dto(row,utcnow());stays.append({k:value.get(k) for k in ('id','version','deleted_at','stop_id','display_name','identity_state','identity','checkin_date','checkout_date','checkin_time','checkout_time','dates_confirmed')})
+        snapshot['origin_contexts']=contexts
+        snapshot['origin_resolution_input']={'trip':{k:trip[k] for k in ('id','version','start_date','end_date','stops')},'stays':stays,'overrides':overrides}
+        snapshot['origin']=deepcopy(contexts[snapshot['start_date']].get('origin'))
+        if snapshot['origin'] is None and isinstance(overrides.get('origin'),dict):
+            snapshot['origin']={'label':overrides['origin'].get('label'),'latitude':None,'longitude':None,'place_id':None,'coordinate_permitted':False}
+        snapshot['snapshot_version']='itinerary_snapshot_v2'
 
     @staticmethod
     def _leg_guard(result):
@@ -134,6 +176,7 @@ class Itineraries:
             con.execute('BEGIN IMMEDIATE');current=self._scope(con,actor,trip_id)
             cv=con.execute('SELECT version FROM discovery_conditions WHERE trip_id=?',(trip_id,)).fetchone()
             if current['version']!=body['trip_version'] or (cv['version'] if cv else 0)!=body['conditions_version']:error('VERSION_CONFLICT','여행 또는 방문 조건이 변경되었습니다.')
+            self._attach_origins(con,actor,trip_id,snapshot,envelope)
             data=self._data(con,actor,trip_id,snapshot)
             if data['missing_place_ids']:error('NOT_FOUND','사용 가능한 선택 장소를 찾을 수 없습니다.',404)
             ident=new_id('itinerary')
@@ -248,6 +291,7 @@ class Itineraries:
             trip=self._scope(con,actor,trip_id);cv=con.execute('SELECT version FROM discovery_conditions WHERE trip_id=?',(trip_id,)).fetchone()
             if trip['version']!=row['trip_version'] or (cv['version'] if cv else 0)!=row['conditions_version']:
                 error('INPUT_SNAPSHOT_STALE','여행·예약 또는 방문 조건이 변경되었습니다. 현재 조건으로 새 일정을 만들어 주세요.',details={'current_url':f'/api/v2/trips/{trip_id}/itineraries/{ident}','regenerate_required':True})
+            self._origin_guard(con,actor,trip_id,snapshot)
         return row,snapshot,data,json.loads(revision['result_json']),trip['version'],cv['version'] if cv else 0
 
     @staticmethod
@@ -283,6 +327,11 @@ class Itineraries:
             trip=self._scope(con,actor,trip_id);saved=con.execute('SELECT version FROM discovery_conditions WHERE trip_id=?',(trip_id,)).fetchone()
             if trip['version']!=tv or (saved['version'] if saved else 0)!=cv:error('VERSION_CONFLICT','여행이나 방문 조건이 변경되었습니다. 새 미리보기를 확인해 주세요.')
             self._data_guard(con,actor,trip_id,snapshot,data,digest(data));self._leg_guard(result)
+            from .prices import price_delta
+            active=con.execute('SELECT result_json FROM itinerary_revisions WHERE id=?',(current['active_revision_id'],)).fetchone()
+            overrides={r['item_key']:{**json.loads(r['payload_json']),'version':r['version'],'updated_at':r['updated_at']} for r in con.execute('SELECT * FROM expense_overrides WHERE itinerary_id=? ORDER BY item_key',(row['id'],))}
+            result['price_delta']=price_delta(json.loads(active['result_json']),result,snapshot,data['candidates'],overrides,row['id'],clock())
+            result['expense_manifest']=digest(overrides)
             con.execute('INSERT INTO itinerary_previews VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
                 (ident,row['id'],trip_id,actor.id,row['version'],tv,cv,kind,dump(commands),dump(result),digest(data),dump(data),steps,None,stamp,expires))
         return self._preview_dto(ident,row,result,commands,expires)
@@ -332,6 +381,9 @@ class Itineraries:
             if trip['version']!=row['trip_version'] or (cv['version'] if cv else 0)!=row['conditions_version']:error('INPUT_SNAPSHOT_STALE','현재 여행 조건으로 일정을 다시 만들어 주세요.')
             snapshot=json.loads(row['snapshot_json']);data=json.loads(p['input_data_json']);result=json.loads(p['result_json'])
             data=self._data_guard(con,actor,trip_id,snapshot,data,p['data_manifest']);self._leg_guard(result)
+            if 'expense_manifest' in result:
+                overrides={r['item_key']:{**json.loads(r['payload_json']),'version':r['version'],'updated_at':r['updated_at']} for r in con.execute('SELECT * FROM expense_overrides WHERE itinerary_id=? ORDER BY item_key',(row['id'],))}
+                if digest(overrides)!=result['expense_manifest']:error('EXPENSE_DATA_CHANGED','예상 지출 입력이 바뀌었습니다. 새 미리보기를 확인해 주세요.')
             if p['kind']=='plan_b':
                 from src.travel_tools.alternatives import check_apply
                 active=con.execute('SELECT result_json FROM itinerary_revisions WHERE id=?',(row['active_revision_id'],)).fetchone()

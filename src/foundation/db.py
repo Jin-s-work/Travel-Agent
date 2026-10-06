@@ -8,7 +8,7 @@ import sqlite3
 import fcntl
 
 
-SCHEMA_VERSION = 11
+SCHEMA_VERSION = 12
 SCHEMA = """
 CREATE TABLE users (
  id TEXT PRIMARY KEY, email TEXT NOT NULL, auth_provider TEXT NOT NULL,
@@ -185,6 +185,17 @@ COMMIT;''')
             if version == 10:
                 from src.discovery.intent_schema import SCHEMA as intent_schema
                 connection.executescript('BEGIN IMMEDIATE;\n' + intent_schema + '\nPRAGMA user_version=11;\nCOMMIT;')
+                version = 11
+            if version == 11:
+                from src.accommodations.schema import SCHEMA as accommodation_schema, migrate_legacy
+                connection.executescript('BEGIN IMMEDIATE;\n' + accommodation_schema)
+                try:
+                    migrate_legacy(connection)
+                    connection.execute('PRAGMA user_version=12')
+                    connection.commit()
+                except BaseException:
+                    connection.rollback()
+                    raise
 
     @contextmanager
     def connect(self):

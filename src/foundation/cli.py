@@ -204,6 +204,9 @@ def restore(directory: Path, destination: Path, deletions_from: Path | None = No
             elif item['target_type'] == 'document':
                 con.execute('UPDATE source_documents SET deleted_at=COALESCE(deleted_at,?) WHERE id=?', (stamp, item['target_id']))
                 con.execute('UPDATE bookings SET deleted_at=COALESCE(deleted_at,?) WHERE document_id=?', (stamp, item['target_id']))
+            elif item['target_type'] == 'accommodation':
+                from src.accommodations.service import Accommodations
+                Accommodations.scrub_one(con,item['target_id'],stamp,destination/'private-job-artifacts')
             elif item['target_type'] == 'booking':
                 con.execute('UPDATE bookings SET deleted_at=COALESCE(deleted_at,?) WHERE id=?', (stamp, item['target_id']))
     from src.research.maintenance import merge_tombstones

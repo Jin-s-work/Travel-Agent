@@ -13,7 +13,7 @@ from src.foundation.repository import DomainError, dump, new_id, utcnow
 from src.discovery.models import Conditions
 from src.recommendations.models import RecommendationInput
 
-VERSIONS = ['local_editorial_v1','iconic_v1','local_observed_v1']
+VERSIONS = ['local_editorial_v2','iconic_v2','local_observed_v2']
 
 
 def digest(value):
@@ -21,8 +21,9 @@ def digest(value):
 
 
 class Recommendations:
-    def __init__(self, db, repo, jobs, discovery, reviews):
+    def __init__(self, db, repo, jobs, discovery, reviews, matrix=None):
         self.db,self.repo,self.jobs,self.discovery,self.reviews = db,repo,jobs,discovery,reviews
+        self.matrix=matrix
 
     @staticmethod
     def _review_guard(con):
@@ -74,7 +75,7 @@ class Recommendations:
         if issue:
             raise DomainError('CONDITIONS_OUTDATED','여행 정보가 바뀌었습니다. '+issue['message'],409,[issue])
         snapshot={**body,'conditions':conditions,'trip':{k:trip[k] for k in ('id','version','start_date','end_date','stops')},
-                  'pipeline_version':'discovery_pipeline_v1','ranker_versions':VERSIONS,
+                  'pipeline_version':'discovery_pipeline_v2','movement_version':'v2','origin_context':envelope.get('origin_context'),'ranker_versions':VERSIONS,
                   'explanation_version':'server_templates_v1','evaluation_at':utcnow()}
         with self.db.connect() as con:
             con.execute('BEGIN IMMEDIATE')
@@ -83,6 +84,9 @@ class Recommendations:
             cv=saved['version'] if saved else 0
             if current['version']!=trip['version'] or current['version']!=body['trip_version'] or cv!=body['conditions_version'] or cv!=envelope['version']:
                 raise DomainError('VERSION_CONFLICT','여행 또는 방문 조건이 변경되었습니다. 최신 내용을 확인해 주세요.',409)
+            from src.accommodations.origin import snapshot_is_current
+            if snapshot.get('origin_context') and not snapshot_is_current(con,self.repo,actor,trip_id,snapshot['origin_context']):
+                raise DomainError('ORIGIN_CHANGED','출발점이 바뀌었습니다. 최신 숙소를 확인해 주세요.',409)
             from src.product.events import consented
             snapshot['analytics_opt_in']=consented(con,actor.id)
             snapshot['feedback_policy_version']='soft_avoid_half_v1'
@@ -147,7 +151,10 @@ class Recommendations:
                 con.execute('UPDATE recommendation_runs SET candidates_json=?,manifest_hash=?,data_status=? WHERE id=?',
                     (dump(candidates),digest(candidates),'captured',ident))
         ctx.checkpoint({'candidate_snapshot':ident},stage='constraints_and_scoring',done=0,total=len(candidates))
+        snapshot=self._routes(actor,trip_id,ident,snapshot,candidates,ctx)
         result=recommend(snapshot,candidates,now=datetime.fromisoformat(snapshot['evaluation_at']))
+        result['route_status']=snapshot.get('route_stats',{'provider_calls':0,'reason':'ROUTE_PROVIDER_DISABLED'})
+        result['origin_context']=deepcopy(snapshot.get('origin_context'))
         result['external_discovery']={'state':'unavailable','reason':'EXTERNAL_DISCOVERY_NOT_CONFIGURED','calls':0,'cost':None}
         result['requested_constraints']={k:snapshot[k] for k in ('conditions','review_language_filter','rating_filter')}
         result.setdefault('applied_constraints',deepcopy(result['requested_constraints']))
@@ -159,17 +166,59 @@ class Recommendations:
         with self.db.connect() as con:
             con.execute('BEGIN IMMEDIATE');ctx.guard(con=con)
             self._guard_catalog(con,actor,trip_id,snapshot['conditions']['city'],candidates)
+            from src.accommodations.origin import snapshot_is_current
+            if snapshot.get('origin_context') and not snapshot_is_current(con,self.repo,actor,trip_id,snapshot['origin_context']):
+                raise DomainError('ORIGIN_CHANGED','숙소가 바뀌어 이전 위치의 추천을 활성화하지 않았습니다.',409)
             con.execute("UPDATE recommendation_runs SET result_json=?,data_status='current',completed_at=? WHERE id=?",(dump(result),utcnow(),ident))
             from src.product.events import capture_run
             capture_run(con,actor.id,trip_id,ident,snapshot,candidates,result)
         ctx.progress('recommendation_complete',done=len(candidates),total=len(candidates))
         return {'run_id':ident}
 
+    def _routes(self,actor,trip_id,ident,snapshot,candidates,ctx):
+        """Collect a bounded matrix only inside the explicit recommendation job."""
+        if 'route_evidence' in snapshot or snapshot.get('movement_version')!='v2':return snapshot
+        from .engine import route_candidates,endpoint_version
+        origin=(snapshot.get('origin_context') or {}).get('origin') or snapshot['conditions'].get('origin')
+        conditions=snapshot['conditions'];now=datetime.fromisoformat(snapshot['evaluation_at'])
+        current=deepcopy(snapshot)
+        stats={'provider_calls':0,'matrix_elements':0,'candidates':0,'reason':'ROUTE_PROVIDER_DISABLED' if not self.matrix else 'ORIGIN_COORDINATES_UNKNOWN'}
+        evidence={}
+        if self.matrix and origin and origin.get('latitude') is not None and origin.get('longitude') is not None:
+            maximum=min(100,self.matrix.max_candidates)
+            filtered=route_candidates(snapshot,candidates,now,maximum)
+            endpoints=[{'id':p['place_id'],'version':endpoint_version(p),'latitude':p['latitude'],'longitude':p['longitude'],'coordinate_permitted':True} for p in filtered]
+            source={'id':origin.get('accommodation_id') or origin.get('place_id') or 'manual-origin','version':(snapshot.get('origin_context') or {}).get('origin_version') or 'manual-v1','latitude':origin['latitude'],'longitude':origin['longitude'],'coordinate_permitted':True}
+            if endpoints:
+                try:
+                    from src.foundation.models import local_to_instant
+                    visit=conditions['visit']
+                    try:departure=local_to_instant(visit['date']+'T'+visit['local_time'],visit['timezone']) if visit.get('local_time') else None
+                    except ValueError:departure=None
+                    output=self.matrix.collect(actor,trip_id,[source],endpoints,conditions.get('transport','walking'),departure,job_ctx=ctx,request_key='recommendation:'+ident,accessibility=(conditions.get('required') or {}).get('accessibility',[]))
+                    stats=output['stats']
+                    for element in output['elements']:
+                        index=element.get('destination_index')
+                        if element.get('origin_index')==0 and type(index) is int and 0<=index<len(filtered):evidence[filtered[index]['place_id']]=element
+                except DomainError as exc:
+                    if exc.code in {'NOT_FOUND','LEASE_LOST','JOB_CANCELLED','JOB_DEADLINE','VERSION_CONFLICT','TRIP_DELETED','SOURCE_DATA_CHANGED'}:raise
+                    stats={**stats,'reason':exc.code}
+            else:stats={**stats,'reason':'NO_ROUTE_ELIGIBLE_CANDIDATES'}
+        current.update(route_evidence=evidence,route_stats=stats,route_evaluation_at=utcnow(),route_policy_fingerprint=self.matrix.policy_fingerprint() if self.matrix else None)
+        with self.db.connect() as con:
+            con.execute('BEGIN IMMEDIATE');ctx.guard(con=con)
+            con.execute('UPDATE recommendation_runs SET snapshot_json=? WHERE id=?',(dump(current),ident))
+        ctx.checkpoint({'route_snapshot':ident},stage='route_snapshot',done=len(evidence),total=stats.get('matrix_elements',0))
+        return current
+
     def get(self,actor,trip_id,ident,*,check_data=True):
         with self.db.connect() as con:
             row=dict(self._get(con,actor,trip_id,ident))
             cv=con.execute('SELECT version FROM discovery_conditions WHERE trip_id=?',(trip_id,)).fetchone()
             trip=con.execute('SELECT version FROM trips WHERE id=?',(trip_id,)).fetchone()
+            origin_snapshot=json.loads(row['snapshot_json']).get('origin_context')
+            from src.accommodations.origin import snapshot_is_current
+            origin_current=not origin_snapshot or snapshot_is_current(con,self.repo,actor,trip_id,origin_snapshot)
         snapshot=json.loads(row['snapshot_json']); result=json.loads(row['result_json']) if row['result_json'] else None
         if check_data and row['candidates_json'] and digest(self._catalog(actor,trip_id,snapshot['conditions']['city']))!=row['manifest_hash']:
             # Do not continue serving revoked/expired facts out of an old run.
@@ -177,15 +226,34 @@ class Recommendations:
                 con.execute('BEGIN IMMEDIATE');self._get(con,actor,trip_id,ident)
                 con.execute("UPDATE recommendation_runs SET result_json=NULL,candidates_json=NULL,data_status='stale' WHERE id=?",(ident,))
             row['data_status']='stale';result=None
+        route_status='captured'
+        route_policy=snapshot.get('route_policy_fingerprint')
+        route_policy_current=not route_policy or self.matrix is not None and route_policy==self.matrix.policy_fingerprint()
+        now=datetime.now(timezone.utc)
+        if result:
+            for section in result.get('sections',{}).values():
+                for group in section.values():
+                    for item in group:
+                        travel=item.get('movement') or {}; route=travel.get('route') or {}
+                        if route.get('status')!='ok':continue
+                        try:fresh=datetime.fromisoformat(route['expires_at']).astimezone(timezone.utc)>now
+                        except (ValueError,TypeError,KeyError):fresh=False
+                        if not fresh or not route_policy_current:
+                            route_status='stale' if route_policy_current else 'unavailable'
+                            # Preserve immutable SQL evidence, but never display expired durations as current.
+                            travel['route']={**route,'status':'unknown','distance_m':None,'duration_seconds':None,'reason_codes':['ROUTE_EXPIRED' if route_policy_current else 'ROUTE_POLICY_CHANGED']}
+                            travel.update(duration_minutes=None,provider=None,distance_m=travel.get('straight_line_m'),kind='estimate' if travel.get('straight_line_m') is not None else 'unknown',method='haversine_straight_line' if travel.get('straight_line_m') is not None else None)
         job=self.jobs.get(row['job_id'],actor.id,actor.session_id)
         return {'run_id':ident,'job_id':row['job_id'],'state':job['state'],'job':job,
             'trip_version':row['trip_version'],'conditions_version':row['conditions_version'],
             'request':{k:snapshot[k] for k in ('trip_version','conditions_version','review_language_filter','rating_filter','limit') if k in snapshot},
             'error_code':job.get('error_code'),
             'conditions_snapshot':snapshot.get('conditions'),'snapshot':snapshot,
-            'input_status':'current' if trip['version']==row['trip_version'] and (cv['version'] if cv else 0)==row['conditions_version'] else 'stale',
+            'input_status':'current' if trip['version']==row['trip_version'] and (cv['version'] if cv else 0)==row['conditions_version'] and origin_current else 'stale',
+            'origin_status':'current' if origin_current else 'stale','origin_context':snapshot.get('origin_context'),
+            'route_status':route_status,
             'data_status':row['data_status'],'result':result,'created_at':row['created_at'],
-            'completed_at':row['completed_at'],'reason_codes':['SOURCE_DATA_CHANGED'] if row['data_status']=='stale' else [],
+            'completed_at':row['completed_at'],'reason_codes':(['SOURCE_DATA_CHANGED'] if row['data_status']=='stale' else [])+([] if origin_current else ['ORIGIN_CHANGED']),
             'ranker_versions':json.loads(row['ranker_versions_json'])}
 
     def list(self,actor,trip_id,limit=20,offset=0):
@@ -215,7 +283,8 @@ class Recommendations:
         run=self.get(actor,trip_id,row['run_id'])
         by_id={p['place_id']:p for s in (run.get('result') or {}).get('sections',{}).values() for name in ('items','needs_confirmation','insufficient_data') for p in s.get(name,[])}
         return {'comparison_id':ident,'run_id':row['run_id'],'conditions':json.loads(row['context_json']),
-            'input_status':run['input_status'],'data_status':run['data_status'],
+            'comparison_basis':{'visit':run['conditions_snapshot']['visit'],'party':run['conditions_snapshot']['party'],'origin_version':(run['origin_context'] or {}).get('origin_version'),'transport':run['conditions_snapshot'].get('transport','walking')},
+            'input_status':run['input_status'],'data_status':run['data_status'],'origin_status':run['origin_status'],'origin_context':run['origin_context'],'route_status':run['route_status'],
             'items':[by_id[p] for p in json.loads(row['place_ids_json']) if p in by_id],
             'reason_codes':run['reason_codes']}
 

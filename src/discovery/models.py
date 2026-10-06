@@ -54,6 +54,24 @@ class Origin(Input):
     def paired(self):
         if (self.latitude is None)!=(self.longitude is None):raise ValueError('Provide both location coordinates')
         return self
+class OriginSelection(Input):
+    kind:Literal['automatic','accommodation','manual','none']='automatic'
+    accommodation_id:str|None=Field(default=None,max_length=100)
+    expected_version:int|None=Field(default=None,ge=1)
+    @model_validator(mode='after')
+    def coherent(self):
+        if self.kind=='accommodation' and not self.accommodation_id:raise ValueError('숙소를 선택해 주세요.')
+        if self.kind!='accommodation' and (self.accommodation_id is not None or self.expected_version is not None):raise ValueError('선택한 숙소에만 버전을 지정할 수 있습니다.')
+        return self
+class DistanceFilter(Input):
+    kind:Literal['straight_line','walking']
+    max_distance_m:float|None=Field(default=None,gt=0,le=50000,allow_inf_nan=False)
+    max_duration_minutes:float|None=Field(default=None,gt=0,le=180,allow_inf_nan=False)
+    @model_validator(mode='after')
+    def separate_units(self):
+        if self.kind=='straight_line' and (self.max_distance_m is None or self.max_duration_minutes is not None):raise ValueError('직선거리 조건은 거리만 입력합니다.')
+        if self.kind=='walking' and (self.max_duration_minutes is None or self.max_distance_m is not None):raise ValueError('도보 조건은 이동시간만 입력합니다.')
+        return self
 class Required(Input):
     dietary:list[str]=Field(default_factory=list,max_length=20)
     accessibility:list[str]=Field(default_factory=list,max_length=20)
@@ -68,6 +86,9 @@ class Conditions(Input):
     recommendation_types:list[Literal['local_discovery','landmark']]=Field(default=['local_discovery','landmark'],min_length=1,max_length=2)
     budget:Budget|None=None
     origin:Origin|None=None
+    origin_selection:OriginSelection=Field(default_factory=OriginSelection)
+    distance_filter:DistanceFilter|None=None
+    prefer_nearby:bool=False
     density:Literal['relaxed','balanced','packed']='balanced'
     transport:Literal['walking','transit','car']='walking'
     meal_time:Literal['breakfast','lunch','dinner']|None=None

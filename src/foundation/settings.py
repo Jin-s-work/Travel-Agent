@@ -34,6 +34,8 @@ class Settings:
     job_max_attempts: int = field(default_factory=lambda: int(os.getenv('JOB_MAX_ATTEMPTS', '3')))
     job_deadline_seconds: int = field(default_factory=lambda: int(os.getenv('JOB_DEADLINE_SECONDS', '900')))
     job_shutdown_seconds: float = field(default_factory=lambda: float(os.getenv('JOB_SHUTDOWN_SECONDS', '5')))
+    location_provider_config: str = field(default_factory=lambda: os.getenv('LOCATION_PROVIDER_CONFIG', ''))
+    google_maps_api_key: str = field(default_factory=lambda: os.getenv('GOOGLE_MAPS_API_KEY', ''))
     storage_orphan_grace_seconds: int = 86400
 
     @property

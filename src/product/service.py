@@ -178,7 +178,7 @@ class Product:
             candidates={p['place_id']:p for p in data['candidates']}
             overrides={r['item_key']:r for r in con.execute('SELECT * FROM expense_overrides WHERE itinerary_id=?',(row['id'],))}
             items=[(i['item_id'],i) for i in result['items']]
-            items += [('leg:'+(l.get('from_item_id') or 'origin')+':'+(l.get('to_item_id') or 'end'),{'name':'이동 비용','local_start':l.get('departure_local')}) for l in result.get('legs',[])]
+            items += [('leg:'+(l.get('from_item_id') or 'origin')+':'+(l.get('to_item_id') or 'end'),{'name':'이동 비용','local_start':l.get('departure_local')}) for l in result.get('legs',[]) if not l.get('filter_only')]
             for key,item in items:
                 entry={'key':row['id']+':'+key,'item_key':key,'itinerary_id':row['id'],'label':'예약 비용' if item.get('booking_id') else item.get('name') or '방문 비용','party':snap['conditions']['party'],'price':None,'source':'unknown','source_id':None,'checked_at':None,'override_version':0,'included_by':None,'covers_days':None}
                 candidate=candidates.get(item.get('place_id'))

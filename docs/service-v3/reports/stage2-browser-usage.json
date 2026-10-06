@@ -1,0 +1,93 @@
+{
+  "synthetic": true,
+  "external_http_calls": 0,
+  "location_invocations": [
+    {
+      "operation": "geocoding",
+      "elements": 1,
+      "synthetic": true
+    },
+    {
+      "operation": "route_matrix",
+      "elements": 3,
+      "synthetic": true
+    },
+    {
+      "operation": "route_matrix",
+      "elements": 1,
+      "synthetic": true
+    },
+    {
+      "operation": "route_matrix",
+      "elements": 1,
+      "synthetic": true
+    },
+    {
+      "operation": "route_matrix",
+      "elements": 1,
+      "synthetic": true
+    },
+    {
+      "operation": "route_matrix",
+      "elements": 1,
+      "synthetic": true
+    },
+    {
+      "operation": "route_matrix",
+      "elements": 1,
+      "synthetic": true
+    },
+    {
+      "operation": "route_matrix",
+      "elements": 1,
+      "synthetic": true
+    },
+    {
+      "operation": "route_matrix",
+      "elements": 1,
+      "synthetic": true
+    }
+  ],
+  "metered_usage": [
+    {
+      "provider": "synthetic_location",
+      "operation": "geocoding",
+      "state": "settled",
+      "calls": 1,
+      "reserved_micros": 1,
+      "actual_micros": 1
+    },
+    {
+      "provider": "synthetic_location",
+      "operation": "route_matrix",
+      "state": "settled",
+      "calls": 8,
+      "reserved_micros": 10,
+      "actual_micros": 10
+    }
+  ],
+  "jobs": [
+    {
+      "operation": "accommodation_resolve",
+      "state": "succeeded",
+      "jobs": 1
+    },
+    {
+      "operation": "itinerary_generate",
+      "state": "succeeded",
+      "jobs": 1
+    },
+    {
+      "operation": "recommendations",
+      "state": "succeeded",
+      "jobs": 1
+    }
+  ],
+  "counts": {
+    "trips": 1,
+    "trip_accommodations": 1,
+    "recommendation_runs": 1,
+    "itineraries": 1,
+    "itinerary_revisions": 3
+  }
+}

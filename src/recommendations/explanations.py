@@ -17,6 +17,10 @@ def render(candidate):
         "language": "자격을 확인한 관측 구간의 리뷰 언어 자료를 반영했습니다.",
         "quality": "같은 플랫폼의 평점과 전체 평가 수 조건을 확인했습니다.",
     }
+    if 'VERIFIED_WALKING_ROUTE' in (components.get('movement') or {}).get('reason_codes',[]):
+        labels['movement']='확인된 도보 경로의 이동시간을 가까운 곳 선호에 반영했습니다.'
+    elif (candidate.get('movement') or {}).get('route',{}).get('status')=='ok':
+        labels['movement']='출발점과의 직선거리를 참고했습니다. 이동시간은 별도 경로 근거에서 확인할 수 있습니다.'
     preferred = ("iconic_evidence", "local_evidence", "language", "preference", "price", "movement", "quality")
     for name in preferred:
         component = components.get(name) or {}

@@ -10,11 +10,12 @@
 <meta name="theme-color" content="#245C4F">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Travel Inbox">
-<link rel="stylesheet" href="/css/foundation.css?v=3b1c57cc38c1">
+<link rel="stylesheet" href="/css/foundation.css?v=b74cc711e39d">
 <script src="/js/offline-store.js?v=f2e23f13122c" defer></script>
 <script src="/js/product.js?v=a8fe8457aace" defer></script>
 <script src="/js/travel-tools.js?v=babbf4751245" defer></script>
-<script src="/js/foundation.js?v=7799ae6dcd8e" defer></script>
+<script src="/js/accommodations.js?v=7401032ccdd4" defer></script>
+<script src="/js/foundation.js?v=240ac7a1d6e8" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">본문으로 이동</a>
@@ -73,6 +74,7 @@
         <div class="trip-overview">
         <div class="page-heading"><div><p class="eyebrow">YOUR JOURNEY</p><h1 id="tripTitle">나의 여행</h1><p id="tripSubtitle" class="muted"></p></div><div class="actions"><button id="editTrip" class="secondary" type="button">여행 수정</button><button id="refreshBookings" class="icon-button" type="button" aria-label="예약 새로고침">↻</button></div></div>
         <div id="tripSummary" class="summary-grid"></div></div>
+        <section id="homeOrigin" class="panel stay-summary" aria-label="여행 숙소와 출발점" hidden></section>
         <div id="homePlaces" class="panel home-places" hidden></div>
         <div id="noTrip" class="empty panel" hidden><span aria-hidden="true">↗</span><h2>첫 여행을 만들어 보세요</h2><p>예약 메일이 없어도 괜찮아요.<br>날짜와 도시를 정하고 예약을 직접 추가할 수 있어요.</p><button type="button" id="emptyCreateTrip" class="primary">여행 만들기</button></div>
 
@@ -105,6 +107,7 @@
       </section>
       <section id="view-explore" class="view" aria-labelledby="exploreTitle" hidden>
         <div class="page-heading"><div><p class="eyebrow">YOUR PLACES, WITH CONTEXT</p><h1 id="exploreTitle">여행지 탐색</h1><p class="muted scope-text"></p></div><button id="addBookmark" type="button" class="primary">＋ 장소 저장</button></div>
+        <section id="exploreOrigin" class="panel stay-summary" aria-label="탐색 출발점" hidden></section>
         <div class="section-switch" role="group" aria-label="탐색 보기"><button type="button" data-explore-view="recommend" aria-pressed="true">추천 찾기</button><button type="button" data-explore-view="saved" aria-pressed="false">저장한 장소</button></div>
         <div id="discoveryQuick" class="panel discovery-quick"></div>
         <p id="discoveryError" class="banner error" role="alert" hidden></p>

@@ -143,7 +143,7 @@ def opening_windows(candidate, day, zone, now):
     return result
 
 
-def assess_visit(item, candidate, snapshot, now):
+def assess_visit(item, candidate, snapshot, now, distance_evidence=None):
     result = []
     ident = item['item_id']
     span = bounds(item)
@@ -167,14 +167,25 @@ def assess_visit(item, candidate, snapshot, now):
         add('USER_EXCLUDED', 'violated')
     if not facts.sources:
         add('SOURCE_POLICY_UNAVAILABLE', 'violated')
-    if conditions.get('radius_m'):
-        distance = movement(candidate, {**conditions, 'origin': snapshot.get('origin', conditions.get('origin'))})['distance_m'] if candidate.get('coordinate_permitted') is True else None
-        if distance is None:
-            add('UNKNOWN_REQUIRED_DISTANCE', field='radius_m')
-        elif distance > conditions['radius_m']:
-            add('MAXIMUM_DISTANCE_EXCEEDED', 'violated', field='radius_m')
-        else:
-            add('DISTANCE_MATCH', 'satisfied', field='radius_m')
+    from .origins import origin_for
+    from src.recommendations.engine import straight_line_distance
+    selected_origin=origin_for(snapshot,day.isoformat(),span[0].astimezone(ZoneInfo(zone)).strftime('%H:%M'))
+    distance_filter=conditions.get('distance_filter') or {}
+    maximum=distance_filter.get('max_distance_m') if distance_filter.get('kind')=='straight_line' else conditions.get('radius_m')
+    if maximum is not None:
+        distance=straight_line_distance(selected_origin,candidate) if candidate.get('coordinate_permitted') is True else None
+        if distance is None:add('UNKNOWN_REQUIRED_DISTANCE',field='distance_filter')
+        elif distance>maximum:add('MAXIMUM_DISTANCE_EXCEEDED','violated',field='distance_filter')
+        else:add('DISTANCE_MATCH','satisfied',field='distance_filter')
+    if distance_filter.get('kind')=='walking':
+        route=distance_evidence or {};duration=route.get('duration_minutes')
+        known=route.get('basis')=='provider' and route.get('mode')=='walking' and type(duration) in (int,float) and isfinite(duration) and duration>=0
+        try:known=known and utc(route['checked_at'])<=utc(route.get('observed_at') or now) and max(utc(now),utc(route.get('observed_at') or now))<utc(route['expires_at'])
+        except (KeyError,TypeError,ValueError):known=False
+        if conditions.get('required',{}).get('accessibility') and route.get('accessibility_status')!='satisfied':known=False
+        if not known:add('UNKNOWN_REQUIRED_WALKING_TIME',field='distance_filter')
+        elif duration>distance_filter['max_duration_minutes']:add('MAXIMUM_WALKING_TIME_EXCEEDED','violated',field='distance_filter')
+        else:add('WALKING_TIME_MATCH','satisfied',field='distance_filter')
     count = party['adults']+len(party.get('children', []))
     for field, compare in (('min_party', lambda value: count >= value), ('max_party', lambda value: count <= value)):
         value, rows, _ = facts.get(field)
@@ -182,6 +193,10 @@ def assess_visit(item, candidate, snapshot, now):
             add('MISSING_REQUIRED_FACT', field=field)
         else:
             add('PARTY_MATCH' if compare(value) else 'PARTY_MISMATCH', 'satisfied' if compare(value) else 'violated', facts.refs(rows), field)
+    if party.get('children_status')=='unknown' and not party.get('children'):
+        rule,rows,_=facts.get('children_rule')
+        if isinstance(rule,dict) and (rule.get('allowed') is False or type(rule.get('minimum_age')) is int and rule['minimum_age']>0):
+            add('CHILD_PARTY_UNKNOWN',refs=facts.refs(rows),field='children')
     if party.get('children'):
         rule, rows, _ = facts.get('children_rule')
         if not isinstance(rule, dict) or type(rule.get('allowed')) is not bool:
@@ -291,7 +306,7 @@ def validate(items, candidates, snapshot, legs, now, bookings=None):
             if item['place_id'] not in catalog:
                 checks.append(issue('PLACE_UNAVAILABLE', [ident], state='violated'))
             else:
-                checks.extend(assess_visit(fresh, catalog[item['place_id']], snapshot, now))
+                checks.extend(assess_visit(fresh, catalog[item['place_id']], snapshot, now,next((leg for leg in legs if leg.get('filter_only') and leg.get('to_item_id')==ident),None)))
         if item.get('item_type') == 'booking' and item.get('reservation_status') not in {'source_verified', 'user_confirmed'}:
             checks.append(issue('BOOKING_NEEDS_REVIEW', [ident]))
     busy = [item for item in normalized if item.get('blocking', True) and bounds(item)]
@@ -304,6 +319,7 @@ def validate(items, candidates, snapshot, legs, now, bookings=None):
     by_id = {item['item_id']: item for item in normalized}
     known_pairs = set()
     for leg in legs:
+        if leg.get('filter_only'):continue
         origin_id, destination_id = leg.get('from_item_id'), leg.get('to_item_id')
         known_pairs.add((origin_id, destination_id))
         related = [value for value in (origin_id, destination_id) if value in by_id]
