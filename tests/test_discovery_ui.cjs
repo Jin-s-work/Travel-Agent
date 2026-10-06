@@ -133,3 +133,24 @@ test('stale unknown travel hides retained identity claims while valid zero-minut
   }
   assert.equal(context.itinerarySamePlaceLeg({basis:'unknown',duration_minutes:0,reason_codes:['IDENTICAL_LOCATION']}),false);
 });
+
+
+test('switching cities selects an actual stay date, preserving valid return visits',()=>{
+  const context=load(['discoveryStayChoice']);const trip={start_date:'2026-11-06',end_date:'2026-11-11'};
+  const stays=[{city:'tokyo',start_date:'2026-11-06',end_date:'2026-11-07'},{city:'barcelona',start_date:'2026-11-08',end_date:'2026-11-09'},{city:'tokyo',start_date:'2026-11-10',end_date:'2026-11-11'}];
+  assert.equal(context.discoveryStayChoice(stays,'barcelona','2026-11-06',trip).date,'2026-11-08');
+  assert.equal(context.discoveryStayChoice(stays,'barcelona','2026-11-06',trip).timezone,'Europe/Madrid');
+  assert.equal(context.discoveryStayChoice(stays,'tokyo','2026-11-10',trip).date,'2026-11-10');
+  assert.equal(context.discoveryStayChoice(stays,'tokyo','2026-11-08',trip).date,'2026-11-06');
+});
+test('unsupported and outdated contexts never submit a recommendation job',async()=>{
+  let calls=0;const {context,state}=submitContext(async()=>{calls++;});
+  for(const context_state of ['unsupported_city','outdated']){state.discovery.conditions.context_state=context_state;await context.applyRecommendations();}
+  assert.equal(calls,0);
+});
+test('calendar dates reject zero and six-digit years while allowing leap dates',()=>{
+  const context=load(['calendarDate']);
+  for(const value of ['0000-01-01','202626-10-10','2026-02-29','2026-13-01'])assert.equal(context.calendarDate(value),null);
+  assert.notEqual(context.calendarDate('2028-02-29'),null);
+  assert.notEqual(context.calendarDate('0001-01-01'),null);
+});

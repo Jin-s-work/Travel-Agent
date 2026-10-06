@@ -1,3 +1,4 @@
+from src.destinations import CITIES
 from datetime import datetime,timezone
 import json
 from src.foundation.repository import DomainError,dump,new_id,utcnow
@@ -50,7 +51,7 @@ class Product:
         if body.get('visit_date'):
             triprow=self.repo._trip_dto(con,self.scope(con,actor,trip))
             if not triprow['start_date']<=body['visit_date']<=triprow['end_date']:fail('VISIT_DATE_OUTSIDE_TRIP','방문일을 여행 기간 안에서 확인해 주세요.')
-            if body['visit_status']=='visited' and body['visit_date']>datetime.now(timezone.utc).astimezone(__import__('zoneinfo').ZoneInfo('Asia/Tokyo' if con.execute('SELECT city FROM place_identities WHERE id=?',(place,)).fetchone()[0]=='tokyo' else 'Europe/Madrid')).date().isoformat():fail('VISIT_IN_FUTURE','미래 날짜를 방문 완료로 기록할 수 없습니다.')
+            if body['visit_status']=='visited' and body['visit_date']>datetime.now(timezone.utc).astimezone(__import__('zoneinfo').ZoneInfo(CITIES[con.execute('SELECT city FROM place_identities WHERE id=?',(place,)).fetchone()[0]]['timezone'])).date().isoformat():fail('VISIT_IN_FUTURE','미래 날짜를 방문 완료로 기록할 수 없습니다.')
         return digest({'kind':body['feedback_kind'],'run':body.get('run_id'),'item':body.get('item_id'),'itinerary':body.get('itinerary_id')})
     def _feedback(self,con,actor,trip,ident):
         self.scope(con,actor,trip);row=con.execute('SELECT * FROM visit_feedback WHERE id=? AND owner_id=? AND trip_id=?',(ident,actor.id,trip)).fetchone()

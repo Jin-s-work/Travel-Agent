@@ -64,12 +64,15 @@ class Recommendations:
                 row=con.execute('SELECT id FROM recommendation_runs WHERE job_id=?',(existing['id'],)).fetchone()
             return self._receipt(row['id'],existing)
         envelope=self.discovery.get_conditions(actor,trip_id)
+        if envelope.get('context_state')=='unsupported_city':
+            raise DomainError('CITY_UNSUPPORTED','이 도시의 자동 추천은 준비 중입니다. 장소 링크나 이름은 보관함에 저장할 수 있습니다.',422)
         if envelope['conditions'].get('city') is None or envelope['version']==0 and envelope['city_needs_confirmation']:
             raise DomainError('CITY_CONFIRMATION_REQUIRED','먼저 지원 도시와 방문 조건을 저장해 주세요.',422)
         conditions=Conditions.model_validate(envelope['conditions']).model_dump(mode='json')
         trip=envelope['trip_snapshot']
-        if not trip['start_date']<=conditions['visit']['date']<=trip['end_date']:
-            raise DomainError('CONDITIONS_OUTDATED','현재 여행 기간에 맞게 방문 조건을 다시 저장해 주세요.',409)
+        issue=self.discovery.context_issue(trip,conditions)
+        if issue:
+            raise DomainError('CONDITIONS_OUTDATED','여행 정보가 바뀌었습니다. '+issue['message'],409,[issue])
         snapshot={**body,'conditions':conditions,'trip':{k:trip[k] for k in ('id','version','start_date','end_date','stops')},
                   'pipeline_version':'discovery_pipeline_v1','ranker_versions':VERSIONS,
                   'explanation_version':'server_templates_v1','evaluation_at':utcnow()}
@@ -78,7 +81,7 @@ class Recommendations:
             current=self.jobs._scope(con,actor.id,actor.session_id,'personal_trip',trip_id)
             saved=con.execute('SELECT version FROM discovery_conditions WHERE trip_id=?',(trip_id,)).fetchone()
             cv=saved['version'] if saved else 0
-            if current['version']!=body['trip_version'] or cv!=body['conditions_version'] or cv!=envelope['version']:
+            if current['version']!=trip['version'] or current['version']!=body['trip_version'] or cv!=body['conditions_version'] or cv!=envelope['version']:
                 raise DomainError('VERSION_CONFLICT','여행 또는 방문 조건이 변경되었습니다. 최신 내용을 확인해 주세요.',409)
             from src.product.events import consented
             snapshot['analytics_opt_in']=consented(con,actor.id)

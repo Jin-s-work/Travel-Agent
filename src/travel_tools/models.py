@@ -2,6 +2,7 @@ from datetime import date, time, datetime
 from typing import Literal
 from pydantic import Field, field_validator
 from src.discovery.models import Input, Party, Origin
+from src.destinations import IanaTimezone
 
 class TaskCreate(Input):
     title: str = Field(min_length=1,max_length=200)
@@ -12,7 +13,7 @@ class TaskCreate(Input):
     task_kind: Literal['open_check','reserve','party_inquiry','cancel_check'] = 'reserve'
     visit_date: date
     requested_time: time | None = None
-    timezone: Literal['Asia/Tokyo','Europe/Madrid']
+    timezone: IanaTimezone
     party: Party | None = None
     rule_fact_id: str | None = Field(default=None,max_length=100)
     request_keys: list[Literal['vegetarian','vegan','nut_allergy','gluten_free','step_free']] = Field(default_factory=list,max_length=5)

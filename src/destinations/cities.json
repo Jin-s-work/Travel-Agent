@@ -1,0 +1,1010 @@
+{
+  "version": "world-100-v1",
+  "cities": [
+    {
+      "id": "tokyo",
+      "name_ko": "도쿄",
+      "name_en": "Tokyo",
+      "country_code": "JP",
+      "timezone": "Asia/Tokyo",
+      "currency": "JPY",
+      "aliases": [
+        "東京"
+      ]
+    },
+    {
+      "id": "osaka",
+      "name_ko": "오사카",
+      "name_en": "Osaka",
+      "country_code": "JP",
+      "timezone": "Asia/Tokyo",
+      "currency": "JPY",
+      "aliases": [
+        "大阪"
+      ]
+    },
+    {
+      "id": "kyoto",
+      "name_ko": "교토",
+      "name_en": "Kyoto",
+      "country_code": "JP",
+      "timezone": "Asia/Tokyo",
+      "currency": "JPY",
+      "aliases": [
+        "京都"
+      ]
+    },
+    {
+      "id": "fukuoka",
+      "name_ko": "후쿠오카",
+      "name_en": "Fukuoka",
+      "country_code": "JP",
+      "timezone": "Asia/Tokyo",
+      "currency": "JPY",
+      "aliases": [
+        "福岡"
+      ]
+    },
+    {
+      "id": "sapporo",
+      "name_ko": "삿포로",
+      "name_en": "Sapporo",
+      "country_code": "JP",
+      "timezone": "Asia/Tokyo",
+      "currency": "JPY",
+      "aliases": [
+        "札幌"
+      ]
+    },
+    {
+      "id": "nagoya",
+      "name_ko": "나고야",
+      "name_en": "Nagoya",
+      "country_code": "JP",
+      "timezone": "Asia/Tokyo",
+      "currency": "JPY",
+      "aliases": [
+        "名古屋"
+      ]
+    },
+    {
+      "id": "naha",
+      "name_ko": "나하",
+      "name_en": "Naha",
+      "country_code": "JP",
+      "timezone": "Asia/Tokyo",
+      "currency": "JPY",
+      "aliases": [
+        "那覇"
+      ]
+    },
+    {
+      "id": "hiroshima",
+      "name_ko": "히로시마",
+      "name_en": "Hiroshima",
+      "country_code": "JP",
+      "timezone": "Asia/Tokyo",
+      "currency": "JPY",
+      "aliases": [
+        "広島"
+      ]
+    },
+    {
+      "id": "seoul",
+      "name_ko": "서울",
+      "name_en": "Seoul",
+      "country_code": "KR",
+      "timezone": "Asia/Seoul",
+      "currency": "KRW",
+      "aliases": [
+        "서울특별시"
+      ]
+    },
+    {
+      "id": "busan",
+      "name_ko": "부산",
+      "name_en": "Busan",
+      "country_code": "KR",
+      "timezone": "Asia/Seoul",
+      "currency": "KRW",
+      "aliases": [
+        "부산광역시"
+      ]
+    },
+    {
+      "id": "jeju",
+      "name_ko": "제주시",
+      "name_en": "Jeju City",
+      "country_code": "KR",
+      "timezone": "Asia/Seoul",
+      "currency": "KRW",
+      "aliases": [
+        "제주"
+      ]
+    },
+    {
+      "id": "beijing",
+      "name_ko": "베이징",
+      "name_en": "Beijing",
+      "country_code": "CN",
+      "timezone": "Asia/Shanghai",
+      "currency": "CNY",
+      "aliases": [
+        "北京"
+      ]
+    },
+    {
+      "id": "shanghai",
+      "name_ko": "상하이",
+      "name_en": "Shanghai",
+      "country_code": "CN",
+      "timezone": "Asia/Shanghai",
+      "currency": "CNY",
+      "aliases": [
+        "上海"
+      ]
+    },
+    {
+      "id": "guangzhou",
+      "name_ko": "광저우",
+      "name_en": "Guangzhou",
+      "country_code": "CN",
+      "timezone": "Asia/Shanghai",
+      "currency": "CNY",
+      "aliases": [
+        "广州"
+      ]
+    },
+    {
+      "id": "chengdu",
+      "name_ko": "청두",
+      "name_en": "Chengdu",
+      "country_code": "CN",
+      "timezone": "Asia/Shanghai",
+      "currency": "CNY",
+      "aliases": [
+        "成都"
+      ]
+    },
+    {
+      "id": "hong-kong",
+      "name_ko": "홍콩",
+      "name_en": "Hong Kong",
+      "country_code": "HK",
+      "timezone": "Asia/Hong_Kong",
+      "currency": "HKD",
+      "aliases": [
+        "香港"
+      ]
+    },
+    {
+      "id": "macau",
+      "name_ko": "마카오",
+      "name_en": "Macau",
+      "country_code": "MO",
+      "timezone": "Asia/Macau",
+      "currency": "MOP",
+      "aliases": [
+        "Macao",
+        "澳門"
+      ]
+    },
+    {
+      "id": "taipei",
+      "name_ko": "타이베이",
+      "name_en": "Taipei",
+      "country_code": "TW",
+      "timezone": "Asia/Taipei",
+      "currency": "TWD",
+      "aliases": [
+        "台北"
+      ]
+    },
+    {
+      "id": "kaohsiung",
+      "name_ko": "가오슝",
+      "name_en": "Kaohsiung",
+      "country_code": "TW",
+      "timezone": "Asia/Taipei",
+      "currency": "TWD",
+      "aliases": [
+        "高雄"
+      ]
+    },
+    {
+      "id": "singapore",
+      "name_ko": "싱가포르",
+      "name_en": "Singapore",
+      "country_code": "SG",
+      "timezone": "Asia/Singapore",
+      "currency": "SGD",
+      "aliases": []
+    },
+    {
+      "id": "bangkok",
+      "name_ko": "방콕",
+      "name_en": "Bangkok",
+      "country_code": "TH",
+      "timezone": "Asia/Bangkok",
+      "currency": "THB",
+      "aliases": []
+    },
+    {
+      "id": "chiang-mai",
+      "name_ko": "치앙마이",
+      "name_en": "Chiang Mai",
+      "country_code": "TH",
+      "timezone": "Asia/Bangkok",
+      "currency": "THB",
+      "aliases": []
+    },
+    {
+      "id": "phuket",
+      "name_ko": "푸껫",
+      "name_en": "Phuket",
+      "country_code": "TH",
+      "timezone": "Asia/Bangkok",
+      "currency": "THB",
+      "aliases": [
+        "푸켓"
+      ]
+    },
+    {
+      "id": "hanoi",
+      "name_ko": "하노이",
+      "name_en": "Hanoi",
+      "country_code": "VN",
+      "timezone": "Asia/Ho_Chi_Minh",
+      "currency": "VND",
+      "aliases": []
+    },
+    {
+      "id": "ho-chi-minh-city",
+      "name_ko": "호찌민",
+      "name_en": "Ho Chi Minh City",
+      "country_code": "VN",
+      "timezone": "Asia/Ho_Chi_Minh",
+      "currency": "VND",
+      "aliases": [
+        "호치민",
+        "Saigon"
+      ]
+    },
+    {
+      "id": "da-nang",
+      "name_ko": "다낭",
+      "name_en": "Da Nang",
+      "country_code": "VN",
+      "timezone": "Asia/Ho_Chi_Minh",
+      "currency": "VND",
+      "aliases": []
+    },
+    {
+      "id": "kuala-lumpur",
+      "name_ko": "쿠알라룸푸르",
+      "name_en": "Kuala Lumpur",
+      "country_code": "MY",
+      "timezone": "Asia/Kuala_Lumpur",
+      "currency": "MYR",
+      "aliases": []
+    },
+    {
+      "id": "george-town",
+      "name_ko": "조지타운",
+      "name_en": "George Town",
+      "country_code": "MY",
+      "timezone": "Asia/Kuala_Lumpur",
+      "currency": "MYR",
+      "aliases": [
+        "페낭 조지타운"
+      ]
+    },
+    {
+      "id": "jakarta",
+      "name_ko": "자카르타",
+      "name_en": "Jakarta",
+      "country_code": "ID",
+      "timezone": "Asia/Jakarta",
+      "currency": "IDR",
+      "aliases": []
+    },
+    {
+      "id": "denpasar",
+      "name_ko": "덴파사르",
+      "name_en": "Denpasar",
+      "country_code": "ID",
+      "timezone": "Asia/Makassar",
+      "currency": "IDR",
+      "aliases": [
+        "발리 덴파사르"
+      ]
+    },
+    {
+      "id": "manila",
+      "name_ko": "마닐라",
+      "name_en": "Manila",
+      "country_code": "PH",
+      "timezone": "Asia/Manila",
+      "currency": "PHP",
+      "aliases": []
+    },
+    {
+      "id": "cebu-city",
+      "name_ko": "세부시티",
+      "name_en": "Cebu City",
+      "country_code": "PH",
+      "timezone": "Asia/Manila",
+      "currency": "PHP",
+      "aliases": [
+        "세부"
+      ]
+    },
+    {
+      "id": "new-delhi",
+      "name_ko": "뉴델리",
+      "name_en": "New Delhi",
+      "country_code": "IN",
+      "timezone": "Asia/Kolkata",
+      "currency": "INR",
+      "aliases": []
+    },
+    {
+      "id": "mumbai",
+      "name_ko": "뭄바이",
+      "name_en": "Mumbai",
+      "country_code": "IN",
+      "timezone": "Asia/Kolkata",
+      "currency": "INR",
+      "aliases": []
+    },
+    {
+      "id": "jaipur",
+      "name_ko": "자이푸르",
+      "name_en": "Jaipur",
+      "country_code": "IN",
+      "timezone": "Asia/Kolkata",
+      "currency": "INR",
+      "aliases": []
+    },
+    {
+      "id": "kathmandu",
+      "name_ko": "카트만두",
+      "name_en": "Kathmandu",
+      "country_code": "NP",
+      "timezone": "Asia/Kathmandu",
+      "currency": "NPR",
+      "aliases": []
+    },
+    {
+      "id": "dubai",
+      "name_ko": "두바이",
+      "name_en": "Dubai",
+      "country_code": "AE",
+      "timezone": "Asia/Dubai",
+      "currency": "AED",
+      "aliases": []
+    },
+    {
+      "id": "abu-dhabi",
+      "name_ko": "아부다비",
+      "name_en": "Abu Dhabi",
+      "country_code": "AE",
+      "timezone": "Asia/Dubai",
+      "currency": "AED",
+      "aliases": []
+    },
+    {
+      "id": "doha",
+      "name_ko": "도하",
+      "name_en": "Doha",
+      "country_code": "QA",
+      "timezone": "Asia/Qatar",
+      "currency": "QAR",
+      "aliases": []
+    },
+    {
+      "id": "istanbul",
+      "name_ko": "이스탄불",
+      "name_en": "Istanbul",
+      "country_code": "TR",
+      "timezone": "Europe/Istanbul",
+      "currency": "TRY",
+      "aliases": [
+        "İstanbul"
+      ]
+    },
+    {
+      "id": "madrid",
+      "name_ko": "마드리드",
+      "name_en": "Madrid",
+      "country_code": "ES",
+      "timezone": "Europe/Madrid",
+      "currency": "EUR",
+      "aliases": []
+    },
+    {
+      "id": "barcelona",
+      "name_ko": "바르셀로나",
+      "name_en": "Barcelona",
+      "country_code": "ES",
+      "timezone": "Europe/Madrid",
+      "currency": "EUR",
+      "aliases": []
+    },
+    {
+      "id": "seville",
+      "name_ko": "세비야",
+      "name_en": "Seville",
+      "country_code": "ES",
+      "timezone": "Europe/Madrid",
+      "currency": "EUR",
+      "aliases": [
+        "Sevilla"
+      ]
+    },
+    {
+      "id": "valencia",
+      "name_ko": "발렌시아",
+      "name_en": "Valencia",
+      "country_code": "ES",
+      "timezone": "Europe/Madrid",
+      "currency": "EUR",
+      "aliases": [
+        "València"
+      ]
+    },
+    {
+      "id": "lisbon",
+      "name_ko": "리스본",
+      "name_en": "Lisbon",
+      "country_code": "PT",
+      "timezone": "Europe/Lisbon",
+      "currency": "EUR",
+      "aliases": [
+        "Lisboa"
+      ]
+    },
+    {
+      "id": "porto",
+      "name_ko": "포르투",
+      "name_en": "Porto",
+      "country_code": "PT",
+      "timezone": "Europe/Lisbon",
+      "currency": "EUR",
+      "aliases": []
+    },
+    {
+      "id": "paris",
+      "name_ko": "파리",
+      "name_en": "Paris",
+      "country_code": "FR",
+      "timezone": "Europe/Paris",
+      "currency": "EUR",
+      "aliases": []
+    },
+    {
+      "id": "nice",
+      "name_ko": "니스",
+      "name_en": "Nice",
+      "country_code": "FR",
+      "timezone": "Europe/Paris",
+      "currency": "EUR",
+      "aliases": []
+    },
+    {
+      "id": "lyon",
+      "name_ko": "리옹",
+      "name_en": "Lyon",
+      "country_code": "FR",
+      "timezone": "Europe/Paris",
+      "currency": "EUR",
+      "aliases": []
+    },
+    {
+      "id": "london",
+      "name_ko": "런던",
+      "name_en": "London",
+      "country_code": "GB",
+      "timezone": "Europe/London",
+      "currency": "GBP",
+      "aliases": []
+    },
+    {
+      "id": "edinburgh",
+      "name_ko": "에든버러",
+      "name_en": "Edinburgh",
+      "country_code": "GB",
+      "timezone": "Europe/London",
+      "currency": "GBP",
+      "aliases": []
+    },
+    {
+      "id": "dublin",
+      "name_ko": "더블린",
+      "name_en": "Dublin",
+      "country_code": "IE",
+      "timezone": "Europe/Dublin",
+      "currency": "EUR",
+      "aliases": []
+    },
+    {
+      "id": "rome",
+      "name_ko": "로마",
+      "name_en": "Rome",
+      "country_code": "IT",
+      "timezone": "Europe/Rome",
+      "currency": "EUR",
+      "aliases": [
+        "Roma"
+      ]
+    },
+    {
+      "id": "milan",
+      "name_ko": "밀라노",
+      "name_en": "Milan",
+      "country_code": "IT",
+      "timezone": "Europe/Rome",
+      "currency": "EUR",
+      "aliases": [
+        "Milano"
+      ]
+    },
+    {
+      "id": "florence",
+      "name_ko": "피렌체",
+      "name_en": "Florence",
+      "country_code": "IT",
+      "timezone": "Europe/Rome",
+      "currency": "EUR",
+      "aliases": [
+        "Firenze"
+      ]
+    },
+    {
+      "id": "venice",
+      "name_ko": "베네치아",
+      "name_en": "Venice",
+      "country_code": "IT",
+      "timezone": "Europe/Rome",
+      "currency": "EUR",
+      "aliases": [
+        "Venezia",
+        "베니스"
+      ]
+    },
+    {
+      "id": "naples",
+      "name_ko": "나폴리",
+      "name_en": "Naples",
+      "country_code": "IT",
+      "timezone": "Europe/Rome",
+      "currency": "EUR",
+      "aliases": [
+        "Napoli"
+      ]
+    },
+    {
+      "id": "berlin",
+      "name_ko": "베를린",
+      "name_en": "Berlin",
+      "country_code": "DE",
+      "timezone": "Europe/Berlin",
+      "currency": "EUR",
+      "aliases": []
+    },
+    {
+      "id": "munich",
+      "name_ko": "뮌헨",
+      "name_en": "Munich",
+      "country_code": "DE",
+      "timezone": "Europe/Berlin",
+      "currency": "EUR",
+      "aliases": [
+        "München"
+      ]
+    },
+    {
+      "id": "frankfurt",
+      "name_ko": "프랑크푸르트",
+      "name_en": "Frankfurt",
+      "country_code": "DE",
+      "timezone": "Europe/Berlin",
+      "currency": "EUR",
+      "aliases": [
+        "Frankfurt am Main"
+      ]
+    },
+    {
+      "id": "amsterdam",
+      "name_ko": "암스테르담",
+      "name_en": "Amsterdam",
+      "country_code": "NL",
+      "timezone": "Europe/Amsterdam",
+      "currency": "EUR",
+      "aliases": []
+    },
+    {
+      "id": "brussels",
+      "name_ko": "브뤼셀",
+      "name_en": "Brussels",
+      "country_code": "BE",
+      "timezone": "Europe/Brussels",
+      "currency": "EUR",
+      "aliases": [
+        "Bruxelles",
+        "Brussel"
+      ]
+    },
+    {
+      "id": "zurich",
+      "name_ko": "취리히",
+      "name_en": "Zurich",
+      "country_code": "CH",
+      "timezone": "Europe/Zurich",
+      "currency": "CHF",
+      "aliases": [
+        "Zürich"
+      ]
+    },
+    {
+      "id": "geneva",
+      "name_ko": "제네바",
+      "name_en": "Geneva",
+      "country_code": "CH",
+      "timezone": "Europe/Zurich",
+      "currency": "CHF",
+      "aliases": [
+        "Genève"
+      ]
+    },
+    {
+      "id": "vienna",
+      "name_ko": "빈",
+      "name_en": "Vienna",
+      "country_code": "AT",
+      "timezone": "Europe/Vienna",
+      "currency": "EUR",
+      "aliases": [
+        "Wien"
+      ]
+    },
+    {
+      "id": "prague",
+      "name_ko": "프라하",
+      "name_en": "Prague",
+      "country_code": "CZ",
+      "timezone": "Europe/Prague",
+      "currency": "CZK",
+      "aliases": [
+        "Praha"
+      ]
+    },
+    {
+      "id": "budapest",
+      "name_ko": "부다페스트",
+      "name_en": "Budapest",
+      "country_code": "HU",
+      "timezone": "Europe/Budapest",
+      "currency": "HUF",
+      "aliases": []
+    },
+    {
+      "id": "warsaw",
+      "name_ko": "바르샤바",
+      "name_en": "Warsaw",
+      "country_code": "PL",
+      "timezone": "Europe/Warsaw",
+      "currency": "PLN",
+      "aliases": [
+        "Warszawa"
+      ]
+    },
+    {
+      "id": "krakow",
+      "name_ko": "크라쿠프",
+      "name_en": "Krakow",
+      "country_code": "PL",
+      "timezone": "Europe/Warsaw",
+      "currency": "PLN",
+      "aliases": [
+        "Kraków"
+      ]
+    },
+    {
+      "id": "copenhagen",
+      "name_ko": "코펜하겐",
+      "name_en": "Copenhagen",
+      "country_code": "DK",
+      "timezone": "Europe/Copenhagen",
+      "currency": "DKK",
+      "aliases": [
+        "København"
+      ]
+    },
+    {
+      "id": "stockholm",
+      "name_ko": "스톡홀름",
+      "name_en": "Stockholm",
+      "country_code": "SE",
+      "timezone": "Europe/Stockholm",
+      "currency": "SEK",
+      "aliases": []
+    },
+    {
+      "id": "oslo",
+      "name_ko": "오슬로",
+      "name_en": "Oslo",
+      "country_code": "NO",
+      "timezone": "Europe/Oslo",
+      "currency": "NOK",
+      "aliases": []
+    },
+    {
+      "id": "helsinki",
+      "name_ko": "헬싱키",
+      "name_en": "Helsinki",
+      "country_code": "FI",
+      "timezone": "Europe/Helsinki",
+      "currency": "EUR",
+      "aliases": []
+    },
+    {
+      "id": "reykjavik",
+      "name_ko": "레이캬비크",
+      "name_en": "Reykjavik",
+      "country_code": "IS",
+      "timezone": "Atlantic/Reykjavik",
+      "currency": "ISK",
+      "aliases": [
+        "Reykjavík"
+      ]
+    },
+    {
+      "id": "athens",
+      "name_ko": "아테네",
+      "name_en": "Athens",
+      "country_code": "GR",
+      "timezone": "Europe/Athens",
+      "currency": "EUR",
+      "aliases": []
+    },
+    {
+      "id": "dubrovnik",
+      "name_ko": "두브로브니크",
+      "name_en": "Dubrovnik",
+      "country_code": "HR",
+      "timezone": "Europe/Zagreb",
+      "currency": "EUR",
+      "aliases": []
+    },
+    {
+      "id": "new-york",
+      "name_ko": "뉴욕",
+      "name_en": "New York",
+      "country_code": "US",
+      "timezone": "America/New_York",
+      "currency": "USD",
+      "aliases": [
+        "New York City",
+        "NYC"
+      ]
+    },
+    {
+      "id": "los-angeles",
+      "name_ko": "로스앤젤레스",
+      "name_en": "Los Angeles",
+      "country_code": "US",
+      "timezone": "America/Los_Angeles",
+      "currency": "USD",
+      "aliases": [
+        "LA"
+      ]
+    },
+    {
+      "id": "san-francisco",
+      "name_ko": "샌프란시스코",
+      "name_en": "San Francisco",
+      "country_code": "US",
+      "timezone": "America/Los_Angeles",
+      "currency": "USD",
+      "aliases": []
+    },
+    {
+      "id": "las-vegas",
+      "name_ko": "라스베이거스",
+      "name_en": "Las Vegas",
+      "country_code": "US",
+      "timezone": "America/Los_Angeles",
+      "currency": "USD",
+      "aliases": []
+    },
+    {
+      "id": "seattle",
+      "name_ko": "시애틀",
+      "name_en": "Seattle",
+      "country_code": "US",
+      "timezone": "America/Los_Angeles",
+      "currency": "USD",
+      "aliases": []
+    },
+    {
+      "id": "chicago",
+      "name_ko": "시카고",
+      "name_en": "Chicago",
+      "country_code": "US",
+      "timezone": "America/Chicago",
+      "currency": "USD",
+      "aliases": []
+    },
+    {
+      "id": "boston",
+      "name_ko": "보스턴",
+      "name_en": "Boston",
+      "country_code": "US",
+      "timezone": "America/New_York",
+      "currency": "USD",
+      "aliases": []
+    },
+    {
+      "id": "miami",
+      "name_ko": "마이애미",
+      "name_en": "Miami",
+      "country_code": "US",
+      "timezone": "America/New_York",
+      "currency": "USD",
+      "aliases": []
+    },
+    {
+      "id": "honolulu",
+      "name_ko": "호놀룰루",
+      "name_en": "Honolulu",
+      "country_code": "US",
+      "timezone": "Pacific/Honolulu",
+      "currency": "USD",
+      "aliases": []
+    },
+    {
+      "id": "vancouver",
+      "name_ko": "밴쿠버",
+      "name_en": "Vancouver",
+      "country_code": "CA",
+      "timezone": "America/Vancouver",
+      "currency": "CAD",
+      "aliases": []
+    },
+    {
+      "id": "toronto",
+      "name_ko": "토론토",
+      "name_en": "Toronto",
+      "country_code": "CA",
+      "timezone": "America/Toronto",
+      "currency": "CAD",
+      "aliases": []
+    },
+    {
+      "id": "montreal",
+      "name_ko": "몬트리올",
+      "name_en": "Montreal",
+      "country_code": "CA",
+      "timezone": "America/Toronto",
+      "currency": "CAD",
+      "aliases": [
+        "Montréal"
+      ]
+    },
+    {
+      "id": "mexico-city",
+      "name_ko": "멕시코시티",
+      "name_en": "Mexico City",
+      "country_code": "MX",
+      "timezone": "America/Mexico_City",
+      "currency": "MXN",
+      "aliases": [
+        "Ciudad de México"
+      ]
+    },
+    {
+      "id": "cancun",
+      "name_ko": "칸쿤",
+      "name_en": "Cancun",
+      "country_code": "MX",
+      "timezone": "America/Cancun",
+      "currency": "MXN",
+      "aliases": [
+        "Cancún"
+      ]
+    },
+    {
+      "id": "lima",
+      "name_ko": "리마",
+      "name_en": "Lima",
+      "country_code": "PE",
+      "timezone": "America/Lima",
+      "currency": "PEN",
+      "aliases": []
+    },
+    {
+      "id": "buenos-aires",
+      "name_ko": "부에노스아이레스",
+      "name_en": "Buenos Aires",
+      "country_code": "AR",
+      "timezone": "America/Argentina/Buenos_Aires",
+      "currency": "ARS",
+      "aliases": []
+    },
+    {
+      "id": "rio-de-janeiro",
+      "name_ko": "리우데자네이루",
+      "name_en": "Rio de Janeiro",
+      "country_code": "BR",
+      "timezone": "America/Sao_Paulo",
+      "currency": "BRL",
+      "aliases": []
+    },
+    {
+      "id": "sydney",
+      "name_ko": "시드니",
+      "name_en": "Sydney",
+      "country_code": "AU",
+      "timezone": "Australia/Sydney",
+      "currency": "AUD",
+      "aliases": []
+    },
+    {
+      "id": "melbourne",
+      "name_ko": "멜버른",
+      "name_en": "Melbourne",
+      "country_code": "AU",
+      "timezone": "Australia/Melbourne",
+      "currency": "AUD",
+      "aliases": []
+    },
+    {
+      "id": "brisbane",
+      "name_ko": "브리즈번",
+      "name_en": "Brisbane",
+      "country_code": "AU",
+      "timezone": "Australia/Brisbane",
+      "currency": "AUD",
+      "aliases": []
+    },
+    {
+      "id": "auckland",
+      "name_ko": "오클랜드",
+      "name_en": "Auckland",
+      "country_code": "NZ",
+      "timezone": "Pacific/Auckland",
+      "currency": "NZD",
+      "aliases": []
+    },
+    {
+      "id": "cairo",
+      "name_ko": "카이로",
+      "name_en": "Cairo",
+      "country_code": "EG",
+      "timezone": "Africa/Cairo",
+      "currency": "EGP",
+      "aliases": []
+    },
+    {
+      "id": "cape-town",
+      "name_ko": "케이프타운",
+      "name_en": "Cape Town",
+      "country_code": "ZA",
+      "timezone": "Africa/Johannesburg",
+      "currency": "ZAR",
+      "aliases": []
+    },
+    {
+      "id": "marrakesh",
+      "name_ko": "마라케시",
+      "name_en": "Marrakesh",
+      "country_code": "MA",
+      "timezone": "Africa/Casablanca",
+      "currency": "MAD",
+      "aliases": [
+        "Marrakech"
+      ]
+    }
+  ]
+}

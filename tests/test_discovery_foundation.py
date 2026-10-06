@@ -277,3 +277,51 @@ def test_whitespace_bookmark_rejected_without_creating_record(discovery):
     response=discovery.client.post(path,json={'input_kind':'name','input_value':'   '})
     assert response.status_code==422
     assert discovery.client.get(path).json()['items']==[]
+
+
+def test_madrid_has_explicit_capability_and_preserves_private_bookmarks(discovery):
+    result=discovery.client.post('/api/v2/trips',json={'title':'Madrid fixture','start_date':'2026-11-06','end_date':'2026-11-09',
+        'stops':[{'city':'Madrid','sequence':1,'start_date':'2026-11-06','end_date':'2026-11-09','timezone':'Europe/Madrid'}]})
+    assert result.status_code==201,result.text
+    trip=result.json();base=f"/api/v2/trips/{trip['id']}"
+    envelope=discovery.client.get(base+'/discovery-conditions').json()
+    assert envelope['context_state']=='ready' and envelope['stay_options'][0]['city']=='madrid'
+    assert envelope['catalog_availability']['real_reviewed_candidates']==0
+    assert envelope['conditions']['city']=='madrid' and envelope['unsupported_cities']==[]
+    saved=bookmark(discovery.client,trip,'name','Madrid test restaurant')
+    assert saved['resolve_state']=='unresolved'
+    response=discovery.client.post(base+'/recommendations',json={'trip_version':1,'conditions_version':0},headers={'Idempotency-Key':'madrid-fixture-intent'})
+    assert response.status_code==202,response.text
+    _job(discovery.client,response.json())
+    assert discovery.client.get(base).json()['stops'][0]['city']=='Madrid'
+
+
+def test_stay_ranges_include_return_visits_and_error_points_to_date(discovery):
+    stops=[{'city':'東京','sequence':1,'start_date':'2026-11-06','end_date':'2026-11-07','timezone':'Asia/Tokyo'},
+           {'city':'Barcelona','sequence':2,'start_date':'2026-11-08','end_date':'2026-11-09','timezone':'Europe/Madrid'},
+           {'city':'도쿄','sequence':3,'start_date':'2026-11-10','end_date':'2026-11-11','timezone':'Asia/Tokyo'}]
+    result=discovery.client.post('/api/v2/trips',json={'title':'Multiple stops','start_date':'2026-11-06','end_date':'2026-11-11','stops':stops})
+    assert result.status_code==201,result.text
+    base=f"/api/v2/trips/{result.json()['id']}/discovery-conditions"
+    envelope=discovery.client.get(base).json()
+    assert envelope['context_state']=='ready'
+    assert [s['city'] for s in envelope['stay_options']]==['tokyo','barcelona','tokyo']
+    value=conditions();value['visit']['date']='2026-11-08'
+    bad=discovery.client.patch(base,json={'expected_version':0,'conditions':value})
+    assert bad.status_code==422 and bad.json()['error']['details'][0]['field']=='visit.date'
+    assert discovery.client.get(base).json()['version']==0
+    value['visit']['date']='2026-11-10'
+    assert discovery.client.patch(base,json={'expected_version':0,'conditions':value}).status_code==200
+
+
+def test_saved_context_is_revalidated_after_city_stay_changes(discovery):
+    trip=_trip(discovery.client);base=f"/api/v2/trips/{trip['id']}"
+    assert discovery.client.patch(base+'/discovery-conditions',json={'expected_version':0,'conditions':conditions()}).status_code==200
+    changed=discovery.client.patch(base,json={'expected_version':trip['version'],'stops':[
+        {'city':'도쿄','sequence':1,'start_date':'2026-11-08','end_date':'2026-11-09','timezone':'Asia/Tokyo'}]})
+    assert changed.status_code==200,changed.text
+    assert discovery.client.get(base+'/discovery-conditions').json()['context_state']=='outdated'
+    response=discovery.client.post(base+'/recommendations',json={'trip_version':changed.json()['version'],'conditions_version':1},headers={'Idempotency-Key':'outdated-stay'})
+    assert response.status_code==409 and response.json()['error']['code']=='CONDITIONS_OUTDATED'
+    with discovery.app.state.db.connect() as con:
+        assert con.execute("SELECT count(*) FROM recommendation_runs WHERE trip_id=?",(trip['id'],)).fetchone()[0]==0

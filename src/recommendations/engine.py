@@ -4,6 +4,7 @@ Component mappings are versioned hypotheses, not learned quality estimates. Miss
 evidence remains None: no weight redistribution or invented neutral score.
 """
 from __future__ import annotations
+from src.destinations import CURRENCIES
 
 from copy import deepcopy
 from dataclasses import asdict, dataclass
@@ -297,7 +298,7 @@ def _price(facts, conditions):
     price, rows, reason = facts.get("price")
     budget = conditions.get("budget")
     refs = facts.refs(rows)
-    if not isinstance(price, dict) or price.get("currency") not in {"JPY", "EUR"} or price.get("basis") not in {"per_person", "group"} or price.get("period") not in {"meal", "day", "visit"}:
+    if not isinstance(price, dict) or price.get("currency") not in CURRENCIES or price.get("basis") not in {"per_person", "group"} or price.get("period") not in {"meal", "day", "visit"}:
         return None, "unknown", "PRICE_UNKNOWN", refs, None
     lower, upper = _money(price.get("amount_min")), _money(price.get("amount_max"))
     if lower is None and upper is None or lower is not None and upper is not None and lower > upper:

@@ -1,3 +1,4 @@
+from src.destinations import CITIES
 from copy import deepcopy
 from datetime import datetime,timezone
 import json
@@ -23,7 +24,7 @@ class Preparation:
         if value.get('place_id'):
             place=self._place(con,value['place_id'])
             value['place_name']=place['name']
-            if {'tokyo':'Asia/Tokyo','barcelona':'Europe/Madrid'}.get(place['city'])!=value['timezone']:fail('FACILITY_TIMEZONE_MISMATCH','지점의 시설 시간대를 확인해 주세요.',details={'field':'timezone'})
+            if CITIES.get(place['city'],{}).get('timezone')!=value['timezone']:fail('FACILITY_TIMEZONE_MISMATCH','지점의 시설 시간대를 확인해 주세요.',details={'field':'timezone'})
         if value.get('booking_id'):
             self.repo._booking(con,actor.id,trip,value['booking_id'])
         if value.get('item_id'):

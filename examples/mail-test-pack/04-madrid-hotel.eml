@@ -1,0 +1,19 @@
+From: Travel Demo <reservations@example.invalid>
+To: demo-traveler@example.invalid
+Subject: [TEST ONLY] Reserva de hotel de prueba en Madrid
+Date: Tue, 06 Oct 2026 09:00:00 +0900
+Message-ID: <04-madrid-hotel.eml@example.invalid>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+SYNTHETIC TEST DATA / =EC=8B=A4=EC=A0=9C =EC=98=88=EC=95=BD=EC=9D=B4 =EC=95=
+=84=EB=8B=99=EB=8B=88=EB=8B=A4. =EC=99=B8=EB=B6=80 =EC=98=88=EC=95=BD=C2=B7=
+=EA=B2=B0=EC=A0=9C =ED=9A=A8=EB=A0=A5 =EC=97=86=EC=9D=8C.
+
+Hotel Demo Madrid Centro, establecimiento ficticio. Referencia TEST-MAD-004.
+Entrada: 12 noviembre 2026, 15:00 Europe/Madrid. Salida: 16 noviembre 2026, 1=
+1:00 Europe/Madrid.
+2 adultos. Precio total EUR 480, impuestos incluidos. Direcci=C3=B3n y coorde=
+nadas: no disponibles.
+Ciudad: Madrid, no Barcelona.

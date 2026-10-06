@@ -4,6 +4,7 @@ from datetime import datetime,timedelta,timezone
 import json
 from pathlib import Path
 from .reporting import report,metric
+from src.destinations import CITIES
 from .evaluation import compare
 
 def main():
@@ -11,7 +12,7 @@ def main():
     sample=sub.add_parser('evaluate-synthetic');sample.add_argument('--output',type=Path,required=True)
     sample.add_argument('--candidate',choices=['diversity-v2','distance-v2'],default='diversity-v2')
     empty=sub.add_parser('retrospective-template');empty.add_argument('--output',type=Path,required=True)
-    r=sub.add_parser('report');r.add_argument('--database',type=Path,required=True);r.add_argument('--admin-id',required=True);r.add_argument('--start',required=True);r.add_argument('--end',required=True);r.add_argument('--city',choices=['tokyo','barcelona']);r.add_argument('--synthetic',action='store_true');r.add_argument('--output',type=Path,required=True)
+    r=sub.add_parser('report');r.add_argument('--database',type=Path,required=True);r.add_argument('--admin-id',required=True);r.add_argument('--start',required=True);r.add_argument('--end',required=True);r.add_argument('--city',choices=sorted(CITIES));r.add_argument('--synthetic',action='store_true');r.add_argument('--output',type=Path,required=True)
     args=parser.parse_args()
     if args.command=='evaluate-synthetic':
         from tests.test_recommendation_engine import catalog,snapshot,NOW,review

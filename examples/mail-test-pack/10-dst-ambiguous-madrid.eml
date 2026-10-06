@@ -1,0 +1,14 @@
+From: Travel Demo <reservations@example.invalid>
+To: demo-traveler@example.invalid
+Subject: [TEST ONLY] Hora ambigua por cambio horario
+Date: Tue, 06 Oct 2026 09:00:00 +0900
+Message-ID: <10-dst-ambiguous-madrid.eml@example.invalid>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+
+U1lOVEhFVElDIFRFU1QgREFUQSAvIOyLpOygnCDsmIjslb3snbQg7JWE64uZ64uI64ukLiDsmbjr
+toAg7JiI7JW9wrfqsrDsoJwg7Zqo66ClIOyXhuydjC4NCg0KRGVtbyBNYWRyaWQgbmlnaHQgdmlz
+aXQsIGZpY3Rpb25hbC4gMjAyNi0xMC0yNSAwMjozMCBFdXJvcGUvTWFkcmlkLiAyIGFkdWx0cy4g
+T2Zmc2V0IGFuZCBmaXJzdC9zZWNvbmQgb2NjdXJyZW5jZSBhcmUgTk9UIHN1cHBsaWVkLiBURVNU
+LURTVC0wMTAuDQo=

@@ -14,6 +14,7 @@ from uuid import uuid4
 
 from src.foundation.repository import DomainError
 from .models import Conditions,PackInput,FactInput
+from src.destinations import CITIES,city_key
 from .schema import scrub_trip
 
 
@@ -23,8 +24,6 @@ def deny(code,message,status=409):raise DomainError(code,message,status)
 def norm(value):return unicodedata.normalize('NFKC',value).strip().casefold()
 def now():return datetime.now(timezone.utc).isoformat()
 def instant(value):return datetime.fromisoformat(value.replace('Z','+00:00')).astimezone(timezone.utc)
-def city_key(value):
-    return {'tokyo':'tokyo','도쿄':'tokyo','東京':'tokyo','barcelona':'barcelona','바르셀로나':'barcelona'}.get(norm(value))
 def public_url(value):
     from .safe_fetch import validate_public_url
     try:return validate_public_url(value)
@@ -52,9 +51,9 @@ class DiscoveryService:
         con.execute('INSERT INTO discovery_audit VALUES(?,?,?,?,?,?)',(new_id('audit'),actor.id,action,target,encode(details),now()))
     def _owner(self,con,actor,trip_id):return self.repo._trip(con,actor.id,trip_id)
     def _default_conditions(self,trip):
-        first=next((s for s in trip['stops'] if s['city'].casefold() in ('tokyo','東京','도쿄','barcelona','바르셀로나')),None)
+        first=next((s for s in trip['stops'] if city_key(s['city'])),None)
         city=city_key(first['city']) if first else ('barcelona' if 'barcelona' in trip['title'].casefold() or '바르셀로나' in trip['title'] else 'tokyo')
-        value={'city':city,'visit':{'date':first['start_date'] if first else trip['start_date'],'local_time':None,'timezone':'Europe/Madrid' if city=='barcelona' else 'Asia/Tokyo'},'party':trip['party']}
+        value={'city':city,'visit':{'date':first['start_date'] if first else trip['start_date'],'local_time':None,'timezone':CITIES[city]['timezone']},'party':trip['party']}
         if first and first.get('base_location'):
             value['origin']={'label':first['base_location'][:300],'latitude':None,'longitude':None,'place_id':None}
         output=Conditions.model_validate(value).model_dump(mode='json')
@@ -66,24 +65,43 @@ class DiscoveryService:
         trip=self.repo.get_trip(actor.id,trip_id)
         with self.db.connect() as con:row=con.execute('SELECT * FROM discovery_conditions WHERE trip_id=? AND owner_id=?',(trip_id,actor.id)).fetchone()
         saved=json.loads(row['conditions_json']) if row else self._default_conditions(trip)
-        relevant=[s for s in trip['stops'] if saved.get('city') and city_key(s['city'])==saved.get('city') and s['start_date']<=saved['visit']['date']<=s['end_date']]
-        confirmed=bool(row and not trip['stops'] or relevant)
+        stays=[{'stop_id':s['id'],'city':city_key(s['city']),'label':s['city'],
+                'start_date':s['start_date'],'end_date':s['end_date'],
+                'timezone':s['timezone']} for s in trip['stops'] if city_key(s['city'])]
+        unsupported=bool(trip['stops'] and not stays)
+        issue=self.context_issue(trip,saved)
+        confirmed=not issue and bool(row or trip['stops'])
         return {'version':row['version'] if row else 0,'trip_version':trip['version'],
             'saved_trip_version':row['trip_version'] if row else trip['version'],'trip_snapshot':trip,
             'city_needs_confirmation':not confirmed,
+            'context_state':'unsupported_city' if unsupported else 'outdated' if issue else 'ready' if confirmed else 'selection_required',
+            'stay_options':stays,
             'catalog_availability':self.availability(saved.get('city')),
+            'city_metadata':CITIES.get(saved.get('city')),
             'unsupported_cities':[s['city'] for s in trip['stops'] if not city_key(s['city'])],
             'conditions':saved}
+
+    @staticmethod
+    def context_issue(trip,conditions):
+        visit=conditions['visit']['date']
+        if not trip['start_date']<=visit<=trip['end_date']:
+            return {'field':'visit.date','message':'여행 기간 안에서 방문일을 선택해 주세요.'}
+        relevant=[s for s in trip['stops'] if city_key(s['city'])==conditions.get('city') and conditions.get('city') and s['timezone']==conditions['visit']['timezone']]
+        if trip['stops'] and not relevant:
+            return {'field':'city','message':'등록한 여행 도시에서 선택해 주세요. 이 도시의 자동 추천이 미지원이어도 장소 보관함은 사용할 수 있습니다.'}
+        if relevant and not any(s['start_date']<=visit<=s['end_date'] for s in relevant):
+            ranges=' / '.join(s['start_date']+' ~ '+s['end_date'] for s in relevant)
+            return {'field':'visit.date','message':f'선택한 도시의 체류일({ranges}) 중에서 방문일을 선택해 주세요.'}
+        return None
+
     def save_conditions(self,actor,trip_id,body):
         conditions=Conditions.model_validate(body['conditions']).model_dump(mode='json')
         with self.db.connect() as con:
             con.execute('BEGIN IMMEDIATE');row=self._owner(con,actor,trip_id);trip=self.repo._trip_dto(con,row)
             old=con.execute('SELECT * FROM discovery_conditions WHERE trip_id=?',(trip_id,)).fetchone()
             if body['expected_version']!=(old['version'] if old else 0):deny('VERSION_CONFLICT','다른 화면에서 조건이 바뀌었습니다. 입력을 보존한 채 최신 조건을 확인해 주세요.')
-            visit=conditions['visit']['date']
-            if not trip['start_date']<=visit<=trip['end_date']:deny('VALIDATION_FAILED','방문일은 여행 기간 안이어야 합니다.',422)
-            relevant=[s for s in trip['stops'] if city_key(s['city'])==conditions['city'] and s['timezone']==conditions['visit']['timezone']]
-            if trip['stops'] and not any(s['start_date']<=visit<=s['end_date'] for s in relevant):deny('VALIDATION_FAILED','방문일에 해당 도시 체류 구간이 없습니다.',422)
+            issue=self.context_issue(trip,conditions)
+            if issue:raise DomainError('VALIDATION_FAILED',issue['message'],422,[issue])
             con.execute('INSERT INTO discovery_conditions VALUES(?,?,?,?,?,?,?) ON CONFLICT(trip_id) DO UPDATE SET version=excluded.version,trip_version=excluded.trip_version,snapshot_json=excluded.snapshot_json,conditions_json=excluded.conditions_json,updated_at=excluded.updated_at',
                 (trip_id,actor.id,body['expected_version']+1,trip['version'],encode(trip),encode(conditions),now()))
         return self.get_conditions(actor,trip_id)

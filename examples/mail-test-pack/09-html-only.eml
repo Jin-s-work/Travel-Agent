@@ -1,0 +1,15 @@
+From: Travel Demo <reservations@example.invalid>
+To: demo-traveler@example.invalid
+Subject: [TEST ONLY] HTML-only synthetic booking
+Date: Tue, 06 Oct 2026 09:00:00 +0900
+Message-ID: <09-html-only.eml@example.invalid>
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+
+PGh0bWw+PGJvZHk+PHA+U1lOVEhFVElDIFRFU1QgREFUQSAvIOyLpOygnCDsmIjslb3snbQg7JWE
+64uZ64uI64ukLiDsmbjrtoAg7JiI7JW9wrfqsrDsoJwg7Zqo66ClIOyXhuydjC48L3A+PHA+PC9w
+PjxwPkRlbW8gVG9reW8gR2FsbGVyeS4gMjAyNi0xMS0wOCAxNDowMCBBc2lhL1Rva3lvLiAyIGFk
+dWx0cy4gUmVmZXJlbmNlIFRFU1QtSFRNTC0wMDkuIExpbmsgaXMgYSBwbGFjZWhvbGRlciBhbmQg
+bXVzdCBub3QgYmUgZmV0Y2hlZCBhdXRvbWF0aWNhbGx5LjwvcD48YSBocmVmPSJodHRwczovL2V4
+YW1wbGUuaW52YWxpZC9ib29raW5nIj5UZXN0IGxpbmsgb25seTwvYT48L2JvZHk+PC9odG1sPg0K

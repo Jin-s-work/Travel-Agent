@@ -496,3 +496,9 @@ DB 비밀번호 확인/필요 시 소유자의 직접 재설정과 Google 웹 �
 - 무료 정책 유지: ZERO_SPEND1·halted·예산0·유료 키 제거. 새 메일 AI 추출/임베딩·자유형 AI·외부 지도/검색/리뷰 OFF. 저장/수동 입력/SQL 날짜 질문/비용 없는 계산은 사용 가능. 도쿄·바르셀로나 승인 운영 추천 후보는 각각0, 엄격 언어 추천 OFF. 실제 모바일 기기·최대5명 동시 부하·추천/일정 전체 실환경 E2E는 이번 배포 시험에 포함하지 않았다.
 
 재실행 순서와 제한은 `docs/service-v2/reports/live-deployment-2026-10-06.md`에 기록했다. 로컬 전체 시험 결과와 실제 배포 시험 결과는 별도로 유지한다.
+
+## 20. V3 입력 피로 개선·100도시·메일 체험팩 (2026-10-06)
+
+기획·상세2단계 프롬프트와 긴급 수정은 `docs/service-v3/`로 이어간다. [상세 PRD](../service-v3/PRD.md), [1단계](../service-v3/prompts/01-simple-trip-and-discovery.md), [2단계](../service-v3/prompts/02-stay-distance-and-itinerary.md), [실제 진행 기록](../service-v3/IMPLEMENTATION_STATUS.md).
+
+100도시 registry/시간대·통화/탐색 조건, Madrid 체류일 오류 수정, 오래된조건 차단, 날짜 연도4자리 범위, 간단 여행 생성, 합성메일12개+다운로드를 구현했다. 전체748 passed/11 skipped 및 이후관련73 passed, Node36 passed. 로컬Chrome 실제 생성·탐색·조건저장·새로고침·메일ZIP다운로드·390px 가로넘침없음 확인. 실제숙소 지점확인/도보경로/전체메뉴재편은 후속구현이다. 실제후보없는100도시를 맛집추천완성으로 보고하지 않는다.

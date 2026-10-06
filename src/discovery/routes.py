@@ -6,6 +6,11 @@ from .models import ConditionsPatch,BookmarkInput,BookmarkPatch,VersionInput,Sel
 router=APIRouter(prefix='/api/v2')
 def service(request):return request.app.state.discovery
 
+@router.get('/cities')
+def cities(actor=Depends(require_actor)):
+    from src.destinations import CATALOG
+    return {**CATALOG,'coverage_note':'도시 등록은 추천 후보나 리뷰 품질 검증 완료를 의미하지 않습니다.'}
+
 @router.get('/trips/{trip_id}/discovery-conditions')
 def conditions(trip_id:str,request:Request,actor=Depends(require_actor)):
     return service(request).get_conditions(actor,trip_id)

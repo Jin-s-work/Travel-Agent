@@ -5,6 +5,7 @@ import json
 from typing import Any,Literal
 from zoneinfo import ZoneInfo,ZoneInfoNotFoundError
 from pydantic import BaseModel,ConfigDict,Field,model_validator,field_validator
+from src.destinations import CITIES,CityId,Currency,IanaTimezone
 
 
 class Input(BaseModel):
@@ -17,14 +18,14 @@ class Party(Input):
 class Visit(Input):
     date:date
     local_time:time|None=None
-    timezone:Literal['Asia/Tokyo','Europe/Madrid']
+    timezone:IanaTimezone
     @field_validator('local_time')
     @classmethod
     def local_only(cls,value):
         if value is not None and value.tzinfo is not None:raise ValueError('Local time and timezone must be separate')
         return value
 class Budget(Input):
-    currency:Literal['JPY','EUR']
+    currency:Currency
     amount_min:Decimal|None=Field(default=None,ge=0,max_digits=12,decimal_places=2)
     amount_max:Decimal|None=Field(default=None,ge=0,max_digits=12,decimal_places=2)
     basis:Literal['per_person','group']='per_person'
@@ -50,7 +51,7 @@ class Preferred(Input):
     tags:list[str]=Field(default_factory=list,max_length=30)
     dietary:list[str]=Field(default_factory=list,max_length=20)
 class Conditions(Input):
-    city:Literal['tokyo','barcelona']
+    city:CityId
     visit:Visit
     party:Party
     categories:list[Literal['restaurant','cafe','attraction']]=Field(default=['restaurant'],min_length=1,max_length=3)
@@ -65,7 +66,7 @@ class Conditions(Input):
     preferred:Preferred=Field(default_factory=Preferred)
     @model_validator(mode='after')
     def city_rules(self):
-        zone={'tokyo':'Asia/Tokyo','barcelona':'Europe/Madrid'}[self.city]
+        zone=CITIES[self.city]['timezone']
         if self.visit.timezone!=zone:raise ValueError('Timezone must match city')
         if len(set(self.categories))!=len(self.categories) or len(set(self.recommendation_types))!=len(self.recommendation_types):raise ValueError('Duplicate selections')
         for values in (self.required.dietary,self.required.accessibility,self.preferred.tags,self.preferred.dietary):
@@ -219,7 +220,7 @@ class CandidateInput(Input):
     facts:list[FactInput]=Field(default_factory=list,max_length=60)
 class PackInput(Input):
     version:str=Field(min_length=1,max_length=100)
-    city:Literal['tokyo','barcelona']
+    city:CityId
     synthetic:bool=False
     places:list[CandidateInput]=Field(min_length=1,max_length=50)
 class Approval(Input):

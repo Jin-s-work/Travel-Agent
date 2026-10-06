@@ -5,6 +5,7 @@ from src.foundation.auth import require_actor
 from src.foundation.repository import DomainError
 from .models import Feedback,FeedbackPatch,Version,Consent,ClientEvent,FactReport,ReviewReport,Expense,Evaluation
 from .reporting import report
+from src.destinations import CityId
 from .evaluation import compare
 router=APIRouter(prefix='/api/v2')
 def service(r):return r.app.state.product
@@ -38,7 +39,7 @@ def costs(trip:str,r:Request,actor=Depends(require_actor)):return service(r).cos
 @router.put('/trips/{trip}/cost-estimate')
 def cost_update(trip:str,body:Expense,r:Request,actor=Depends(require_actor)):return service(r).expense(actor,trip,body.model_dump(mode='json'))
 @router.get('/admin/product-report')
-def product_report(r:Request,start:datetime|None=None,end:datetime|None=None,city:str|None=Query(None,pattern='^(tokyo|barcelona)$'),ranker:str|None=Query(None,max_length=100),synthetic:bool=False,recommendation_type:str|None=Query(None,pattern='^(local_discovery|landmark)$'),language_required:bool|None=None,actor=Depends(require_actor)):
+def product_report(r:Request,start:datetime|None=None,end:datetime|None=None,city:CityId|None=None,ranker:str|None=Query(None,max_length=100),synthetic:bool=False,recommendation_type:str|None=Query(None,pattern='^(local_discovery|landmark)$'),language_required:bool|None=None,actor=Depends(require_actor)):
     with r.app.state.db.connect() as con:r.app.state.discovery._admin(con,actor)
     end=end or datetime.now(timezone.utc);start=start or end-timedelta(days=30)
     return report(r.app.state.db,start=start.isoformat(),end=end.isoformat(),city=city,ranker=ranker,synthetic=synthetic,recommendation_type=recommendation_type,language_required=language_required)

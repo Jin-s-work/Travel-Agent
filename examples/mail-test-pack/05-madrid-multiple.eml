@@ -1,0 +1,20 @@
+From: Travel Demo <reservations@example.invalid>
+To: demo-traveler@example.invalid
+Subject: [TEST ONLY] Dos reservas independientes
+Date: Tue, 06 Oct 2026 09:00:00 +0900
+Message-ID: <05-madrid-multiple.eml@example.invalid>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+SYNTHETIC TEST DATA / =EC=8B=A4=EC=A0=9C =EC=98=88=EC=95=BD=EC=9D=B4 =EC=95=
+=84=EB=8B=99=EB=8B=88=EB=8B=A4. =EC=99=B8=EB=B6=80 =EC=98=88=EC=95=BD=C2=B7=
+=EA=B2=B0=EC=A0=9C =ED=9A=A8=EB=A0=A5 =EC=97=86=EC=9D=8C.
+
+Todos los sitios son ficticios.
+A) Restaurante Demo Sol, sucursal Centro. 13 noviembre 2026 13:30 Europe/Madr=
+id. 2 adultos. TEST-MEAL-005. Precio por persona EUR 25=E2=80=9335, impuestos=
+ incluidos.
+B) Museo Demo Madrid. 14 noviembre 2026 10:00=E2=80=9311:30 Europe/Madrid. 2 =
+adultos. TEST-MUSEUM-005. Total EUR 30. No incluye comida ni transporte.
+Son dos reservas independientes en un solo correo.

@@ -57,11 +57,11 @@
       place=c.field(grid,'place_id','검증한 지점',task?.place_id||'',{select:[['','아직 확인하지 않음'],...catalog.map(p=>[p.place_id,p.name])]});
       day=c.field(grid,'visit_date','방문일',task?.visit_date||c.state.trip.start_date,{type:'date',required:true});
       clock=c.field(grid,'requested_time','희망 시각 · 미확정',task?.requested_time||'',{type:'time'});
-      zone=c.field(grid,'timezone','시설 시간대',task?.timezone||'Asia/Tokyo',{select:[['Asia/Tokyo','도쿄'],['Europe/Madrid','바르셀로나']]});
+      zone=c.field(grid,'timezone','시설 시간대',task?.timezone||c.state.trip.stops?.[0]?.timezone||'Asia/Tokyo',{select:[...new Set(c.destinations().map(city=>city.timezone))]});
       adults=c.field(grid,'party.adults','성인 수 · 비우면 여행 인원 사용',task?.party?.adults||'',{type:'number',min:1,max:50});
       children=c.field(grid,'party.children','아동 나이 · 쉼표로 구분, 미확인 ?',task?.party?.children?.map(a=>a.age??'?').join(',')||'');
       rule=c.field(grid,'rule_fact_id','공식 예약 오픈 규칙','',{select:[['','규칙 미확인']]});
-      function rules(){const selected=catalog.find(p=>p.place_id===place.value);rule.replaceChildren(new Option('규칙 미확인',''));for(const f of selected?.facts||[])if(f.field==='booking_open_rule'&&f.usable&&f.status==='verified')rule.append(new Option(ruleLabel(f.value),f.id));rule.value=task?.rule_fact_id||'';if(!task&&selected)zone.value=selected.city==='barcelona'?'Europe/Madrid':'Asia/Tokyo';}
+      function rules(){const selected=catalog.find(p=>p.place_id===place.value);rule.replaceChildren(new Option('규칙 미확인',''));for(const f of selected?.facts||[])if(f.field==='booking_open_rule'&&f.usable&&f.status==='verified')rule.append(new Option(ruleLabel(f.value),f.id));rule.value=task?.rule_fact_id||'';if(!task&&selected)zone.value=c.knownDestination(selected.city)?.timezone||zone.value;}
       place.addEventListener('change',rules);rules();
       for(const [k,l] of [['vegetarian','채식'],['vegan','비건'],['nut_allergy','견과류 알레르기'],['gluten_free','글루텐 제외'],['step_free','계단 없는 접근']]){const label=c.make('label','check'),input=c.make('input');input.type='checkbox';input.checked=!!task?.request_keys?.includes(k);requestChecks[k]=input;label.append(input,c.make('span','',l+' 문의'));grid.append(label);}
       requests=c.field(grid,'requests','추가 요청 원문 · 문의문에서 번역 확인 필요',task?.requests||'',{textarea:true,maxLength:1000,wide:true});

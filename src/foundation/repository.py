@@ -150,7 +150,9 @@ class Repository:
         stops = [dict(stop) for stop in con.execute('SELECT * FROM trip_stops WHERE trip_id=? ORDER BY sequence', (row['id'],))]
         for stop in stops:
             stop.pop('trip_id')
-            stop['recommendation_supported'] = bool(stop['recommendation_supported'])
+            from src.destinations import city_key
+            stop['recommendation_supported'] = bool(city_key(stop['city']))
+            stop['recommendation_coverage'] = 'checked_per_request'
         return {'id': row['id'], 'title': row['title'], 'start_date': row['start_date'], 'end_date': row['end_date'],
                 'party': conditions.get('party', {'adults': 1, 'children': []}), 'stops': stops,
                 'active_index_id': row['active_index_id'],
@@ -159,7 +161,8 @@ class Repository:
     def _write_stops(self, con, trip_id, stops):
         con.execute('DELETE FROM trip_stops WHERE trip_id=?', (trip_id,))
         for stop in stops:
-            supported = stop['city'].casefold() in ('tokyo', '도쿄', '東京', 'barcelona', '바르셀로나')
+            from src.destinations import city_key
+            supported = bool(city_key(stop['city']))
             con.execute('INSERT INTO trip_stops(id,trip_id,sequence,city,start_date,end_date,timezone,base_location,recommendation_supported) VALUES (?,?,?,?,?,?,?,?,?)',
                         (new_id('stop'), trip_id, stop['sequence'], stop['city'], stop['start_date'], stop['end_date'], stop['timezone'], stop.get('base_location'), int(supported)))
 
