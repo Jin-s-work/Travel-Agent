@@ -45,3 +45,12 @@ Chrome/macOS, 로컬 합성 OIDC/공급자 서버(`tests/browser_discovery_fixtu
 - 무료 운영은 AI 추출/임베딩·유료 지도/검색/리뷰 OFF. 새 메일의 자동 분석 성공을 이 체험팩 제공만으로 보장하지 않음.
 - 일부 부가 기능의 기존 범위는 유지: 실제 리뷰 수집 도시 정책은2도시, 예상 지출 수동 가격 입력은JPY/EUR. 전세계 통화의 비용 회계까지 완료했다고 보고하지 않음.
 - 운영 배포 결과는 아래에 별도로 추가한다.
+
+### 운영 반영 완료
+
+- 실제 URL: https://travel-inbox-rag.onrender.com . 기존 Render Free/Supabase hii와 기존 비밀·0원 정책을 그대로 사용.
+- 커밋 `4c33f2c0748f4c746626cfd5551b30a7b8fab27e`, feature branch `codex/private-beta-launch`. main 변경 없음. 수동 배포 `dep-db29ta3bc2fs73fr64f0`, 2026-10-06 **16:10:43 KST** 서비스Live 로그 확인.
+- HTTPS `/`200·새 asset hash 확인, `/health/ready`200(schema/storage/dispatcher/identity/restore 전부true). 운영 ZIP200·로컬 원본SHA256일치.
+- 기존 실제 인증 세션으로 운영 탐색 화면에서 등록된 Madrid 조건/기간/인원 상속, 자료0 안내, 추천 버튼을 확인. 운영 여행 생성 모달 datalist100개, date min0001-01-01/max9999-12-31 확인. 사용자의 실제 여행/예약을 임의 수정하거나 테스트 예약을 추가하지 않음.
+- 무료 호스트의 기동 대기 화면을 실제 관측한 뒤 정상으로 회복. 무중단·즉시 응답 서비스라고 주장하지 않음.
+- SMTP 형식 eml의 의도된CRLF는 `git -c core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol diff --cached --check`로 검사했다. 일반 whitespace 검사가 CRLF를 trailing whitespace로 표시한 점은 코드 오류와 구분했다.
