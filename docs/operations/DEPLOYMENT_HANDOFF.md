@@ -14,12 +14,14 @@
 | `OIDC_CLIENT_SECRET` | 같은 Google 웹 클라이언트의 보안 비밀 |
 | `DEPLOY_ADMIN_EMAIL` | Google 로그인에 사용할 본인 이메일. 개인 초대 생성용이며 Render 설정에 전송하지 않음 |
 
-`SESSION_SECRET`, 무료/운영 모드, URL·경로는 입력 파일에 준비했다. 파일은 Render가 자동으로 읽지 않는다. 값 입력 후 다음 검사/변환을 실행한다.
+`SESSION_SECRET`은 입력 파일에 준비했다. 직접 입력하는 5개와 이 세션 키만 `.env`에 남기고, 무료/운영 모드·URL·저장 경로·job 설정은 `scripts/prepare_render_env.py`의 기본값에서 채운다. 루트 `.env`는 기존 로컬 개발용이며 배포에 읽지 않는다. 파일은 Render가 자동으로 읽지 않는다. 값 입력 후 다음 검사/변환을 실행한다.
 
 ```sh
 .venv/bin/python scripts/prepare_render_env.py --check
 .venv/bin/python scripts/prepare_render_env.py
 ```
+
+DB의 `verify-full`에는 이미지에 포함한 Supabase 공식 CA(`/app/deploy/render-supabase/prod-ca-2021.crt`)를 사용한다. 일반 OS CA bundle만 사용하면 현재 pooler의 인증서 검증이 실패한다.
 
 누락은 변수 이름만 표시한다. 변환은 비밀번호를 URL 인코딩하고 Session pooler5432·TLS 검증·고정 hii 프로젝트·production·zero spend를 검사한다. `.env.render`를 권한600으로 저장하며 비밀값을 stdout에 출력하지 않는다. Render Environment의 Import .env에 사용하는 파일이다. 원문 비밀번호, 관리자 이메일, 선택적인 로컬 Render API 키는 제외한다. 유료 OpenAI/Tavily/Apify 키는 빈 값으로 덮어쓰도록 구성한다.
 

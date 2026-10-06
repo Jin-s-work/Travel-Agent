@@ -1,6 +1,6 @@
 from importlib.util import module_from_spec,spec_from_file_location
 from pathlib import Path
-from urllib.parse import urlsplit,unquote
+from urllib.parse import urlsplit,unquote,parse_qs
 import pytest
 
 spec=spec_from_file_location('prepare_render_env',Path(__file__).parents[1]/'scripts/prepare_render_env.py')
@@ -29,3 +29,45 @@ def test_handoff_rejects_wrong_project_or_transaction_pooler(value):
 def test_handoff_rejects_production_bypass():
     data=config();data['APP_ENV']='development'
     with pytest.raises(ValueError,match='APP_ENV'):module.render_values(data)
+
+
+def test_handoff_requires_bundled_supabase_ca():
+    data=config();values=module.render_values(data)
+    query=parse_qs(urlsplit(values['DATABASE_URL']).query)
+    assert query['sslmode']==['verify-full']
+    assert query['sslrootcert']==[module.DB_CA_PATH]
+    data['DATABASE_URL']=values['DATABASE_URL'].replace(module.DB_CA_PATH,'/etc/ssl/certs/ca-certificates.crt')
+    with pytest.raises(ValueError,match='DATABASE_URL'):module.render_values(data)
+
+def test_handoff_requires_invitation_email_without_exporting_it():
+    data=config();data['DEPLOY_ADMIN_EMAIL']=''
+    with pytest.raises(ValueError,match='DEPLOY_ADMIN_EMAIL'):module.render_values(data)
+
+def test_bundled_certificate_identity_expiry_and_image_inclusion():
+    from cryptography import x509
+    from cryptography.hazmat.primitives import hashes
+    from datetime import datetime,timezone
+    root=Path(__file__).parents[1]
+    rel='deploy/render-supabase/prod-ca-2021.crt'
+    pem=(root/rel).read_bytes()
+    cert=x509.load_pem_x509_certificate(pem)
+    assert cert.fingerprint(hashes.SHA256()).hex()=='807025ad50d4ed219d2c9c7d299c004f824eb00cf7f65afef607d07b72e6cafa'
+    assert cert.not_valid_before_utc < datetime.now(timezone.utc) < cert.not_valid_after_utc
+    assert cert.extensions.get_extension_for_class(x509.BasicConstraints).value.ca
+    assert b'PRIVATE KEY' not in pem
+    assert f'!{rel}' in (root/'.dockerignore').read_text().splitlines()
+    assert f'COPY --chown=user:user {rel} ./{rel}' in (root/'Dockerfile').read_text()
+
+
+def test_minimal_six_value_input_generates_full_free_runtime():
+    full=config()
+    minimal={key:full[key] for key in ['OIDC_CLIENT_ID','OIDC_CLIENT_SECRET','SUPABASE_DB_PASSWORD','SUPABASE_SECRET_KEY','DEPLOY_ADMIN_EMAIL','SESSION_SECRET']}
+    values=module.render_values(minimal)
+    assert values['APP_ENV']=='production'
+    assert values['ZERO_SPEND']=='1'
+    assert values['SUPABASE_URL']=='https://whudlguhvmrbxudybnme.supabase.co'
+    assert values['PUBLIC_BASE_URL']=='https://travel-inbox-rag.onrender.com'
+    assert values['WEB_CONCURRENCY']=='1'
+    assert values['OIDC_CLIENT_SECRET']==minimal['OIDC_CLIENT_SECRET']
+    assert 'SUPABASE_DB_PASSWORD' not in values
+    assert 'DEPLOY_ADMIN_EMAIL' not in values

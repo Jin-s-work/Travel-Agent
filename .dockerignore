@@ -13,6 +13,7 @@ deploy/*
 !deploy/render-supabase/
 deploy/render-supabase/*
 !deploy/render-supabase/pricing-zero.json
+!deploy/render-supabase/prod-ca-2021.crt
 tests/
 seed/
 .DS_Store

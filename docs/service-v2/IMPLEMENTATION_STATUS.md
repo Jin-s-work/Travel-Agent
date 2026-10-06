@@ -470,3 +470,13 @@ node --test tests/*.cjs
 DB 비밀번호 확인/필요 시 소유자의 직접 재설정과 Google 웹 클라이언트 발급/입력 대기다. 실제 새 배포·HTTPS 로그인·Supabase 왕복/재시작/외부 복원은 아직 미검증이다. 새 지출·지인 초대 발송 없음.
 
 배포용 코드 커밋 `039c63c`를 `origin/codex/private-beta-launch`에 push했다. `main` 및 기존 Render 서비스는 변경하지 않았다. Docker native 이미지의 UID1000·비밀 .env 미포함·최신 public shell v12 포함을 검증했고, 설정 없는 실제 launcher가 exit78로 거절하는 것을 확인했다. 입력 파일은 권한600이며 Git tracked 목록에서 제외됨을 재확인했다. 새 운영 서비스 배포는 아직 실행하지 않았고, Google 웹 클라이언트 및 hii 비밀값 입력이 남았다.
+
+
+### 19.1 배포 재개·입력 단순화·Supabase 연결 (2026-10-06)
+
+- `.env`를 사용자 입력 5개(OIDC ID/Secret, hii DB 비밀번호/서버 key, 본인 이메일)와 기존 세션 키만 남기도록 정리했다. 6개 값은 정리 전후 동일함을 검증했다. 고정 주소·무료 정책·경로·job 설정은 배포 변환 스크립트가 채운다. 루트 개발용 `.env`는 변경하지 않았다.
+- Supabase `travel-private` 서버 key GET 200 및 private=true, hii Session pooler 5432 DB 연결을 실제 확인했다. 일반 OS CA만으로는 인증서 검증이 실패하여 공식 Supabase Root 2021 CA를 Docker 이미지에 포함했다. `verify-full`과 호스트 검증을 유지한다. 공개 인증서 지문·만료·출처는 `deploy/render-supabase/CERTIFICATE.md`에 기록했다.
+- 실제 운영 드라이버(libpq)의 CA/호스트 검증과 자격 증명 연결 통과. Python 3.13 일반 SSLContext의 strict 검사는 해당 공급자 루트 인증서의 keyUsage 부재로 실패했으므로 이를 DB 운영 드라이버 결과와 혼동하지 않는다. 인증서 검증을 끄지 않았다.
+- 설정 변환/인증서/최소 입력 시험 **9 passed**, diff check 통과. native arm64 Docker `travel-inbox-beta:20261006-tls` 빌드 성공.
+- 실제 hii에 전용 `travel` 스키마를 기동 migration으로 생성하고 512MiB 제한 로컬 운영 컨테이너에서 `/health/live` 200, `/health/ready` 200(schema/storage/dispatcher/identity/restore true), 비로그인 `/api/v2/trips` 401 확인. 단일 시점 약66MiB/CPU0.26%이며 5명 부하 측정은 아니다. identity=true는 설정 확인이고 실제 Google 로그인 성공을 뜻하지 않는다.
+- Render의 기존 운영 배포는 아직 `main/aefee57`이다. 설정 파일을 가져오려면 Chrome ChatGPT 확장프로그램의 파일 URL 접근 허용 또는 사용자의 직접 파일 선택이 필요하다. `.env.render`는 준비했고 비밀값을 출력하지 않았다. 실제 Render 신규 배포·HTTPS OAuth·재시작/복원 검증은 계속 진행 중이다.

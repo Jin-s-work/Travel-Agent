@@ -7,12 +7,36 @@ from urllib.parse import quote, urlsplit, parse_qs
 from dotenv import dotenv_values
 
 ROOT = Path(__file__).resolve().parents[1]
-REQUIRED = ('SUPABASE_SECRET_KEY', 'OIDC_CLIENT_ID', 'OIDC_CLIENT_SECRET', 'SESSION_SECRET')
+DB_CA_PATH = '/app/deploy/render-supabase/prod-ca-2021.crt'
+REQUIRED = ('SUPABASE_SECRET_KEY', 'OIDC_CLIENT_ID', 'OIDC_CLIENT_SECRET', 'SESSION_SECRET', 'DEPLOY_ADMIN_EMAIL')
 LOCAL_ONLY = {'SUPABASE_DB_PASSWORD', 'DEPLOY_ADMIN_EMAIL', 'RENDER_API_KEY'}
+
+# Fixed settings for the existing free service. The private input file only
+# contains the five account inputs and the already-generated session secret.
+RUNTIME_DEFAULTS = {
+    'STORAGE_BACKEND': 'supabase',
+    'SUPABASE_URL': 'https://whudlguhvmrbxudybnme.supabase.co',
+    'SUPABASE_STORAGE_BUCKET': 'travel-private',
+    'APP_ENV': 'production',
+    'PUBLIC_BASE_URL': 'https://travel-inbox-rag.onrender.com',
+    'OIDC_SERVER_METADATA_URL': 'https://accounts.google.com/.well-known/openid-configuration',
+    'PYTHON_DOTENV_DISABLED': '1', 'SEED_ON_EMPTY': '0', 'WEB_CONCURRENCY': '1',
+    'DATABASE_PATH': '/tmp/travel-cache/sql/unused.sqlite3',
+    'DOCUMENTS_DIR': '/tmp/travel-cache/documents',
+    'VECTORS_DIR': '/tmp/travel-cache/vectors',
+    'EMAILS_DIR': '/tmp/travel-cache/legacy-emails',
+    'CHROMA_DIR': '/tmp/travel-cache/legacy-chroma',
+    'JOB_POLL_SECONDS': '3', 'JOB_LEASE_SECONDS': '90',
+    'JOB_HEARTBEAT_SECONDS': '20', 'JOB_SHUTDOWN_SECONDS': '5',
+    'JOB_MAX_ATTEMPTS': '3', 'JOB_DEADLINE_SECONDS': '900',
+    'BACKUP_ENABLED': '0', 'ZERO_SPEND': '1',
+    'PRICING_CONFIG': '/app/deploy/render-supabase/pricing-zero.json',
+    'OPENAI_API_KEY': '', 'TAVILY_API_KEY': '', 'APIFY_TOKEN': '',
+}
 
 
 def render_values(source):
-    values = {key: value or '' for key, value in source.items()}
+    values = {**RUNTIME_DEFAULTS, **{key: value or '' for key, value in source.items()}}
     missing = [key for key in REQUIRED if not values.get(key)]
     if not values.get('DATABASE_URL'):
         if not values.get('SUPABASE_DB_PASSWORD'):
@@ -21,14 +45,14 @@ def render_values(source):
             password = quote(values['SUPABASE_DB_PASSWORD'], safe='')
             values['DATABASE_URL'] = ('postgresql://postgres.whudlguhvmrbxudybnme:' + password +
                 '@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres'
-                '?sslmode=verify-full&sslrootcert=/etc/ssl/certs/ca-certificates.crt')
+                '?sslmode=verify-full&sslrootcert=' + DB_CA_PATH)
     if missing:
         raise ValueError('입력 필요: ' + ', '.join(missing))
     if len(values['SESSION_SECRET']) < 32:
         raise ValueError('SESSION_SECRET: 최소 32자 필요')
     try:
         db = urlsplit(values['DATABASE_URL'])
-        valid = db.scheme in {'postgres','postgresql'} and db.hostname == 'aws-0-ap-northeast-1.pooler.supabase.com' and db.port == 5432 and db.username == 'postgres.whudlguhvmrbxudybnme' and bool(db.password) and parse_qs(db.query).get('sslmode') == ['verify-full']
+        valid = db.scheme in {'postgres','postgresql'} and db.hostname == 'aws-0-ap-northeast-1.pooler.supabase.com' and db.port == 5432 and db.username == 'postgres.whudlguhvmrbxudybnme' and bool(db.password) and parse_qs(db.query).get('sslmode') == ['verify-full'] and parse_qs(db.query).get('sslrootcert') == [DB_CA_PATH]
     except ValueError:
         valid = False
     if not valid:
