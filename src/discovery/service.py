@@ -380,7 +380,7 @@ class DiscoveryService:
             'chain_id':row['chain_id'],'neighborhood':row['neighborhood'],'latitude':row['latitude'],'longitude':row['longitude'],
             'identity_status':row['identity_status'],'pack_status':pack['status'],'synthetic':bool(pack['synthetic']),
             'canonical_url':row['canonical_url'],'facts':facts,'sources':sources}
-    def catalog(self,actor,trip_id,city=None,include_unapproved=False):
+    def catalog(self,actor,trip_id,city=None,include_unapproved=False,*,include_photos=True):
         self.repo.get_trip(actor.id,trip_id)
         with self.db.connect() as con:
             if include_unapproved:self._admin(con,actor)
@@ -390,6 +390,9 @@ class DiscoveryService:
             for row in rows:
                 value=self._candidate(con,row,include_unapproved);value['excluded']=row['place_id'] in excluded;items[row['place_id']]=value
                 if value['synthetic'] and not self.allow_synthetic:items.pop(row['place_id'],None)
+                elif include_photos:
+                    from .photos import for_place
+                    value.update(for_place(con,row['place_id']))
             return list(items.values())
     def detail(self,actor,trip_id,place_id):
         self.repo.get_trip(actor.id,trip_id)
@@ -401,6 +404,8 @@ class DiscoveryService:
             candidate=con.execute('SELECT c.*,p.name,p.address,p.city,p.identity_status FROM research_candidates c JOIN place_identities p ON p.id=c.place_id WHERE c.place_id=? ORDER BY c.updated_at DESC LIMIT 1',(place_id,)).fetchone()
             facts,sources=self._facts(con,place_id)
             basic={'id':place_id,'name':place['name'],'display_name':place['name'],'native_name':candidate['native_name'] if candidate else None,'city':place['city'],'address':place['address'],'identity_status':place['identity_status'],'categories':[candidate['category']] if candidate else [],'canonical_url':candidate['canonical_url'] if candidate else place['source_url']}
+            from .photos import for_place
+            basic.update(for_place(con,place_id))
             excluded=bool(con.execute('SELECT 1 FROM discovery_exclusions WHERE trip_id=? AND place_id=?',(trip_id,place_id)).fetchone())
         try:evidence=self.reviews.evidence(actor,trip_id,place_id)
         except DomainError:evidence={'state':'unavailable','metrics':None,'evaluation':{'decision':'unsupported','strict_pass':False,'reason_codes':['NO_LINKED_REVIEW_EVIDENCE']}}

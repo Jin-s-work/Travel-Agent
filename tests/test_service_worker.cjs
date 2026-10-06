@@ -19,7 +19,7 @@ function worker() {
 }
 test('all private API, download, query, cross-origin and mutation requests bypass the cache',async()=>{
   const {listeners,writes}=worker();
-  for(const [method,url] of [['GET','https://travel.test/api/v2/session'],['GET','https://travel.test/api/v2/trips/t/documents/d/content'],['GET','https://travel.test/api/bookings'],['POST','https://travel.test/'],['GET','https://travel.test/?invitation=secret'],['GET','https://other.test/index.html']]) {
+  for(const [method,url] of [['GET','https://travel.test/api/v2/session'],['GET','https://travel.test/api/v2/trips/t/documents/d/content'],['GET','https://travel.test/api/bookings'],['POST','https://travel.test/'],['GET','https://travel.test/?invitation=secret'],['GET','https://other.test/index.html'],['GET','https://thumb.wikimedia.org/wikipedia/commons/thumb/6/65/Kanda-Matsuya_01.jpg/960px-Kanda-Matsuya_01.jpg']]) {
     let responded=false;
     listeners.fetch({request:{method,url},respondWith:()=>{responded=true;}});
     assert.equal(responded,false,method+' '+url);

@@ -171,3 +171,19 @@ test('calendar dates reject zero and six-digit years while allowing leap dates',
   const merged=context.mergeDraft({required:{dietary:['vegan']}},next);
   assert.equal(merged.required.dietary[0],'vegan');assert.equal(merged.origin,null);
  });
+
+test('trip city labels use the entire destination catalog, including aliases and return stays',()=>{
+  const cities=JSON.parse(fs.readFileSync('src/destinations/cities.json','utf8')).cities;
+  const context=load(['knownDestination','destinationLabel','tripCityLabel'],{destinationCatalog:cities});
+  assert(cities.length>=100);for(const city of cities){assert.equal(context.destinationLabel(city.id),city.name_ko);assert.equal(context.destinationLabel(city.name_en),city.name_ko);for(const alias of city.aliases)assert.equal(context.destinationLabel(alias),city.name_ko);}
+  assert.equal(context.tripCityLabel({stops:[{city:'madrid'},{city:'Barcelona'},{city:'madrid'}]}),'마드리드 → 바르셀로나 → 마드리드');
+  assert.equal(context.destinationLabel('사용자가 적은 작은 마을'),'사용자가 적은 작은 마을');assert.equal(context.destinationLabel(null),'도시 미정');
+});
+test('late city catalog recovery relabels the current trip without changing its stored city or title',async()=>{
+  const cities=JSON.parse(fs.readFileSync('src/destinations/cities.json','utf8')).cities,nodes={'#tripScope':{},'#tripCitySummary':{}},trip={id:'a',title:'내가 적은 여행 이름',start_date:'2026-11-06',end_date:'2026-11-09',stops:[{city:'madrid'}]},state={trip};let resolve,calls=0;
+  const context=load(['tripDates','knownDestination','destinationLabel','tripCityLabel','renderTripCityLabels','loadDestinations'],{destinationCatalog:[],discoveryCityNames:{},state,$:selector=>nodes[selector],api:()=>{calls++;return new Promise(done=>resolve=done);}});
+  context.renderTripCityLabels();assert.match(nodes['#tripScope'].textContent,/madrid/);assert.equal(nodes['#tripCitySummary'].textContent,'madrid');
+  const loading=context.loadDestinations();state.trip={...trip,id:'b',stops:[{city:'barcelona'}]};resolve({cities});await loading;
+  assert.equal(nodes['#tripScope'].textContent,'2026-11-06 — 2026-11-09 · 바르셀로나');assert.equal(nodes['#tripCitySummary'].textContent,'바르셀로나');assert.equal(trip.stops[0].city,'madrid');assert.equal(state.trip.stops[0].city,'barcelona');assert.equal(state.trip.title,'내가 적은 여행 이름');
+  await context.loadDestinations();assert.equal(calls,1);
+});

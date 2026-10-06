@@ -1,0 +1,283 @@
+{
+  "version": "restaurant_photos_v1",
+  "places": [
+    {
+      "external_id": "casa-ciriaco-mayor84",
+      "address": "Calle Mayor, 84, 28013 Madrid",
+      "canonical_url": "https://www.esmadrid.com/restaurantes/casa-ciriaco",
+      "city": "madrid",
+      "photos": [
+        {
+          "id": "6a55c6b4c1b866577228",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7f/Casa_Ciriaco-2009.jpg/960px-Casa_Ciriaco-2009.jpg",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Casa_Ciriaco-2009.jpg",
+          "author": "Tamorlan",
+          "license": "CC BY 3.0",
+          "license_url": "https://creativecommons.org/licenses/by/3.0/",
+          "alt": "카사 시리아코 · 식당 참고 사진",
+          "checked_at": "2026-10-06T14:35:40.366060+00:00",
+          "expires_at": "2027-10-06T14:35:40.366060+00:00",
+          "taken_at": null,
+          "width": 800,
+          "height": 1200,
+          "identity_evidence": "Commons 파일 설명·분류와 기존 공식 출처의 지점 이름·주소를 대조. Calle Mayor, 84, 28013 Madrid",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "external_id": "casa-lucio-cavabaja35",
+      "address": "Cava Baja 35, 28005 Madrid",
+      "canonical_url": "https://casalucio.es/",
+      "city": "madrid",
+      "photos": [
+        {
+          "id": "f8718e189056f2fbed08",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0f/Casa_Lucio_en_la_Cava_Baja_%2833023857980%29.jpg/960px-Casa_Lucio_en_la_Cava_Baja_%2833023857980%29.jpg",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Casa_Lucio_en_la_Cava_Baja_(33023857980).jpg",
+          "author": "manuel m. v. from Valdemoro, Spain",
+          "license": "CC BY 2.0",
+          "license_url": "https://creativecommons.org/licenses/by/2.0/",
+          "alt": "카사 루시오 · 식당 참고 사진",
+          "checked_at": "2026-10-06T14:35:40.366060+00:00",
+          "expires_at": "2027-10-06T14:35:40.366060+00:00",
+          "taken_at": "2017-03-09",
+          "width": 800,
+          "height": 534,
+          "identity_evidence": "Commons 파일 설명·분류와 기존 공식 출처의 지점 이름·주소를 대조. Cava Baja 35, 28005 Madrid",
+          "enabled": true
+        },
+        {
+          "id": "2505022d69dc5ec12d26",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d7/Barra_de_Casa_Lucio_%284245090907%29.jpg/960px-Barra_de_Casa_Lucio_%284245090907%29.jpg",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Barra_de_Casa_Lucio_(4245090907).jpg",
+          "author": "Javier Lastras from España/Spain",
+          "license": "CC BY 2.0",
+          "license_url": "https://creativecommons.org/licenses/by/2.0/",
+          "alt": "카사 루시오 · 식당 참고 사진",
+          "checked_at": "2026-10-06T14:35:40.366060+00:00",
+          "expires_at": "2027-10-06T14:35:40.366060+00:00",
+          "taken_at": "2010-01-04",
+          "width": 800,
+          "height": 600,
+          "identity_evidence": "Commons 파일 설명·분류와 기존 공식 출처의 지점 이름·주소를 대조. Cava Baja 35, 28005 Madrid",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "external_id": "botin-cuchilleros17",
+      "address": "Calle de Cuchilleros, 17, 28005 Madrid",
+      "canonical_url": "https://www.esmadrid.com/restaurantes/botin",
+      "city": "madrid",
+      "photos": [
+        {
+          "id": "76a31649718e0d98c1d1",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Casa_Bot%C3%ADn-Madrid-2009.jpg/960px-Casa_Bot%C3%ADn-Madrid-2009.jpg",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Casa_Bot%C3%ADn-Madrid-2009.jpg",
+          "author": "Tamorlan",
+          "license": "CC BY 3.0",
+          "license_url": "https://creativecommons.org/licenses/by/3.0/",
+          "alt": "보틴 · 식당 참고 사진",
+          "checked_at": "2026-10-06T14:35:40.366060+00:00",
+          "expires_at": "2027-10-06T14:35:40.366060+00:00",
+          "taken_at": "2009-07-09",
+          "width": 800,
+          "height": 533,
+          "identity_evidence": "Commons 파일 설명·분류와 기존 공식 출처의 지점 이름·주소를 대조. Calle de Cuchilleros, 17, 28005 Madrid",
+          "enabled": true
+        },
+        {
+          "id": "dc0683f34462b18579d4",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4a/Sobrino_de_Bot%C3%ADn_02.jpg/960px-Sobrino_de_Bot%C3%ADn_02.jpg",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Sobrino_de_Bot%C3%ADn_02.jpg",
+          "author": "Edmund Gall",
+          "license": "CC BY-SA 2.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/2.0/",
+          "alt": "보틴 · 식당 참고 사진",
+          "checked_at": "2026-10-06T14:35:40.366060+00:00",
+          "expires_at": "2027-10-06T14:35:40.366060+00:00",
+          "taken_at": "2013-04-18",
+          "width": 800,
+          "height": 533,
+          "identity_evidence": "Commons 파일 설명·분류와 기존 공식 출처의 지점 이름·주소를 대조. Calle de Cuchilleros, 17, 28005 Madrid",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "external_id": "can-culleretes-quintana5",
+      "address": "Carrer d’en Quintana, 5, 08002 Barcelona",
+      "canonical_url": "https://culleretes.com/en/contact/",
+      "city": "barcelona",
+      "photos": [
+        {
+          "id": "787216a46fc999ea7352",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/67/Can_Culleretes.jpg/960px-Can_Culleretes.jpg",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Can_Culleretes.jpg",
+          "author": "Enfo",
+          "license": "CC BY-SA 3.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+          "alt": "칸 쿨레레테스 · 식당 참고 사진",
+          "checked_at": "2026-10-06T14:35:40.366060+00:00",
+          "expires_at": "2027-10-06T14:35:40.366060+00:00",
+          "taken_at": "2011-09-07",
+          "width": 800,
+          "height": 600,
+          "identity_evidence": "Commons 파일 설명·분류와 기존 공식 출처의 지점 이름·주소를 대조. Carrer d’en Quintana, 5, 08002 Barcelona",
+          "enabled": true
+        },
+        {
+          "id": "cb589725d6a1b920ca58",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2b/Can_Culleretes%2C_detall.jpg/960px-Can_Culleretes%2C_detall.jpg",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Can_Culleretes,_detall.jpg",
+          "author": "Enfo",
+          "license": "CC BY-SA 3.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+          "alt": "칸 쿨레레테스 · 식당 참고 사진",
+          "checked_at": "2026-10-06T14:35:40.366060+00:00",
+          "expires_at": "2027-10-06T14:35:40.366060+00:00",
+          "taken_at": "2011-09-06",
+          "width": 800,
+          "height": 600,
+          "identity_evidence": "Commons 파일 설명·분류와 기존 공식 출처의 지점 이름·주소를 대조. Carrer d’en Quintana, 5, 08002 Barcelona",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "external_id": "bar-la-plata-merce28",
+      "address": "Carrer de la Mercè, 28, 08002 Barcelona",
+      "canonical_url": "https://barlaplata.com/ubicacion-y-contacto/",
+      "city": "barcelona",
+      "photos": []
+    },
+    {
+      "external_id": "7-portes-isabel14",
+      "address": "Passeig Isabel II, 14, 08003 Barcelona",
+      "canonical_url": "https://7portes.com/en/",
+      "city": "barcelona",
+      "photos": [
+        {
+          "id": "5d6884d4aefdf2e959f9",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/007_Porxos_d%27en_Xifr%C3%A9%2C_7_Portes.JPG/960px-007_Porxos_d%27en_Xifr%C3%A9%2C_7_Portes.JPG",
+          "source_url": "https://commons.wikimedia.org/wiki/File:007_Porxos_d%27en_Xifr%C3%A9,_7_Portes.JPG",
+          "author": "Enric",
+          "license": "CC BY-SA 3.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+          "alt": "세븐 포르테스 · 식당 참고 사진",
+          "checked_at": "2026-10-06T14:35:40.366060+00:00",
+          "expires_at": "2027-10-06T14:35:40.366060+00:00",
+          "taken_at": "2013-12-06",
+          "width": 800,
+          "height": 600,
+          "identity_evidence": "Commons 파일 설명·분류와 기존 공식 출처의 지점 이름·주소를 대조. Passeig Isabel II, 14, 08003 Barcelona",
+          "enabled": true
+        },
+        {
+          "id": "4aea48fb30ef94d1a28a",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/87/Paella_Parellada_%287_Portes%29.jpg/960px-Paella_Parellada_%287_Portes%29.jpg",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Paella_Parellada_(7_Portes).jpg",
+          "author": "Tamorlan",
+          "license": "CC BY 3.0",
+          "license_url": "https://creativecommons.org/licenses/by/3.0/",
+          "alt": "세븐 포르테스 · 음식 사진",
+          "checked_at": "2026-10-06T14:35:40.366060+00:00",
+          "expires_at": "2027-10-06T14:35:40.366060+00:00",
+          "taken_at": null,
+          "width": 800,
+          "height": 533,
+          "identity_evidence": "Commons 파일 설명·분류와 기존 공식 출처의 지점 이름·주소를 대조. Passeig Isabel II, 14, 08003 Barcelona",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "external_id": "kanda-matsuya-sudacho",
+      "address": "東京都千代田区神田須田町1-13",
+      "canonical_url": "https://visit-chiyoda.tokyo/app/spot/detail/359",
+      "city": "tokyo",
+      "photos": [
+        {
+          "id": "1fb36280b33b8c370bdf",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/65/Kanda-Matsuya_01.jpg/960px-Kanda-Matsuya_01.jpg",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Kanda-Matsuya_01.jpg",
+          "author": "Higa4",
+          "license": "CC0",
+          "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+          "alt": "간다 마쓰야 · 식당 참고 사진",
+          "checked_at": "2026-10-06T14:35:40.366060+00:00",
+          "expires_at": "2027-10-06T14:35:40.366060+00:00",
+          "taken_at": "2025-04-02",
+          "width": 800,
+          "height": 600,
+          "identity_evidence": "Commons 파일 설명·분류와 기존 공식 출처의 지점 이름·주소를 대조. 東京都千代田区神田須田町1-13",
+          "enabled": true
+        },
+        {
+          "id": "1c88e619543a15c6d772",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/Kanda-Matsuya_02.jpg/960px-Kanda-Matsuya_02.jpg",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Kanda-Matsuya_02.jpg",
+          "author": "Higa4",
+          "license": "CC0",
+          "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+          "alt": "간다 마쓰야 · 음식 사진",
+          "checked_at": "2026-10-06T14:35:40.366060+00:00",
+          "expires_at": "2027-10-06T14:35:40.366060+00:00",
+          "taken_at": "2025-04-02",
+          "width": 800,
+          "height": 600,
+          "identity_evidence": "Commons 파일 설명·분류와 기존 공식 출처의 지점 이름·주소를 대조. 東京都千代田区神田須田町1-13",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "external_id": "nihonbashi-tamai-honten",
+      "address": "東京都中央区日本橋2-9-9",
+      "canonical_url": "https://anago-tamai.com/nihonbashi/",
+      "city": "tokyo",
+      "photos": []
+    },
+    {
+      "external_id": "daikokuya-asakusa13810",
+      "address": "東京都台東区浅草1-38-10",
+      "canonical_url": "https://asakusa-shoren.jp/stores/819/",
+      "city": "tokyo",
+      "photos": [
+        {
+          "id": "bac78d2ac8396383a6c4",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/64/Tempura_Daikokuya1.JPG/960px-Tempura_Daikokuya1.JPG",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Tempura_Daikokuya1.JPG",
+          "author": "江戸村のとくぞう (Edomura no Tokuzo)",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "alt": "다이코쿠야 본점 · 식당 참고 사진",
+          "checked_at": "2026-10-06T14:35:40.366060+00:00",
+          "expires_at": "2027-10-06T14:35:40.366060+00:00",
+          "taken_at": "2009-05-15",
+          "width": 800,
+          "height": 600,
+          "identity_evidence": "Commons 파일 설명·분류와 기존 공식 출처의 지점 이름·주소를 대조. 東京都台東区浅草1-38-10",
+          "enabled": true
+        },
+        {
+          "id": "f2b514bbb9281054e92a",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/Tempura_restaurant_by_clanchou_in_Asakusa%2C_Tokyo.jpg/960px-Tempura_restaurant_by_clanchou_in_Asakusa%2C_Tokyo.jpg",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Tempura_restaurant_by_clanchou_in_Asakusa,_Tokyo.jpg",
+          "author": "clanchou from Tempura restaurant Daikokuya Tempura in Asakusa, Taito, Tokyo",
+          "license": "CC BY 2.0",
+          "license_url": "https://creativecommons.org/licenses/by/2.0/",
+          "alt": "다이코쿠야 본점 · 식당 참고 사진",
+          "checked_at": "2026-10-06T14:35:40.366060+00:00",
+          "expires_at": "2027-10-06T14:35:40.366060+00:00",
+          "taken_at": "2008-03-29",
+          "width": 800,
+          "height": 1067,
+          "identity_evidence": "Commons 파일 설명·분류와 기존 공식 출처의 지점 이름·주소를 대조. 東京都台東区浅草1-38-10",
+          "enabled": true
+        }
+      ]
+    }
+  ]
+}

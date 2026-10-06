@@ -130,3 +130,14 @@ Chrome/macOS, 로컬 합성 OIDC/공급자 서버(`tests/browser_discovery_fixtu
 - 현재 제목은 바르셀로나지만 여행 도시가Madrid인 입력 상태를 안내했다. 제목·숙소 주소만으로 사용자의 여행 도시를 자동 변경하지 않았다.
 - 마지막 Node **62 passed**, 배포 전 백엔드889/임시PG114 결과 유지. 실제 외부 식당 검색은미구현, 기본자료3도시9곳, 나머지97도시는 자료없음이며 유료 지도/엄격언어/검색OFF 유지.
 - 보존 비교에서 여행·구간·예약·교정은 모든 값 동일. 문서6건은 원본해시·메타데이터 동일하고 백업의격리파일경로로변환되는 opaque_path만 별개다. 원문변경으로보고하지않았다. [비교JSON](reports/green-live-preservation.json).
+
+
+## 2026-10-06 — Airbnb 참고 디자인과 실제 식당 사진
+
+- DESIGN.md와 emil-design-eng 기준으로 흰 배경/잉크 선택/코랄CTA, 사진 우선 카드·여백·다크모드·모바일을 정리했다. PWA아이콘/theme/cachev17까지 일치. [디자인 계약·Before/After/Why](DESIGN_SYSTEM.md).
+- 실제9곳중7곳13장, 카드·상세 최대2장. 독립된 지점/라이선스검수, 출처·저작자·촬영일·잘림표시, 실패/없음 상태. 나머지2곳 사진은미확보. [사진 출처](reports/restaurant-photo-sources.md).
+- 기존추천을읽을때 현재 허용사진만붙인다. 사진이 순위/snapshot/job/Chroma/오프라인에혼입되지않는다. DBschema12·개인여행자료·유료설정변경없음.
+- 카드 중복문구와0/3내부표현을줄이고 검증된음식태그·자료확인일과 상세/저장/비교를앞에둔다. 필수미확인은유지. 홈/상단100도시한국어표시.
+- 최종Python922passed/12skipped/2warnings,Node77passed,임시PG85passed/2warnings. 초기배포파일경로실패1개를수정후전체재검증. [명령·검증범위·복구](reports/airbnb-photo-validation.md).
+- Chrome합성로그인→추천진행→사진전환/키보드→상세→저장/비교→새로고침확인.390/319px가로넘침0,200%글자·다크·모달Escape포커스확인. 실물모바일/Safari미검증.
+- 기존무료환경에반영예정. 실제배포성공은아래후속기록에서별도로확인한다.

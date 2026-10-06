@@ -107,7 +107,7 @@ class Recommendations:
                 'status_url':'/api/v2/jobs/'+job['id'],'events_url':'/api/v2/jobs/'+job['id']+'/events'}
 
     def _catalog(self,actor,trip_id,city):
-        candidates=self.discovery.catalog(actor,trip_id,city)
+        candidates=self.discovery.catalog(actor,trip_id,city,include_photos=False)
         if len(candidates)>100: candidates=candidates[:100]
         # Link only server-verified candidates within this owned trip so the
         # existing consumer evidence policy remains the sole review gate.
@@ -254,6 +254,19 @@ class Recommendations:
                             # Preserve immutable SQL evidence, but never display expired durations as current.
                             travel['route']={**route,'status':'unknown','distance_m':None,'duration_seconds':None,'reason_codes':['ROUTE_EXPIRED' if route_policy_current else 'ROUTE_POLICY_CHANGED']}
                             travel.update(duration_minutes=None,provider=None,distance_m=travel.get('straight_line_m'),kind='estimate' if travel.get('straight_line_m') is not None else 'unknown',method='haversine_straight_line' if travel.get('straight_line_m') is not None else None)
+        if result:
+            # Presentation-only photos are always current. They never enter the
+            # immutable ranking snapshot, Chroma, or its manifest fingerprint.
+            from src.discovery.photos import for_place
+            with self.db.connect() as con:
+                self._get(con,actor,trip_id,ident)
+                images={}
+                for section in result.get('sections',{}).values():
+                    for group in section.values():
+                        for item in group:
+                            place_id=item.get('place_id')
+                            if place_id not in images:images[place_id]=for_place(con,place_id)
+                            item.update(images[place_id])
         job=self.jobs.get(row['job_id'],actor.id,actor.session_id)
         return {'run_id':ident,'job_id':row['job_id'],'state':job['state'],'job':job,
             'trip_version':row['trip_version'],'conditions_version':row['conditions_version'],
