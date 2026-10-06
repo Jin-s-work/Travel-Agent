@@ -10,7 +10,6 @@ services:
     autoDeployTrigger: off
     dockerfilePath: ./Dockerfile
     healthCheckPath: /health/ready
-    maxShutdownDelaySeconds: 30
     envVars:
       - key: STORAGE_BACKEND
         value: supabase

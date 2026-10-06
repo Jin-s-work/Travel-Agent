@@ -39,8 +39,8 @@ DB의 `verify-full`에는 이미지에 포함한 Supabase 공식 CA(`/app/deploy
 ## 적용 순서
 
 1. 코드/비밀 누락 검사와 Docker 빌드를 통과한 릴리스 사용.
-2. 기존 Render는 `main` On Commit 상태다. 준비 중 브랜치는 `codex/private-beta-launch`이며 main/운영 서비스는 설정 준비 전에 갱신하지 않는다.
-3. 인증·DB 설정이 준비되면 기존 Blueprint diff를 검토해 Free·instance1·autoDeploy off·health `/health/ready`·새 환경 설정을 적용한다. 유료 업그레이드와 중복 서비스를 생성하지 않는다.
+2. 기존 Render 서비스와 Blueprint를 `codex/private-beta-launch`에 연결한다. Auto-Deploy Off·Blueprint Auto Sync No로 수동 배포하며 공개 기본 `main` 브랜치는 변경하지 않는다.
+3. 인증·DB 설정이 준비되면 기존 Blueprint diff를 검토해 Free·instance1·autoDeploy off·health `/health/ready`·새 환경 설정을 적용한다. 유료 업그레이드와 중복 서비스를 생성하지 않는다. Free에서는 `maxShutdownDelaySeconds`가 지원되지 않아 지정하지 않는다. 앱의 job 종료 대기5초·uvicorn graceful timeout20초는 유지한다.
 4. 기동 migration 성공, liveness/readiness, 개인 API401을 확인한다. 운영 설정 누락을 개발 모드로 우회하지 않는다.
 5. 본인 이메일에만 초대 생성 후 실제 Google 로그인·예약 CRUD·재시작 유지 검증. 초대 토큰은 로컬 개인 파일로 전달하고 공개 URL/로그에 넣지 않는다.
 6. Supabase 원문 저장·영속 DB·격리 백업 복원 검증 후 지인 확대로 진행한다. 무료 sleep과 새 AI 호출OFF를 유지한다.
