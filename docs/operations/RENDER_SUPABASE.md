@@ -1,6 +1,6 @@
 # 기존 Render Free + Supabase Free 전환
 
-2026-10-06 선택한 운영 경로다. 기존 Render `travel-inbox-rag`와 Supabase `hii`를 재사용한다. **코드 전환·로컬 PostgreSQL 검증과 실제 배포를 구분한다.** 현재 URL https://travel-inbox-rag.onrender.com 은 이전 배포이며 이 문서의 개편이 적용됐다는 뜻이 아니다. `sta-saju`는 변경하지 않는다. 신규 유료 리소스·유료 API·자동 증설은 사용하지 않는다.
+2026-10-06 선택한 운영 경로다. 기존 Render `travel-inbox-rag`와 Supabase `hii`를 재사용한다. **코드 전환·로컬 PostgreSQL 검증과 실제 배포를 구분한다.** 현재 URL https://travel-inbox-rag.onrender.com 에 `b90c449`가 실제 배포됐다. 본인 Google 로그인·여행/수동 예약·날짜 질문·서버 재시작 후 조회를 확인했다. 전체5명/추천 데이터/유료 기능 검증 완료를 뜻하지 않는다. `sta-saju`는 변경하지 않는다. 신규 유료 리소스·유료 API·자동 증설은 사용하지 않는다.
 
 ## 데이터가 남는 위치
 
@@ -31,7 +31,7 @@
 
 1. `hii`가 Healthy인지 확인한다. 기존 public 테이블/다른 버킷을 삭제하지 않는다. Storage에 **private** `travel-private` 버킷을 만든다. 브라우저용 공개 읽기 정책을 만들지 않는다. 파일 제한은1MiB, 파일 내용은 서버에서도 txt/eml 검사한다. 서버는 octet-stream으로 전송하므로 MIME 제한을 추가하면 이를 허용해야 한다.
 2. Connect에서 **Session pooler / port5432 / IPv4** 연결을 선택한다. Transaction pooler6543은 session reader pin과 맞지 않아 거절한다. [연결 방식](https://supabase.com/docs/guides/database/connecting-to-postgres). DB 비밀번호를 모르면 사용자가 직접 관리해야 한다. 다른 앱의 비밀번호를 임의 초기화하지 않는다.
-3. 기존 Render 서비스 Environment에 `deploy/render-supabase/.env.example`의 값을 입력한다. 비밀을 채팅/Git에 붙이지 않는다. DB URL의 비밀번호는 URL 인코딩한다. `sslmode=verify-full&sslrootcert=/app/deploy/render-supabase/prod-ca-2021.crt`를 사용하며 인증서 검증을 끄지 않는다.
+3. `deploy/render-supabase/.env.example`을 참고해 비공개 `.env`에 필요한6개 값만 준비하고 `scripts/prepare_render_env.py`로 `.env.render`를 생성한 뒤 기존 Render Environment에 가져온다. 비밀을 채팅/Git에 붙이지 않는다. DB URL의 비밀번호는 URL 인코딩한다. `sslmode=verify-full&sslrootcert=/app/deploy/render-supabase/prod-ca-2021.crt`를 사용하며 인증서 검증을 끄지 않는다.
 4. `SUPABASE_URL=https://whudlguhvmrbxudybnme.supabase.co`, `SUPABASE_STORAGE_BUCKET=travel-private`. `SUPABASE_SECRET_KEY`는 서버 전용 secret(또는 기존 service_role)이다. anon/publishable 키로 대체하지 않는다. [API key](https://supabase.com/docs/guides/getting-started/api-keys). 이 자격 증명은 프로젝트 전체에 강한 권한이 있으므로 Render secret에만 보관한다. 브라우저는 FastAPI 인증 API만 호출한다.
 5. OIDC 등록값과 긴 `SESSION_SECRET`을 넣는다. `PUBLIC_BASE_URL=https://travel-inbox-rag.onrender.com`, OAuth callback `https://travel-inbox-rag.onrender.com/api/v2/auth/callback`. Supabase 저장소를 쓴다고 기존 초대 Authlib 인증을 Supabase Auth로 바꾸지 않는다. 개발 인증 우회는 없다. 인증 설정 없으면 production launcher가 HTTP 포트를 열지 않는다.
 6. 검증된 코드를 Git에 반영하고 기존 Blueprint의 변경 diff를 검토한다. `plan: free`, disk 없음, instance1, autoDeploy off를 유지한다. 기존 Blueprint에서 `sync:false` 비밀값이 자동 추가된다고 가정하지 말고 Environment에서 확인한다. 새 서비스를 중복 생성하지 않는다. 본 작업의 로컬 변경만으로 Render 코드가 갱신되지는 않는다.
@@ -74,7 +74,7 @@ Render 임시 디스크와 같은 Supabase 프로젝트는 각각 독립 백업�
 
 PostgreSQL repeatable-read snapshot + 원문 hash 검사 + 활성 세대 manifest를 AES-GCM 암호화한다. 벡터와 진행 중 provider receipt는 full restore에서 재활성화하지 않는다. 최신 삭제/권한/비용 checkpoint를 적용하고 폐쇄 상태로 검사한다. 예약·교정·일정이 보존되고 삭제 자료가 없는지 확인한 뒤, 위 import 명령으로 **빈 목적 스키마**에 옮긴다. 복원 상태에서는 검색 재생성 비용도 승인 전 차단한다. 단순 Render 재시작에서는 원격 벡터/receipt가 그대로 유지되므로 재호출하지 않는다.
 
-가장 최근 full snapshot 이후 신규 자료는 잃을 수 있다. 가장 최근 offhost checkpoint 이후 삭제는 입증할 수 없으므로 개방 전에 대조한다. 현 cloud profile에는5분 자동 tombstone 외부 전송이 연결되어 있지 않다. 운영 RPO/RTO 약속을 하지 않으며 지인 확대 전 자동화·실제 복원 측정이 필요하다. Render가 잠든 동안의 작업 실행/백업도 보장하지 않는다.
+가장 최근 full snapshot 이후 신규 자료는 잃을 수 있다. 가장 최근 offhost checkpoint 이후 삭제는 입증할 수 없으므로 개방 전에 대조한다. 현 cloud profile에는5분 자동 tombstone 외부 전송이 연결되어 있지 않다. 운영 RPO/RTO 약속을 하지 않으며 지인 확대 전 자동화·실사용 자료의 복원 측정이 필요하다. 2026-10-06 로그인 전 스키마의 수동 백업16.29초·격리 복원0.04초를 확인했지만 데이터가 없는 상태의 측정이다. 배포 migration과 동시에 백업할 때 DDL/read 잠금 deadlock이 관측되므로 현 수동 절차는 기동 완료 이후에 수행한다. 중단된 백업은 성공본으로 취급하지 않는다. Render가 잠든 동안의 작업 실행/백업도 보장하지 않는다.
 
 기능 OFF는 SQL controls로 외부 작업을 중지한다. image rollback은 동일 cloud schema를 이해하는 이미지에서만 가능하다. SQLite 전용 구형 이미지는 cloud DB를 읽을 수 없으므로 rollback 대상으로 쓰지 않는다. DB restore는 별도 격리·검증 절차이며 image rollback과 다르다.
 

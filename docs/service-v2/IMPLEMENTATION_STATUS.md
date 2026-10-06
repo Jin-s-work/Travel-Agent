@@ -480,3 +480,19 @@ DB 비밀번호 확인/필요 시 소유자의 직접 재설정과 Google 웹 �
 - 설정 변환/인증서/최소 입력 시험 **9 passed**, diff check 통과. native arm64 Docker `travel-inbox-beta:20261006-tls` 빌드 성공.
 - 실제 hii에 전용 `travel` 스키마를 기동 migration으로 생성하고 512MiB 제한 로컬 운영 컨테이너에서 `/health/live` 200, `/health/ready` 200(schema/storage/dispatcher/identity/restore true), 비로그인 `/api/v2/trips` 401 확인. 단일 시점 약66MiB/CPU0.26%이며 5명 부하 측정은 아니다. identity=true는 설정 확인이고 실제 Google 로그인 성공을 뜻하지 않는다.
 - Render의 기존 운영 배포는 아직 `main/aefee57`이다. 설정 파일을 가져오려면 Chrome ChatGPT 확장프로그램의 파일 URL 접근 허용 또는 사용자의 직접 파일 선택이 필요하다. `.env.render`는 준비했고 비밀값을 출력하지 않았다. 실제 Render 신규 배포·HTTPS OAuth·재시작/복원 검증은 계속 진행 중이다.
+
+
+### 19.2 Render Free 실제 배포·Google 로그인·재시작 검증 (2026-10-06)
+
+**기본 비공개 베타 배포 완료.** 실제 URL: https://travel-inbox-rag.onrender.com . Render 기존 Free 서비스와 Supabase hii를 재사용했다. 운영 revision은 `b90c44965b928c7529fcfce09dc21e919d4f5036`, 배포 ID `dep-db28rvjncjis73dqkaqg`, 15:00 KST Live(콘솔 소요1분46초)다. 이것을 전체 추천 데이터/유료 AI/5명 베타 검증 완료로 해석하지 않는다.
+
+- Chrome 파일 URL 권한 적용 후 `.env.render`를 실제 Render Environment에 가져왔다. 기존 중복 OpenAI/Tavily 행을 제거하고 **활성31개 키 중 중복0·유료3개 키 빈 값**을 확인해 Save only 했다. 비밀값은 Git/출력에 기록하지 않았다.
+- 서비스와 Blueprint를 `codex/private-beta-launch`로 연결, Auto-Deploy Off/Auto Sync No 유지. 공개 기본 main은 변경하지 않았다. Free에서 거절된 `maxShutdownDelaySeconds`를 삭제하고 Blueprint 검증을 통과했다. health 경로 변경에 따라 구형 이미지로 시작된 자동 재배포는 취소한 뒤 최신 커밋을 명시적으로 수동 배포했다.
+- 실제 HTTPS GET `/` 200, `/health/live` 200, `/health/ready` 200(schema/storage/dispatcher/identity/restore 모두 true). 비로그인 신규 `/api/v2/trips`와 기존 `/api/bookings`는401, 잘못된 Origin의 로그인 POST는403. 로그인 리다이렉트는 Google·정확한 callback·openid/email/profile·PKCE S256이며 임시 쿠키 Secure/HttpOnly/SameSite=Lax를 확인했다.
+- **실제 Google 계정 로그인 성공**: 지정한 본인 이메일에 발급한 초대 코드를 사용하고 Google 계정 선택→callback→여행 화면까지 확인했다. 외부 OIDC 미설정 시험이 아니다. 입력의 `DEPLOY_ADMIN_EMAIL`과 검증된 Google 사용자가 일치함을 확인한 뒤 기존 운영 CLI로 admin 역할을 적용, 세션 회수 및 초대 코드 없는 재로그인까지 확인했다. 타인 초대 메시지는 발송하지 않았다.
+- Chrome/macOS 실제 브라우저: `배포 확인용 도쿄 여행`(2026-10-15~17) 생성→`저장 확인용 점심 · 실제 예약 아님` 수동 예약→날짜 질문→총1개·시각 미확인 응답→직접 입력 근거 모달→새로고침 조회를 통과했다. 실제 외부 식당 예약이 아닌 합성 검증 자료이며 사용자 계정에 남겼다.
+- Render 15:04 KST Restart service 실행, 신규 프로세스 기동·이전 프로세스 정상 종료 로그 확인. 작업자 인계 중 readiness503(dispatcher false)을 관측했고 이후200·전체true로 회복했다. 서버 재시작 및 재로그인 후 동일 여행·예약1건을 확인했다. 중단 없는 재시작이나 무지연 복구를 주장하지 않는다.
+- 실제 hii의 로그인 전 스키마 암호화 백업→로컬 격리 복원 성공: 백업16.29초, 복원0.04초, integrity ok, FK 오류0, archive768044bytes. 당시 users/trips/bookings/itineraries0이므로 실사용 자료·메일·일정의 전체 복구 시험은 아니다. 파일/암호키는 Git 제외 `data/beta-release/`에 권한600으로 저장했다. 첫 시도는 서버 기동 DDL과 읽기 잠금 deadlock으로 안전하게 중단됐고 기동 완료 후 재실행했다. **현재 수동 백업을 배포/재시작 migration과 동시에 실행하지 않는다.** 자동 오프호스트 백업과 populated 복구 검증은 남았다.
+- 무료 정책 유지: ZERO_SPEND1·halted·예산0·유료 키 제거. 새 메일 AI 추출/임베딩·자유형 AI·외부 지도/검색/리뷰 OFF. 저장/수동 입력/SQL 날짜 질문/비용 없는 계산은 사용 가능. 도쿄·바르셀로나 승인 운영 추천 후보는 각각0, 엄격 언어 추천 OFF. 실제 모바일 기기·최대5명 동시 부하·추천/일정 전체 실환경 E2E는 이번 배포 시험에 포함하지 않았다.
+
+재실행 순서와 제한은 `docs/service-v2/reports/live-deployment-2026-10-06.md`에 기록했다. 로컬 전체 시험 결과와 실제 배포 시험 결과는 별도로 유지한다.
