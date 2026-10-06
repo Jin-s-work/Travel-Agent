@@ -6,6 +6,7 @@ import os
 
 @dataclass
 class Settings:
+    public_discovery_enabled: bool | None = field(default_factory=lambda: None if 'PUBLIC_DISCOVERY_ENABLED' not in os.environ else os.getenv('PUBLIC_DISCOVERY_ENABLED','').lower() in {'true','1'})
     preparation_enabled: bool = field(default_factory=lambda: os.getenv('PREPARATION_ENABLED', 'true').lower() == 'true')
     plan_b_enabled: bool = field(default_factory=lambda: os.getenv('PLAN_B_ENABLED', 'true').lower() == 'true')
     offline_enabled: bool = field(default_factory=lambda: os.getenv('OFFLINE_ENABLED', 'false').lower() == 'true')

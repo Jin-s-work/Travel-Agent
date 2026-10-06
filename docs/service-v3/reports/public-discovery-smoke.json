@@ -1,0 +1,104 @@
+{
+  "observed_at": "2026-10-06T15:52:47.403576+00:00",
+  "paid_calls": 0,
+  "requests": [
+    {
+      "city": "paris",
+      "state": "ok",
+      "candidates": 60,
+      "response_bytes": 32833,
+      "sample": [
+        {
+          "name": "All'Antico Vinaio",
+          "address": "상세 주소 미등록 · 공개지도 위치 확인",
+          "latitude": 48.852612,
+          "longitude": 2.3467113,
+          "source_url": "https://www.openstreetmap.org/node/251474112"
+        },
+        {
+          "name": "Le Lutétia Île Saint-Louis",
+          "address": "33 Quai de Bourbon, 75004",
+          "latitude": 48.8532987,
+          "longitude": 2.3540953,
+          "source_url": "https://www.openstreetmap.org/node/251125928"
+        },
+        {
+          "name": "La Perla",
+          "address": "상세 주소 미등록 · 공개지도 위치 확인",
+          "latitude": 48.8557588,
+          "longitude": 2.3561398,
+          "source_url": "https://www.openstreetmap.org/node/251043137"
+        }
+      ],
+      "seconds": 5.3
+    },
+    {
+      "city": "london",
+      "state": "ok",
+      "candidates": 60,
+      "response_bytes": 30577,
+      "sample": [
+        {
+          "name": "Starbucks",
+          "address": "London",
+          "latitude": 51.507446,
+          "longitude": -0.1227884,
+          "source_url": "https://www.openstreetmap.org/node/295971749"
+        },
+        {
+          "name": "Old Tree Daiwan Bee",
+          "address": "상세 주소 미등록 · 공개지도 위치 확인",
+          "latitude": 51.5110542,
+          "longitude": -0.1325596,
+          "source_url": "https://www.openstreetmap.org/node/26845558"
+        },
+        {
+          "name": "Costa",
+          "address": "상세 주소 미등록 · 공개지도 위치 확인",
+          "latitude": 51.5140415,
+          "longitude": -0.1256046,
+          "source_url": "https://www.openstreetmap.org/node/311877305"
+        }
+      ],
+      "seconds": 3.18
+    },
+    {
+      "city": "new-york",
+      "state": "unavailable",
+      "code": "HTTP_UNAVAILABLE",
+      "seconds": 10.32
+    },
+    {
+      "city": "seoul",
+      "state": "ok",
+      "candidates": 60,
+      "response_bytes": 23460,
+      "sample": [
+        {
+          "name": "The Coffee Bean & Tea Leaf",
+          "address": "상세 주소 미등록 · 공개지도 위치 확인",
+          "latitude": 37.5698428,
+          "longitude": 126.9790229,
+          "source_url": "https://www.openstreetmap.org/node/1553878207"
+        },
+        {
+          "name": "피자모레",
+          "address": "상세 주소 미등록 · 공개지도 위치 확인",
+          "latitude": 37.5632601,
+          "longitude": 126.9825093,
+          "source_url": "https://www.openstreetmap.org/node/3611823884"
+        },
+        {
+          "name": "봉가안동찜닭",
+          "address": "상세 주소 미등록 · 공개지도 위치 확인",
+          "latitude": 37.5633555,
+          "longitude": 126.9834991,
+          "source_url": "https://www.openstreetmap.org/node/3611826195"
+        }
+      ],
+      "seconds": 2.52
+    }
+  ],
+  "scope": "Explicit operator smoke, 4 city-center queries, no private input",
+  "limit": "Not proof of 100-city data completeness"
+}

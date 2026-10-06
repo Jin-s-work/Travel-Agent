@@ -153,6 +153,9 @@ def create_app(settings=None, *, parser=None, embedder=None, vector_factory=None
     app.state.reviews=ReviewService(app.state.db,app.state.repo,app.state.jobs,app.state.gateway,provider=review_provider,detector=review_detector,fault_hook=fault_hook)
     from src.discovery.service import DiscoveryService
     app.state.discovery=DiscoveryService(app.state.db,app.state.repo,app.state.jobs,app.state.reviews,allow_synthetic=settings.environment=='development')
+    if settings.public_discovery_enabled is True or settings.public_discovery_enabled is None and settings.environment!='development':
+        from src.discovery.public_places import PublicDiscovery
+        app.state.discovery.public_provider=PublicDiscovery(app.state.db)
     from src.location import build_location_providers, MatrixService
     location_config={}
     if settings.location_provider_config:

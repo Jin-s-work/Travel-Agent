@@ -1,41 +1,45 @@
-/* Travel Inbox travel-first design system, inspired by the supplied Airbnb analysis.
-   Palette -> semantic roles -> component aliases. No vendor assets or remote fonts.
+/* 여정: a quiet travel notebook, informed by the supplied Airbnb analysis.
+   Palette -> semantic roles -> component aliases. SUIT is self-hosted under OFL-1.1.
    See docs/service-v3/DESIGN_SYSTEM.md for component and evidence contracts. */
+@font-face {
+  font-family:"SUIT Variable"; font-style:normal; font-weight:100 900; font-display:swap;
+  src:url("/fonts/SUIT-Variable-v2.0.5.woff2") format("woff2");
+}
 :root {
-  --coral-50:#fff1f4;
-  --coral-500:#ff385c;
-  --coral-600:#e00b41;
-  --coral-700:#c41548;
-  --grey-50:#ffffff;
-  --grey-100:#f7f7f7;
-  --grey-200:#dddddd;
-  --grey-300:#c1c1c1;
-  --grey-600:#6a6a6a;
-  --grey-700:#3f3f3f;
-  --grey-900:#222222;
+  --petrol-50:#edf2f4;
+  --petrol-500:#476a7b;
+  --petrol-600:#25485a;
+  --petrol-700:#173746;
+  --grey-50:#faf9f6;
+  --grey-100:#f3f2ee;
+  --grey-200:#dedfda;
+  --grey-300:#b8bdbd;
+  --grey-600:#657073;
+  --grey-700:#4b5558;
+  --grey-900:#252b2f;
 
   --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px;
   --space-5:20px; --space-6:24px; --space-8:32px; --space-10:40px; --space-16:64px;
-  --radius-badge:6px; --radius-field:10px; --radius-control:10px;
-  --radius-card:18px; --radius-photo:16px; --radius-sheet:24px; --radius-pill:999px;
+  --radius-badge:4px; --radius-field:8px; --radius-control:8px;
+  --radius-card:14px; --radius-photo:12px; --radius-sheet:24px; --radius-pill:999px;
   --type-caption:calc(13px * var(--text-scale,1));
-  --type-body:calc(15px * var(--text-scale,1));
+  --type-body:calc(16px * var(--text-scale,1));
   --type-label:calc(15px * var(--text-scale,1));
   --type-title:calc(20px * var(--text-scale,1));
   --type-page:calc(28px * var(--text-scale,1));
-  --font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Segoe UI","Noto Sans KR",Roboto,Arial,sans-serif;
+  --font:"SUIT Variable",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Segoe UI","Noto Sans KR",Roboto,Arial,sans-serif;
   --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
   --ease-out:cubic-bezier(.23,1,.32,1);
   --duration-press:140ms;
 }
 :root, :root[data-theme="light"] {
   --fill-page:var(--grey-50); --fill-surface:#ffffff; --fill-secondary:var(--grey-100);
-  --fill-brand:var(--coral-600); --fill-brand-pressed:var(--coral-700); --fill-brand-weak:var(--coral-50);
+  --fill-brand:var(--petrol-600); --fill-brand-pressed:var(--petrol-700); --fill-brand-weak:var(--petrol-50);
   --text-primary:var(--grey-900); --text-secondary:var(--grey-700); --text-tertiary:var(--grey-600);
-  --text-on-brand:#ffffff; --text-brand:var(--coral-700);
-  --border-default:var(--grey-200); --border-subtle:#ebebeb;
-  --border-field:#8a8a8a; --fill-field:#ffffff;
-  --fill-disabled:#f2f2f2; --text-disabled:#6a6a6a;
+  --text-on-brand:#ffffff; --text-brand:var(--petrol-700);
+  --border-default:var(--grey-200); --border-subtle:#e8e8e3;
+  --border-field:#879297; --fill-field:#ffffff;
+  --fill-disabled:#efefeb; --text-disabled:#657073;
   --fill-warning:#fff7e6; --text-warning:#885b0f;
   --fill-danger-weak:#fff0eb; --text-danger:#b32505;
   --danger-fill:#b32505; --danger-on:#ffffff;
@@ -53,19 +57,19 @@
 }
 @media(prefers-color-scheme:dark) {
   :root:not([data-theme="light"]) {
-    --fill-page:#171717; --fill-surface:#222222; --fill-secondary:#2e2e2e;
-    --fill-brand:#ff7594; --fill-brand-pressed:#ff9aae; --fill-brand-weak:#402730;
-    --text-primary:#f7f7f7; --text-secondary:#d5d5d5; --text-tertiary:#b3b3b3;
-    --text-on-brand:#29131a; --text-brand:#ff9aae;
-    --border-default:#494949; --border-subtle:#3a3a3a;
-    --border-field:#808080; --fill-field:#252525;
-    --fill-disabled:#333333; --text-disabled:#b3b3b3;
+    --fill-page:#171c1e; --fill-surface:#202729; --fill-secondary:#2b3437;
+    --fill-brand:#a3c1ce; --fill-brand-pressed:#c1d6df; --fill-brand-weak:#2b3c44;
+    --text-primary:#f2f3f1; --text-secondary:#d2dadb; --text-tertiary:#a8b5b9;
+    --text-on-brand:#14252d; --text-brand:#bdd2dc;
+    --border-default:#455257; --border-subtle:#344247;
+    --border-field:#7e9097; --fill-field:#222c30;
+    --fill-disabled:#303a3e; --text-disabled:#a8b5b9;
     --fill-warning:#3b2d1b; --text-warning:#ffc978;
     --fill-danger-weak:#422b23; --text-danger:#ffb29a;
     --danger-fill:#ffb29a; --danger-on:#3a190f;
     --fill-success-weak:#223a2c; --text-success:#8fdab1;
     --overlay-scrim:rgba(0,0,0,.64);
-    --selection-fill:#f7f7f7; --selection-text:#222222;
+    --selection-fill:#d2e0e5; --selection-text:#1b313b;
     --photo-control-fill:#ffffff; --photo-control-text:#222222;
     --photo-counter-fill:rgba(34,34,34,.8); --photo-counter-text:#ffffff;
     --shadow-card:0 1px 2px rgba(0,0,0,.12);
@@ -77,19 +81,19 @@
   }
 }
 :root[data-theme="dark"] {
-  --fill-page:#171717; --fill-surface:#222222; --fill-secondary:#2e2e2e;
-  --fill-brand:#ff7594; --fill-brand-pressed:#ff9aae; --fill-brand-weak:#402730;
-  --text-primary:#f7f7f7; --text-secondary:#d5d5d5; --text-tertiary:#b3b3b3;
-  --text-on-brand:#29131a; --text-brand:#ff9aae;
-  --border-default:#494949; --border-subtle:#3a3a3a;
-  --border-field:#808080; --fill-field:#252525;
-  --fill-disabled:#333333; --text-disabled:#b3b3b3;
+  --fill-page:#171c1e; --fill-surface:#202729; --fill-secondary:#2b3437;
+  --fill-brand:#a3c1ce; --fill-brand-pressed:#c1d6df; --fill-brand-weak:#2b3c44;
+  --text-primary:#f2f3f1; --text-secondary:#d2dadb; --text-tertiary:#a8b5b9;
+  --text-on-brand:#14252d; --text-brand:#bdd2dc;
+  --border-default:#455257; --border-subtle:#344247;
+  --border-field:#7e9097; --fill-field:#222c30;
+  --fill-disabled:#303a3e; --text-disabled:#a8b5b9;
   --fill-warning:#3b2d1b; --text-warning:#ffc978;
   --fill-danger-weak:#422b23; --text-danger:#ffb29a;
   --danger-fill:#ffb29a; --danger-on:#3a190f;
   --fill-success-weak:#223a2c; --text-success:#8fdab1;
   --overlay-scrim:rgba(0,0,0,.64);
-    --selection-fill:#f7f7f7; --selection-text:#222222;
+    --selection-fill:#d2e0e5; --selection-text:#1b313b;
     --photo-control-fill:#ffffff; --photo-control-text:#222222;
     --photo-counter-fill:rgba(34,34,34,.8); --photo-counter-text:#ffffff;
   --shadow-card:0 1px 2px rgba(0,0,0,.12);
@@ -209,7 +213,7 @@ input,select,textarea { min-width:0; }
   .recommendation-step-mark { border:1px solid CanvasText; }
 }
 
-/* Travel discovery: selected dates and filters use ink; coral is reserved for the main action. */
+/* Travel discovery: selected states stay clear; petrol is reserved for meaningful actions. */
 .sidebar nav button[aria-current],.sidebar nav button[data-current] { color:var(--text-primary); background:var(--fill-secondary); }
 .sidebar nav button[aria-current] .nav-icon,.sidebar nav button[data-current] .nav-icon { color:var(--text-brand); }
 .date-chip[aria-pressed="true"],.filter-chip[aria-pressed="true"],.day-choice[aria-pressed="true"] { color:var(--selection-text); background:var(--selection-fill); border-color:var(--selection-fill); }
@@ -217,9 +221,9 @@ input,select,textarea { min-width:0; }
 .recommendation-selection-actions>button[aria-pressed="true"] { color:var(--text-primary); border-color:var(--text-primary); background:var(--fill-secondary); }
 .recommendation-rank { color:var(--text-primary); background:var(--fill-secondary); }
 
-/* Photos are actual place evidence, never decorative venue substitutes. No automatic motion. */
+/* Actual place photography: three labelled views, explicit controls, and opt-in credits. */
 .place-photo-gallery { min-width:0; margin:0 0 12px; }
-.place-photo-frame { position:relative; width:100%; aspect-ratio:4/3; overflow:hidden; isolation:isolate; border-radius:var(--radius-photo); background:var(--fill-secondary); }
+.place-photo-frame { position:relative; width:100%; aspect-ratio:3/2; touch-action:pan-y; overflow:hidden; isolation:isolate; border-radius:var(--radius-photo); background:var(--fill-secondary); }
 .place-photo-slide { position:absolute; inset:0; width:100%; height:100%; }
 .place-photo-image { display:block; width:100%; height:100%; object-fit:cover; background:var(--fill-secondary); }
 .place-photo-frame>a,.place-photo-frame>picture { display:block; width:100%; height:100%; }
@@ -240,7 +244,7 @@ input,select,textarea { min-width:0; }
 .place-photo-frame>.place-photo-unavailable .discovery-link { margin:0; }
 .place-photo-gallery-empty .place-photo-frame { aspect-ratio:auto; }
 #dialogBody>.place-photo-gallery { margin-bottom:24px; }
-#dialogBody>.place-photo-gallery .place-photo-frame { max-height:360px; }
+#dialogBody>.place-photo-gallery .place-photo-frame { aspect-ratio:16/10; max-height:360px; }
 @media(hover:hover) and (pointer:fine) {
   .place-photo-navigation button:hover:not(:disabled) { background:#f2f2f2; border-color:#8a8a8a; }
   .date-chip:not([aria-pressed="true"]):hover,.filter-chip:not([aria-pressed="true"]):hover,.day-choice:not([aria-pressed="true"]):hover { border-color:var(--text-primary); background:var(--fill-secondary); }
@@ -253,7 +257,7 @@ input,select,textarea { min-width:0; }
 :root[data-text-size="large"] .place-photo-navigation { position:static; padding:0 10px 10px; justify-content:flex-end; }
 :root[data-text-size="large"] .place-photo-frame { aspect-ratio:auto; }
 :root[data-text-size="large"] .place-photo-slide { position:static; height:auto; }
-:root[data-text-size="large"] .place-photo-image { aspect-ratio:4/3; height:auto; }
+:root[data-text-size="large"] .place-photo-image { aspect-ratio:3/2; height:auto; }
 :root[data-text-size="large"] .place-photo-frame>.place-photo-unavailable { position:static; min-height:200px; }
 :root[data-text-size="large"] .place-photo-navigation button { width:52px; height:52px; font-size:28px; }
 :root[data-text-size="large"] #dialogBody>.place-photo-gallery .place-photo-frame { max-height:none; }
@@ -261,3 +265,34 @@ input,select,textarea { min-width:0; }
   .place-photo-navigation button,.place-photo-counter { border:1px solid ButtonText; }
   .place-photo-unavailable { border:1px solid CanvasText; }
 }
+
+/* Photography stays useful without turning each card into a license report. */
+.place-photo-type { position:absolute; top:12px; left:12px; z-index:1; max-width:calc(100% - 24px); padding:4px 9px; border-radius:4px; color:var(--photo-control-text); background:var(--photo-control-fill); font-size:var(--type-caption); font-weight:500; line-height:1.5; }
+.place-photo-credits { display:block; margin-top:4px; }
+.place-photo-caption { display:block; margin:3px 0; font-size:var(--type-caption); color:var(--text-tertiary); line-height:1.45; }
+.place-photo-credit-details { margin:0; }
+.place-photo-credit-details>summary { display:list-item; width:fit-content; max-width:100%; min-height:44px; padding:11px 0; cursor:pointer; color:var(--text-tertiary); font-size:var(--type-caption); font-weight:400; line-height:1.5; text-underline-offset:3px; }
+.place-photo-credit-details>summary::marker { font-size:.8em; }
+.place-photo-credit-body { display:flex; align-items:baseline; flex-wrap:wrap; gap:3px 12px; padding:0 0 10px; font-size:var(--type-caption); line-height:1.55; }
+.place-photo-credit-body .place-photo-credit-line,.place-photo-credit-body .place-photo-date { flex-basis:100%; }
+.place-photo-credit-body .discovery-link { min-height:0; padding:0; margin:0; }
+.place-photo-credit-details[open]>summary { color:var(--text-secondary); }
+.recommendation-meta-inline { display:flex; align-items:baseline; flex-wrap:wrap; gap:4px 14px; margin:8px 0; color:var(--text-secondary); font-size:calc(14px * var(--text-scale,1)); line-height:1.5; }
+.recommendation-meta-inline>* { margin:0; }
+.recommendation-card-bottom { margin-top:12px; }
+.recommendation-card-bottom .actions { margin:4px 0 0; padding-top:0; }
+@media(hover:hover) and (pointer:fine) { .place-photo-credit-details>summary:hover { color:var(--text-primary); text-decoration:underline; } }
+:root[data-text-size="large"] .place-photo-type { position:static; display:block; width:fit-content; margin:10px; }
+
+/* Completed work is a compact receipt; running work retains its real step list. */
+#recommendationRunStatus:is([data-state="complete"],[data-state="partial"]) { padding:10px 12px; margin-bottom:8px; border:0; border-radius:8px; background:var(--fill-secondary); }
+#recommendationRunStatus:is([data-state="complete"],[data-state="partial"]) .recommendation-progress-heading>div { display:flex; align-items:baseline; flex-wrap:wrap; gap:3px 12px; }
+#recommendationRunStatus:is([data-state="complete"],[data-state="partial"]) .recommendation-progress-title { margin:0; font-size:calc(14px * var(--text-scale,1)); font-weight:500; line-height:1.5; }
+#recommendationRunStatus:is([data-state="complete"],[data-state="partial"]) .recommendation-progress-heading .hint { margin:0; flex:1 1 420px; font-size:var(--type-caption); line-height:1.5; }
+#recommendationRunStatus:is([data-state="complete"],[data-state="partial"])>.actions { margin-top:8px; }
+#recommendationRunStatus:is([data-state="complete"],[data-state="partial"])>.recommendation-progress-count { margin:6px 0 0; }
+.recommendation-result-summary { gap:4px 16px; padding:8px 0; margin:10px 0 14px; }
+.recommendation-result-summary strong { font-size:calc(16px * var(--text-scale,1)); font-weight:500; line-height:1.5; }
+.recommendation-result-summary .recommendation-result-counts { margin:0; line-height:1.5; }
+:root[data-text-size="large"] #recommendationRunStatus:is([data-state="complete"],[data-state="partial"]) .recommendation-progress-heading>div { display:block; }
+:root[data-text-size="large"] #recommendationRunStatus:is([data-state="complete"],[data-state="partial"]) .recommendation-progress-heading .hint { margin-top:4px; }

@@ -502,3 +502,8 @@ DB 비밀번호 확인/필요 시 소유자의 직접 재설정과 Google 웹 �
 기획·상세2단계 프롬프트와 긴급 수정은 `docs/service-v3/`로 이어간다. [상세 PRD](../service-v3/PRD.md), [1단계](../service-v3/prompts/01-simple-trip-and-discovery.md), [2단계](../service-v3/prompts/02-stay-distance-and-itinerary.md), [실제 진행 기록](../service-v3/IMPLEMENTATION_STATUS.md).
 
 100도시 registry/시간대·통화/탐색 조건, Madrid 체류일 오류 수정, 오래된조건 차단, 날짜 연도4자리 범위, 간단 여행 생성, 합성메일12개+다운로드를 구현했다. 전체748 passed/11 skipped 및 이후관련73 passed, Node36 passed. 로컬Chrome 실제 생성·탐색·조건저장·새로고침·메일ZIP다운로드·390px 가로넘침없음 확인. 실제숙소 지점확인/도보경로/전체메뉴재편은 후속구현이다. 실제후보없는100도시를 맛집추천완성으로 보고하지 않는다.
+
+
+## 21. 여정 디자인·사진·무료 도시 탐색 (2026-10-07)
+
+후속 현재 구현은 [V3 진행 기록](../service-v3/IMPLEMENTATION_STATUS.md)과 [실제 검증 보고서](../service-v3/reports/yeojeong-design-validation.md)를 따른다. 이름·폰트·사진3장·공개지도100도시 보조 검색을 구현했고, 기존 인증/개인 여행/무료 정책과schema12를 유지한다. 이전 절의 후보0/배포 전 상태는 당시 이력이며 최신 배포 여부는 연결한 보고서에서 별도로 확인한다.

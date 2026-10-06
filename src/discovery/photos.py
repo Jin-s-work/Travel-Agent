@@ -26,6 +26,8 @@ LICENSE_URLS = {
     'CC0': 'https://creativecommons.org/publicdomain/zero/1.0/',
     'Public domain': 'https://creativecommons.org/publicdomain/mark/1.0/',
 }
+PHOTO_KIND_ORDER = {'food': 0, 'interior': 1, 'exterior': 2, 'other': 3}
+MAX_PHOTOS = 3
 IMAGE_PATH = re.compile(r'^/wikipedia/commons/(?:thumb/)?[a-f0-9]/[a-f0-9]{2}/[^/]+(?:/[0-9]+px-[^/]+)?\.(?:jpe?g|png|webp)$', re.I)
 
 
@@ -81,6 +83,8 @@ def _photo(photo, clock):
         if not all(_plain(photo.get(key), maximum) for key, maximum in (
                 ('id', 100), ('author', 500), ('alt', 500), ('identity_evidence', 1500))):
             raise ValueError('Missing plain-text attribution or identity review')
+        if photo.get('kind') not in PHOTO_KIND_ORDER:
+            raise ValueError('Explicit reviewed photo kind required')
         if not _taken(photo.get('taken_at')):
             raise ValueError('Invalid capture date')
         for key in ('width', 'height'):
@@ -90,7 +94,7 @@ def _photo(photo, clock):
         return None, 'PHOTO_METADATA_INVALID'
     return {key: photo.get(key) for key in (
         'id', 'url', 'source_url', 'author', 'license', 'license_url', 'alt',
-        'checked_at', 'expires_at', 'taken_at', 'width', 'height')}, None
+        'checked_at', 'expires_at', 'taken_at', 'width', 'height', 'kind')}, None
 
 
 @lru_cache(maxsize=4)
@@ -137,24 +141,41 @@ def select_photos(manifest, identity, *, approved, clock=None):
     if (not _plain(entry.get('address'), 1000) or _norm(entry['address']) != _norm(identity.get('address', ''))
             or not entry.get('canonical_url') or entry['canonical_url'].rstrip('/') != (identity.get('source_url') or '').rstrip('/')):
         return unavailable('PHOTO_IDENTITY_MISMATCH')
-    if not isinstance(entry.get('photos'), list) or len(entry['photos']) > 2:
+    if not isinstance(entry.get('photos'), list) or len(entry['photos']) > MAX_PHOTOS:
         return unavailable('PHOTO_METADATA_INVALID')
-    result, reasons, ids, urls = [], [], set(), set()
+    result, reasons, ids, urls, sources = [], [], set(), set(), set()
     for raw in entry['photos']:
         photo, reason = _photo(raw, clock)
-        if photo and (photo['id'] in ids or photo['url'] in urls):
+        source = unicodedata.normalize('NFC', unquote(urlsplit(photo['source_url']).path)).replace(' ', '_') if photo else None
+        if photo and (photo['id'] in ids or photo['url'] in urls or source in sources):
             photo, reason = None, 'PHOTO_DUPLICATE'
         if photo:
             result.append(photo)
-            ids.add(photo['id']); urls.add(photo['url'])
+            ids.add(photo['id']); urls.add(photo['url']); sources.add(source)
         elif reason not in reasons:
             reasons.append(reason)
+    # A photo's contents are reviewed metadata, never guessed from a file name.
+    # Stable ordering makes food/interiors the lead image without changing ranking.
+    result.sort(key=lambda photo: PHOTO_KIND_ORDER[photo['kind']])
+    if any(photo['kind'] != 'exterior' for photo in result):
+        seen_exterior = False
+        selected = []
+        for photo in result:
+            if photo['kind'] == 'exterior':
+                if seen_exterior:
+                    continue
+                seen_exterior = True
+            selected.append(photo)
+        result = selected
     return {'photos': result, 'photo_status': {'state': 'available' if result else 'unavailable',
             'available_count': len(result), 'reason_codes': reasons or ([] if result else ['PHOTO_NOT_REVIEWED'])}}
 
 
 def for_place(con, place_id, *, manifest=None, clock=None):
     """Gate every read using current public identity, pack and source approvals."""
+    # OSM candidates never authorize photo reuse. Skip even the first SQL read.
+    if isinstance(place_id, str) and re.fullmatch(r'osm_(?:node|way|relation)_[1-9][0-9]*', place_id):
+        return unavailable('PHOTO_NOT_REVIEWED')
     row = con.execute('SELECT * FROM place_identities WHERE id=? AND deleted_at IS NULL', (place_id,)).fetchone()
     if not row:
         return unavailable('PLACE_NOT_APPROVED')

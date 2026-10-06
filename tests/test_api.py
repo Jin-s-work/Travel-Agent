@@ -155,7 +155,7 @@ def test_trim_after_refusal_leaves_normal_answers():
 def test_web_index_is_served():
     res = client.get("/")
     assert res.status_code == 200
-    assert "Travel" in res.text
+    assert "<title>여정 · 나의 여행</title>" in res.text
 
 
 def test_service_worker_served_from_root():

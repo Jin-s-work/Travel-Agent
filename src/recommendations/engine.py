@@ -455,6 +455,8 @@ def _candidate(snapshot, candidate, kind, current, config):
     visit, party = conditions["visit"], conditions["party"]
     facts = Facts(candidate, visit, current)
     checks, reasons, used = [], [], set()
+    from src.discovery.public_places import is_public_candidate
+    public_map=is_public_candidate(candidate)
 
     def check(field, state, code, refs=()):
         refs = sorted(set(refs)); used.update(refs)
@@ -465,10 +467,12 @@ def _candidate(snapshot, candidate, kind, current, config):
     for valid, code in ((candidate.get("city") == conditions["city"], "CITY_MISMATCH"),
                         (candidate.get("category") in conditions["categories"], "CATEGORY_MISMATCH"),
                         (not candidate.get("excluded"), "USER_EXCLUDED"),
-                        (candidate.get("identity_status") == "verified", "PLACE_IDENTITY_UNVERIFIED"),
-                        (candidate.get("pack_status") == "approved", "PACK_UNAPPROVED")):
+                        (candidate.get("identity_status") == "verified" or public_map, "PLACE_IDENTITY_UNVERIFIED"),
+                        (candidate.get("pack_status") == "approved" or public_map, "PACK_UNAPPROVED")):
         if not valid:
             check("identity", "failed", code)
+    if public_map:
+        check("identity", "unknown", "PUBLIC_MAP_UNVERIFIED", facts.sources.keys())
     if not facts.sources:
         check("source", "unknown", "SOURCE_POLICY_UNAVAILABLE")
     closed, rows, closed_reason = facts.get("closed")
@@ -585,12 +589,13 @@ def _candidate(snapshot, candidate, kind, current, config):
         components['preference']['reason_codes'].append('USER_SELECTED_SOFT_AVOID')
     missing = [name for name, item in components.items() if item["value"] is None]
     score = None if missing else float(sum(Decimal(str(item["value"])) * Decimal(str(item["weight"])) for item in components.values()))
+    if public_map:score=None
     eligibility = "ineligible" if any(item["state"] == "failed" for item in checks) else "needs_confirmation" if any(item["state"] == "unknown" for item in checks) else "eligible"
     refs = [deepcopy(facts.sources[ident]) for ident in sorted(used) if ident in facts.sources]
     reason_codes = _unique(reasons + [code for item in components.values() for code in item["reason_codes"]])
     important = _unique([item["reason_code"] for item in checks if item["state"] == "unknown"])
     important.append("LIVE_AVAILABILITY_NOT_CONFIRMED")
-    output = {key: deepcopy(candidate.get(key)) for key in ("place_id", "name", "native_name", "address", "city", "category", "synthetic", "canonical_url", "chain_id", "neighborhood")}
+    output = {key: deepcopy(candidate.get(key)) for key in ("place_id", "name", "native_name", "address", "city", "category", "synthetic", "canonical_url", "chain_id", "neighborhood", "source_kind", "provider", "identity_status", "attribution", "latitude", "longitude", "tags")}
     output.update(recommendation_type=kind, eligibility=eligibility, reason_codes=reason_codes,
                   important_unknowns=important, ranker_version=model, config_version=config.version,
                   score=round(score, 6) if score is not None else None, score_components=components,

@@ -1,0 +1,1011 @@
+{
+  "version": "geonames-centers-v1",
+  "source": "https://download.geonames.org/export/dump/cities15000.zip",
+  "source_sha256": "5073d9575f4d4f34ab1eed62922b25c2c8a060cfb58fa7177eeb3c694cfc2a34",
+  "retrieved_at": "2026-10-06T15:45:00.641308+00:00",
+  "attribution": "City centers: GeoNames (CC BY 4.0)",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "scope": "3 km around city reference point, not administrative city boundaries or accommodation proximity",
+  "cities": {
+    "tokyo": {
+      "latitude": 35.6895,
+      "longitude": 139.69171,
+      "geonames_id": "1850147",
+      "source_name": "Tokyo",
+      "country_code": "JP",
+      "source_timezone": "Asia/Tokyo",
+      "source_url": "https://www.geonames.org/1850147/",
+      "radius_m": 3000
+    },
+    "osaka": {
+      "latitude": 34.69379,
+      "longitude": 135.50107,
+      "geonames_id": "1853909",
+      "source_name": "Osaka",
+      "country_code": "JP",
+      "source_timezone": "Asia/Tokyo",
+      "source_url": "https://www.geonames.org/1853909/",
+      "radius_m": 3000
+    },
+    "kyoto": {
+      "latitude": 35.02107,
+      "longitude": 135.75385,
+      "geonames_id": "1857910",
+      "source_name": "Kyoto",
+      "country_code": "JP",
+      "source_timezone": "Asia/Tokyo",
+      "source_url": "https://www.geonames.org/1857910/",
+      "radius_m": 3000
+    },
+    "fukuoka": {
+      "latitude": 33.6,
+      "longitude": 130.41667,
+      "geonames_id": "1863967",
+      "source_name": "Fukuoka",
+      "country_code": "JP",
+      "source_timezone": "Asia/Tokyo",
+      "source_url": "https://www.geonames.org/1863967/",
+      "radius_m": 3000
+    },
+    "sapporo": {
+      "latitude": 43.06667,
+      "longitude": 141.35,
+      "geonames_id": "2128295",
+      "source_name": "Sapporo",
+      "country_code": "JP",
+      "source_timezone": "Asia/Tokyo",
+      "source_url": "https://www.geonames.org/2128295/",
+      "radius_m": 3000
+    },
+    "nagoya": {
+      "latitude": 35.18147,
+      "longitude": 136.90641,
+      "geonames_id": "1856057",
+      "source_name": "Nagoya",
+      "country_code": "JP",
+      "source_timezone": "Asia/Tokyo",
+      "source_url": "https://www.geonames.org/1856057/",
+      "radius_m": 3000
+    },
+    "naha": {
+      "latitude": 26.213,
+      "longitude": 127.67851,
+      "geonames_id": "1856035",
+      "source_name": "Naha",
+      "country_code": "JP",
+      "source_timezone": "Asia/Tokyo",
+      "source_url": "https://www.geonames.org/1856035/",
+      "radius_m": 3000
+    },
+    "hiroshima": {
+      "latitude": 34.4,
+      "longitude": 132.45,
+      "geonames_id": "1862415",
+      "source_name": "Hiroshima",
+      "country_code": "JP",
+      "source_timezone": "Asia/Tokyo",
+      "source_url": "https://www.geonames.org/1862415/",
+      "radius_m": 3000
+    },
+    "seoul": {
+      "latitude": 37.566,
+      "longitude": 126.9784,
+      "geonames_id": "1835848",
+      "source_name": "Seoul",
+      "country_code": "KR",
+      "source_timezone": "Asia/Seoul",
+      "source_url": "https://www.geonames.org/1835848/",
+      "radius_m": 3000
+    },
+    "busan": {
+      "latitude": 35.10168,
+      "longitude": 129.03004,
+      "geonames_id": "1838524",
+      "source_name": "Busan",
+      "country_code": "KR",
+      "source_timezone": "Asia/Seoul",
+      "source_url": "https://www.geonames.org/1838524/",
+      "radius_m": 3000
+    },
+    "jeju": {
+      "latitude": 33.50972,
+      "longitude": 126.52194,
+      "geonames_id": "1846266",
+      "source_name": "Jeju City",
+      "country_code": "KR",
+      "source_timezone": "Asia/Seoul",
+      "source_url": "https://www.geonames.org/1846266/",
+      "radius_m": 3000
+    },
+    "beijing": {
+      "latitude": 39.9075,
+      "longitude": 116.39723,
+      "geonames_id": "1816670",
+      "source_name": "Beijing",
+      "country_code": "CN",
+      "source_timezone": "Asia/Shanghai",
+      "source_url": "https://www.geonames.org/1816670/",
+      "radius_m": 3000
+    },
+    "shanghai": {
+      "latitude": 31.22222,
+      "longitude": 121.45806,
+      "geonames_id": "1796236",
+      "source_name": "Shanghai",
+      "country_code": "CN",
+      "source_timezone": "Asia/Shanghai",
+      "source_url": "https://www.geonames.org/1796236/",
+      "radius_m": 3000
+    },
+    "guangzhou": {
+      "latitude": 23.11667,
+      "longitude": 113.25,
+      "geonames_id": "1809858",
+      "source_name": "Guangzhou",
+      "country_code": "CN",
+      "source_timezone": "Asia/Shanghai",
+      "source_url": "https://www.geonames.org/1809858/",
+      "radius_m": 3000
+    },
+    "chengdu": {
+      "latitude": 30.66667,
+      "longitude": 104.06667,
+      "geonames_id": "1815286",
+      "source_name": "Chengdu",
+      "country_code": "CN",
+      "source_timezone": "Asia/Shanghai",
+      "source_url": "https://www.geonames.org/1815286/",
+      "radius_m": 3000
+    },
+    "hong-kong": {
+      "latitude": 22.27832,
+      "longitude": 114.17469,
+      "geonames_id": "1819729",
+      "source_name": "Hong Kong",
+      "country_code": "HK",
+      "source_timezone": "Asia/Hong_Kong",
+      "source_url": "https://www.geonames.org/1819729/",
+      "radius_m": 3000
+    },
+    "macau": {
+      "latitude": 22.20056,
+      "longitude": 113.54611,
+      "geonames_id": "1821274",
+      "source_name": "Macau",
+      "country_code": "MO",
+      "source_timezone": "Asia/Macau",
+      "source_url": "https://www.geonames.org/1821274/",
+      "radius_m": 3000
+    },
+    "taipei": {
+      "latitude": 25.05306,
+      "longitude": 121.52639,
+      "geonames_id": "1668341",
+      "source_name": "Taipei",
+      "country_code": "TW",
+      "source_timezone": "Asia/Taipei",
+      "source_url": "https://www.geonames.org/1668341/",
+      "radius_m": 3000
+    },
+    "kaohsiung": {
+      "latitude": 22.61626,
+      "longitude": 120.31333,
+      "geonames_id": "1673820",
+      "source_name": "Kaohsiung",
+      "country_code": "TW",
+      "source_timezone": "Asia/Taipei",
+      "source_url": "https://www.geonames.org/1673820/",
+      "radius_m": 3000
+    },
+    "singapore": {
+      "latitude": 1.28967,
+      "longitude": 103.85007,
+      "geonames_id": "1880252",
+      "source_name": "Singapore",
+      "country_code": "SG",
+      "source_timezone": "Asia/Singapore",
+      "source_url": "https://www.geonames.org/1880252/",
+      "radius_m": 3000
+    },
+    "bangkok": {
+      "latitude": 13.75398,
+      "longitude": 100.50144,
+      "geonames_id": "1609350",
+      "source_name": "Bangkok",
+      "country_code": "TH",
+      "source_timezone": "Asia/Bangkok",
+      "source_url": "https://www.geonames.org/1609350/",
+      "radius_m": 3000
+    },
+    "chiang-mai": {
+      "latitude": 18.79038,
+      "longitude": 98.98468,
+      "geonames_id": "1153671",
+      "source_name": "Chiang Mai",
+      "country_code": "TH",
+      "source_timezone": "Asia/Bangkok",
+      "source_url": "https://www.geonames.org/1153671/",
+      "radius_m": 3000
+    },
+    "phuket": {
+      "latitude": 7.89059,
+      "longitude": 98.3981,
+      "geonames_id": "1151254",
+      "source_name": "Phuket",
+      "country_code": "TH",
+      "source_timezone": "Asia/Bangkok",
+      "source_url": "https://www.geonames.org/1151254/",
+      "radius_m": 3000
+    },
+    "hanoi": {
+      "latitude": 21.0245,
+      "longitude": 105.84117,
+      "geonames_id": "1581130",
+      "source_name": "Hanoi",
+      "country_code": "VN",
+      "source_timezone": "Asia/Bangkok",
+      "source_url": "https://www.geonames.org/1581130/",
+      "radius_m": 3000
+    },
+    "ho-chi-minh-city": {
+      "latitude": 10.82302,
+      "longitude": 106.62965,
+      "geonames_id": "1566083",
+      "source_name": "Ho Chi Minh City",
+      "country_code": "VN",
+      "source_timezone": "Asia/Ho_Chi_Minh",
+      "source_url": "https://www.geonames.org/1566083/",
+      "radius_m": 3000
+    },
+    "da-nang": {
+      "latitude": 16.06778,
+      "longitude": 108.22083,
+      "geonames_id": "1583992",
+      "source_name": "Da Nang",
+      "country_code": "VN",
+      "source_timezone": "Asia/Ho_Chi_Minh",
+      "source_url": "https://www.geonames.org/1583992/",
+      "radius_m": 3000
+    },
+    "kuala-lumpur": {
+      "latitude": 3.1412,
+      "longitude": 101.68653,
+      "geonames_id": "1735161",
+      "source_name": "Kuala Lumpur",
+      "country_code": "MY",
+      "source_timezone": "Asia/Kuala_Lumpur",
+      "source_url": "https://www.geonames.org/1735161/",
+      "radius_m": 3000
+    },
+    "george-town": {
+      "latitude": 5.41123,
+      "longitude": 100.33543,
+      "geonames_id": "1735106",
+      "source_name": "George Town",
+      "country_code": "MY",
+      "source_timezone": "Asia/Kuala_Lumpur",
+      "source_url": "https://www.geonames.org/1735106/",
+      "radius_m": 3000
+    },
+    "jakarta": {
+      "latitude": -6.21462,
+      "longitude": 106.84513,
+      "geonames_id": "1642911",
+      "source_name": "Jakarta",
+      "country_code": "ID",
+      "source_timezone": "Asia/Jakarta",
+      "source_url": "https://www.geonames.org/1642911/",
+      "radius_m": 3000
+    },
+    "denpasar": {
+      "latitude": -8.65,
+      "longitude": 115.21667,
+      "geonames_id": "1645528",
+      "source_name": "Denpasar",
+      "country_code": "ID",
+      "source_timezone": "Asia/Makassar",
+      "source_url": "https://www.geonames.org/1645528/",
+      "radius_m": 3000
+    },
+    "manila": {
+      "latitude": 14.6042,
+      "longitude": 120.9822,
+      "geonames_id": "1701668",
+      "source_name": "Manila",
+      "country_code": "PH",
+      "source_timezone": "Asia/Manila",
+      "source_url": "https://www.geonames.org/1701668/",
+      "radius_m": 3000
+    },
+    "cebu-city": {
+      "latitude": 10.31672,
+      "longitude": 123.89071,
+      "geonames_id": "1717512",
+      "source_name": "Cebu City",
+      "country_code": "PH",
+      "source_timezone": "Asia/Manila",
+      "source_url": "https://www.geonames.org/1717512/",
+      "radius_m": 3000
+    },
+    "new-delhi": {
+      "latitude": 28.62137,
+      "longitude": 77.2148,
+      "geonames_id": "1261481",
+      "source_name": "New Delhi",
+      "country_code": "IN",
+      "source_timezone": "Asia/Kolkata",
+      "source_url": "https://www.geonames.org/1261481/",
+      "radius_m": 3000
+    },
+    "mumbai": {
+      "latitude": 19.07283,
+      "longitude": 72.88261,
+      "geonames_id": "1275339",
+      "source_name": "Mumbai",
+      "country_code": "IN",
+      "source_timezone": "Asia/Kolkata",
+      "source_url": "https://www.geonames.org/1275339/",
+      "radius_m": 3000
+    },
+    "jaipur": {
+      "latitude": 26.91962,
+      "longitude": 75.78781,
+      "geonames_id": "1269515",
+      "source_name": "Jaipur",
+      "country_code": "IN",
+      "source_timezone": "Asia/Kolkata",
+      "source_url": "https://www.geonames.org/1269515/",
+      "radius_m": 3000
+    },
+    "kathmandu": {
+      "latitude": 27.70169,
+      "longitude": 85.3206,
+      "geonames_id": "1283240",
+      "source_name": "Kathmandu",
+      "country_code": "NP",
+      "source_timezone": "Asia/Kathmandu",
+      "source_url": "https://www.geonames.org/1283240/",
+      "radius_m": 3000
+    },
+    "dubai": {
+      "latitude": 25.07725,
+      "longitude": 55.30927,
+      "geonames_id": "292223",
+      "source_name": "Dubai",
+      "country_code": "AE",
+      "source_timezone": "Asia/Dubai",
+      "source_url": "https://www.geonames.org/292223/",
+      "radius_m": 3000
+    },
+    "abu-dhabi": {
+      "latitude": 24.45118,
+      "longitude": 54.39696,
+      "geonames_id": "292968",
+      "source_name": "Abu Dhabi",
+      "country_code": "AE",
+      "source_timezone": "Asia/Dubai",
+      "source_url": "https://www.geonames.org/292968/",
+      "radius_m": 3000
+    },
+    "doha": {
+      "latitude": 25.28545,
+      "longitude": 51.53096,
+      "geonames_id": "290030",
+      "source_name": "Doha",
+      "country_code": "QA",
+      "source_timezone": "Asia/Qatar",
+      "source_url": "https://www.geonames.org/290030/",
+      "radius_m": 3000
+    },
+    "istanbul": {
+      "latitude": 41.01384,
+      "longitude": 28.94966,
+      "geonames_id": "745044",
+      "source_name": "Istanbul",
+      "country_code": "TR",
+      "source_timezone": "Europe/Istanbul",
+      "source_url": "https://www.geonames.org/745044/",
+      "radius_m": 3000
+    },
+    "madrid": {
+      "latitude": 40.4165,
+      "longitude": -3.70256,
+      "geonames_id": "3117735",
+      "source_name": "Madrid",
+      "country_code": "ES",
+      "source_timezone": "Europe/Madrid",
+      "source_url": "https://www.geonames.org/3117735/",
+      "radius_m": 3000
+    },
+    "barcelona": {
+      "latitude": 41.38879,
+      "longitude": 2.15899,
+      "geonames_id": "3128760",
+      "source_name": "Barcelona",
+      "country_code": "ES",
+      "source_timezone": "Europe/Madrid",
+      "source_url": "https://www.geonames.org/3128760/",
+      "radius_m": 3000
+    },
+    "seville": {
+      "latitude": 37.38283,
+      "longitude": -5.97317,
+      "geonames_id": "2510911",
+      "source_name": "Sevilla",
+      "country_code": "ES",
+      "source_timezone": "Europe/Madrid",
+      "source_url": "https://www.geonames.org/2510911/",
+      "radius_m": 3000
+    },
+    "valencia": {
+      "latitude": 39.47391,
+      "longitude": -0.37966,
+      "geonames_id": "2509954",
+      "source_name": "Valencia",
+      "country_code": "ES",
+      "source_timezone": "Europe/Madrid",
+      "source_url": "https://www.geonames.org/2509954/",
+      "radius_m": 3000
+    },
+    "lisbon": {
+      "latitude": 38.72509,
+      "longitude": -9.1498,
+      "geonames_id": "2267057",
+      "source_name": "Lisbon",
+      "country_code": "PT",
+      "source_timezone": "Europe/Lisbon",
+      "source_url": "https://www.geonames.org/2267057/",
+      "radius_m": 3000
+    },
+    "porto": {
+      "latitude": 41.1485,
+      "longitude": -8.61097,
+      "geonames_id": "2735943",
+      "source_name": "Porto",
+      "country_code": "PT",
+      "source_timezone": "Europe/Lisbon",
+      "source_url": "https://www.geonames.org/2735943/",
+      "radius_m": 3000
+    },
+    "paris": {
+      "latitude": 48.85341,
+      "longitude": 2.3488,
+      "geonames_id": "2988507",
+      "source_name": "Paris",
+      "country_code": "FR",
+      "source_timezone": "Europe/Paris",
+      "source_url": "https://www.geonames.org/2988507/",
+      "radius_m": 3000
+    },
+    "nice": {
+      "latitude": 43.70313,
+      "longitude": 7.26608,
+      "geonames_id": "2990440",
+      "source_name": "Nice",
+      "country_code": "FR",
+      "source_timezone": "Europe/Paris",
+      "source_url": "https://www.geonames.org/2990440/",
+      "radius_m": 3000
+    },
+    "lyon": {
+      "latitude": 45.74906,
+      "longitude": 4.84789,
+      "geonames_id": "2996944",
+      "source_name": "Lyon",
+      "country_code": "FR",
+      "source_timezone": "Europe/Paris",
+      "source_url": "https://www.geonames.org/2996944/",
+      "radius_m": 3000
+    },
+    "london": {
+      "latitude": 51.50853,
+      "longitude": -0.12574,
+      "geonames_id": "2643743",
+      "source_name": "London",
+      "country_code": "GB",
+      "source_timezone": "Europe/London",
+      "source_url": "https://www.geonames.org/2643743/",
+      "radius_m": 3000
+    },
+    "edinburgh": {
+      "latitude": 55.95206,
+      "longitude": -3.19648,
+      "geonames_id": "2650225",
+      "source_name": "Edinburgh",
+      "country_code": "GB",
+      "source_timezone": "Europe/London",
+      "source_url": "https://www.geonames.org/2650225/",
+      "radius_m": 3000
+    },
+    "dublin": {
+      "latitude": 53.33306,
+      "longitude": -6.24889,
+      "geonames_id": "2964574",
+      "source_name": "Dublin",
+      "country_code": "IE",
+      "source_timezone": "Europe/Dublin",
+      "source_url": "https://www.geonames.org/2964574/",
+      "radius_m": 3000
+    },
+    "rome": {
+      "latitude": 41.89193,
+      "longitude": 12.51133,
+      "geonames_id": "3169070",
+      "source_name": "Rome",
+      "country_code": "IT",
+      "source_timezone": "Europe/Rome",
+      "source_url": "https://www.geonames.org/3169070/",
+      "radius_m": 3000
+    },
+    "milan": {
+      "latitude": 45.46427,
+      "longitude": 9.18951,
+      "geonames_id": "3173435",
+      "source_name": "Milan",
+      "country_code": "IT",
+      "source_timezone": "Europe/Rome",
+      "source_url": "https://www.geonames.org/3173435/",
+      "radius_m": 3000
+    },
+    "florence": {
+      "latitude": 43.77925,
+      "longitude": 11.24626,
+      "geonames_id": "3176959",
+      "source_name": "Florence",
+      "country_code": "IT",
+      "source_timezone": "Europe/Rome",
+      "source_url": "https://www.geonames.org/3176959/",
+      "radius_m": 3000
+    },
+    "venice": {
+      "latitude": 45.43713,
+      "longitude": 12.33265,
+      "geonames_id": "3164603",
+      "source_name": "Venice",
+      "country_code": "IT",
+      "source_timezone": "Europe/Rome",
+      "source_url": "https://www.geonames.org/3164603/",
+      "radius_m": 3000
+    },
+    "naples": {
+      "latitude": 40.85216,
+      "longitude": 14.26811,
+      "geonames_id": "3172394",
+      "source_name": "Naples",
+      "country_code": "IT",
+      "source_timezone": "Europe/Rome",
+      "source_url": "https://www.geonames.org/3172394/",
+      "radius_m": 3000
+    },
+    "berlin": {
+      "latitude": 52.52437,
+      "longitude": 13.41053,
+      "geonames_id": "2950159",
+      "source_name": "Berlin",
+      "country_code": "DE",
+      "source_timezone": "Europe/Berlin",
+      "source_url": "https://www.geonames.org/2950159/",
+      "radius_m": 3000
+    },
+    "munich": {
+      "latitude": 48.13743,
+      "longitude": 11.57549,
+      "geonames_id": "2867714",
+      "source_name": "Munich",
+      "country_code": "DE",
+      "source_timezone": "Europe/Berlin",
+      "source_url": "https://www.geonames.org/2867714/",
+      "radius_m": 3000
+    },
+    "frankfurt": {
+      "latitude": 50.11552,
+      "longitude": 8.68417,
+      "geonames_id": "2925533",
+      "source_name": "Frankfurt am Main",
+      "country_code": "DE",
+      "source_timezone": "Europe/Berlin",
+      "source_url": "https://www.geonames.org/2925533/",
+      "radius_m": 3000
+    },
+    "amsterdam": {
+      "latitude": 52.37403,
+      "longitude": 4.88969,
+      "geonames_id": "2759794",
+      "source_name": "Amsterdam",
+      "country_code": "NL",
+      "source_timezone": "Europe/Amsterdam",
+      "source_url": "https://www.geonames.org/2759794/",
+      "radius_m": 3000
+    },
+    "brussels": {
+      "latitude": 50.85045,
+      "longitude": 4.34878,
+      "geonames_id": "2800866",
+      "source_name": "Brussels",
+      "country_code": "BE",
+      "source_timezone": "Europe/Brussels",
+      "source_url": "https://www.geonames.org/2800866/",
+      "radius_m": 3000
+    },
+    "zurich": {
+      "latitude": 47.36667,
+      "longitude": 8.55,
+      "geonames_id": "2657896",
+      "source_name": "Zürich",
+      "country_code": "CH",
+      "source_timezone": "Europe/Zurich",
+      "source_url": "https://www.geonames.org/2657896/",
+      "radius_m": 3000
+    },
+    "geneva": {
+      "latitude": 46.20222,
+      "longitude": 6.14569,
+      "geonames_id": "2660646",
+      "source_name": "Geneva",
+      "country_code": "CH",
+      "source_timezone": "Europe/Zurich",
+      "source_url": "https://www.geonames.org/2660646/",
+      "radius_m": 3000
+    },
+    "vienna": {
+      "latitude": 48.20849,
+      "longitude": 16.37208,
+      "geonames_id": "2761369",
+      "source_name": "Vienna",
+      "country_code": "AT",
+      "source_timezone": "Europe/Vienna",
+      "source_url": "https://www.geonames.org/2761369/",
+      "radius_m": 3000
+    },
+    "prague": {
+      "latitude": 50.08804,
+      "longitude": 14.42076,
+      "geonames_id": "3067696",
+      "source_name": "Prague",
+      "country_code": "CZ",
+      "source_timezone": "Europe/Prague",
+      "source_url": "https://www.geonames.org/3067696/",
+      "radius_m": 3000
+    },
+    "budapest": {
+      "latitude": 47.49835,
+      "longitude": 19.04045,
+      "geonames_id": "3054643",
+      "source_name": "Budapest",
+      "country_code": "HU",
+      "source_timezone": "Europe/Budapest",
+      "source_url": "https://www.geonames.org/3054643/",
+      "radius_m": 3000
+    },
+    "warsaw": {
+      "latitude": 52.22977,
+      "longitude": 21.01178,
+      "geonames_id": "756135",
+      "source_name": "Warsaw",
+      "country_code": "PL",
+      "source_timezone": "Europe/Warsaw",
+      "source_url": "https://www.geonames.org/756135/",
+      "radius_m": 3000
+    },
+    "krakow": {
+      "latitude": 50.06143,
+      "longitude": 19.93658,
+      "geonames_id": "3094802",
+      "source_name": "Kraków",
+      "country_code": "PL",
+      "source_timezone": "Europe/Warsaw",
+      "source_url": "https://www.geonames.org/3094802/",
+      "radius_m": 3000
+    },
+    "copenhagen": {
+      "latitude": 55.67594,
+      "longitude": 12.56553,
+      "geonames_id": "2618425",
+      "source_name": "Copenhagen",
+      "country_code": "DK",
+      "source_timezone": "Europe/Copenhagen",
+      "source_url": "https://www.geonames.org/2618425/",
+      "radius_m": 3000
+    },
+    "stockholm": {
+      "latitude": 59.32938,
+      "longitude": 18.06871,
+      "geonames_id": "2673730",
+      "source_name": "Stockholm",
+      "country_code": "SE",
+      "source_timezone": "Europe/Stockholm",
+      "source_url": "https://www.geonames.org/2673730/",
+      "radius_m": 3000
+    },
+    "oslo": {
+      "latitude": 59.91273,
+      "longitude": 10.74609,
+      "geonames_id": "3143244",
+      "source_name": "Oslo",
+      "country_code": "NO",
+      "source_timezone": "Europe/Oslo",
+      "source_url": "https://www.geonames.org/3143244/",
+      "radius_m": 3000
+    },
+    "helsinki": {
+      "latitude": 60.16952,
+      "longitude": 24.93545,
+      "geonames_id": "658225",
+      "source_name": "Helsinki",
+      "country_code": "FI",
+      "source_timezone": "Europe/Helsinki",
+      "source_url": "https://www.geonames.org/658225/",
+      "radius_m": 3000
+    },
+    "reykjavik": {
+      "latitude": 64.13548,
+      "longitude": -21.89541,
+      "geonames_id": "3413829",
+      "source_name": "Reykjavík",
+      "country_code": "IS",
+      "source_timezone": "Atlantic/Reykjavik",
+      "source_url": "https://www.geonames.org/3413829/",
+      "radius_m": 3000
+    },
+    "athens": {
+      "latitude": 37.98376,
+      "longitude": 23.72784,
+      "geonames_id": "264371",
+      "source_name": "Athens",
+      "country_code": "GR",
+      "source_timezone": "Europe/Athens",
+      "source_url": "https://www.geonames.org/264371/",
+      "radius_m": 3000
+    },
+    "dubrovnik": {
+      "latitude": 42.64125,
+      "longitude": 18.10909,
+      "geonames_id": "3201047",
+      "source_name": "Dubrovnik",
+      "country_code": "HR",
+      "source_timezone": "Europe/Zagreb",
+      "source_url": "https://www.geonames.org/3201047/",
+      "radius_m": 3000
+    },
+    "new-york": {
+      "latitude": 40.71427,
+      "longitude": -74.00597,
+      "geonames_id": "5128581",
+      "source_name": "New York City",
+      "country_code": "US",
+      "source_timezone": "America/New_York",
+      "source_url": "https://www.geonames.org/5128581/",
+      "radius_m": 3000
+    },
+    "los-angeles": {
+      "latitude": 34.05223,
+      "longitude": -118.24368,
+      "geonames_id": "5368361",
+      "source_name": "Los Angeles",
+      "country_code": "US",
+      "source_timezone": "America/Los_Angeles",
+      "source_url": "https://www.geonames.org/5368361/",
+      "radius_m": 3000
+    },
+    "san-francisco": {
+      "latitude": 37.77493,
+      "longitude": -122.41942,
+      "geonames_id": "5391959",
+      "source_name": "San Francisco",
+      "country_code": "US",
+      "source_timezone": "America/Los_Angeles",
+      "source_url": "https://www.geonames.org/5391959/",
+      "radius_m": 3000
+    },
+    "las-vegas": {
+      "latitude": 36.17497,
+      "longitude": -115.13722,
+      "geonames_id": "5506956",
+      "source_name": "Las Vegas",
+      "country_code": "US",
+      "source_timezone": "America/Los_Angeles",
+      "source_url": "https://www.geonames.org/5506956/",
+      "radius_m": 3000
+    },
+    "seattle": {
+      "latitude": 47.60621,
+      "longitude": -122.33207,
+      "geonames_id": "5809844",
+      "source_name": "Seattle",
+      "country_code": "US",
+      "source_timezone": "America/Los_Angeles",
+      "source_url": "https://www.geonames.org/5809844/",
+      "radius_m": 3000
+    },
+    "chicago": {
+      "latitude": 41.85003,
+      "longitude": -87.65005,
+      "geonames_id": "4887398",
+      "source_name": "Chicago",
+      "country_code": "US",
+      "source_timezone": "America/Chicago",
+      "source_url": "https://www.geonames.org/4887398/",
+      "radius_m": 3000
+    },
+    "boston": {
+      "latitude": 42.35843,
+      "longitude": -71.05977,
+      "geonames_id": "4930956",
+      "source_name": "Boston",
+      "country_code": "US",
+      "source_timezone": "America/New_York",
+      "source_url": "https://www.geonames.org/4930956/",
+      "radius_m": 3000
+    },
+    "miami": {
+      "latitude": 25.77427,
+      "longitude": -80.19366,
+      "geonames_id": "4164138",
+      "source_name": "Miami",
+      "country_code": "US",
+      "source_timezone": "America/New_York",
+      "source_url": "https://www.geonames.org/4164138/",
+      "radius_m": 3000
+    },
+    "honolulu": {
+      "latitude": 21.30694,
+      "longitude": -157.85833,
+      "geonames_id": "5856195",
+      "source_name": "Honolulu",
+      "country_code": "US",
+      "source_timezone": "Pacific/Honolulu",
+      "source_url": "https://www.geonames.org/5856195/",
+      "radius_m": 3000
+    },
+    "vancouver": {
+      "latitude": 49.24966,
+      "longitude": -123.11934,
+      "geonames_id": "6173331",
+      "source_name": "Vancouver",
+      "country_code": "CA",
+      "source_timezone": "America/Vancouver",
+      "source_url": "https://www.geonames.org/6173331/",
+      "radius_m": 3000
+    },
+    "toronto": {
+      "latitude": 43.70643,
+      "longitude": -79.39864,
+      "geonames_id": "6167865",
+      "source_name": "Toronto",
+      "country_code": "CA",
+      "source_timezone": "America/Toronto",
+      "source_url": "https://www.geonames.org/6167865/",
+      "radius_m": 3000
+    },
+    "montreal": {
+      "latitude": 45.50884,
+      "longitude": -73.58781,
+      "geonames_id": "6077243",
+      "source_name": "Montréal",
+      "country_code": "CA",
+      "source_timezone": "America/Toronto",
+      "source_url": "https://www.geonames.org/6077243/",
+      "radius_m": 3000
+    },
+    "mexico-city": {
+      "latitude": 19.42847,
+      "longitude": -99.12766,
+      "geonames_id": "3530597",
+      "source_name": "Mexico City",
+      "country_code": "MX",
+      "source_timezone": "America/Mexico_City",
+      "source_url": "https://www.geonames.org/3530597/",
+      "radius_m": 3000
+    },
+    "cancun": {
+      "latitude": 21.17429,
+      "longitude": -86.84656,
+      "geonames_id": "3531673",
+      "source_name": "Cancún",
+      "country_code": "MX",
+      "source_timezone": "America/Cancun",
+      "source_url": "https://www.geonames.org/3531673/",
+      "radius_m": 3000
+    },
+    "lima": {
+      "latitude": -12.04318,
+      "longitude": -77.02824,
+      "geonames_id": "3936456",
+      "source_name": "Lima",
+      "country_code": "PE",
+      "source_timezone": "America/Lima",
+      "source_url": "https://www.geonames.org/3936456/",
+      "radius_m": 3000
+    },
+    "buenos-aires": {
+      "latitude": -34.61315,
+      "longitude": -58.37723,
+      "geonames_id": "3435910",
+      "source_name": "Buenos Aires",
+      "country_code": "AR",
+      "source_timezone": "America/Argentina/Buenos_Aires",
+      "source_url": "https://www.geonames.org/3435910/",
+      "radius_m": 3000
+    },
+    "rio-de-janeiro": {
+      "latitude": -22.90642,
+      "longitude": -43.18223,
+      "geonames_id": "3451190",
+      "source_name": "Rio de Janeiro",
+      "country_code": "BR",
+      "source_timezone": "America/Sao_Paulo",
+      "source_url": "https://www.geonames.org/3451190/",
+      "radius_m": 3000
+    },
+    "sydney": {
+      "latitude": -33.86785,
+      "longitude": 151.20732,
+      "geonames_id": "2147714",
+      "source_name": "Sydney",
+      "country_code": "AU",
+      "source_timezone": "Australia/Sydney",
+      "source_url": "https://www.geonames.org/2147714/",
+      "radius_m": 3000
+    },
+    "melbourne": {
+      "latitude": -37.814,
+      "longitude": 144.96332,
+      "geonames_id": "2158177",
+      "source_name": "Melbourne",
+      "country_code": "AU",
+      "source_timezone": "Australia/Melbourne",
+      "source_url": "https://www.geonames.org/2158177/",
+      "radius_m": 3000
+    },
+    "brisbane": {
+      "latitude": -27.46794,
+      "longitude": 153.02809,
+      "geonames_id": "2174003",
+      "source_name": "Brisbane",
+      "country_code": "AU",
+      "source_timezone": "Australia/Brisbane",
+      "source_url": "https://www.geonames.org/2174003/",
+      "radius_m": 3000
+    },
+    "auckland": {
+      "latitude": -36.84853,
+      "longitude": 174.76349,
+      "geonames_id": "2193733",
+      "source_name": "Auckland",
+      "country_code": "NZ",
+      "source_timezone": "Pacific/Auckland",
+      "source_url": "https://www.geonames.org/2193733/",
+      "radius_m": 3000
+    },
+    "cairo": {
+      "latitude": 30.06263,
+      "longitude": 31.24967,
+      "geonames_id": "360630",
+      "source_name": "Cairo",
+      "country_code": "EG",
+      "source_timezone": "Africa/Cairo",
+      "source_url": "https://www.geonames.org/360630/",
+      "radius_m": 3000
+    },
+    "cape-town": {
+      "latitude": -33.92584,
+      "longitude": 18.42322,
+      "geonames_id": "3369157",
+      "source_name": "Cape Town",
+      "country_code": "ZA",
+      "source_timezone": "Africa/Johannesburg",
+      "source_url": "https://www.geonames.org/3369157/",
+      "radius_m": 3000
+    },
+    "marrakesh": {
+      "latitude": 31.63416,
+      "longitude": -7.99994,
+      "geonames_id": "2542997",
+      "source_name": "Marrakesh",
+      "country_code": "MA",
+      "source_timezone": "Africa/Casablanca",
+      "source_url": "https://www.geonames.org/2542997/",
+      "radius_m": 3000
+    }
+  }
+}

@@ -38,12 +38,18 @@ class DiscoveryService:
     def __init__(self,db,repo,jobs,reviews,*,allow_synthetic=False):
         self.db,self.repo,self.jobs,self.reviews=db,repo,jobs,reviews
         self.allow_synthetic=allow_synthetic
+        self.public_provider=None
     def availability(self,city):
         with self.db.connect() as con:
             real=con.execute("SELECT count(DISTINCT c.place_id) FROM research_candidates c JOIN candidate_packs k ON k.id=c.pack_id JOIN place_identities p ON p.id=c.place_id WHERE k.synthetic=0 AND k.status='approved' AND c.status='approved' AND p.identity_status='verified' AND p.deleted_at IS NULL AND p.city=? AND EXISTS(SELECT 1 FROM evidence_sources s WHERE s.place_id=p.id AND s.status='active' AND s.read_confirmed=1 AND s.display_permitted=1)",(city,)).fetchone()[0]
             synthetic=con.execute("SELECT count(DISTINCT c.place_id) FROM research_candidates c JOIN candidate_packs k ON k.id=c.pack_id WHERE k.synthetic=1 AND k.status='approved' AND k.city=?",(city,)).fetchone()[0] if self.allow_synthetic else 0
-        return {'city':city,'real_reviewed_candidates':real,'synthetic_test_candidates':synthetic,
-                'state':'limited_catalog' if real else 'no_live_candidates',
+        from .public_places import center, ATTRIBUTION
+        enabled=bool(self.public_provider and center(city))
+        with self.db.connect() as con:
+            public_count=len(self._public_catalog(con,city,set()))
+        return {'public_discovery_enabled':enabled,'public_candidates':public_count,'public_scope':'city_center','radius_m':3000,'attribution':ATTRIBUTION,
+                'city':city,'real_reviewed_candidates':real,'synthetic_test_candidates':synthetic,
+                'state':'limited_catalog' if real else 'public_catalog' if public_count else 'public_search_available' if enabled else 'no_live_candidates',
                 'visit_qualification':'checked_per_request','review_language':'separate_policy_and_quality_gate'}
     def _admin(self,con,actor):
         self.reviews._admin(con,actor)
@@ -184,7 +190,10 @@ class DiscoveryService:
             con.execute("UPDATE bookmarks SET resolve_state='resolving',job_id=?,reason_codes_json='[]',updated_at=? WHERE id=?",(job['id'],now(),ident))
         return {'job_id':job['id'],'bookmark_id':ident,'state':'queued','status_url':'/api/v2/jobs/'+job['id'],'events_url':'/api/v2/jobs/'+job['id']+'/events'}
     def _visible_place(self,con,ident):
-        return con.execute("SELECT p.* FROM place_identities p WHERE p.id=? AND p.deleted_at IS NULL AND p.identity_status='verified' AND (EXISTS(SELECT 1 FROM research_candidates c JOIN candidate_packs k ON k.id=c.pack_id WHERE c.place_id=p.id AND c.status='approved' AND k.status='approved' AND (?=1 OR k.synthetic=0)) OR NOT EXISTS(SELECT 1 FROM research_candidates c WHERE c.place_id=p.id))",(ident,int(self.allow_synthetic))).fetchone()
+        place=con.execute("SELECT p.* FROM place_identities p WHERE p.id=? AND p.deleted_at IS NULL AND p.identity_status='verified' AND (EXISTS(SELECT 1 FROM research_candidates c JOIN candidate_packs k ON k.id=c.pack_id WHERE c.place_id=p.id AND c.status='approved' AND k.status='approved' AND (?=1 OR k.synthetic=0)) OR NOT EXISTS(SELECT 1 FROM research_candidates c WHERE c.place_id=p.id))",(ident,int(self.allow_synthetic))).fetchone()
+        if place:return place
+        from .public_places import POLICY, TTL
+        return con.execute("SELECT p.* FROM place_identities p JOIN research_candidates c ON c.place_id=p.id JOIN candidate_packs k ON k.id=c.pack_id WHERE p.id=? AND p.deleted_at IS NULL AND p.provider='openstreetmap' AND p.identity_status='needs_confirmation' AND c.status='public_data' AND k.status='public_data' AND k.updated_at>? AND EXISTS(SELECT 1 FROM evidence_sources s WHERE s.place_id=p.id AND s.policy_version=? AND s.status='active' AND s.read_confirmed=1 AND s.display_permitted=1)",(ident,(datetime.now(timezone.utc)-TTL).isoformat(),POLICY)).fetchone()
     def execute_resolution(self,job,ctx):
         actor=type('Owner',(),{'id':job['actor_id'],'session_id':job['session_id']})()
         with self.db.connect() as con:
@@ -380,7 +389,41 @@ class DiscoveryService:
             'chain_id':row['chain_id'],'neighborhood':row['neighborhood'],'latitude':row['latitude'],'longitude':row['longitude'],
             'identity_status':row['identity_status'],'pack_status':pack['status'],'synthetic':bool(pack['synthetic']),
             'canonical_url':row['canonical_url'],'facts':facts,'sources':sources}
-    def catalog(self,actor,trip_id,city=None,include_unapproved=False,*,include_photos=True):
+    def _public_catalog(self,con,city,excluded,*,categories=None):
+        from .public_places import POLICY, TTL, ATTRIBUTION, DISPLAY_CANDIDATES
+        cutoff=(datetime.now(timezone.utc)-TTL).isoformat()
+        rows=con.execute("SELECT c.*,p.name,p.address,p.city,p.identity_status FROM research_candidates c JOIN candidate_packs k ON k.id=c.pack_id JOIN place_identities p ON p.id=c.place_id WHERE p.provider='openstreetmap' AND p.deleted_at IS NULL AND p.identity_status='needs_confirmation' AND c.status='public_data' AND k.status='public_data' AND k.updated_at>? AND (CAST(? AS TEXT) IS NULL OR p.city=?) ORDER BY c.sort_order,p.id",(cutoff,city,city)).fetchall()
+        if not rows:return []
+        ids={r['place_id'] for r in rows}
+        sources={r['place_id']:self._source_dto(r) for r in con.execute("SELECT s.* FROM evidence_sources s JOIN place_identities p ON p.id=s.place_id WHERE p.provider='openstreetmap' AND s.policy_version=? AND s.status='active' AND s.read_confirmed=1 AND s.display_permitted=1 AND (CAST(? AS TEXT) IS NULL OR p.city=?)",(POLICY,city,city)) if r['place_id'] in ids}
+        # Apply the request and source gates before filling the display slots.
+        # Otherwise excluded restaurants can hide a usable cafe later in the cache.
+        categories=set(categories) if categories is not None else None
+        counts={};selected=[]
+        for row in rows:
+            if row['place_id'] in excluded or row['place_id'] not in sources:continue
+            if categories is not None and row['category'] not in categories:continue
+            count=counts.get(row['city'],0)
+            if count>=DISPLAY_CANDIDATES:continue
+            counts[row['city']]=count+1;selected.append(row)
+        rows=selected
+        ids={r['place_id'] for r in rows}
+        facts={}
+        for r in con.execute("SELECT f.* FROM place_facts f JOIN place_identities p ON p.id=f.place_id WHERE p.provider='openstreetmap' AND f.policy_version=? AND (CAST(? AS TEXT) IS NULL OR p.city=?)",(POLICY,city,city)):
+            if r['place_id'] not in ids:continue
+            value={k:r[k] for k in ('id','field','status','source_id','checked_at','valid_for_date','valid_from','valid_until','expires_at','policy_version')}
+            fresh=r['expires_at']>now();source=sources.get(r['place_id'])
+            allowed=bool(fresh and source and source['id']==r['source_id'])
+            value.update(place_id=r['place_id'],value=json.loads(r['value_json']) if allowed else None,freshness='fresh' if fresh else 'expired',usable=allowed,reason_codes=[] if allowed else ['FACT_STALE'])
+            facts.setdefault(r['place_id'],[]).append(value)
+        result=[]
+        for r in rows:
+            source=sources.get(r['place_id'])
+            if not source:continue
+            result.append({'place_id':r['place_id'],'name':r['name'],'native_name':r['native_name'],'display_name':r['name'],'address':r['address'],'city':r['city'],'category':r['category'],'categories':[r['category']],'recommendation_types':['local_discovery'],'tags':json.loads(r['tags_json']),'chain_id':None,'neighborhood':r['neighborhood'],'latitude':r['latitude'],'longitude':r['longitude'],'identity_status':'needs_confirmation','pack_status':'public_data','synthetic':False,'canonical_url':r['canonical_url'],'facts':facts.get(r['place_id'],[]),'sources':[source],'provider':'openstreetmap','source_kind':'public_map','attribution':ATTRIBUTION,'excluded':r['place_id'] in excluded})
+        return result
+
+    def catalog(self,actor,trip_id,city=None,include_unapproved=False,*,include_photos=True,categories=None):
         self.repo.get_trip(actor.id,trip_id)
         with self.db.connect() as con:
             if include_unapproved:self._admin(con,actor)
@@ -393,7 +436,12 @@ class DiscoveryService:
                 elif include_photos:
                     from .photos import for_place
                     value.update(for_place(con,row['place_id']))
-            return list(items.values())
+            for value in self._public_catalog(con,city,excluded,categories=categories):
+                items[value['place_id']]=value
+                if include_photos:
+                    from .photos import for_place
+                    value.update(for_place(con,value['place_id']))
+            return sorted(items.values(),key=lambda p:p['place_id'])
     def detail(self,actor,trip_id,place_id):
         self.repo.get_trip(actor.id,trip_id)
         with self.db.connect() as con:
@@ -406,6 +454,9 @@ class DiscoveryService:
             basic={'id':place_id,'name':place['name'],'display_name':place['name'],'native_name':candidate['native_name'] if candidate else None,'city':place['city'],'address':place['address'],'identity_status':place['identity_status'],'categories':[candidate['category']] if candidate else [],'canonical_url':candidate['canonical_url'] if candidate else place['source_url']}
             from .photos import for_place
             basic.update(for_place(con,place_id))
+            if place['provider']=='openstreetmap':
+                from .public_places import ATTRIBUTION
+                basic.update(provider='openstreetmap',source_kind='public_map',attribution=ATTRIBUTION,latitude=candidate['latitude'] if candidate else None,longitude=candidate['longitude'] if candidate else None,tags=json.loads(candidate['tags_json']) if candidate else [])
             excluded=bool(con.execute('SELECT 1 FROM discovery_exclusions WHERE trip_id=? AND place_id=?',(trip_id,place_id)).fetchone())
         try:evidence=self.reviews.evidence(actor,trip_id,place_id)
         except DomainError:evidence={'state':'unavailable','metrics':None,'evaluation':{'decision':'unsupported','strict_pass':False,'reason_codes':['NO_LINKED_REVIEW_EVIDENCE']}}

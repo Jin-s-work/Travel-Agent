@@ -25,7 +25,7 @@ def picture(number=1):
         'checked_at': (NOW-timedelta(days=1)).isoformat(),
         'expires_at': (NOW+timedelta(days=365)).isoformat(),
         'identity_evidence': 'Test-only branch identity fixture, no live media verification.',
-        'enabled': True, 'taken_at': '2018-06-21', 'width': 640, 'height': 480}
+        'enabled': True, 'kind': 'food', 'taken_at': '2018-06-21', 'width': 640, 'height': 480}
 
 
 def manifest():
@@ -71,7 +71,7 @@ def test_untrusted_image_urls_never_reach_api(url):
 
 
 @pytest.mark.parametrize('key,value',[
-    ('source_url','https://example.org/license-claim'),('author','<a>Author</a>'),
+    ('kind', None), ('kind', 'stock'), ('kind', []), ('source_url','https://example.org/license-claim'),('author','<a>Author</a>'),
     ('author',''),('identity_evidence',''),('license','All rights reserved'),
     ('license_url','https://example.org/cc-by'),('checked_at','2026-10-07T12:00:00Z'),
     ('checked_at','2026-10-05'),('width',0),('height',False),('taken_at','2020-02-30'),
@@ -82,7 +82,7 @@ def test_unreviewed_or_invalid_metadata_is_not_displayed(key,value):
 
 
 def test_bounded_photos_exact_branch_and_current_rights():
-    data=manifest();data['places'][0]['photos'].append(picture(3))
+    data=manifest();data['places'][0]['photos'].extend([picture(3),picture(4)])
     assert select(data)['photos']==[]
     for key,value in [('city','barcelona'),('external_id','different'),('address','another branch'),('canonical_url','https://example.org/other')]:
         data=manifest();data['places'][0][key]=value
@@ -184,7 +184,7 @@ def test_saved_runs_get_current_photos_without_persisting_media_or_restarting(di
     assert discovery.calls==[]
 
 
-def test_reviewed_manifest_matches_seven_exact_real_branches_and_thirteen_images():
+def test_reviewed_manifest_matches_seven_exact_real_branches_and_nineteen_images():
     root=Path(__file__).resolve().parents[1]
     manifest=json.loads((root/'src/discovery/restaurant_photos.json').read_text())
     catalog=json.loads((root/'docs/service-v3/data/official-restaurants-2026-10-06.json').read_text())
@@ -199,8 +199,8 @@ def test_reviewed_manifest_matches_seven_exact_real_branches_and_thirteen_images
             results.append(photos.select_photos(manifest,record,approved=True,clock=checked))
     assert len(results)==9
     assert sum(result['photo_status']['state']=='available' for result in results)==7
-    assert sum(len(result['photos']) for result in results)==13
-    assert all(len(result['photos'])<=2 for result in results)
+    assert sum(len(result['photos']) for result in results)==19
+    assert all(len(result['photos'])<=3 for result in results)
     assert all(not result['photo_status']['reason_codes'] for result in results if result['photos'])
 
 
@@ -213,3 +213,44 @@ def test_expired_hours_do_not_pretend_independent_photo_rights_are_expired(disco
     detail=discovery.client.get(f"/api/v2/trips/{trip['id']}/places/{place_id}/detail").json()
     assert len(detail['place']['photos'])==1
     assert all(not fact['usable'] and fact['freshness']=='expired' for fact in detail['facts'])
+
+
+def test_food_then_interior_then_exterior_order_is_stable_and_unique():
+    data=manifest()
+    data['places'][0]['photos']=[{**picture(1),'kind':'exterior'},
+        {**picture(2),'kind':'interior'},{**picture(3),'kind':'food'}]
+    result=select(data)
+    assert [p['id'] for p in result['photos']]==['fixture-photo-3','fixture-photo-2','fixture-photo-1']
+    assert [p['kind'] for p in result['photos']]==['food','interior','exterior']
+    data['places'][0]['photos']=[picture(3),picture(1),picture(2)]
+    assert [p['id'] for p in select(data)['photos']]==['fixture-photo-3','fixture-photo-1','fixture-photo-2']
+
+
+def test_duplicate_source_cannot_fill_another_slide_with_a_different_thumbnail():
+    data=manifest()
+    data['places'][0]['photos'][1]['source_url']=picture()['source_url']
+    result=select(data)
+    assert len(result['photos'])==1
+    assert result['photo_status']['reason_codes']==['PHOTO_DUPLICATE']
+
+
+def test_only_one_exterior_is_selected_when_food_or_interior_exists():
+    data=manifest()
+    data['places'][0]['photos']=[{**picture(1),'kind':'exterior'},
+        {**picture(2),'kind':'exterior'},picture(3)]
+    result=select(data)
+    assert [p['id'] for p in result['photos']]==['fixture-photo-3','fixture-photo-1']
+    assert result['photo_status']['available_count']==2
+    # Revoking the food does not falsely claim that exterior pictures are food.
+    data['places'][0]['photos'][2]['enabled']=False
+    result=select(data)
+    assert [p['kind'] for p in result['photos']]==['exterior','exterior']
+    assert result['photo_status']['reason_codes']==['PHOTO_DISABLED']
+
+
+@pytest.mark.parametrize('place_id',['osm_node_123','osm_way_456','osm_relation_789'])
+def test_public_map_identity_never_runs_photo_sql_or_uses_curated_permissions(place_id):
+    class NoQueries:
+        def execute(self,*args):
+            pytest.fail('Unreviewed public map photo lookup must not run SQL')
+    assert photos.for_place(NoQueries(),place_id)['photos']==[]

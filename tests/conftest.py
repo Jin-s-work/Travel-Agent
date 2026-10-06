@@ -27,6 +27,7 @@ os.environ["SESSION_SECRET"] = ""
 os.environ["OPENAI_API_KEY"] = "test-placeholder"
 os.environ["TAVILY_API_KEY"] = ""
 os.environ["SEED_ON_EMPTY"] = "0"
+os.environ["PUBLIC_DISCOVERY_ENABLED"] = "0"  # No live network from production-shaped test apps.
 
 import pytest  # noqa: E402  (환경변수 설정 뒤에 와야 한다)
 

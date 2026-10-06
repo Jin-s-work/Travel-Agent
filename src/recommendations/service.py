@@ -31,18 +31,21 @@ class Recommendations:
             'controls':[dict(r) for r in con.execute('SELECT * FROM review_controls')],
             'policies':[dict(r) for r in con.execute('SELECT id,status,version,rights_json,expires_at FROM provider_policies ORDER BY id')],
             'aggregates':[dict(r) for r in con.execute('SELECT id,invalidated_at,expires_at FROM review_aggregates ORDER BY id')],
-            'pointers':[tuple(r) for r in con.execute('SELECT id,active_aggregate_id FROM place_identities ORDER BY id')],
+            'pointers':[tuple(r) for r in con.execute('SELECT id,active_aggregate_id FROM place_identities WHERE active_aggregate_id IS NOT NULL ORDER BY id')],
         })
 
-    def _guard_catalog(self,con,actor,trip_id,city,candidates):
+    def _guard_catalog(self,con,actor,trip_id,city,candidates,*,categories=None):
         rows=con.execute("SELECT c.*,p.name,p.address,p.city,p.identity_status FROM research_candidates c JOIN candidate_packs k ON k.id=c.pack_id JOIN place_identities p ON p.id=c.place_id WHERE p.deleted_at IS NULL AND c.status='approved' AND k.status='approved' AND p.identity_status='verified' AND p.city=? ORDER BY p.id",(city,)).fetchall()
         excluded={r[0] for r in con.execute('SELECT place_id FROM discovery_exclusions WHERE trip_id=?',(trip_id,))}
         current={}
         for row in rows:
             p=self.discovery._candidate(con,row)
             p['excluded']=row['place_id'] in excluded;current[row['place_id']]=p
+        for p in self.discovery._public_catalog(con,city,excluded,categories=categories):current[p['place_id']]=p
+        current=dict(sorted(current.items()))
         core=[{k:v for k,v in p.items() if k not in {'review_evidence','review_guard_token'}} for p in candidates]
-        if digest(list(current.values())[:100])!=digest(core) or any(p['review_guard_token']!=self._review_guard(con) for p in candidates):
+        review_guard=self._review_guard(con)
+        if digest(list(current.values())[:100])!=digest(core) or any(p['review_guard_token']!=review_guard for p in candidates):
             raise DomainError('SOURCE_DATA_CHANGED','출처나 장소 자료가 바뀌었습니다. 다시 확인해 주세요.',409)
         for p in candidates:
             review=p.get('review_evidence') or {}
@@ -106,20 +109,21 @@ class Recommendations:
         return {'run_id':ident,'job_id':job['id'],'state':job['state'],
                 'status_url':'/api/v2/jobs/'+job['id'],'events_url':'/api/v2/jobs/'+job['id']+'/events'}
 
-    def _catalog(self,actor,trip_id,city):
-        candidates=self.discovery.catalog(actor,trip_id,city,include_photos=False)
+    def _catalog(self,actor,trip_id,city,*,categories=None):
+        candidates=self.discovery.catalog(actor,trip_id,city,include_photos=False,categories=categories)
         if len(candidates)>100: candidates=candidates[:100]
         # Link only server-verified candidates within this owned trip so the
         # existing consumer evidence policy remains the sole review gate.
         with self.db.connect() as con:
             con.execute('BEGIN IMMEDIATE')
             self.jobs._scope(con,actor.id,actor.session_id,'personal_trip',trip_id)
-            for p in candidates:
-                con.execute('INSERT OR IGNORE INTO trip_places VALUES(?,?,?)',(trip_id,p['place_id'],utcnow()))
+            con.executemany('INSERT OR IGNORE INTO trip_places VALUES(?,?,?)',[(trip_id,p['place_id'],utcnow()) for p in candidates])
         self.reviews.purge()
         with self.db.connect() as con: review_guard=self._review_guard(con)
         for candidate in candidates:
-            try: candidate['review_evidence']=self.reviews.evidence(actor,trip_id,candidate['place_id'])
+            try:
+                if candidate.get('provider')=='openstreetmap':raise DomainError('PUBLIC_MAP_NO_REVIEWS','공개지도에 리뷰 근거가 없습니다.',404)
+                candidate['review_evidence']=self.reviews.evidence(actor,trip_id,candidate['place_id'])
             except DomainError as exc:
                 if exc.status in (401,): raise
                 candidate['review_evidence']={'state':'unavailable','counts':None,'metrics':None,
@@ -138,8 +142,27 @@ class Recommendations:
         if row['result_json']:
             return {'run_id':ident}
         snapshot=json.loads(row['snapshot_json'])
+        if not row['candidates_json'] and self.discovery.public_provider and set(snapshot['conditions']['categories']) & {'restaurant','cafe'} and 'local_discovery' in snapshot['conditions']['recommendation_types']:
+            city=snapshot['conditions']['city']
+            with self.db.connect() as con:
+                reviewed=con.execute("SELECT 1 FROM research_candidates c JOIN candidate_packs k ON k.id=c.pack_id JOIN place_identities p ON p.id=c.place_id WHERE k.synthetic=0 AND k.status='approved' AND c.status='approved' AND p.identity_status='verified' AND p.deleted_at IS NULL AND p.city=? AND EXISTS(SELECT 1 FROM evidence_sources s WHERE s.place_id=p.id AND s.status='active' AND s.read_confirmed=1 AND s.display_permitted=1) LIMIT 1",(city,)).fetchone()
+            language=snapshot.get('review_language_filter') or {}
+            strict=language.get('required') and 'local_discovery' in language.get('apply_to',['local_discovery'])
+            ctx.progress('public_discovery',done=0,total=1)
+            if reviewed:
+                external=self.discovery.public_provider._status(city,'not_needed',reason='REVIEWED_CATALOG_AVAILABLE')
+            elif strict:
+                external=self.discovery.public_provider._status(city,'unavailable',reason='PUBLIC_REVIEW_FILTER_UNSUPPORTED')
+            else:
+                external=self.discovery.public_provider.ensure(actor,trip_id,city,ctx)
+            snapshot['public_discovery']=external
+            snapshot['evaluation_at']=utcnow()
+            with self.db.connect() as con:
+                con.execute('BEGIN IMMEDIATE');ctx.guard(con=con)
+                con.execute('UPDATE recommendation_runs SET snapshot_json=? WHERE id=?',(dump(snapshot),ident))
+            ctx.progress('public_discovery',done=1,total=1)
         ctx.progress('candidate_snapshot',done=0,total=1)
-        current=self._catalog(actor,trip_id,snapshot['conditions']['city'])
+        current=self._catalog(actor,trip_id,snapshot['conditions']['city'],categories=snapshot['conditions']['categories'])
         if row['candidates_json']:
             candidates=json.loads(row['candidates_json'])
             if digest(current)!=row['manifest_hash']:
@@ -159,19 +182,27 @@ class Recommendations:
         result['summary']=summarize(snapshot,candidates,result)
         result['route_status']=snapshot.get('route_stats',{'provider_calls':0,'reason':'ROUTE_PROVIDER_DISABLED'})
         result['origin_context']=deepcopy(snapshot.get('origin_context'))
-        result['external_discovery']={'state':'unavailable','reason':'EXTERNAL_DISCOVERY_NOT_CONFIGURED','calls':0,'cost':None}
+        result['external_discovery']=snapshot.get('public_discovery',{'state':'unavailable','reason':'EXTERNAL_DISCOVERY_NOT_CONFIGURED','calls':0,'cost':None})
+        result['public_discovery']=result['external_discovery']
+        if not candidates and snapshot.get('public_discovery'):
+            status=snapshot['public_discovery']
+            result['summary']['empty_state']={'code':status.get('reason','PUBLIC_DISCOVERY_EMPTY'),'title':'공개지도에서 장소를 찾지 못했어요' if status['state']=='empty' else '공개지도 검색을 잠시 이용할 수 없어요','description':'도심 3km 안에 등록된 식당·카페가 없을 수 있어요. 장소 이름이나 링크를 보관함에 저장할 수 있어요.' if status['state']=='empty' else '잠시 후 다시 찾거나 원하는 장소의 이름·링크를 저장해 주세요. 무료 검색의 공유 한도나 제공 서버 상태에 따라 제한될 수 있어요.','actions':['retry','save_place']}
+        if not candidates and result['external_discovery']['state']=='ready':
+            result['summary']['empty_state']={'code':'PUBLIC_DISCOVERY_NO_MATCHES','title':'조건에 맞는 공개지도 장소가 없어요','description':'현재 표시할 수 있는 공개지도 후보 중 선택한 종류와 제외 조건에 맞는 장소가 없어요. 조건을 바꾸거나 가고 싶은 장소를 저장할 수 있어요.','actions':['edit_conditions','save_place']}
+        if not candidates and result['external_discovery'].get('reason')=='PUBLIC_REVIEW_FILTER_UNSUPPORTED':
+            result['summary']['empty_state']={'code':'PUBLIC_REVIEW_FILTER_UNSUPPORTED','title':'리뷰 조건을 확인할 자료가 없어요','description':'공개지도는 리뷰 언어를 제공하지 않아요. 필터를 직접 바꾸거나 가고 싶은 장소를 저장할 수 있어요.','actions':['edit_conditions','save_place']}
         result['requested_constraints']={k:snapshot[k] for k in ('conditions','review_language_filter','rating_filter')}
         result.setdefault('applied_constraints',deepcopy(result['requested_constraints']))
         result.setdefault('unsupported_constraints',[])
         # No external work was performed, but both deletion and evidence may
         # still change concurrently with a CPU-bound calculation.
         ctx.progress('source_revalidation',done=0,total=1)
-        if digest(self._catalog(actor,trip_id,snapshot['conditions']['city']))!=digest(candidates):
+        if digest(self._catalog(actor,trip_id,snapshot['conditions']['city'],categories=snapshot['conditions']['categories']))!=digest(candidates):
             raise DomainError('SOURCE_DATA_CHANGED','자료가 변경되어 이전 결과를 적용하지 않았습니다.',409)
         ctx.progress('source_revalidation',done=1,total=1)
         with self.db.connect() as con:
             con.execute('BEGIN IMMEDIATE');ctx.guard(con=con)
-            self._guard_catalog(con,actor,trip_id,snapshot['conditions']['city'],candidates)
+            self._guard_catalog(con,actor,trip_id,snapshot['conditions']['city'],candidates,categories=snapshot['conditions']['categories'])
             from src.accommodations.origin import snapshot_is_current
             if snapshot.get('origin_context') and not snapshot_is_current(con,self.repo,actor,trip_id,snapshot['origin_context']):
                 raise DomainError('ORIGIN_CHANGED','숙소가 바뀌어 이전 위치의 추천을 활성화하지 않았습니다.',409)
@@ -231,7 +262,7 @@ class Recommendations:
             from src.accommodations.origin import snapshot_is_current
             origin_current=not origin_snapshot or snapshot_is_current(con,self.repo,actor,trip_id,origin_snapshot)
         snapshot=json.loads(row['snapshot_json']); result=json.loads(row['result_json']) if row['result_json'] else None
-        if check_data and row['candidates_json'] and digest(self._catalog(actor,trip_id,snapshot['conditions']['city']))!=row['manifest_hash']:
+        if check_data and row['candidates_json'] and digest(self._catalog(actor,trip_id,snapshot['conditions']['city'],categories=snapshot['conditions']['categories']))!=row['manifest_hash']:
             # Do not continue serving revoked/expired facts out of an old run.
             with self.db.connect() as con:
                 con.execute('BEGIN IMMEDIATE');self._get(con,actor,trip_id,ident)
