@@ -37,7 +37,7 @@ test('public asset URLs carry their current content hash to prevent mixed HTML a
   const {createHash}=require('node:crypto');
   const html=fs.readFileSync(path.join(__dirname,'../web/index.html'),'utf8');
   const {listeners}=worker();
-  for(const asset of ['js/foundation.js','js/travel-tools.js','js/offline-store.js','css/foundation.css']){
+  for(const asset of ['js/foundation.js','js/travel-tools.js','js/offline-store.js','css/foundation.css','css/design-system.css']){
     const hash=createHash('sha256').update(fs.readFileSync(path.join(__dirname,'../web',asset))).digest('hex').slice(0,12);
     assert.ok(html.includes('/'+asset+'?v='+hash),'Run python3 scripts/version_web_assets.py after editing '+asset);
     let intercepted=false;

@@ -1,0 +1,1411 @@
+{
+  "version": "official-restaurants-2026-10-06-v1",
+  "synthetic": false,
+  "packs": [
+    {
+      "version": "official-restaurants-madrid-2026-10-06-v1",
+      "city": "madrid",
+      "synthetic": false,
+      "places": [
+        {
+          "external_id": "casa-ciriaco-mayor84",
+          "name": "카사 시리아코",
+          "native_name": "Casa Ciriaco",
+          "address": "Calle Mayor, 84, 28013 Madrid",
+          "category": "restaurant",
+          "canonical_url": "https://www.esmadrid.com/restaurantes/casa-ciriaco",
+          "neighborhood": null,
+          "tags": [
+            "마드리드 요리",
+            "타파스",
+            "전통 음식"
+          ],
+          "recommendation_types": [
+            "local_discovery"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "main",
+              "url": "https://www.esmadrid.com/restaurantes/casa-ciriaco",
+              "source_type": "tourism",
+              "source_group": "www.esmadrid.com",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 페이지에서 상호·지점 주소와 아래 기초 사실을 직접 확인하고 짧게 정리함. 사진·리뷰·원문 전문·지도 데이터는 복제하지 않음. 실제 잔여석과 주민 비율은 확인하지 않음."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "restaurant",
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "tags",
+              "value": [
+                "마드리드 요리",
+                "타파스",
+                "전통 음식"
+              ],
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "opening_hours",
+              "value": {
+                "timezone": "Europe/Madrid",
+                "scope": "published_regular_schedule",
+                "weekly": {
+                  "monday": [
+                    {
+                      "start": "09:00",
+                      "end": "23:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "tuesday": [
+                    {
+                      "start": "09:00",
+                      "end": "23:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "wednesday": [
+                    {
+                      "start": "09:00",
+                      "end": "23:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "thursday": [
+                    {
+                      "start": "09:00",
+                      "end": "23:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "friday": [
+                    {
+                      "start": "09:00",
+                      "end": "23:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "saturday": [
+                    {
+                      "start": "09:00",
+                      "end": "23:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "sunday": [
+                    {
+                      "start": "09:00",
+                      "end": "23:00",
+                      "end_day_offset": 0
+                    }
+                  ]
+                },
+                "exceptions": [],
+                "notes": [
+                  "마드리드 공식 관광청이 소개하는 전통 요리 식당이에요. 현지인 비율을 확인한 것은 아니에요."
+                ]
+              },
+              "status": "provisional",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-10-13T09:26:06.664465+00:00"
+            },
+            {
+              "field": "reservation_methods",
+              "value": [
+                "공식 안내 페이지의 식당 홈페이지에서 예약 방법을 확인해 주세요."
+              ],
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "reservation_url",
+              "value": "https://www.esmadrid.com/restaurantes/casa-ciriaco",
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "local_evidence",
+              "value": {
+                "source_groups": [
+                  "www.esmadrid.com"
+                ],
+                "direct_confirmation": false,
+                "summary": "마드리드 공식 관광청이 소개하는 전통 요리 식당이에요. 현지인 비율을 확인한 것은 아니에요."
+              },
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "casa-lucio-cavabaja35",
+          "name": "카사 루시오",
+          "native_name": "Casa Lucio",
+          "address": "Cava Baja 35, 28005 Madrid",
+          "category": "restaurant",
+          "canonical_url": "https://casalucio.es/",
+          "neighborhood": null,
+          "tags": [
+            "스페인 요리",
+            "전통 음식"
+          ],
+          "recommendation_types": [
+            "local_discovery"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "main",
+              "url": "https://casalucio.es/",
+              "source_type": "official",
+              "source_group": "casalucio.es",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 페이지에서 상호·지점 주소와 아래 기초 사실을 직접 확인하고 짧게 정리함. 사진·리뷰·원문 전문·지도 데이터는 복제하지 않음. 실제 잔여석과 주민 비율은 확인하지 않음."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "restaurant",
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "tags",
+              "value": [
+                "스페인 요리",
+                "전통 음식"
+              ],
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "opening_hours",
+              "value": {
+                "timezone": "Europe/Madrid",
+                "scope": "published_regular_schedule",
+                "weekly": {
+                  "monday": [
+                    {
+                      "start": "13:00",
+                      "end": "16:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "20:00",
+                      "end": "23:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "tuesday": [
+                    {
+                      "start": "13:00",
+                      "end": "16:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "20:00",
+                      "end": "23:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "wednesday": [
+                    {
+                      "start": "13:00",
+                      "end": "16:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "20:00",
+                      "end": "23:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "thursday": [
+                    {
+                      "start": "13:00",
+                      "end": "16:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "20:00",
+                      "end": "23:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "friday": [
+                    {
+                      "start": "13:00",
+                      "end": "16:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "20:00",
+                      "end": "23:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "saturday": [
+                    {
+                      "start": "13:00",
+                      "end": "16:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "20:00",
+                      "end": "23:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "sunday": [
+                    {
+                      "start": "13:00",
+                      "end": "16:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "20:00",
+                      "end": "23:30",
+                      "end_day_offset": 0
+                    }
+                  ]
+                },
+                "exceptions": [],
+                "notes": [
+                  "공식 통상 영업시간이에요. 8월 휴가 및 연말·연초 일부 저녁 휴무가 별도로 안내되어 있어요. 방문일을 다시 확인해 주세요."
+                ]
+              },
+              "status": "provisional",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-10-13T09:26:06.664465+00:00"
+            },
+            {
+              "field": "reservation_methods",
+              "value": [
+                "공식 홈페이지의 예약 메뉴에서 요청할 수 있어요. 확정 여부는 식당 답변을 확인해 주세요."
+              ],
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "reservation_url",
+              "value": "https://casalucio.es/",
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "botin-cuchilleros17",
+          "name": "보틴",
+          "native_name": "Sobrino de Botín",
+          "address": "Calle de Cuchilleros, 17, 28005 Madrid",
+          "category": "restaurant",
+          "canonical_url": "https://www.esmadrid.com/restaurantes/botin",
+          "neighborhood": null,
+          "tags": [
+            "카스티야 요리",
+            "로스트 요리",
+            "역사 있는 식당"
+          ],
+          "recommendation_types": [
+            "landmark"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "main",
+              "url": "https://www.esmadrid.com/restaurantes/botin",
+              "source_type": "tourism",
+              "source_group": "www.esmadrid.com",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 페이지에서 상호·지점 주소와 아래 기초 사실을 직접 확인하고 짧게 정리함. 사진·리뷰·원문 전문·지도 데이터는 복제하지 않음. 실제 잔여석과 주민 비율은 확인하지 않음."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "restaurant",
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "tags",
+              "value": [
+                "카스티야 요리",
+                "로스트 요리",
+                "역사 있는 식당"
+              ],
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "opening_hours",
+              "value": {
+                "timezone": "Europe/Madrid",
+                "scope": "published_regular_schedule",
+                "weekly": {
+                  "monday": [
+                    {
+                      "start": "13:00",
+                      "end": "16:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "20:00",
+                      "end": "00:00",
+                      "end_day_offset": 1
+                    }
+                  ],
+                  "tuesday": [
+                    {
+                      "start": "13:00",
+                      "end": "16:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "20:00",
+                      "end": "00:00",
+                      "end_day_offset": 1
+                    }
+                  ],
+                  "wednesday": [
+                    {
+                      "start": "13:00",
+                      "end": "16:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "20:00",
+                      "end": "00:00",
+                      "end_day_offset": 1
+                    }
+                  ],
+                  "thursday": [
+                    {
+                      "start": "13:00",
+                      "end": "16:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "20:00",
+                      "end": "00:00",
+                      "end_day_offset": 1
+                    }
+                  ],
+                  "friday": [
+                    {
+                      "start": "13:00",
+                      "end": "16:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "20:00",
+                      "end": "00:00",
+                      "end_day_offset": 1
+                    }
+                  ],
+                  "saturday": [
+                    {
+                      "start": "13:00",
+                      "end": "16:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "20:00",
+                      "end": "00:00",
+                      "end_day_offset": 1
+                    }
+                  ],
+                  "sunday": [
+                    {
+                      "start": "13:00",
+                      "end": "16:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "20:00",
+                      "end": "00:00",
+                      "end_day_offset": 1
+                    }
+                  ]
+                },
+                "exceptions": [],
+                "notes": [
+                  "마드리드 공식 관광청이 역사 있는 카스티야 요리 식당으로 소개해요."
+                ]
+              },
+              "status": "provisional",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-10-13T09:26:06.664465+00:00"
+            },
+            {
+              "field": "reservation_methods",
+              "value": [
+                "공식 관광청에 연결된 식당 홈페이지에서 예약을 확인해 주세요."
+              ],
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "reservation_url",
+              "value": "https://www.esmadrid.com/restaurantes/botin",
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "local_evidence",
+              "value": {
+                "source_groups": [
+                  "www.esmadrid.com"
+                ],
+                "direct_confirmation": false,
+                "summary": "마드리드 공식 관광청이 역사 있는 카스티야 요리 식당으로 소개해요."
+              },
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "iconic_evidence",
+              "value": {
+                "source_groups": [
+                  "www.esmadrid.com"
+                ],
+                "level": "city",
+                "summary": "마드리드 관광청이 소개하는 역사 있는 식당이에요."
+              },
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "official-restaurants-barcelona-2026-10-06-v1",
+      "city": "barcelona",
+      "synthetic": false,
+      "places": [
+        {
+          "external_id": "can-culleretes-quintana5",
+          "name": "칸 쿨레레테스",
+          "native_name": "Can Culleretes",
+          "address": "Carrer d’en Quintana, 5, 08002 Barcelona",
+          "category": "restaurant",
+          "canonical_url": "https://culleretes.com/en/contact/",
+          "neighborhood": null,
+          "tags": [
+            "역사 있는 식당"
+          ],
+          "recommendation_types": [
+            "local_discovery"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "main",
+              "url": "https://culleretes.com/en/contact/",
+              "source_type": "official",
+              "source_group": "culleretes.com",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 페이지에서 상호·지점 주소와 아래 기초 사실을 직접 확인하고 짧게 정리함. 사진·리뷰·원문 전문·지도 데이터는 복제하지 않음. 실제 잔여석과 주민 비율은 확인하지 않음."
+            },
+            {
+              "key": "details",
+              "url": "https://culleretes.com/en/",
+              "source_type": "official",
+              "source_group": "culleretes.com",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "예약 방법과 통상 시간표를 직접 확인. 방문일의 영업·인원별 잔여석 확정이 아님."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "restaurant",
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "tags",
+              "value": [
+                "역사 있는 식당"
+              ],
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "opening_hours",
+              "value": {
+                "timezone": "Europe/Madrid",
+                "scope": "published_regular_schedule",
+                "weekly": {
+                  "monday": [],
+                  "tuesday": [
+                    {
+                      "start": "13:00",
+                      "end": "15:45",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "wednesday": [
+                    {
+                      "start": "13:00",
+                      "end": "15:45",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "thursday": [
+                    {
+                      "start": "13:00",
+                      "end": "15:45",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "20:00",
+                      "end": "22:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "friday": [
+                    {
+                      "start": "13:00",
+                      "end": "15:45",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "20:00",
+                      "end": "22:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "saturday": [
+                    {
+                      "start": "13:00",
+                      "end": "15:45",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "20:00",
+                      "end": "22:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "sunday": [
+                    {
+                      "start": "13:00",
+                      "end": "15:45",
+                      "end_day_offset": 0
+                    }
+                  ]
+                },
+                "exceptions": [],
+                "notes": [
+                  "월요일 점심은 공휴일 예외가 있어요. 일요일~수요일 저녁은 휴무 안내가 있어요."
+                ]
+              },
+              "status": "provisional",
+              "source_key": "details",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-10-13T09:26:06.664465+00:00"
+            },
+            {
+              "field": "reservation_methods",
+              "value": [
+                "공식 홈페이지의 양식으로 예약을 요청해요.",
+                "6명을 넘으면 전화나 이메일로 문의하라는 안내가 있어요. 최대 수용 인원을 뜻하지 않아요."
+              ],
+              "status": "verified",
+              "source_key": "details",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "reservation_url",
+              "value": "https://culleretes.com/en/",
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "bar-la-plata-merce28",
+          "name": "바 라 플라타",
+          "native_name": "Bar La Plata",
+          "address": "Carrer de la Mercè, 28, 08002 Barcelona",
+          "category": "restaurant",
+          "canonical_url": "https://barlaplata.com/ubicacion-y-contacto/",
+          "neighborhood": null,
+          "tags": [
+            "타파스"
+          ],
+          "recommendation_types": [
+            "local_discovery"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "main",
+              "url": "https://barlaplata.com/ubicacion-y-contacto/",
+              "source_type": "official",
+              "source_group": "barlaplata.com",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 페이지에서 상호·지점 주소와 아래 기초 사실을 직접 확인하고 짧게 정리함. 사진·리뷰·원문 전문·지도 데이터는 복제하지 않음. 실제 잔여석과 주민 비율은 확인하지 않음."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "restaurant",
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "tags",
+              "value": [
+                "타파스"
+              ],
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "opening_hours",
+              "value": {
+                "timezone": "Europe/Madrid",
+                "scope": "published_regular_schedule",
+                "weekly": {
+                  "monday": [
+                    {
+                      "start": "11:00",
+                      "end": "15:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "18:00",
+                      "end": "23:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "tuesday": [
+                    {
+                      "start": "11:00",
+                      "end": "15:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "18:00",
+                      "end": "23:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "wednesday": [
+                    {
+                      "start": "11:00",
+                      "end": "15:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "18:00",
+                      "end": "23:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "thursday": [
+                    {
+                      "start": "11:00",
+                      "end": "15:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "18:00",
+                      "end": "23:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "friday": [
+                    {
+                      "start": "11:00",
+                      "end": "15:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "18:00",
+                      "end": "23:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "saturday": [
+                    {
+                      "start": "11:00",
+                      "end": "15:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "18:00",
+                      "end": "23:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "sunday": []
+                },
+                "exceptions": [],
+                "notes": [
+                  "일요일과 공휴일은 쉬는 것으로 안내되어 있어요. 방문일에 다시 확인해 주세요."
+                ]
+              },
+              "status": "provisional",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-10-13T09:26:06.664465+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "7-portes-isabel14",
+          "name": "세븐 포르테스",
+          "native_name": "7 Portes",
+          "address": "Passeig Isabel II, 14, 08003 Barcelona",
+          "category": "restaurant",
+          "canonical_url": "https://7portes.com/en/",
+          "neighborhood": null,
+          "tags": [
+            "카탈루냐 요리",
+            "파에야",
+            "지중해 요리"
+          ],
+          "recommendation_types": [
+            "landmark"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "main",
+              "url": "https://7portes.com/en/",
+              "source_type": "official",
+              "source_group": "7portes.com",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 페이지에서 상호·지점 주소와 아래 기초 사실을 직접 확인하고 짧게 정리함. 사진·리뷰·원문 전문·지도 데이터는 복제하지 않음. 실제 잔여석과 주민 비율은 확인하지 않음."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "restaurant",
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "tags",
+              "value": [
+                "카탈루냐 요리",
+                "파에야",
+                "지중해 요리"
+              ],
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "opening_hours",
+              "value": {
+                "timezone": "Europe/Madrid",
+                "scope": "published_regular_schedule",
+                "weekly": {
+                  "monday": [
+                    {
+                      "start": "13:00",
+                      "end": "00:00",
+                      "end_day_offset": 1
+                    }
+                  ],
+                  "tuesday": [
+                    {
+                      "start": "13:00",
+                      "end": "00:00",
+                      "end_day_offset": 1
+                    }
+                  ],
+                  "wednesday": [
+                    {
+                      "start": "13:00",
+                      "end": "00:00",
+                      "end_day_offset": 1
+                    }
+                  ],
+                  "thursday": [
+                    {
+                      "start": "13:00",
+                      "end": "00:00",
+                      "end_day_offset": 1
+                    }
+                  ],
+                  "friday": [
+                    {
+                      "start": "13:00",
+                      "end": "00:00",
+                      "end_day_offset": 1
+                    }
+                  ],
+                  "saturday": [
+                    {
+                      "start": "13:00",
+                      "end": "00:00",
+                      "end_day_offset": 1
+                    }
+                  ],
+                  "sunday": [
+                    {
+                      "start": "13:00",
+                      "end": "00:00",
+                      "end_day_offset": 1
+                    }
+                  ]
+                },
+                "exceptions": [],
+                "notes": []
+              },
+              "status": "provisional",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-10-13T09:26:06.664465+00:00"
+            },
+            {
+              "field": "reservation_methods",
+              "value": [
+                "공식 홈페이지의 Book a table에서 예약을 요청할 수 있어요. 잔여석은 따로 확인해 주세요."
+              ],
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "reservation_url",
+              "value": "https://7portes.com/en/",
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "official-restaurants-tokyo-2026-10-06-v1",
+      "city": "tokyo",
+      "synthetic": false,
+      "places": [
+        {
+          "external_id": "kanda-matsuya-sudacho",
+          "name": "간다 마쓰야",
+          "native_name": "神田まつや",
+          "address": "東京都千代田区神田須田町1-13",
+          "category": "restaurant",
+          "canonical_url": "https://visit-chiyoda.tokyo/app/spot/detail/359",
+          "neighborhood": null,
+          "tags": [
+            "소바",
+            "역사 있는 식당"
+          ],
+          "recommendation_types": [
+            "local_discovery"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "main",
+              "url": "https://visit-chiyoda.tokyo/app/spot/detail/359",
+              "source_type": "tourism",
+              "source_group": "visit-chiyoda.tokyo",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 페이지에서 상호·지점 주소와 아래 기초 사실을 직접 확인하고 짧게 정리함. 사진·리뷰·원문 전문·지도 데이터는 복제하지 않음. 실제 잔여석과 주민 비율은 확인하지 않음."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "restaurant",
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "tags",
+              "value": [
+                "소바",
+                "역사 있는 식당"
+              ],
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "opening_hours",
+              "value": {
+                "timezone": "Asia/Tokyo",
+                "scope": "published_regular_schedule",
+                "weekly": {
+                  "monday": [
+                    {
+                      "start": "11:00",
+                      "end": "20:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "tuesday": [
+                    {
+                      "start": "11:00",
+                      "end": "20:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "wednesday": [
+                    {
+                      "start": "11:00",
+                      "end": "20:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "thursday": [
+                    {
+                      "start": "11:00",
+                      "end": "20:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "friday": [
+                    {
+                      "start": "11:00",
+                      "end": "20:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "saturday": [
+                    {
+                      "start": "11:00",
+                      "end": "19:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "sunday": []
+                },
+                "exceptions": [],
+                "notes": [
+                  "치요다구 관광협회가 소개하는 간다의 소바 식당이에요. 공휴일은 토요일 시간표를 안내해요. 마지막 주문은 평일20시·토요일/공휴일19시예요."
+                ]
+              },
+              "status": "provisional",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-10-13T09:26:06.664465+00:00"
+            },
+            {
+              "field": "local_evidence",
+              "value": {
+                "source_groups": [
+                  "visit-chiyoda.tokyo"
+                ],
+                "direct_confirmation": false,
+                "summary": "치요다구 관광협회가 소개하는 간다의 소바 식당이에요. 공휴일은 토요일 시간표를 안내해요. 마지막 주문은 평일20시·토요일/공휴일19시예요."
+              },
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "nihonbashi-tamai-honten",
+          "name": "니혼바시 타마이 본점",
+          "native_name": "日本橋 玉ゐ 本店",
+          "address": "東京都中央区日本橋2-9-9",
+          "category": "restaurant",
+          "canonical_url": "https://anago-tamai.com/nihonbashi/",
+          "neighborhood": null,
+          "tags": [
+            "아나고",
+            "일식"
+          ],
+          "recommendation_types": [
+            "local_discovery"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "main",
+              "url": "https://anago-tamai.com/nihonbashi/",
+              "source_type": "official",
+              "source_group": "anago-tamai.com",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 페이지에서 상호·지점 주소와 아래 기초 사실을 직접 확인하고 짧게 정리함. 사진·리뷰·원문 전문·지도 데이터는 복제하지 않음. 실제 잔여석과 주민 비율은 확인하지 않음."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "restaurant",
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "tags",
+              "value": [
+                "아나고",
+                "일식"
+              ],
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "opening_hours",
+              "value": {
+                "timezone": "Asia/Tokyo",
+                "scope": "published_regular_schedule",
+                "weekly": {
+                  "monday": [
+                    {
+                      "start": "11:00",
+                      "end": "14:30",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "17:00",
+                      "end": "21:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "tuesday": [
+                    {
+                      "start": "11:00",
+                      "end": "14:30",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "17:00",
+                      "end": "21:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "wednesday": [
+                    {
+                      "start": "11:00",
+                      "end": "14:30",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "17:00",
+                      "end": "21:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "thursday": [
+                    {
+                      "start": "11:00",
+                      "end": "14:30",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "17:00",
+                      "end": "21:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "friday": [
+                    {
+                      "start": "11:00",
+                      "end": "14:30",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "17:00",
+                      "end": "21:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "saturday": [
+                    {
+                      "start": "11:00",
+                      "end": "15:30",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "16:30",
+                      "end": "21:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "sunday": [
+                    {
+                      "start": "11:00",
+                      "end": "15:30",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "16:30",
+                      "end": "21:00",
+                      "end_day_offset": 0
+                    }
+                  ]
+                },
+                "exceptions": [],
+                "notes": [
+                  "공휴일은 주말 시간표예요. 마지막 주문은 각 영업 종료30분 전으로 안내돼요."
+                ]
+              },
+              "status": "provisional",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-10-13T09:26:06.664465+00:00"
+            },
+            {
+              "field": "reservation_methods",
+              "value": [
+                "공식 본점 안내상 저녁에만 전화 예약이 가능해요."
+              ],
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "reservation_url",
+              "value": "https://anago-tamai.com/nihonbashi/",
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "facility_capacity",
+              "value": 25,
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "daikokuya-asakusa13810",
+          "name": "다이코쿠야 본점",
+          "native_name": "大黒家",
+          "address": "東京都台東区浅草1-38-10",
+          "category": "restaurant",
+          "canonical_url": "https://asakusa-shoren.jp/stores/819/",
+          "neighborhood": null,
+          "tags": [
+            "덴동",
+            "튀김",
+            "역사 있는 식당"
+          ],
+          "recommendation_types": [
+            "landmark"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "main",
+              "url": "https://asakusa-shoren.jp/stores/819/",
+              "source_type": "tourism",
+              "source_group": "asakusa-shoren.jp",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 페이지에서 상호·지점 주소와 아래 기초 사실을 직접 확인하고 짧게 정리함. 사진·리뷰·원문 전문·지도 데이터는 복제하지 않음. 실제 잔여석과 주민 비율은 확인하지 않음."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "restaurant",
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "tags",
+              "value": [
+                "덴동",
+                "튀김",
+                "역사 있는 식당"
+              ],
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            },
+            {
+              "field": "opening_hours",
+              "value": {
+                "timezone": "Asia/Tokyo",
+                "scope": "published_regular_schedule",
+                "weekly": {
+                  "monday": [
+                    {
+                      "start": "11:00",
+                      "end": "20:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "tuesday": [
+                    {
+                      "start": "11:00",
+                      "end": "20:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "wednesday": [
+                    {
+                      "start": "11:00",
+                      "end": "20:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "thursday": [
+                    {
+                      "start": "11:00",
+                      "end": "20:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "friday": [
+                    {
+                      "start": "11:00",
+                      "end": "20:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "saturday": [
+                    {
+                      "start": "11:00",
+                      "end": "20:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "sunday": [
+                    {
+                      "start": "11:00",
+                      "end": "20:00",
+                      "end_day_offset": 0
+                    }
+                  ]
+                },
+                "exceptions": [],
+                "notes": [
+                  "아사쿠사 상점연합회가 본점 주소와 덴동을 소개해요. 식당 자체 홈페이지는 이번 확인에서 응답하지 않았어요."
+                ]
+              },
+              "status": "provisional",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-10-13T09:26:06.664465+00:00"
+            },
+            {
+              "field": "local_evidence",
+              "value": {
+                "source_groups": [
+                  "asakusa-shoren.jp"
+                ],
+                "direct_confirmation": false,
+                "summary": "아사쿠사 상점연합회가 본점 주소와 덴동을 소개해요. 식당 자체 홈페이지는 이번 확인에서 응답하지 않았어요."
+              },
+              "status": "verified",
+              "source_key": "main",
+              "checked_at": "2026-10-06T09:26:06.664465+00:00",
+              "expires_at": "2026-11-05T09:26:06.664465+00:00"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

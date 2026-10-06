@@ -150,9 +150,13 @@ class Recommendations:
                 con.execute('BEGIN IMMEDIATE');ctx.guard(con=con)
                 con.execute('UPDATE recommendation_runs SET candidates_json=?,manifest_hash=?,data_status=? WHERE id=?',
                     (dump(candidates),digest(candidates),'captured',ident))
-        ctx.checkpoint({'candidate_snapshot':ident},stage='constraints_and_scoring',done=0,total=len(candidates))
+        ctx.checkpoint({'candidate_snapshot':ident},stage='candidate_snapshot',done=1,total=1)
         snapshot=self._routes(actor,trip_id,ident,snapshot,candidates,ctx)
+        ctx.progress('constraints_and_scoring',done=0,total=len(candidates))
         result=recommend(snapshot,candidates,now=datetime.fromisoformat(snapshot['evaluation_at']))
+        ctx.progress('constraints_and_scoring',done=len(candidates),total=len(candidates))
+        from .presentation import summarize
+        result['summary']=summarize(snapshot,candidates,result)
         result['route_status']=snapshot.get('route_stats',{'provider_calls':0,'reason':'ROUTE_PROVIDER_DISABLED'})
         result['origin_context']=deepcopy(snapshot.get('origin_context'))
         result['external_discovery']={'state':'unavailable','reason':'EXTERNAL_DISCOVERY_NOT_CONFIGURED','calls':0,'cost':None}
@@ -161,8 +165,10 @@ class Recommendations:
         result.setdefault('unsupported_constraints',[])
         # No external work was performed, but both deletion and evidence may
         # still change concurrently with a CPU-bound calculation.
+        ctx.progress('source_revalidation',done=0,total=1)
         if digest(self._catalog(actor,trip_id,snapshot['conditions']['city']))!=digest(candidates):
             raise DomainError('SOURCE_DATA_CHANGED','자료가 변경되어 이전 결과를 적용하지 않았습니다.',409)
+        ctx.progress('source_revalidation',done=1,total=1)
         with self.db.connect() as con:
             con.execute('BEGIN IMMEDIATE');ctx.guard(con=con)
             self._guard_catalog(con,actor,trip_id,snapshot['conditions']['city'],candidates)
@@ -177,7 +183,11 @@ class Recommendations:
 
     def _routes(self,actor,trip_id,ident,snapshot,candidates,ctx):
         """Collect a bounded matrix only inside the explicit recommendation job."""
-        if 'route_evidence' in snapshot or snapshot.get('movement_version')!='v2':return snapshot
+        if 'route_evidence' in snapshot or snapshot.get('movement_version')!='v2':
+            elements=len(snapshot.get('route_evidence') or {})
+            ctx.progress('route_snapshot',done=elements,total=elements)
+            return snapshot
+        ctx.progress('route_snapshot',done=0,total=0)
         from .engine import route_candidates,endpoint_version
         origin=(snapshot.get('origin_context') or {}).get('origin') or snapshot['conditions'].get('origin')
         conditions=snapshot['conditions'];now=datetime.fromisoformat(snapshot['evaluation_at'])
@@ -190,6 +200,7 @@ class Recommendations:
             endpoints=[{'id':p['place_id'],'version':endpoint_version(p),'latitude':p['latitude'],'longitude':p['longitude'],'coordinate_permitted':True} for p in filtered]
             source={'id':origin.get('accommodation_id') or origin.get('place_id') or 'manual-origin','version':(snapshot.get('origin_context') or {}).get('origin_version') or 'manual-v1','latitude':origin['latitude'],'longitude':origin['longitude'],'coordinate_permitted':True}
             if endpoints:
+                ctx.progress('route_snapshot',done=0,total=len(endpoints))
                 try:
                     from src.foundation.models import local_to_instant
                     visit=conditions['visit']

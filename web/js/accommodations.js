@@ -39,18 +39,33 @@
   function render(){
     if(!ui)return;
     for(const selector of ['#homeOrigin','#exploreOrigin']){
-      const host=document.querySelector(selector);if(!host)continue;const prior=host.contains(document.activeElement)?document.activeElement.dataset.action:null;host.replaceChildren();host.hidden=!active();if(!active())continue;
-      const {make,button}=ui;const top=make('div','stay-summary-row'),copy=make('div','stay-summary-copy');copy.append(make('p','eyebrow','방문일의 출발점'));
-      const title=context?.status==='ready'&&context.origin?context.origin.label:items.length?'숙소 저장됨 · 위치 확인 필요':'숙소를 기준으로 가볍게 탐색';
-      copy.append(make('h3','',title));const detail=context?.error||reasons[context?.reason_codes?.[0]]||(context?.status==='ready'?'이 출발점으로 거리와 이동을 확인합니다. 숙박 예약 완료를 뜻하지는 않아요.':loading?'저장된 숙소를 불러오는 중…':'이름이나 지도 링크만 저장하세요. 날짜는 여행에서 가져옵니다.');copy.append(make('p','hint',detail));
-      const actions=make('div','actions');const manage=button(items.length?`숙소 관리 (${items.length})`:'숙소 추가',()=>items.length?manager():editor(),'secondary');manage.dataset.action='manage';actions.append(manage);const fast=button('숙소 근처 저녁',dinner,'primary');fast.dataset.action='dinner';actions.append(fast);top.append(copy,actions);host.append(top);
-      const draft=ui.ensureDiscoveryDraft();if(selector==='#exploreOrigin'&&draft){
+      const host=document.querySelector(selector);if(!host)continue;
+      const prior=host.contains(document.activeElement)?document.activeElement.dataset.action:null;
+      const optionsOpen=Boolean(host.querySelector('.stay-options')?.open);
+      host.replaceChildren();host.hidden=!active();if(!active())continue;
+      const {make,button}=ui;const top=make('div','stay-summary-row'),copy=make('div','stay-summary-copy');
+      const ready=context?.status==='ready'&&context.origin;
+      const explicitlyUnset=context?.reason_codes?.includes('ORIGIN_EXPLICITLY_UNSET');
+      const title=explicitlyUnset?'출발점 없이 탐색':ready?context.origin.label||'직접 선택한 출발점':items.length===1?items[0].display_name||'저장한 숙소':items.length?`저장한 숙소 ${items.length}곳`:'숙소 없이 탐색';
+      const detail=context?.error||reasons[context?.reason_codes?.[0]]||(ready?'이 출발점으로 거리와 이동을 확인합니다. 숙박 예약 완료를 뜻하지는 않아요.':loading?'저장된 숙소를 불러오는 중…':'이름이나 지도 링크만 저장하세요. 날짜는 여행에서 가져옵니다.');
+      const needsAction=context?.error||(context?.reason_codes||[]).some(code=>!['ACCOMMODATION_NOT_ADDED','ACCOMMODATION_LOCATION_UNKNOWN','ORIGIN_EXPLICITLY_UNSET'].includes(code));
+      const brief=loading?'저장된 숙소를 불러오는 중…':explicitlyUnset?'출발점을 사용하지 않아요. 이동시간은 미확인이에요.':needsAction?detail:ready?'방문일의 출발점 · 숙박 예약 확인은 별도예요.':items.length?'위치 미확인 · 숙소 없이도 추천받을 수 있어요.':'숙소 없이도 일반 추천을 볼 수 있어요.';
+      copy.append(make('h3','',title),make('p','hint',brief));
+      const actions=make('div','actions');const manage=button(items.length?'숙소 관리':'숙소 추가',()=>items.length?manager():editor(),'secondary');manage.dataset.action='manage';actions.append(manage);top.append(copy,actions);host.append(top);
+      const draft=ui.ensureDiscoveryDraft();
+      const options=make('details','stay-options');options.open=optionsOpen;
+      const summary=make('summary');summary.dataset.action='options';summary.append(make('span','','출발점·거리 옵션'));
+      if(draft?.conditions.distance_filter||draft?.conditions.radius_m!=null)summary.append(make('span','stay-option-hint','거리 제한 적용 중'));
+      else if(draft?.conditions.prefer_nearby)summary.append(make('span','stay-option-hint','가까운 곳 우선'));
+      options.append(summary,make('p','hint',detail));
+      if(selector==='#exploreOrigin'&&draft){
         const controls=make('div','stay-explore-controls');
         if(items.length){const label=make('label','','이번 방문의 출발점');const select=make('select');select.dataset.action='origin';select.setAttribute('aria-label','이번 방문의 출발점');select.append(new Option('날짜에 맞는 숙소 자동 선택','automatic'));for(const stay of items.filter(x=>!draft.stop_id||x.stop_id===draft.stop_id))select.append(new Option(`${stay.display_name} · ${labels[stay.identity_state]}`,stay.id));select.append(new Option('출발점 없이 탐색','none'));if(draft.conditions.origin_selection?.kind==='manual')select.append(new Option('직접 입력한 출발점','manual'));select.value=draft.conditions.origin_selection?.accommodation_id||draft.conditions.origin_selection?.kind||'automatic';select.addEventListener('change',()=>{const stay=items.find(x=>x.id===select.value);mutateDraft({origin_selection:stay?{kind:'accommodation',accommodation_id:stay.id,expected_version:stay.version}:{kind:select.value}});});label.append(select);controls.append(label);}
-        const filterLabel=make('label','','거리 조건');const filter=make('select');filter.dataset.action='distance';filter.setAttribute('aria-label','거리 조건');const options=[['none','거리 제한 없음'],['straight_line','직선거리 1km 이내'],['walking','도보 15분 이내 · 경로 확인 필요']];for(const [value,label]of options)filter.append(new Option(label,value));const current=draft.conditions.distance_filter;if(current&&(current.kind==='straight_line'&&current.max_distance_m!==1000||current.kind==='walking'&&current.max_duration_minutes!==15))filter.append(new Option(current.kind==='walking'?`도보 ${current.max_duration_minutes}분 이내`:`직선거리 ${current.max_distance_m}m 이내`,'custom'));filter.value=current?(current.kind==='straight_line'&&current.max_distance_m!==1000||current.kind==='walking'&&current.max_duration_minutes!==15?'custom':current.kind):'none';filter.addEventListener('change',()=>{if(filter.value==='custom')return;mutateDraft({distance_filter:filter.value==='none'?null:filter.value==='walking'?{kind:'walking',max_duration_minutes:15}:{kind:'straight_line',max_distance_m:1000}});});filterLabel.append(filter);controls.append(filterLabel);host.append(controls);
-        if(draft.conditions.radius_m!=null)host.append(make('p','hint',`기존 직선 반경 ${draft.conditions.radius_m}m 조건도 유지 중입니다. 변경은 필터에서 할 수 있어요.`));
-        if(draft.conditions.prefer_nearby)host.append(make('p','stay-draft-note','가까운 곳 우선'+(draft.conditions.meal_time==='dinner'?' · 저녁 18:00':'')+(ui.state.discovery.dirty?' · 추천 보기를 누르면 적용':' · 현재 추천 조건')));
+        const filterLabel=make('label','','거리 조건');const filter=make('select');filter.dataset.action='distance';filter.setAttribute('aria-label','거리 조건');const filterOptions=[['none','거리 제한 없음'],['straight_line','직선거리 1km 이내'],['walking','도보 15분 이내 · 경로 확인 필요']];for(const [value,label]of filterOptions)filter.append(new Option(label,value));const current=draft.conditions.distance_filter;if(current&&(current.kind==='straight_line'&&current.max_distance_m!==1000||current.kind==='walking'&&current.max_duration_minutes!==15))filter.append(new Option(current.kind==='walking'?`도보 ${current.max_duration_minutes}분 이내`:`직선거리 ${current.max_distance_m}m 이내`,'custom'));filter.value=current?(current.kind==='straight_line'&&current.max_distance_m!==1000||current.kind==='walking'&&current.max_duration_minutes!==15?'custom':current.kind):'none';filter.addEventListener('change',()=>{if(filter.value==='custom')return;mutateDraft({distance_filter:filter.value==='none'?null:filter.value==='walking'?{kind:'walking',max_duration_minutes:15}:{kind:'straight_line',max_distance_m:1000}});});filterLabel.append(filter);controls.append(filterLabel);options.append(controls);
+        if(draft.conditions.radius_m!=null)options.append(make('p','hint',`기존 직선 반경 ${draft.conditions.radius_m}m 조건도 유지 중입니다. 변경은 필터에서 할 수 있어요.`));
+        if(draft.conditions.prefer_nearby)options.append(make('p','stay-draft-note','가까운 곳 우선'+(draft.conditions.meal_time==='dinner'?' · 저녁 18:00':'')+(ui.state.discovery.dirty?' · 추천 보기를 누르면 적용':' · 현재 추천 조건')));
       }
+      const shortcuts=make('div','actions stay-option-actions');const fast=button('숙소 근처 저녁',dinner,'secondary');fast.dataset.action='dinner';shortcuts.append(fast);options.append(shortcuts);host.append(options);
       if(prior)host.querySelector(`[data-action="${prior}"]`)?.focus({preventScroll:true});
     }
   }

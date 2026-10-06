@@ -7,22 +7,23 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/icon.svg">
-<meta name="theme-color" content="#245C4F">
+<meta name="theme-color" content="#087F5B">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Travel Inbox">
-<link rel="stylesheet" href="/css/foundation.css?v=b74cc711e39d">
+<link rel="stylesheet" href="/css/foundation.css?v=20feded912e8">
+<link rel="stylesheet" href="/css/design-system.css?v=4d0faed42ef5">
 <script src="/js/offline-store.js?v=f2e23f13122c" defer></script>
 <script src="/js/product.js?v=a8fe8457aace" defer></script>
 <script src="/js/travel-tools.js?v=babbf4751245" defer></script>
-<script src="/js/accommodations.js?v=7401032ccdd4" defer></script>
-<script src="/js/foundation.js?v=240ac7a1d6e8" defer></script>
+<script src="/js/accommodations.js?v=70220802978c" defer></script>
+<script src="/js/foundation.js?v=5c2e20cf4210" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">본문으로 이동</a>
 <div id="boot" class="boot" role="status">여행 공간을 확인하고 있어요…</div>
 <main id="auth" class="auth" hidden>
   <div class="brand-mark" aria-hidden="true">↗</div>
-  <p class="eyebrow">TRAVEL INBOX · PRIVATE BETA</p>
+  <p class="eyebrow">나와 친구를 위한 여행 공간</p>
   <h1>예약은 한곳에.<br>여행은 더 가볍게.</h1>
   <p class="auth-intro">예약 메일을 정리하고, 내 여행에 대해 물어보세요.<br>초대받은 사람만 사용하는 개인 여행 공간입니다.</p>
   <form id="loginForm" class="panel auth-panel" action="/api/v2/auth/login" method="post">
@@ -42,7 +43,7 @@
   <aside class="sidebar">
     <a class="brand" href="/" aria-label="Travel Inbox 홈"><span aria-hidden="true">↗</span> Travel Inbox</a>
     <nav aria-label="주 메뉴">
-      <p class="nav-label">MY JOURNEY</p>
+      <p class="nav-label">내 여행</p>
       <button type="button" data-tab="trip" class="nav-primary" aria-current="page"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h16v11H4z M8 9V5h8v4 M9 13v3 M15 13v3"/></svg><span class="nav-text">홈</span></button>
       <button type="button" data-tab="explore" class="nav-primary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18 M16 8l-2.5 5.5L8 16l2.5-5.5z"/></svg><span class="nav-text">탐색</span></button>
       <button type="button" data-tab="itinerary" class="nav-primary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3v4 M18 3v4 M3 10h18 M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2 M7 14h3 M7 17h7"/></svg><span class="nav-text">일정</span></button>
@@ -58,7 +59,7 @@
       <button type="button" data-tab="settings" class="nav-secondary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16 M4 17h16 M8 4v6 M16 14v6"/></svg><span class="nav-text">설정</span></button>
       <button type="button" id="openMore" class="nav-more" aria-haspopup="dialog"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16 M4 12h16 M4 18h16"/></svg><span class="nav-text">더보기</span></button>
     </nav>
-    <div class="sidebar-note"><span class="private-indicator" aria-hidden="true"></span> PRIVATE TRAVEL SPACE<p>계획부터 여행의 순간까지.</p></div>
+    <div class="sidebar-note"><span class="private-indicator" aria-hidden="true"></span> 초대받은 사람만<p>계획부터 여행의 순간까지.</p></div>
   </aside>
   <div class="workspace">
     <header class="topbar">
@@ -72,7 +73,7 @@
       <div class="section-switch" data-sections="itinerary,today" hidden role="group" aria-label="일정 보기"><button type="button" data-tab="itinerary">전체 일정</button><button type="button" data-tab="today">오늘·오프라인</button></div>
       <section id="view-trip" class="view" aria-labelledby="tripTitle">
         <div class="trip-overview">
-        <div class="page-heading"><div><p class="eyebrow">YOUR JOURNEY</p><h1 id="tripTitle">나의 여행</h1><p id="tripSubtitle" class="muted"></p></div><div class="actions"><button id="editTrip" class="secondary" type="button">여행 수정</button><button id="refreshBookings" class="icon-button" type="button" aria-label="예약 새로고침">↻</button></div></div>
+        <div class="page-heading"><div><p class="eyebrow">한눈에 보는 내 여행</p><h1 id="tripTitle">나의 여행</h1><p id="tripSubtitle" class="muted"></p></div><div class="actions"><button id="editTrip" class="secondary" type="button">여행 수정</button><button id="refreshBookings" class="icon-button" type="button" aria-label="예약 새로고침">↻</button></div></div>
         <div id="tripSummary" class="summary-grid"></div></div>
         <section id="homeOrigin" class="panel stay-summary" aria-label="여행 숙소와 출발점" hidden></section>
         <div id="homePlaces" class="panel home-places" hidden></div>
@@ -80,20 +81,20 @@
 
       </section>
       <section id="view-preparation" class="view" hidden aria-labelledby="preparationTitle">
-        <div class="page-heading"><div><p class="eyebrow">BEFORE YOU GO</p><h1 id="preparationTitle">예약 준비</h1><p class="muted scope-text"></p></div><button id="newPreparation" class="primary" type="button">준비할 예약 추가</button></div>
+        <div class="page-heading"><div><p class="eyebrow">출발 전 준비</p><h1 id="preparationTitle">예약 준비</h1><p class="muted scope-text"></p></div><button id="newPreparation" class="primary" type="button">준비할 예약 추가</button></div>
         <p class="form-note">확인할 일부터 메일 증빙까지. 외부 예약·발송·결제는 실행하지 않습니다.</p>
         <button id="refreshPreparation" type="button" class="text-button">준비 목록 새로고침</button><p id="preparationError" class="error" role="alert" hidden></p><div id="preparationList" aria-live="polite"></div>
       </section>
       <section id="view-product" class="view" hidden aria-labelledby="productTitle">
-        <div class="page-heading"><div><p class="eyebrow">YOUR EXPERIENCE</p><h1 id="productTitle">기록·예상 지출</h1><p class="muted scope-text"></p></div></div>
+        <div class="page-heading"><div><p class="eyebrow">여행을 기록해요</p><h1 id="productTitle">기록·예상 지출</h1><p class="muted scope-text"></p></div></div>
         <p id="productError" class="error" role="alert" hidden></p><div id="productContent"></div><div id="productAdmin"></div>
       </section>
       <section id="view-today" class="view" hidden aria-labelledby="todayTitle">
-        <div class="page-heading"><div><p class="eyebrow">ON YOUR JOURNEY</p><h1 id="todayTitle">오늘·오프라인</h1><p class="muted scope-text"></p></div></div>
+        <div class="page-heading"><div><p class="eyebrow">ON 한눈에 보는 내 여행</p><h1 id="todayTitle">오늘·오프라인</h1><p class="muted scope-text"></p></div></div>
         <p id="todayError" class="error" role="alert" hidden></p><div id="todayContent" aria-live="polite"></div>
       </section>
       <section id="view-itinerary" class="view" aria-labelledby="itineraryTitle" hidden>
-        <div class="page-heading"><div><p class="eyebrow">A PLAN YOU CAN CHECK</p><h1 id="itineraryTitle">날짜별 여행 일정</h1><p class="muted scope-text"></p></div><button id="createItinerary" type="button" class="primary">일정 만들기</button></div>
+        <div class="page-heading"><div><p class="eyebrow">차근차근 만드는 여행</p><h1 id="itineraryTitle">날짜별 여행 일정</h1><p class="muted scope-text"></p></div><button id="createItinerary" type="button" class="primary">일정 만들기</button></div>
         <p class="form-note">저장된 일정은 여행 계획입니다. 외부 예약 완료와 다르며, 잠금 표시도 예약 확정을 뜻하지 않습니다.</p>
         <p id="itineraryError" class="banner error" role="alert" hidden></p>
         <details id="itinerarySelections" class="panel itinerary-selections disclosure"><summary><span id="itinerarySelectionTitle">일정에 넣을 장소</span><span id="itineraryCandidateCount" class="disclosure-description"></span></summary><div class="section-heading"><h2>후보와 체류시간</h2><button id="pickItineraryPlaces" type="button" class="secondary">선택·체류시간 확인</button></div><div id="itinerarySelectionSummary"></div></details>
@@ -106,7 +107,7 @@
         <section id="itineraryUnplaced" class="panel itinerary-unplaced" hidden></section>
       </section>
       <section id="view-explore" class="view" aria-labelledby="exploreTitle" hidden>
-        <div class="page-heading"><div><p class="eyebrow">YOUR PLACES, WITH CONTEXT</p><h1 id="exploreTitle">여행지 탐색</h1><p class="muted scope-text"></p></div><button id="addBookmark" type="button" class="primary">＋ 장소 저장</button></div>
+        <div class="page-heading"><div><p class="eyebrow">취향에 맞는 장소 찾기</p><h1 id="exploreTitle">여행지 탐색</h1><p class="muted scope-text"></p></div><button id="addBookmark" type="button" class="secondary">＋ 장소 저장</button></div>
         <section id="exploreOrigin" class="panel stay-summary" aria-label="탐색 출발점" hidden></section>
         <div class="section-switch" role="group" aria-label="탐색 보기"><button type="button" data-explore-view="recommend" aria-pressed="true">추천 찾기</button><button type="button" data-explore-view="saved" aria-pressed="false">저장한 장소</button></div>
         <div id="discoveryQuick" class="panel discovery-quick"></div>
@@ -144,13 +145,13 @@
         </details>
       </section>
       <section id="view-ask" class="view" aria-labelledby="askTitle" hidden>
-        <div class="page-heading"><div><p class="eyebrow">ASK YOUR TRIP</p><h1 id="askTitle">내 여행에 물어보기</h1><p class="muted scope-text"></p></div><button id="clearChat" type="button" class="text-button">대화 지우기</button></div>
+        <div class="page-heading"><div><p class="eyebrow">예약을 바탕으로 답해요</p><h1 id="askTitle">내 여행에 물어보기</h1><p class="muted scope-text"></p></div><button id="clearChat" type="button" class="text-button">대화 지우기</button></div>
         <div id="suggestions" class="chips"></div><div id="thread" class="thread" aria-live="polite" aria-relevant="additions"></div>
         <form id="questionForm" class="composer panel"><label for="question">여행 질문</label><textarea id="question" rows="2" maxlength="1000" placeholder="2일차 예약을 전부 알려줘" required></textarea><div class="composer-footer"><span class="hint">현재 여행의 예약과 출처를 확인해 답합니다.</span><button id="sendQuestion" class="primary" type="submit">질문하기 ↑</button></div><p id="questionError" class="error" role="alert" hidden></p></form>
       </section>
       <section id="view-mail" class="view" aria-labelledby="mailTitle" hidden>
 
-        <div class="page-heading"><div><p class="eyebrow">YOUR RESERVATIONS, TOGETHER</p><h1 id="mailTitle">예약</h1><p class="muted scope-text"></p></div></div>
+        <div class="page-heading"><div><p class="eyebrow">모아 보는 예약</p><h1 id="mailTitle">예약</h1><p class="muted scope-text"></p></div></div>
         <p class="form-note">처음 사용하시나요? <a href="/examples/mail-test-pack.zip" download>테스트 메일 12개 받기</a> · 합성 자료와 확인 안내가 들어 있어요. 무료 운영에서는 AI 분석이 제한될 수 있습니다.</p>
                 <div id="bookingArea">
           <div class="section-heading"><h2>예약 모아보기 <span id="bookingCount" class="count"></span></h2><button id="addBooking" class="secondary" type="button">＋ 예약 직접 추가</button></div>
@@ -163,7 +164,7 @@
         <div class="section-heading"><h2>저장된 메일</h2><button id="refreshDocuments" class="text-button" type="button">새로고침</button></div><div id="documentList"></div>
       </section>
       <section id="view-reviews" class="view" aria-labelledby="reviewTitle" hidden>
-        <div class="page-heading"><div><p class="eyebrow">RECENT REVIEW LANGUAGES</p><h1 id="reviewTitle">장소의 리뷰 근거</h1><p class="muted scope-text"></p></div><button id="refreshReviews" type="button" class="secondary">근거 새로고침</button></div>
+        <div class="page-heading"><div><p class="eyebrow">관측한 리뷰 살펴보기</p><h1 id="reviewTitle">장소의 리뷰 근거</h1><p class="muted scope-text"></p></div><button id="refreshReviews" type="button" class="secondary">근거 새로고침</button></div>
         <p class="form-note">최근 확보한 리뷰에서 어떤 원문 언어가 보이는지 확인합니다. 장소 전체 리뷰의 구성이나 현지 주민의 비율을 뜻하지 않습니다. 새로고침은 저장된 결과를 읽으며 새 수집을 시작하지 않습니다.</p>
         <p id="reviewError" class="banner error" role="alert" hidden></p>
         <div class="section-heading"><h2>이 여행의 장소</h2><button id="linkReviewPlace" type="button" class="text-button">공유받은 장소 추가</button></div>
@@ -177,7 +178,7 @@
         </section>
       </section>
       <section id="view-settings" class="view" aria-labelledby="settingsTitle" hidden>
-        <div class="page-heading"><div><p class="eyebrow">YOUR SPACE</p><h1 id="settingsTitle">설정</h1><p class="muted">계정과 화면을 관리합니다.</p></div></div>
+        <div class="page-heading"><div><p class="eyebrow">내 여행 공간</p><h1 id="settingsTitle">설정</h1><p class="muted">계정과 화면을 관리합니다.</p></div></div>
         <div class="panel settings-panel"><h2>내 계정</h2><p id="accountName"></p><p id="sessionExpiry" class="hint"></p><button id="logout" class="secondary" type="button">로그아웃</button></div>
         <div class="panel settings-panel"><h2>외부 서비스 사용량</h2><div id="usageSummary"></div><p class="hint">예산이 소진되어도 저장된 예약과 날짜별 질문은 사용할 수 있습니다. 공급자의 지연 과금과 이 앱 밖의 사용량은 여기에 포함되지 않을 수 있습니다.</p></div>
         <div class="panel settings-panel"><h2>화면</h2><label for="theme">화면 테마</label><select id="theme"><option value="auto">시스템 설정</option><option value="light">밝게</option><option value="dark">어둡게</option></select><label for="textSize" class="text-size-label">글자 크기</label><select id="textSize"><option value="normal">기본 · 100%</option><option value="large">크게 · 200%</option></select><p class="hint">이 기기의 화면 설정에만 저장됩니다.</p><button id="installApp" class="text-button" type="button">홈 화면에 추가</button></div>

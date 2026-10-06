@@ -239,13 +239,19 @@ class DiscoveryService:
             return [r[0] for r in con.execute('SELECT place_id FROM discovery_exclusions WHERE trip_id=?',(trip_id,))]
     def import_pack(self,actor,payload):
         pack=PackInput.model_validate(payload).model_dump(mode='json')
+        payload_hash=hashlib.sha256(encode(pack).encode()).hexdigest()
         for place in pack['places']:
             public_url(place['canonical_url'])
             for source in place['sources']:public_url(source['url'])
         with self.db.connect() as con:
             con.execute('BEGIN IMMEDIATE');self._admin(con,actor)
-            prior=con.execute('SELECT id FROM candidate_packs WHERE version=? AND city=?',(pack['version'],pack['city'])).fetchone()
-            if prior:return {'pack_id':prior['id'],'duplicate':True,'status':'needs_review'}
+            prior=con.execute('SELECT id,status FROM candidate_packs WHERE version=? AND city=?',(pack['version'],pack['city'])).fetchone()
+            if prior:
+                audit=con.execute("SELECT details_json FROM discovery_audit WHERE action='candidate_pack_imported' AND target_id=? ORDER BY created_at DESC LIMIT 1",(prior['id'],)).fetchone()
+                previous_hash=json.loads(audit['details_json']).get('payload_hash') if audit else None
+                if previous_hash!=payload_hash:
+                    deny('PACK_VERSION_CONFLICT','같은 후보팩 버전의 내용이 다르거나 이전 원본을 대조할 수 없습니다. 새 버전으로 검토해 주세요.')
+                return {'pack_id':prior['id'],'duplicate':True,'status':prior['status']}
             ident,stamp=new_id('pack'),now()
             con.execute('INSERT INTO candidate_packs VALUES(?,?,?,?,?,?,?,?)',(ident,pack['version'],pack['city'],int(pack['synthetic']),'needs_review',actor.id,stamp,stamp))
             provider='synthetic_editorial' if pack['synthetic'] else 'manual_official'
@@ -276,7 +282,7 @@ class DiscoveryService:
                     con.execute('INSERT INTO evidence_sources VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
                         (source_id,place_id,source['key'],source['url'],source['source_type'],source['source_group'],source['checked_at'],source['published_at'],int(source['read_confirmed']),int(source['display_permitted']),'pending',source['evidence_note'],pack['version'],actor.id,1,stamp,stamp))
                 for fact in item['facts']:self._insert_fact(con,actor,place_id,fact,source_ids,pack['version'])
-            self._audit(con,actor,'candidate_pack_imported',ident,{'version':pack['version'],'city':pack['city'],'synthetic':pack['synthetic'],'places':len(pack['places'])})
+            self._audit(con,actor,'candidate_pack_imported',ident,{'version':pack['version'],'city':pack['city'],'synthetic':pack['synthetic'],'places':len(pack['places']),'payload_hash':payload_hash})
         return {'pack_id':ident,'duplicate':False,'status':'needs_review','places':len(pack['places'])}
     def _insert_fact(self,con,actor,place_id,fact,source_ids,policy_version):
         fact=FactInput.model_validate(fact).model_dump(mode='json')
