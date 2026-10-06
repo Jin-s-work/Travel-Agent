@@ -36,3 +36,34 @@ function cardItem(patch={}){return {place_id:'p1',name:'식당',category:'restau
 test('compact cards retain important unknowns while placing method and itinerary actions in more details',()=>{const c=cardContext(),card=c.recommendationCard(cardItem(),{run_id:'r'},null),visible=card.children.filter(n=>n.tag!=='details').map(textContent).join(' '),more=card.children.find(n=>n.tag==='details'&&textContent(n).includes('더 보기'));assert.match(visible,/마드리드 요리 · 타파스/);assert.doesNotMatch(visible,/전통 음식|방문 조건과 추천 근거를 추가로|0\/3|지역 자료 기반|일정에 넣기/);assert.match(visible,/영업 미확인/);assert.match(visible,/잔여석 미확인/);assert.match(visible,/자료 확인 2026-10-06/);assert.match(visible,/상세와 예약 정보.*보관함에 저장.*비교에 추가/);assert.match(textContent(more),/지역 자료 기반/);assert.match(textContent(more),/일정에 넣기/);});
 test('card tags and fallback check dates do not promote unusable or conflicting facts',()=>{const c=cardContext();for(const facts of [[{field:'tags',status:'verified',usable:false,value:['허용 안 된 태그'],checked_at:'2026-10-06'}],[{field:'tags',status:'provisional',usable:true,value:['잠정 태그']}],[{field:'tags',status:'verified',usable:true,value:['상충 태그']},{field:'tags',status:'conflict',usable:true,value:['다른 태그']}]]){const card=c.recommendationCard(cardItem({facts}),{run_id:'r'},null);assert.doesNotMatch(textContent(card),/허용 안 된 태그|잠정 태그|상충 태그|다른 태그/);assert.match(textContent(card),/자료 확인일 미확인/);}});
 test('ranked card reasons and condition count remain, and a sole fallback is preserved without unknowns',()=>{const c=cardContext(),card=c.recommendationCard(cardItem({checked_at:'2026-10-05T09:00:00Z',reason_sentences:['지역 공식 자료가 뒷받침해요.','선택한 취향에 맞아요.'],visit_fit:{confirmed_count:3,required_count:3}}),{run_id:'r'},1);assert.match(textContent(card),/지역 공식 자료가 뒷받침해요/);assert.match(textContent(card),/선택한 취향에 맞아요/);assert.match(textContent(card),/추천 근거 확인 2026-10-05 · 필요한 조건 3\/3개 확인/);assert.match(textContent(c.recommendationCard(cardItem({important_unknowns:[]}),{run_id:'r'},null)),/방문 조건과 추천 근거를 추가로 확인해야 합니다/);});
+
+function resultRecoveryContext(responses){
+  const calls=[],timers=[],watched=[],state={session:{authenticated:true},trip:{id:'t'},epoch:1,tab:'explore',recommendations:{serial:0}};
+  const context=load(['loadRecommendations'],{state,recommendationPollTimer:null,clearTimeout(){},setTimeout(fn,ms){timers.push({fn,ms});return timers.length;},tripPath:()=>'/trips/t',allPages:async path=>{calls.push([path,'GET']);return [{run_id:'r',state:'succeeded'}];},api:async(path,options)=>{calls.push([path,options?.method||'GET']);const response=responses.length>1?responses.shift():responses[0];if(response instanceof Error)throw response;return response;},restoreRecommendationOptions(){},renderRecommendationResults(){},renderRecommendationProgress(){},watchJob:(...args)=>watched.push(args)});
+  return {context,state,calls,timers,watched};
+}
+test('terminal job without a result automatically re-reads that saved run and displays its cards',async()=>{
+  const complete={run_id:'r',state:'succeeded',job_id:'j',result:result({needs_confirmation:[{place_id:'p'}]})};
+  const {context,state,calls,timers,watched}=resultRecoveryContext([{run_id:'r',state:'succeeded',job_id:'j',result:null},complete]);
+  await context.loadRecommendations({runId:'r'});assert.equal(state.recommendations.resultRecoveryPending,true);assert.equal(timers.length,1);assert.equal(timers[0].ms,1200);
+  await timers.shift().fn();assert.equal(state.recommendations.displayed,complete);assert.equal(state.recommendations.resultRecoveryPending,false);assert.equal(timers.length,0);assert.deepEqual(watched,[]);assert(calls.every(([,method])=>method==='GET'));assert.equal(calls.filter(([path])=>path==='/trips/t/recommendations/r').length,2);
+});
+test('missing terminal results stop after three automatic retries and offer an explicit saved-request check',async()=>{
+  const {context,state,calls,timers}=resultRecoveryContext([{run_id:'r',state:'partial',result:null}]);await context.loadRecommendations({runId:'r'});
+  for(let attempt=0;attempt<3;attempt++){assert.equal(timers.length,1);await timers.shift().fn();}
+  assert.equal(timers.length,0);assert.equal(state.recommendations.resultRecoveryPending,false);assert.equal(calls.filter(([path])=>path==='/trips/t/recommendations/r').length,4);assert(calls.every(([,method])=>method==='GET'));
+  const progress=models().recommendationProgressModel(state.recommendations);assert.equal(progress.action,'refresh');assert.equal(progress.busy,false);
+});
+test('terminal recovery cannot query an old run after a trip, tab or newer request changes',async()=>{
+  for(const change of [state=>{state.epoch++;state.trip={id:'other'};},state=>{state.tab='trip';},state=>{state.recommendations.serial++;}]){const {context,state,calls,timers}=resultRecoveryContext([{run_id:'r',state:'succeeded',result:null}]);await context.loadRecommendations({runId:'r'});const before=calls.length;change(state);await timers.shift().fn();assert.equal(calls.length,before);}
+  const stale=resultRecoveryContext([{run_id:'r',state:'succeeded',data_status:'stale',result:null}]);await stale.context.loadRecommendations();assert.equal(stale.timers.length,0);assert.equal(stale.state.recommendations.resultRecoveryPending,false);
+});
+test('connection loss during terminal recovery still consumes the same three-read retry bound',async()=>{
+  const {context,state,calls,timers}=resultRecoveryContext([{run_id:'r',state:'succeeded',result:null},new Error('network')]);await context.loadRecommendations();
+  for(let attempt=0;attempt<3;attempt++){assert.equal(timers.length,1);await timers.shift().fn();}
+  assert.equal(timers.length,0);assert.equal(state.recommendations.resultRecoveryPending,false);assert.equal(calls.filter(([path])=>path==='/trips/t/recommendations/r').length,4);assert(calls.every(([,method])=>method==='GET'));
+});
+test('result handoff shows an honest final-stage loader and rejects a second recommendation submission',async()=>{
+  const recommendations={active:{run_id:'r',state:'succeeded',result:null},resultRecoveryPending:true};const progress=models().recommendationProgressModel(recommendations);assert.equal(progress.state,'finalizing');assert.equal(progress.busy,true);assert.equal(progress.step,2);assert.equal(progress.action,null);
+  let submits=0;const c=load(['applyRecommendations'],{state:{recommendations},notice(){},api(){submits++;}});await c.applyRecommendations();assert.equal(submits,0);
+});

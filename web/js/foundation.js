@@ -878,33 +878,41 @@
   function recommendationInput(){return {trip_version:state.trip.version,conditions_version:state.discovery.conditions.version,review_language_filter:{required:$('#reviewStrictFilter').checked,apply_only_if_qualified:true,apply_to:['local_discovery']},rating_filter:{enabled:$('#ratingFilterEnabled').checked,min_rating:Number($('#recommendationMinRating').value),min_count:Number($('#recommendationMinCount').value),apply_to:['local_discovery']},limit:Number($('#recommendationLimit').value)};}
   function restoreRecommendationOptions(run){const request=run?.request||{};if(state.recommendations.optionsDirty)return;if(request.review_language_filter)$('#reviewStrictFilter').checked=request.review_language_filter.required===true;if(request.rating_filter){$('#ratingFilterEnabled').checked=request.rating_filter.enabled===true;$('#recommendationMinRating').value=request.rating_filter.min_rating??'4.2';$('#recommendationMinCount').value=request.rating_filter.min_count??'200';}if(request.limit)$('#recommendationLimit').value=request.limit;}
   function recommendationStale(run){return run&&(run.input_status==='stale'||run.conditions_version!=null&&run.conditions_version!==state.discovery.conditions?.version||run.request?.conditions_version!=null&&run.request.conditions_version!==state.discovery.conditions?.version||run.trip_version!=null&&run.trip_version!==state.trip?.version);}
-  async function loadRecommendations({runId=null}={}){
+  async function loadRecommendations({runId=null,resultAttempt=0}={}){
     clearTimeout(recommendationPollTimer);if(!state.session?.authenticated||!state.trip){renderRecommendationResults();return;}
     const epoch=state.epoch,serial=++state.recommendations.serial,path=tripPath();
     try{
       const history=await allPages(path+'/recommendations');
       if(epoch!==state.epoch||serial!==state.recommendations.serial)return;state.recommendations.runs=history;
       const id=runId||state.recommendations.active?.run_id||history[0]?.run_id||history[0]?.id;
-      if(!id){state.recommendations.loaded=true;state.recommendations.connectionError=null;renderRecommendationResults();return;}
+      if(!id){state.recommendations.loaded=true;state.recommendations.connectionError=null;state.recommendations.resultRecoveryPending=false;renderRecommendationResults();return;}
       const active=await api(path+'/recommendations/'+encodeURIComponent(id));if(epoch!==state.epoch||serial!==state.recommendations.serial)return;
       state.recommendations.active=active;state.recommendations.loaded=true;state.recommendations.connectionError=null;restoreRecommendationOptions(active);
+      // The job can finish after the API read its result row. Re-read that run, never submit another job.
+      const resultPending=['succeeded','partial'].includes(active.state)&&!active.result&&active.data_status!=='stale';
+      state.recommendations.resultRecoveryPending=resultPending&&resultAttempt<3;
       if(active.result)state.recommendations.displayed=active;
       else {const priorId=state.recommendations.displayed?.run_id;state.recommendations.displayed=null;const previous=history.find(run=>(run.run_id||run.id)===priorId&&(run.run_id||run.id)!==id)||history.find(run=>['succeeded','partial'].includes(run.state)&&(run.run_id||run.id)!==id);if(previous){const retained=await api(path+'/recommendations/'+encodeURIComponent(previous.run_id||previous.id));if(epoch!==state.epoch||serial!==state.recommendations.serial)return;if(retained.result)state.recommendations.displayed=retained;}}
       renderRecommendationResults();
       if(['queued','running'].includes(active.state)){
         if(active.job_id)watchJob(active.job_id,epoch);
         if(state.tab==='explore')recommendationPollTimer=setTimeout(()=>loadRecommendations({runId:active.run_id}).catch(()=>{}),2200);
+      }else if(state.recommendations.resultRecoveryPending&&state.tab==='explore'){
+        recommendationPollTimer=setTimeout(()=>{if(epoch!==state.epoch||serial!==state.recommendations.serial||state.tab!=='explore')return;return loadRecommendations({runId:id,resultAttempt:resultAttempt+1}).catch(()=>{});},1200);
       }
     }catch(error){
       if(epoch!==state.epoch||serial!==state.recommendations.serial||error.status===401||error.name==='AbortError')return;
-      state.recommendations.connectionError=error.code||'CONNECTION_INTERRUPTED';renderRecommendationProgress();
+      state.recommendations.connectionError=error.code||'CONNECTION_INTERRUPTED';
+      const recoverResult=state.recommendations.resultRecoveryPending&&resultAttempt<3;
+      if(!recoverResult)state.recommendations.resultRecoveryPending=false;renderRecommendationProgress();
       // Reconnect to the same saved run with GET only; never repeat a submission on a timer.
       if(state.tab==='explore'&&['queued','running'].includes(state.recommendations.active?.state))recommendationPollTimer=setTimeout(()=>loadRecommendations({runId:runId||state.recommendations.active?.run_id}).catch(()=>{}),4000);
+      else if(state.tab==='explore'&&recoverResult)recommendationPollTimer=setTimeout(()=>{if(epoch!==state.epoch||serial!==state.recommendations.serial||state.tab!=='explore')return;return loadRecommendations({runId:runId||state.recommendations.active?.run_id,resultAttempt:resultAttempt+1}).catch(()=>{});},4000);
       throw error;
     }
   }
   async function applyRecommendations(){
-    if(state.recommendations.submitting||['queued','running'].includes(state.recommendations.active?.state)){notice('이미 추천을 찾고 있어요. 진행 상황을 이어서 볼 수 있어요.');return;}
+    if(state.recommendations.submitting||state.recommendations.resultRecoveryPending||['queued','running'].includes(state.recommendations.active?.state)){notice('이미 추천을 찾고 있어요. 진행 상황을 이어서 볼 수 있어요.');return;}
     if(!state.trip||!state.discovery.conditions){showError($('#recommendationError'),'여행과 저장한 방문 조건을 먼저 확인해 주세요.');return;}
     if(!state.session?.authenticated){showError($('#recommendationError'),'로그인 상태를 다시 확인해 주세요.');return;}
     if(['unsupported_city'].includes(state.discovery.conditions.context_state)){showError($('#recommendationError'),state.discovery.conditions.context_state==='unsupported_city'?'이 도시의 자동 추천은 준비 중입니다. 장소 보관함을 이용해 주세요.':'여행 정보가 바뀌었습니다. 방문 조건의 도시와 날짜를 확인해 주세요.');return;}
@@ -949,13 +957,14 @@
     }
     if(active.state==='cancelled')return {...model,state:'cancelled',title:'추천 찾기를 멈췄어요',description:'기존에 저장한 장소와 일정은 그대로예요. 준비되면 다시 찾아보세요.',action:'retry'};
     if(active.state==='failed')return {...model,state:budgetCodes.has(code)?'budget':'failed',title:budgetCodes.has(code)?'조회 예산을 모두 사용했어요':'추천을 끝까지 확인하지 못했어요',description:budgetCodes.has(code)?'추가 조회를 멈췄어요. 저장된 장소와 일정은 계속 볼 수 있어요.':code==='SOURCE_DATA_CHANGED'?'확인 중 장소 근거가 바뀌었어요. 최신 자료로 다시 찾아보세요.':'입력한 조건과 이전 결과는 남아 있어요. 잠시 후 다시 시도해 주세요.',action:budgetCodes.has(code)?'saved':'retry'};
-    if(!active.result)return {...model,state:'partial',title:'저장된 결과를 확인하고 있어요',description:'상태를 새로고침해서 결과를 이어서 확인해 주세요.',action:'refresh'};
+    if(!active.result&&r.resultRecoveryPending)return {...model,state:'finalizing',busy:true,step:2,title:'찾은 장소를 불러오고 있어요',description:'완료된 요청의 저장 결과를 자동으로 확인해요. 새 추천 요청은 보내지 않아요.'};
+    if(!active.result)return {...model,state:'partial',title:'저장된 결과를 다시 확인해 주세요',description:'자동 확인이 잠시 지연됐어요. 저장된 요청을 확인하면 이어서 볼 수 있어요.',action:'refresh'};
     if(!counts.displayable){const empty=active.result.summary?.empty_state;return {...model,state:'empty',step:2,title:empty?.title||'지금 조건에 맞춰 보여드릴 장소가 없어요',description:empty?.description||'이유를 아래에서 확인하고 방문 조건을 바꿔보세요. 장소 링크를 직접 저장할 수도 있어요.',action:empty?.code==='CATALOG_EMPTY'?'save':'conditions'};}
     return {...model,state:active.state==='partial'||counts.qualified===0?'partial':'complete',step:2,title:counts.qualified===0?`살펴볼 장소 ${counts.displayable}곳을 찾았어요`:`추천 장소 ${counts.qualified}곳을 찾았어요`,description:counts.qualified===0?'영업·인원·이동 등 확인할 정보를 함께 표시했어요. 아직 방문 조건을 모두 통과한 추천은 아니에요.':active.state==='partial'?'확인된 장소부터 볼 수 있어요. 일부 자료는 추가 확인이 필요해요.':'장소별 추천 이유와 방문 전 확인할 정보를 살펴보세요.'};
   }
   function renderRecommendationProgress(){
     const r=state.recommendations||{},model=recommendationProgressModel(r),host=$('#recommendationRunStatus'),submit=$('#applyRecommendations');if(!host||!submit)return;
-    const busy=r.submitting||['queued','running'].includes(r.active?.state);submit.disabled=!state.trip||!state.discovery.conditions||state.discovery.conditions?.context_state==='unsupported_city'||busy;submit.setAttribute('aria-busy',String(busy));submit.textContent=busy?'추천 찾는 중…':'추천 보기';
+    const busy=r.submitting||r.resultRecoveryPending||['queued','running'].includes(r.active?.state);submit.disabled=!state.trip||!state.discovery.conditions||state.discovery.conditions?.context_state==='unsupported_city'||busy;submit.setAttribute('aria-busy',String(busy));submit.textContent=busy?'추천 찾는 중…':'추천 보기';
     const progressKey=JSON.stringify([model,r.active?.run_id,r.active?.job?.cancel_requested_at,Boolean(r.cancelPending),Boolean(r.needsInputRefresh),r.active?.error_code,r.active?.job?.error_code,r.active?.reason_codes]);
     if(host.dataset.progressKey===progressKey)return;host.dataset.progressKey=progressKey;
     host.replaceChildren();host.hidden=model.state==='idle';host.className='recommendation-run-status recommendation-progress';host.dataset.state=model.state;host.setAttribute('aria-live','polite');host.setAttribute('aria-atomic','true');if(model.state==='idle')return;
@@ -982,7 +991,7 @@
   }
   function appendRecommendationReasons(host,codes){if(!codes?.length)return;const list=make('ul','recommendation-reasons');[...new Set(codes)].slice(0,6).forEach(code=>list.append(make('li','',recommendationReasonNames[code]||reviewReasonText[code]||'이 조건에 사용할 근거가 아직 충분하지 않습니다.')));host.append(list);}
   function recommendationConditionsLabel(conditions){if(!conditions)return '저장된 방문 조건';return `${discoveryCityNames[conditions.city]||conditions.city||'도시 미확인'} · ${conditions.visit?.date||'날짜 미확인'}${conditions.visit?.local_time?' '+conditions.visit.local_time:''} · 성인 ${conditions.party?.adults??'미확인'}명 · 아동 ${conditions.party?.children_status==='unknown'?'미확인':(conditions.party?.children||[]).length+'명'}`;}
-  function renderRecommendationResults(){const host=$('#recommendationResults');if(!host)return;const r=state.recommendations||{},active=r.active,displayed=r.displayed;const submitting=r.submitting||['queued','running'].includes(active?.state);$('#applyRecommendations').disabled=!state.trip||!state.discovery.conditions||['unsupported_city'].includes(state.discovery.conditions?.context_state)||submitting;$('#reviewStrictFilter').disabled=!state.trip;$('#ratingFilterEnabled').disabled=!state.trip;
+  function renderRecommendationResults(){const host=$('#recommendationResults');if(!host)return;const r=state.recommendations||{},active=r.active,displayed=r.displayed;const submitting=r.submitting||r.resultRecoveryPending||['queued','running'].includes(active?.state);$('#applyRecommendations').disabled=!state.trip||!state.discovery.conditions||['unsupported_city'].includes(state.discovery.conditions?.context_state)||submitting;$('#reviewStrictFilter').disabled=!state.trip;$('#ratingFilterEnabled').disabled=!state.trip;
     $('#recommendationFilterSummary').textContent=`${$('#reviewStrictFilter').checked?'엄격 리뷰 ON':'엄격 리뷰 OFF'} · ${$('#ratingFilterEnabled').checked?'평점 조건 ON':'평점 조건 OFF'} · 최대 ${$('#recommendationLimit').value}곳`;
     const dirty=r.optionsDirty||r.conditionsDraft||displayed?.origin_status==='stale';$('#recommendationDraft').textContent=displayed?.origin_status==='stale'?'숙소가 바뀌어 이전 출발점 기준의 결과입니다. 현재 조건으로 추천 보기를 눌러 주세요.':dirty?'입력 중인 조건은 아직 적용되지 않았습니다. 저장된 이전 결과를 유지하고 있습니다.':'';$('#recommendationDraft').hidden=!dirty;
     renderRecommendationProgress();
