@@ -507,3 +507,5 @@ DB 비밀번호 확인/필요 시 소유자의 직접 재설정과 Google 웹 �
 ## 21. 여정 디자인·사진·무료 도시 탐색 (2026-10-07)
 
 후속 현재 구현은 [V3 진행 기록](../service-v3/IMPLEMENTATION_STATUS.md)과 [실제 검증 보고서](../service-v3/reports/yeojeong-design-validation.md)를 따른다. 이름·폰트·사진3장·공개지도100도시 보조 검색을 구현했고, 기존 인증/개인 여행/무료 정책과schema12를 유지한다. 이전 절의 후보0/배포 전 상태는 당시 이력이며 최신 배포 여부는 연결한 보고서에서 별도로 확인한다.
+
+여정 최종 운영 revision은 `9c97e86`, 배포 `dep-db2i79mgekts73cfodrg`(2026-10-07 Live)다. 디자인·사진·무료도시탐색과 결과 조회 중 진행 표시를 반영했다. 최종 시험 Python962passed/15skipped·Node99passed 및 실제 운영 검증 범위는 위 V3보고서에 기록한다.

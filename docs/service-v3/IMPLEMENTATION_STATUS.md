@@ -157,4 +157,13 @@ Chrome/macOS, 로컬 합성 OIDC/공급자 서버(`tests/browser_discovery_fixtu
 
 제품명을 여정으로 바꾸고 SUIT 글꼴·따뜻한 흰색/짙은 청색·간결한 화면을 적용했다. 실제 식당7곳19장(5곳3장) 음식·실내 우선 갤러리와100도시 공개지도 보조 검색을 구현했다. 실제 공식 검수 후보는3도시9곳이며 공개 후보를 검증된 맛집으로 승격하지 않는다. 엄격 리뷰/유료공급자OFF, 개인데이터·schema12 보존.
 
-전체Python958passed/15skipped, Node95passed, 사진/추천 임시PG94passed. 최종 필터 순서 수정 후 공개검색SQLite/PG각20passed·기존추천45passed. Chrome 음식/실내/3장/출처·모바일폭·파리 실제 조회/상세/저장 검증. 실제전체100도시·사진전도시·실기기 미검증. 배포 결과는 [검증 보고서](reports/yeojeong-design-validation.md)를 따른다.
+전체Python최종962passed/15skipped, Node최종99passed, 사진/추천 임시PG94passed. 최종 필터 순서 수정 후 공개검색SQLite/PG각20passed·기존추천45passed. Chrome 음식/실내/3장/출처·모바일폭·파리 실제 조회/상세/저장 검증. 실제전체100도시·사진전도시·실기기 미검증. 배포 결과는 [검증 보고서](reports/yeojeong-design-validation.md)를 따른다.
+
+
+### 여정 최종 운영 반영 — 2026-10-07
+
+- 실제 URL: https://travel-inbox-rag.onrender.com . 실행revision `9c97e86`, 수동배포 `dep-db2i79mgekts73cfodrg`,01:36:55 KST 시작·1분02초 후Live. 여정 이름/SUIT/청색·흰색/사진/100도시 보조 탐색 반영.
+- 완료 신호가 결과 조회보다 빨리 도착할 때 복구 안내를 너무 일찍 보여주던 경합을 수정했다. 같은run GET 중복과 늦은 running응답을 차단하고 결과 대기중 busy를 유지한다. 최대3회 GET복구·기존요청 재사용. Node최종99passed, 백엔드전체962passed/15skipped.
+- 최종 운영 검증·자료 범위·배포 중간 이력은 [검증 보고서](reports/yeojeong-design-validation.md), [검증 JSON](reports/yeojeong-live-verification.json). 무료 공개지도는 도심3km/식당·카페 보조 탐색이며 모든 도시 맛집·영업·사진 검수를 뜻하지 않는다. 엄격 리뷰/유료 API/실시간 잔여석은OFF.
+
+- 최종HTTPS/live/ready/개인API차단·8자산해시·RLS/권한유지 확인. 기존여행/원문/예약/숙소건수유지,검증추천2회만증가. 실제새추천54.92초 후 결과조회중busy/중복방지→3카드자동표시·console error0. 처리는 무료환경에서여전히대기가있다.
