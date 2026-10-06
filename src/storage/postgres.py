@@ -162,6 +162,11 @@ class PostgresDatabase:
         with psycopg.connect(self._url, autocommit=True, connect_timeout=8) as con:
             with con.transaction():
                 con.execute("SET LOCAL statement_timeout='60s'")
+                # Match application BEGIN IMMEDIATE before touching any table.
+                # An overlapping old worker may hold rows under WRITE_LOCK; DDL
+                # must not take table locks first and deadlock against that worker.
+                # All new migrations use this same WRITE -> MIGRATION order.
+                con.execute('SELECT pg_advisory_xact_lock(%s)', (WRITE_LOCK,))
                 con.execute('SELECT pg_advisory_xact_lock(%s)', (MIGRATION_LOCK,))
                 con.execute('CREATE SCHEMA IF NOT EXISTS extensions')
                 con.execute('CREATE EXTENSION IF NOT EXISTS vector WITH SCHEMA extensions')
@@ -214,8 +219,16 @@ class PostgresDatabase:
                 for role in roles:
                     con.execute(sql.SQL('REVOKE ALL ON SCHEMA {} FROM {}').format(sql.Identifier(self.schema), sql.Identifier(role)))
                     con.execute(sql.SQL('REVOKE ALL ON ALL TABLES IN SCHEMA {} FROM {}').format(sql.Identifier(self.schema), sql.Identifier(role)))
-                for (table,) in con.execute('SELECT tablename FROM pg_tables WHERE schemaname=%s', (self.schema,)).fetchall():
-                    con.execute(sql.SQL('ALTER TABLE {} ENABLE ROW LEVEL SECURITY').format(sql.Identifier(table)))
+                # Even an already-enabled ALTER requires AccessExclusiveLock.
+                # Read the catalog first so a routine restart does not block
+                # readers or reacquire exclusive locks across every private table.
+                tables=con.execute(
+                    "SELECT c.relname FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace "
+                    "WHERE n.nspname=%s AND c.relkind IN ('r','p') AND NOT c.relrowsecurity ORDER BY c.relname",
+                    (self.schema,)).fetchall()
+                for (table,) in tables:
+                    con.execute(sql.SQL('ALTER TABLE {}.{} ENABLE ROW LEVEL SECURITY').format(
+                        sql.Identifier(self.schema),sql.Identifier(table)))
 
     @contextmanager
     def connect(self):
