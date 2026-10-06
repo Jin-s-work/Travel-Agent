@@ -1,0 +1,21 @@
+{
+  "state": "restored_closed_for_validation",
+  "later_tombstones_applied": 1,
+  "sessions_invalidated": true,
+  "research_deletion_history": {
+    "applied": 0,
+    "scrubbed_runs": 0
+  },
+  "discovery_deletion_history": {
+    "applied": 0
+  },
+  "deletion_history": "independent_checkpoint_applied",
+  "seconds": 0.042,
+  "checkpoint_age_seconds": 0.017,
+  "reindex_seconds": 0.198,
+  "reindex_fake_calls": 1,
+  "paid_calls": 0,
+  "correction_preserved": true,
+  "itinerary_preserved": true,
+  "deleted_trip_absent_from_chroma": true
+}

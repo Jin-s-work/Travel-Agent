@@ -14,7 +14,7 @@ install:
 	pip install -r requirements.txt
 
 serve:
-	uvicorn api:app --reload --port 8000
+	uvicorn api:app --reload --port 8000 --no-access-log
 
 index:
 	python -m src.indexer --sample

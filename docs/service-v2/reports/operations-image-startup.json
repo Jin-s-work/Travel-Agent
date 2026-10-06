@@ -1,0 +1,27 @@
+{
+  "synthetic": true,
+  "external_calls": 0,
+  "readiness": {
+    "ready": true,
+    "checks": {
+      "schema": true,
+      "storage": true,
+      "dispatcher": true,
+      "identity": true,
+      "restore": true
+    }
+  },
+  "unauthenticated_personal_api": 401,
+  "image": {
+    "uid": 1000,
+    "private_write": true,
+    "no_seed": true,
+    "no_env": true,
+    "no_tests": true
+  },
+  "second_process_blocked": true,
+  "future_migration_exit_code": 78,
+  "sensitive_config_not_logged": true,
+  "missing_identity_exit_code": 78,
+  "passed": true
+}

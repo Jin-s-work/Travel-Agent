@@ -36,6 +36,12 @@ def read_email_file(path: str | Path) -> str:
     return path.read_text(encoding="utf-8", errors="replace")
 
 
+def read_email_bytes(data: bytes, filename: str) -> str:
+    if Path(filename).suffix.lower() != '.eml':
+        return data.decode('utf-8',errors='replace')
+    return _message_text(email.message_from_bytes(data,policy=policy.default))
+
+
 def _read_eml(path: Path) -> str:
     """.eml에서 주요 헤더와 text/plain 본문을 추출한다.
 
@@ -43,6 +49,11 @@ def _read_eml(path: Path) -> str:
     """
     with path.open("rb") as fp:
         message = email.message_from_binary_file(fp, policy=policy.default)
+
+    return _message_text(message)
+
+
+def _message_text(message):
 
     header_lines = [
         f"{name}: {message[name]}"

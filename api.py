@@ -1,443 +1,276 @@
-"""HTTP API 계층.
-
-src/의 로직을 그대로 호출하고, web/의 정적 파일을 같은 프로세스에서 서빙한다.
-한 출처에서 HTML과 JSON을 모두 내보내므로 CORS 설정이 필요 없다.
-"""
-
+"""Private single-instance service: authenticated SQL ownership is authoritative."""
 from __future__ import annotations
-
 import json
+import os
 import mimetypes
-import re
-import sys
-import threading
+import secrets
+import uuid
+import asyncio
+import logging
+import time
 from contextlib import asynccontextmanager
 from pathlib import Path
-
-from fastapi import BackgroundTasks, FastAPI, File, HTTPException, UploadFile
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi import FastAPI, Request, Depends
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field
+from starlette.middleware.sessions import SessionMiddleware
+from starlette.exceptions import HTTPException
+from src.config import PROJECT_ROOT
+from src.foundation.settings import Settings
+from src.foundation.db import Database
+from src.foundation.repository import Repository, DomainError
+from src.foundation.auth import Auth, require_actor
+from src.foundation.documents import DocumentService
+from src.foundation.routes import router, AskRequest, Message
+from src.foundation.legacy_helpers import _policy_lines, _to_booking, _can_answer_directly
 
-from src.config import (
-    EMAILS_DIR,
-    MAX_UPLOAD_BYTES,
-    PROJECT_ROOT,
-    SEED_ON_EMPTY,
-    SUPPORTED_EXTENSIONS,
-)
+mimetypes.add_type('application/javascript','.js')
 
-WEB_DIR = PROJECT_ROOT / "web"
-
-# 브라우저는 서비스 워커가 JavaScript MIME 타입이 아니면 등록을 거부한다.
-# 시스템 mimetypes DB가 .js를 text/plain으로 매핑하는 환경이 있어 직접 지정한다.
-mimetypes.add_type("application/javascript", ".js")
-mimetypes.add_type("application/manifest+json", ".webmanifest")
-
-@asynccontextmanager
-async def lifespan(_app: FastAPI):
-    """기동 직후 인덱스가 비어 있으면 데모 예약으로 채운다.
-
-    Render 무료 티어는 디스크가 영구 저장이 아니라 재시작하면 인덱스가 사라진다.
-    서버 기동을 막지 않도록 별도 스레드에서 돌린다.
-    """
-    if SEED_ON_EMPTY:
-        threading.Thread(target=_run_seeding, name="seed", daemon=True).start()
-    yield
-
-
-app = FastAPI(
-    title="Travel Inbox RAG",
-    docs_url="/api/docs",
-    openapi_url="/api/openapi.json",
-    lifespan=lifespan,
-)
-
-
-# ---------------------------------------------------------------- 지연 로딩
-# chromadb와 langchain은 로딩이 무겁다. 서버 기동을 막지 않도록 첫 요청에서 만든다.
-_agent = None
-
-# FastAPI는 동기 엔드포인트를 스레드풀에서 실행한다. 콜드 스타트 중 요청이 겹치면
-# 두 스레드가 동시에 초기화를 시도해 chromadb 내부 상태가 깨진다
-# (KeyError in shared_system_client). 초기화 구간을 한 번만 통과시킨다.
-_agent_lock = threading.Lock()
-
-# 인덱싱은 한 번에 하나만 돈다. 기동 시 시딩과 사용자 업로드가 겹치면
-# 같은 메일을 두 번 임베딩하게 된다.
-_index_lock = threading.Lock()
-
-# 인덱싱 작업 상태. 워커 1개를 전제로 프로세스 메모리에 둔다.
-# 여러 워커로 늘리면 외부 저장소(Redis 등)로 옮겨야 한다.
-_job_lock = threading.Lock()
-_job: dict = {
-    "state": "idle",          # idle | running | done | error
-    "total": 0, "done": 0,
-    "uploaded": [], "rejected": [],
-    "indexed": [], "already_indexed": [],
-    "total_chunks": 0, "error": None,
-    # 기동 직후 자동 복구가 도는 중인지. 화면이 "예약 없음"으로 보이지 않게 한다.
-    "seeding": False,
-}
-
-
-def store():
-    """프로세스 공용 스토어. 에이전트·rag도 같은 인스턴스를 쓴다.
-
-    각자 만들면 인덱스를 비운 뒤 다른 인스턴스가 삭제된 컬렉션 핸들을 들고
-    있어 이후 질문이 NotFoundError로 죽는다.
-    """
-    from src.store import get_store    # chromadb 로딩을 첫 요청까지 미룬다
-
-    return get_store()
-
-
-def agent():
-    global _agent
-    if _agent is None:
-        with _agent_lock:
-            if _agent is None:
-                from src import agent as agent_module
-
-                agent_module.build_agent()
-                _agent = agent_module
-    return _agent
-
-
-# ---------------------------------------------------------------- 스키마
-class Message(BaseModel):
-    role: str
-    content: str
-
-
-class AskRequest(BaseModel):
-    question: str = Field(min_length=1, max_length=1000)
-    history: list[Message] = Field(default_factory=list, max_length=20)
-
-
-class TripStart(BaseModel):
-    date: str | None = None
-
-
-# ---------------------------------------------------------------- 변환
-_POLICY_RE = re.compile(r"환불 및 취소 규정:\s*(.+?)(?:\n메일 원문 발췌:|$)", re.S)
-
-
-def _policy_lines(document: str) -> list[str]:
-    """검색용 문서에서 환불 규정 부분만 잘라 줄 단위로 나눈다.
-
-    규정 전문은 메타데이터가 아니라 청크 본문에 들어 있다. 재인덱싱 없이
-    상세 화면에 보여주려고 여기서 뽑는다.
-    """
-    found = _POLICY_RE.search(document or "")
-    if not found:
-        return []
-    lines = [line.strip(" -·\t") for line in found.group(1).splitlines()]
-    return [line for line in lines if line and not line.startswith("[")]
-
-
-def _to_booking(record: dict) -> dict:
-    """벡터 스토어 메타데이터를 UI가 쓰는 형태로 바꾼다."""
-    time_value = record.get("time") or ""
-    start_time, _, end_time = (part.strip() for part in time_value.partition("~"))
-
-    return {
-        "id": record.get("source_file", ""),
-        "kind": record.get("type"),
-        "provider": record.get("provider"),
-        "confirmation_number": record.get("confirmation_number"),
-        "date": record.get("date"),
-        "date_end": record.get("date_end") or record.get("date"),
-        "time": start_time or None,
-        "time_end": end_time or None,
-        "location": record.get("location"),
-        "source_file": record.get("source_file"),
-        "policy": _policy_lines(record.get("document", "")),
-    }
-
-
-# ---------------------------------------------------------------- 엔드포인트
-@app.get("/api/health")
-def health() -> dict:
-    return {"ok": True}
-
-
-@app.get("/api/bookings")
-def bookings() -> dict:
-    records = store().all_reservations()
-    items = [_to_booking(r) for r in records]
-    dates = [i["date"] for i in items if i["date"]]
-    ends = [i["date_end"] for i in items if i["date_end"]]
-    return {
-        "items": items,
-        "count": len(items),
-        "trip_start": min(dates) if dates else None,
-        "trip_end": max(ends) if ends else None,
-    }
-
-
-# 에이전트를 거치면 LLM을 3번 부른다(도구 선택 → 도구 안의 답변 생성 → 최종 답변).
-# 내 예약을 묻는 흔한 질문은 도구 라우팅이 필요 없으므로 곧바로 처리해 1번으로 줄인다.
-_DAY_REF_RE = re.compile(r"(\d+\s*일차|첫째\s*날|둘째\s*날|셋째\s*날|넷째\s*날|다섯째\s*날|마지막\s*날)")
-_GENERAL_RE = re.compile(
-    r"(날씨|기온|환율|맛집|추천|근처|가는\s*법|교통|지하철|버스편|관광지|볼거리|팁|시차)"
-)
-_BOOKING_RE = re.compile(
-    r"(예약|체크인|체크아웃|환불|취소|수수료|위약금|예약번호|확인번호|픽업|반납|"
-    r"집합|출발|도착|탑승|숙소|호텔|료칸|항공|비행기|렌터카|투어|일정|몇\s*시|언제)"
-)
-
-
-# 앞선 대화를 가리키는 표현. 이런 질문은 검색어만으로 뜻이 서지 않아
-# 대화 맥락을 함께 넣는 에이전트가 필요하다.
-_REFERS_BACK_RE = re.compile(
-    r"(그것|그거|그건|그게|그때|그날|그\s*예약|그\s*호텔|그\s*항공|그\s*투어|"
-    r"거기|저기|아까|방금|앞서|이전에|위에서|말한|같은\s*거)"
-)
-
-
-def _can_answer_directly(question: str) -> bool:
-    """에이전트 없이 예약 검색만으로 답할 수 있는 질문인지 본다.
-
-    'N일차'는 날짜 계산 도구가, 날씨·환율 같은 일반 정보는 웹 검색이 필요하다.
-    "그거 환불돼?"처럼 앞 대화를 가리키면 맥락이 필요하다.
-    그 외에 예약을 가리키는 표현이 있으면 바로 처리한다.
-    """
-    if _DAY_REF_RE.search(question) or _GENERAL_RE.search(question):
-        return False
-    if _REFERS_BACK_RE.search(question):
-        return False
-    return bool(_BOOKING_RE.search(question))
-
-
-@app.post("/api/ask")
-def ask(body: AskRequest) -> dict:
-    question = body.question
-
-    # 빠른 경로. 근거를 못 찾으면 에이전트로 넘겨 다른 도구를 쓰게 한다.
-    if _can_answer_directly(question):
-        from src.rag import answer_question
-
-        try:
-            fast = answer_question(question, store=store())
-        except RuntimeError as error:
-            raise HTTPException(status_code=503, detail=str(error)) from error
-
-        if fast["used_context"]:
-            return {
-                "answer": fast["answer"],
-                "tools_used": ["search_bookings"],
-                "sources": [
-                    {
-                        "source_file": hit["metadata"].get("source_file"),
-                        "type": hit["metadata"].get("type"),
-                        "provider": hit["metadata"].get("provider"),
-                        "confirmation_number": hit["metadata"].get("confirmation_number"),
-                        "similarity": hit["similarity"],
-                    }
-                    for hit in fast["hits"]
-                ],
-            }
-
-    history = [{"role": m.role, "content": m.content} for m in body.history]
-    try:
-        result = agent().ask(question, history=history)
-    except RuntimeError as error:  # API 키 누락 등 설정 문제
-        raise HTTPException(status_code=503, detail=str(error)) from error
-
-    return {
-        "answer": result["answer"],
-        "tools_used": result["tools_used"],
-        "sources": result["sources"],
-    }
-
-
-def _sse(payload: dict) -> str:
-    return f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
-
-
-def _ask_events(body: AskRequest):
-    """질문 처리 과정을 이벤트로 흘려보낸다.
-
-    답변 생성이 전체 시간의 대부분이고, 추론 모델은 추론이 끝나야 첫 글자가
-    나온다. 토큰을 흘려봐도 첫 글자까지의 시간은 줄지 않는다. 대신 1초면
-    끝나는 검색 결과를 먼저 보내 무엇을 찾았는지 바로 보여준다.
-    """
-    question = body.question
-
-    try:
-        # 대화가 이어져도 스스로 뜻이 서는 질문이면 빠른 경로를 쓴다.
-        # 예전에는 history가 있으면 무조건 에이전트로 보내서, 두 번째 질문부터
-        # 같은 질문도 LLM을 세 번 부르며 느려졌다.
-        if _can_answer_directly(question):
-            from src.rag import generate, retrieve, source_of
-
-            hits = retrieve(question, store=store())
-            sources = [source_of(hit) for hit in hits]
-            yield _sse({"type": "sources", "sources": sources})
-
-            if hits:
-                yield _sse({
-                    "type": "answer",
-                    "answer": generate(question, hits),
-                    "tools_used": ["search_bookings"],
-                    "sources": sources,
-                })
+class BoundedBody:
+    """Enforce the complete transport cap even without Content-Length."""
+    def __init__(self, app, maximum):
+        self.app,self.maximum=app,maximum
+    async def __call__(self,scope,receive,send):
+        if scope['type']!='http' or scope.get('method') not in {'POST','PUT','PATCH'}:
+            return await self.app(scope,receive,send)
+        chunks=[]; size=0
+        while True:
+            message=await receive()
+            if message['type']=='http.disconnect':
                 return
-            # 근거를 못 찾았으면 다른 도구가 필요하다. 에이전트로 넘긴다.
-
-        history = [{"role": m.role, "content": m.content} for m in body.history]
-        for event in agent().ask_stream(question, history=history):
-            yield _sse(event)
-
-    except RuntimeError as error:      # API 키 누락 등 설정 문제
-        yield _sse({"type": "error", "detail": str(error)})
-    except Exception as error:
-        yield _sse({"type": "error", "detail": f"{type(error).__name__}: {error}"})
-
-
-@app.post("/api/ask/stream")
-def ask_stream(body: AskRequest) -> StreamingResponse:
-    return StreamingResponse(
-        _ask_events(body),
-        media_type="text/event-stream",
-        # 중간 프록시가 버퍼링하면 스트리밍이 무의미해진다.
-        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
-    )
+            size+=len(message.get('body',b''))
+            if size>self.maximum:
+                response=JSONResponse({'error':{'code':'REQUEST_TOO_LARGE','message':'요청 크기 제한을 초과했습니다.','request_id':str(uuid.uuid4()),'retryable':False,'details':None}},status_code=413,headers={'Cache-Control':'private, no-store'})
+                return await response(scope,receive,send)
+            chunks.append(message.get('body',b''))
+            if not message.get('more_body',False):
+                break
+        done=False
+        async def replay():
+            nonlocal done
+            if done:
+                return await receive()
+            done=True
+            return {'type':'http.request','body':b''.join(chunks),'more_body':False}
+        await self.app(scope,replay,send)
 
 
-def _run_seeding() -> None:
-    """인덱스가 비어 있으면 시드로 채운다. 실패해도 서버는 계속 뜬다."""
-    from src.seed import seed_if_empty
+def create_app(settings=None, *, parser=None, embedder=None, vector_factory=None, answer_generator=None,
+               budget_policy=None, chroma_client=None, fault_hook=None, review_provider=None, review_detector=None,
+               route_provider=None, storage_transport=None):
+    settings=settings or Settings()
+    if settings.storage_backend not in {'local','supabase'}:
+        raise ValueError('Unsupported STORAGE_BACKEND')
+    if settings.storage_backend=='supabase' and not settings.database_url:
+        raise ValueError('Supabase mode requires DATABASE_URL; local fallback is forbidden')
+    if settings.storage_backend=='local' and settings.database_url:
+        raise ValueError('DATABASE_URL requires STORAGE_BACKEND=supabase')
+    for private_path in (settings.database_path,settings.documents_dir,settings.vectors_dir):
+        if private_path.resolve().is_relative_to((PROJECT_ROOT/'web').resolve()):
+            raise ValueError('Private storage must be outside the public web directory')
+    @asynccontextmanager
+    async def lifespan(app):
+        from src.reliability.maintenance import reconcile_storage
+        leader=await asyncio.to_thread(app.state.jobs.acquire_dispatcher,app.state.dispatcher.owner)
+        if app.state.documents.objects:
+            try:
+                await asyncio.to_thread(app.state.documents.objects.verify_private)
+                if leader: await asyncio.to_thread(app.state.documents.objects.reconcile)
+            except DomainError:
+                logging.getLogger(__name__).warning('private_storage_degraded')
+        app.state.storage_reconciliation=await asyncio.to_thread(reconcile_storage,app.state.db,settings,
+            dispatcher_owner=app.state.dispatcher.owner if leader else None)
+        if leader:
+            await asyncio.to_thread(app.state.generations.cleanup)
+            await asyncio.to_thread(app.state.reviews.purge)
+        def purge_product():
+            from src.product.events import purge
+            with app.state.db.connect() as con:purge(con)
+        await asyncio.to_thread(purge_product)
+        await app.state.dispatcher.start()
+        async def review_maintenance():
+            cloud_swept=0
+            while True:
+                await asyncio.sleep(30)
+                try:
+                    await asyncio.to_thread(purge_product)
+                    await asyncio.to_thread(app.state.reviews.purge)
+                    await asyncio.to_thread(app.state.reviews.cleanup_remote)
+                    if app.state.documents.objects and time.monotonic()-cloud_swept>1800:
+                        await asyncio.to_thread(app.state.documents.objects.reconcile)
+                        cloud_swept=time.monotonic()
+                except asyncio.CancelledError:
+                    raise
+                except Exception:
+                    import logging
+                    logging.getLogger(__name__).warning('review_maintenance_failed')
+        review_task=asyncio.create_task(review_maintenance()) if leader else None
+        backup_task=None
+        if leader and os.getenv('BACKUP_ENABLED','0')=='1':
+            from src.operations.remote import loop as backup_loop
+            backup_task=asyncio.create_task(backup_loop(app))
+        try:
+            yield
+        finally:
+            if backup_task:
+                backup_task.cancel()
+                try:await backup_task
+                except asyncio.CancelledError:pass
+            if review_task:
+                review_task.cancel()
+                try: await review_task
+                except asyncio.CancelledError: pass
+            await app.state.dispatcher.stop()
+            if app.state.documents.objects: app.state.documents.objects.close()
+            app.state.db.close()
+    app=FastAPI(title='Travel Agent',docs_url=None,redoc_url=None,openapi_url=None,lifespan=lifespan)
+    app.state.settings=settings
+    from src.operations.health import Metrics
+    app.state.metrics=Metrics()
+    app.state.db=Database(settings.database_path,url=settings.database_url or None)
+    app.state.repo=Repository(app.state.db)
+    app.state.auth=Auth(app.state.db,settings)
+    app.state.documents=DocumentService(app.state.repo,settings,parser,embedder,vector_factory)
+    if settings.storage_backend=='supabase':
+        from src.storage.objects import SupabaseObjects
+        app.state.documents.objects=SupabaseObjects(settings,app.state.db,transport=storage_transport)
+    app.state.answer_generator=answer_generator
+    from src.reliability.jobs import Jobs
+    from src.reliability.dispatcher import Dispatcher
+    from src.reliability.generations import GenerationManager
+    from src.reliability.budget import Budget, BudgetPolicy
+    from src.reliability.providers import ProviderGateway
+    from src.reliability.handlers import Operations
+    app.state.jobs=Jobs(app.state.db,lease_seconds=settings.job_lease_seconds,max_attempts=settings.job_max_attempts)
+    app.state.budget=Budget(app.state.db,budget_policy or BudgetPolicy.from_file(settings.pricing_config))
+    app.state.gateway=ProviderGateway(app.state.budget,settings.artifacts_dir)
+    app.state.generations=GenerationManager(app.state.db,app.state.repo,settings.vectors_dir,client=chroma_client,jobs=app.state.jobs)
+    app.state.operations=Operations(app.state.repo,app.state.documents,app.state.jobs,app.state.generations,app.state.gateway,
+                                    answer_generator=answer_generator,fault_hook=fault_hook)
+    app.state.documents.operations=app.state.operations
+    from src.research.service import ReviewService
+    app.state.reviews=ReviewService(app.state.db,app.state.repo,app.state.jobs,app.state.gateway,provider=review_provider,detector=review_detector,fault_hook=fault_hook)
+    from src.discovery.service import DiscoveryService
+    app.state.discovery=DiscoveryService(app.state.db,app.state.repo,app.state.jobs,app.state.reviews,allow_synthetic=settings.environment=='development')
+    from src.recommendations.service import Recommendations
+    app.state.recommendations=Recommendations(app.state.db,app.state.repo,app.state.jobs,app.state.discovery,app.state.reviews)
+    from src.itineraries.travel_time import TravelTime
+    from src.itineraries.service import Itineraries
+    app.state.travel_time=TravelTime(app.state.gateway,app.state.jobs,provider=route_provider)
+    app.state.itineraries=Itineraries(app.state.db,app.state.repo,app.state.jobs,app.state.discovery,
+                                    app.state.recommendations,app.state.travel_time)
+    from src.travel_tools.alternatives import Alternatives
+    app.state.alternatives=Alternatives(app.state.itineraries,app.state.discovery)
+    from src.travel_tools.preparation import Preparation
+    app.state.preparation=Preparation(app.state.db,app.state.repo,app.state.itineraries,app.state.discovery)
+    from src.product.service import Product
+    app.state.product=Product(app.state.db,app.state.repo,app.state.discovery,app.state.recommendations,app.state.itineraries)
+    from src.travel_tools.today import Today
+    app.state.today=Today(app.state.db,app.state.repo,app.state.itineraries,app.state.discovery,app.state.preparation)
+    def dispatch(job,ctx):
+        if job['operation']=='review_collection':
+            return app.state.reviews.execute(job,ctx)
+        if job['operation']=='bookmark_resolve':
+            return app.state.discovery.execute(job,ctx)
+        if job['operation']=='recommendations':
+            return app.state.recommendations.execute(job,ctx)
+        if job['operation']=='itinerary_generate':
+            return app.state.itineraries.execute(job,ctx)
+        return app.state.operations(job,ctx)
+    app.state.dispatcher=Dispatcher(app.state.jobs,dispatch,poll_seconds=settings.job_poll_seconds,
+                                   heartbeat_seconds=settings.job_heartbeat_seconds,shutdown_seconds=settings.job_shutdown_seconds)
+    app.add_middleware(SessionMiddleware,secret_key=settings.session_secret or secrets.token_urlsafe(48),session_cookie='__Host-oidc' if settings.secure_cookie else 'travel_dev_oidc',max_age=600,same_site='lax',https_only=settings.secure_cookie)
+    app.add_middleware(BoundedBody,maximum=settings.max_request_bytes)
 
-    # 복구가 끝나기 전에 화면을 열면 예약이 0건으로 보인다. 진행 중임을 알린다.
-    with _job_lock:
-        _job.update(seeding=True)
-    try:
-        with _index_lock:
-            result = seed_if_empty(store=store())
-    except Exception as error:  # 키 누락·네트워크 오류 등
-        print(f"시드 실패: {type(error).__name__}: {error}", file=sys.stderr, flush=True)
-        return
-    finally:
-        with _job_lock:
-            _job.update(seeding=False)
+    @app.middleware('http')
+    async def headers(request,call_next):
+        request.state.request_id=str(uuid.uuid4())
+        started=time.monotonic()
+        try:
+            if request.url.path.startswith('/api/'):
+                from src.operations.controls import read as read_controls
+                def current_mode():
+                    with app.state.db.connect() as con:return read_controls(con)['mode']
+                mode=await asyncio.to_thread(current_mode)
+                restoring=any((settings.database_path.parent/p).exists() for p in ('RESTORE_PENDING.json','RESTORE_INCOMPLETE.json'))
+                blocked=restoring or mode=='maintenance' or (mode=='read_only' and request.method not in {'GET','HEAD','OPTIONS'} and request.url.path not in {'/api/v2/auth/login','/api/v2/auth/logout'})
+                if blocked and request.url.path!='/api/health':
+                    response=JSONResponse({'error':{'code':'RESTORE_VALIDATION_REQUIRED' if restoring else 'SERVICE_READ_ONLY','message':'운영 점검 중입니다. 잠시 후 다시 시도해 주세요.','request_id':request.state.request_id,'retryable':True,'details':None}},status_code=503)
+                else:response=await call_next(request)
+            else:response=await call_next(request)
+        except Exception:
+            logging.getLogger(__name__).error('request_failed request_id=%s code=INTERNAL_ERROR',request.state.request_id)
+            response=JSONResponse({'error':{'code':'INTERNAL_ERROR','message':'요청을 처리하지 못했습니다.','request_id':request.state.request_id,'retryable':False,'details':None}},status_code=500)
+        if request.url.path not in {'/api/health','/health/live','/health/ready'}:
+            app.state.metrics.record(response.status_code,time.monotonic()-started)
+        response.headers['X-Request-ID']=request.state.request_id
+        response.headers['X-Content-Type-Options']='nosniff'
+        response.headers['Referrer-Policy']='strict-origin-when-cross-origin'
+        response.headers['X-Frame-Options']='DENY'
+        if request.url.path.startswith('/api/'):
+            response.headers['Cache-Control']='private, no-store'
+            response.headers['Vary']='Cookie'
+        return response
 
-    if result["seeded"]:
-        print(f"시드 완료: 청크 {result['total_chunks']}개", file=sys.stderr, flush=True)
-    else:
-        print(f"시드 건너뜀: {result['reason']}", file=sys.stderr, flush=True)
+    @app.exception_handler(DomainError)
+    async def domain_error(request,exc):
+        return JSONResponse({'error':{'code':exc.code,'message':exc.message,'request_id':request.state.request_id,'retryable':exc.code in {'PROVIDER_UNAVAILABLE','SEARCH_REBUILDING','SERVICE_STOPPING','VERSION_CONFLICT'},'details':exc.details}},status_code=exc.status)
 
+    @app.exception_handler(RequestValidationError)
+    async def validation_error(request,exc):
+        details=[{'field':'.'.join(str(p) for p in e['loc'] if p!='body'),'message':e['msg']} for e in exc.errors()]
+        return JSONResponse({'error':{'code':'VALIDATION_FAILED','message':'입력값을 확인해 주세요.','request_id':request.state.request_id,'retryable':False,'details':details}},status_code=422)
 
-def _run_indexing(filenames: list[str]) -> None:
-    """백그라운드에서 인덱싱을 수행하고 진행 상황을 기록한다."""
-    from src.indexer import index_emails
+    @app.exception_handler(HTTPException)
+    async def http_error(request,exc):
+        return JSONResponse({'error':{'code':'NOT_FOUND' if exc.status_code==404 else 'REQUEST_FAILED','message':'요청을 처리할 수 없습니다.','request_id':request.state.request_id,'retryable':False,'details':None}},status_code=exc.status_code)
 
-    try:
-        with _index_lock:
-            summary = index_emails(store=store())
-        with _job_lock:
-            _job.update(
-                state="done",
-                done=len(summary["indexed"]),
-                indexed=summary["indexed"],
-                already_indexed=summary["skipped"],
-                total_chunks=summary["total_in_store"],
-                error=None,
-            )
-    except Exception as error:  # 키 누락·API 오류 등
-        with _job_lock:
-            _job.update(state="error", error=f"{type(error).__name__}: {error}")
+    @app.get('/api/health')
+    @app.get('/health/live')
+    def health():
+        return {'ok':True}
 
+    @app.get('/health/ready')
+    def health_ready():
+        from src.operations.health import ready
+        result=ready(app)
+        return JSONResponse(result,status_code=200 if result['ready'] else 503,headers={'Cache-Control':'no-store'})
 
-@app.post("/api/index", status_code=202)
-async def index(
-    background: BackgroundTasks, files: list[UploadFile] = File(default=[])
-) -> dict:
-    """파일을 저장하고 인덱싱은 백그라운드로 넘긴다.
+    @app.get('/api/v2/admin/operations')
+    def operations_status(actor=Depends(require_actor)):
+        if actor.role!='admin':raise DomainError('NOT_FOUND','자료를 찾을 수 없습니다.',404)
+        from src.operations.health import summary,ready
+        return {'health':ready(app),'observations':summary(app)}
 
-    메일 1건당 LLM 호출이 한 번 들어가므로 요청 안에서 처리하면 프록시
-    제한 시간을 넘긴다(Render 무료 티어는 100초). 즉시 응답하고
-    /api/index/status 로 진행 상황을 확인하게 한다.
-    """
-    with _job_lock:
-        if _job["state"] == "running":
-            raise HTTPException(status_code=409, detail="이미 인덱싱이 진행 중입니다.")
+    @app.get('/api/v2/openapi.json')
+    def private_openapi(actor=Depends(require_actor)):
+        return app.openapi()
 
-    EMAILS_DIR.mkdir(parents=True, exist_ok=True)
+    app.include_router(router)
+    from src.research.routes import router as review_router
+    app.include_router(review_router)
+    from src.discovery.routes import router as discovery_router
+    app.include_router(discovery_router)
+    from src.http.recommendations import router as recommendation_router
+    app.include_router(recommendation_router)
+    from src.product.routes import router as product_router
+    app.include_router(product_router)
+    from src.itineraries.routes import router as itinerary_router
+    app.include_router(itinerary_router)
+    from src.travel_tools.routes import router as travel_tools_router
+    app.include_router(travel_tools_router)
 
-    saved, rejected = [], []
-    for upload in files:
-        # 업로드된 이름에 경로가 섞여 있어도 파일명만 취한다.
-        name = Path(upload.filename or "").name
-        if not name or Path(name).suffix.lower() not in SUPPORTED_EXTENSIONS:
-            rejected.append(upload.filename)
-            continue
+    @app.api_route('/api/{legacy_path:path}',methods=['GET','POST','PUT','PATCH','DELETE'])
+    def retired(legacy_path:str,request:Request,actor=Depends(require_actor)):
+        # Old global index/download/delete paths must never access shared private files.
+        raise DomainError('LEGACY_API_RETIRED','여행을 선택한 뒤 v2 API를 사용해 주세요.',410)
 
-        content = await upload.read(MAX_UPLOAD_BYTES + 1)
-        if len(content) > MAX_UPLOAD_BYTES:
-            # 예약 메일은 1~2KB다. 큰 파일은 받아도 쓸 데가 없고,
-            # 512MB 인스턴스에서는 몇 개만으로도 프로세스가 죽는다.
-            rejected.append(upload.filename)
-            continue
+    @app.get('/sw.js')
+    def service_worker():
+        return FileResponse(PROJECT_ROOT/'web/sw.js',media_type='application/javascript',headers={'Cache-Control':'no-cache','Service-Worker-Allowed':'/'})
 
-        (EMAILS_DIR / name).write_bytes(content)
-        saved.append(name)
+    app.mount('/',StaticFiles(directory=PROJECT_ROOT/'web',html=True),name='web')
+    return app
 
-    if not saved:
-        return {"state": "done", "uploaded": [], "rejected": rejected,
-                "indexed": [], "already_indexed": [], "total": 0}
-
-    with _job_lock:
-        _job.update(state="running", total=len(saved), done=0, uploaded=saved,
-                    rejected=rejected, indexed=[], already_indexed=[], error=None)
-
-    background.add_task(_run_indexing, saved)
-    return {"state": "running", "uploaded": saved, "rejected": rejected,
-            "total": len(saved)}
-
-
-@app.get("/api/index/status")
-def index_status() -> dict:
-    with _job_lock:
-        return dict(_job)
-
-
-@app.delete("/api/index")
-def clear_index(keep_files: bool = False) -> dict:
-    """인덱스를 비운다. 기본적으로 업로드된 메일 파일도 함께 지운다.
-
-    벡터만 지우면 원본이 남아 다음 인덱싱에서 되살아난다. 사용자가 "비우기"를
-    눌렀는데 자기 메일이 다시 나타나는 것은 개인정보 관점에서도 문제다.
-    """
-    store().reset()
-
-    removed = []
-    if not keep_files and EMAILS_DIR.is_dir():
-        for path in EMAILS_DIR.iterdir():
-            if path.is_file() and path.name != ".gitkeep":
-                path.unlink()
-                removed.append(path.name)
-
-    with _job_lock:
-        _job.update(state="idle", total=0, done=0, uploaded=[], rejected=[],
-                    indexed=[], already_indexed=[], total_chunks=0, error=None)
-
-    return {"total_chunks": store().count(), "removed_files": removed}
-
-
-@app.post("/api/trip-start")
-def set_trip_start(body: TripStart) -> dict:
-    agent().set_trip_start(body.date)
-    return {"trip_start": body.date}
-
-
-# ---------------------------------------------------------------- 정적 파일
-# API 라우트를 먼저 등록한 뒤 마운트해야 /api/*가 가려지지 않는다.
-if WEB_DIR.is_dir():
-    @app.get("/sw.js", include_in_schema=False)
-    def service_worker() -> FileResponse:
-        # 서비스 워커는 루트 경로에서 제공해야 사이트 전체를 제어할 수 있다.
-        return FileResponse(WEB_DIR / "sw.js", media_type="application/javascript")
-
-    app.mount("/", StaticFiles(directory=WEB_DIR, html=True), name="web")
+app=create_app()

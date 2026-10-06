@@ -25,7 +25,7 @@ CHROMA_DIR = Path(os.getenv("CHROMA_DIR") or PROJECT_ROOT / "data" / "chroma")
 # 임베딩만 한다.
 SEED_FILE = PROJECT_ROOT / "seed" / "parsed.json"
 SEED_SOURCE_DIRS = (SAMPLE_EMAILS_DIR, DEMO_EMAILS_DIR)
-SEED_ON_EMPTY = os.getenv("SEED_ON_EMPTY", "1").lower() not in ("0", "false", "no")
+SEED_ON_EMPTY = os.getenv("SEED_ON_EMPTY", "0").lower() not in ("0", "false", "no")
 
 # --- LLM ---
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")

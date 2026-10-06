@@ -1,0 +1,6 @@
+{
+  "name": "travel-inbox-browser-tests",
+  "private": true,
+  "scripts": {"test": "node --test tests/*.cjs"},
+  "devDependencies": {"fake-indexeddb": "6.2.5"}
+}

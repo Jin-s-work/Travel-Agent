@@ -1,0 +1,36 @@
+{
+  "version": "REPLACE_WITH_YOUR_PRICE_REVISION",
+  "confirmed_at": null,
+  "timezone": "UTC",
+  "halted": false,
+  "prices": {
+    "openai/REPLACE_WITH_CHAT_MODEL": {
+      "currency": "USD",
+      "rates_per_million": {
+        "input_tokens": null,
+        "output_tokens": null
+      },
+      "max_units": {
+        "input_tokens": 100000,
+        "output_tokens": 4096
+      }
+    },
+    "openai/REPLACE_WITH_EMBEDDING_MODEL": {
+      "currency": "USD",
+      "rates_per_million": {
+        "input_tokens": null
+      },
+      "max_units": {
+        "input_tokens": 100000
+      }
+    }
+  },
+  "limits": {
+    "USD": {
+      "user_daily": null,
+      "user_monthly": null,
+      "global_daily": null,
+      "global_monthly": null
+    }
+  }
+}

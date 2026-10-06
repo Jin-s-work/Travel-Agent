@@ -1,0 +1,3301 @@
+{
+  "version": "official-candidate-audit-2026-10-01-v1",
+  "synthetic": false,
+  "packs": [
+    {
+      "version": "official-tokyo-2026-10-01-v1",
+      "city": "tokyo",
+      "synthetic": false,
+      "places": [
+        {
+          "external_id": "kanda-matsuya-sudacho",
+          "name": "간다 마쓰야",
+          "native_name": "神田まつや",
+          "address": "東京都千代田区神田須田町1-13",
+          "category": "restaurant",
+          "canonical_url": "https://visit-chiyoda.tokyo/app/spot/detail/359",
+          "chain_id": null,
+          "neighborhood": "神田須田町",
+          "tags": [
+            "soba",
+            "historic_restaurant"
+          ],
+          "recommendation_types": [
+            "local_discovery"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "tourism",
+              "url": "https://visit-chiyoda.tokyo/app/spot/detail/359",
+              "source_type": "tourism",
+              "source_group": "visit-chiyoda.tokyo",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "관광협회 본문에서 상호·주소·통상 시간표·소바 업종 확인. 식당 자체 사이트는 이번에 읽지 못했다."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "restaurant",
+              "status": "verified",
+              "source_key": "tourism",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "tags",
+              "value": [
+                "soba",
+                "historic_restaurant"
+              ],
+              "status": "verified",
+              "source_key": "tourism",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "opening_hours",
+              "value": {
+                "timezone": "Asia/Tokyo",
+                "scope": "published_regular_schedule",
+                "weekly": {
+                  "monday": [
+                    {
+                      "start": "11:00",
+                      "end": "20:30",
+                      "end_day_offset": 0,
+                      "last_order": "20:00"
+                    }
+                  ],
+                  "tuesday": [
+                    {
+                      "start": "11:00",
+                      "end": "20:30",
+                      "end_day_offset": 0,
+                      "last_order": "20:00"
+                    }
+                  ],
+                  "wednesday": [
+                    {
+                      "start": "11:00",
+                      "end": "20:30",
+                      "end_day_offset": 0,
+                      "last_order": "20:00"
+                    }
+                  ],
+                  "thursday": [
+                    {
+                      "start": "11:00",
+                      "end": "20:30",
+                      "end_day_offset": 0,
+                      "last_order": "20:00"
+                    }
+                  ],
+                  "friday": [
+                    {
+                      "start": "11:00",
+                      "end": "20:30",
+                      "end_day_offset": 0,
+                      "last_order": "20:00"
+                    }
+                  ],
+                  "saturday": [
+                    {
+                      "start": "11:00",
+                      "end": "19:30",
+                      "end_day_offset": 0,
+                      "last_order": "19:00"
+                    }
+                  ],
+                  "sunday": []
+                },
+                "exceptions": [],
+                "notes": [
+                  "공휴일은 토요일 시간표. 식당 공식 공지·방문일 재확인 필요."
+                ]
+              },
+              "status": "provisional",
+              "source_key": "tourism",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "local_evidence",
+              "value": {
+                "summary": "치요다구 관광협회가 간다의 오랜 소바점과 역사적 건물로 소개한다. 주민 방문 비율 근거는 아니다.",
+                "source_groups": [
+                  "visit-chiyoda.tokyo"
+                ],
+                "evidence_type": "local_editorial"
+              },
+              "status": "provisional",
+              "source_key": "tourism",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_required",
+              "value": null,
+              "status": "unknown",
+              "source_key": "tourism",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_url",
+              "value": null,
+              "status": "unknown",
+              "source_key": "tourism",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_methods",
+              "value": null,
+              "status": "unknown",
+              "source_key": "tourism",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "booking_open_rule",
+              "value": null,
+              "status": "unknown",
+              "source_key": "tourism",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "min_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "tourism",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "max_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "tourism",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "children_rule",
+              "value": null,
+              "status": "unknown",
+              "source_key": "tourism",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "facility_capacity",
+              "value": null,
+              "status": "unknown",
+              "source_key": "tourism",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "cancellation_policy",
+              "value": null,
+              "status": "unknown",
+              "source_key": "tourism",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "deposit",
+              "value": null,
+              "status": "unknown",
+              "source_key": "tourism",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "live_availability",
+              "value": null,
+              "status": "unknown",
+              "source_key": "tourism",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "price",
+              "value": null,
+              "status": "unknown",
+              "source_key": "tourism",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "nihonbashi-tamai-honten",
+          "name": "니혼바시 타마이 본점",
+          "native_name": "日本橋 玉ゐ 本店",
+          "address": "東京都中央区日本橋2-9-9",
+          "category": "restaurant",
+          "canonical_url": "https://anago-tamai.com/nihonbashi/",
+          "chain_id": "nihonbashi-tamai",
+          "neighborhood": "日本橋",
+          "tags": [
+            "anago",
+            "japanese_cuisine"
+          ],
+          "recommendation_types": [
+            "local_discovery"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "official",
+              "url": "https://anago-tamai.com/nihonbashi/",
+              "source_type": "official",
+              "source_group": "anago-tamai.com",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "본점 지점 페이지. 무로마치·긴자·해외 지점과 구분. 총좌석·저녁 전화 예약 조건 확인."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "restaurant",
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "tags",
+              "value": [
+                "anago",
+                "japanese_cuisine"
+              ],
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "opening_hours",
+              "value": {
+                "timezone": "Asia/Tokyo",
+                "scope": "published_regular_schedule",
+                "weekly": {
+                  "monday": [
+                    {
+                      "start": "11:00",
+                      "end": "14:30",
+                      "end_day_offset": 0,
+                      "last_order": "14:00"
+                    },
+                    {
+                      "start": "17:00",
+                      "end": "21:30",
+                      "end_day_offset": 0,
+                      "last_order": "21:00"
+                    }
+                  ],
+                  "tuesday": [
+                    {
+                      "start": "11:00",
+                      "end": "14:30",
+                      "end_day_offset": 0,
+                      "last_order": "14:00"
+                    },
+                    {
+                      "start": "17:00",
+                      "end": "21:30",
+                      "end_day_offset": 0,
+                      "last_order": "21:00"
+                    }
+                  ],
+                  "wednesday": [
+                    {
+                      "start": "11:00",
+                      "end": "14:30",
+                      "end_day_offset": 0,
+                      "last_order": "14:00"
+                    },
+                    {
+                      "start": "17:00",
+                      "end": "21:30",
+                      "end_day_offset": 0,
+                      "last_order": "21:00"
+                    }
+                  ],
+                  "thursday": [
+                    {
+                      "start": "11:00",
+                      "end": "14:30",
+                      "end_day_offset": 0,
+                      "last_order": "14:00"
+                    },
+                    {
+                      "start": "17:00",
+                      "end": "21:30",
+                      "end_day_offset": 0,
+                      "last_order": "21:00"
+                    }
+                  ],
+                  "friday": [
+                    {
+                      "start": "11:00",
+                      "end": "14:30",
+                      "end_day_offset": 0,
+                      "last_order": "14:00"
+                    },
+                    {
+                      "start": "17:00",
+                      "end": "21:30",
+                      "end_day_offset": 0,
+                      "last_order": "21:00"
+                    }
+                  ],
+                  "saturday": [
+                    {
+                      "start": "11:00",
+                      "end": "15:30",
+                      "end_day_offset": 0,
+                      "last_order": "15:00"
+                    },
+                    {
+                      "start": "16:30",
+                      "end": "21:00",
+                      "end_day_offset": 0,
+                      "last_order": "20:30"
+                    }
+                  ],
+                  "sunday": [
+                    {
+                      "start": "11:00",
+                      "end": "15:30",
+                      "end_day_offset": 0,
+                      "last_order": "15:00"
+                    },
+                    {
+                      "start": "16:30",
+                      "end": "21:00",
+                      "end_day_offset": 0,
+                      "last_order": "20:30"
+                    }
+                  ]
+                },
+                "exceptions": [],
+                "notes": [
+                  "공휴일은 주말 시간표. 미래 날짜 확정 시간 아님."
+                ]
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_methods",
+              "value": {
+                "channels": [
+                  "telephone"
+                ],
+                "phone": "+81-3-3272-3227",
+                "conditions": "저녁만 예약 접수. 점심 예약 가능으로 해석하지 않음."
+              },
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "facility_capacity",
+              "value": 25,
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "local_evidence",
+              "value": {
+                "summary": "본점 공식 자료에 따른 니혼바시 아나고 전문점 후보. 독립 지역 취재는 아직 없다.",
+                "source_groups": [
+                  "anago-tamai.com"
+                ],
+                "evidence_type": "direct_confirmation"
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_required",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_url",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "booking_open_rule",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "min_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "max_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "children_rule",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "cancellation_policy",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "deposit",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "live_availability",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "price",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "cafe-bach-nihonzutsumi",
+          "name": "카페 바흐",
+          "native_name": "カフェ・バッハ",
+          "address": "東京都台東区日本堤1-23-9",
+          "category": "cafe",
+          "canonical_url": "https://www.bach-kaffee.co.jp/カフェ・バッハについて/",
+          "chain_id": null,
+          "neighborhood": "日本堤",
+          "tags": [
+            "coffee",
+            "kissaten",
+            "roastery"
+          ],
+          "recommendation_types": [
+            "local_discovery"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "official",
+              "url": "https://www.bach-kaffee.co.jp/カフェ・バッハについて/",
+              "source_type": "official",
+              "source_group": "bach-kaffee.co.jp",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "상호·주소·영업시간·정기휴무 확인. 역사 설명은 운영자 자체 서술."
+            },
+            {
+              "key": "tourism",
+              "url": "https://www.gourmet.gotokyo.org/article/33.html",
+              "source_type": "tourism",
+              "source_group": "gotokyo.org",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "도쿄 공식 미식 가이드의 킷사텐 기사에서 바흐의 커피 문화 맥락 확인. 관광 홍보 성격을 구분."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "cafe",
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "tags",
+              "value": [
+                "coffee",
+                "kissaten",
+                "roastery"
+              ],
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "opening_hours",
+              "value": {
+                "timezone": "Asia/Tokyo",
+                "scope": "published_regular_schedule",
+                "weekly": {
+                  "monday": [
+                    {
+                      "start": "10:30",
+                      "end": "18:30",
+                      "end_day_offset": 0,
+                      "last_order": "18:15"
+                    }
+                  ],
+                  "tuesday": [],
+                  "wednesday": [
+                    {
+                      "start": "10:30",
+                      "end": "18:30",
+                      "end_day_offset": 0,
+                      "last_order": "18:15"
+                    }
+                  ],
+                  "thursday": [
+                    {
+                      "start": "10:30",
+                      "end": "18:30",
+                      "end_day_offset": 0,
+                      "last_order": "18:15"
+                    }
+                  ],
+                  "friday": [
+                    {
+                      "start": "10:30",
+                      "end": "18:30",
+                      "end_day_offset": 0,
+                      "last_order": "18:15"
+                    }
+                  ],
+                  "saturday": [
+                    {
+                      "start": "10:30",
+                      "end": "18:30",
+                      "end_day_offset": 0,
+                      "last_order": "18:15"
+                    }
+                  ],
+                  "sunday": [
+                    {
+                      "start": "10:30",
+                      "end": "18:30",
+                      "end_day_offset": 0,
+                      "last_order": "18:15"
+                    }
+                  ]
+                },
+                "exceptions": [
+                  {
+                    "kind": "nth_weekday_closed",
+                    "weekday": "wednesday",
+                    "ordinals": [
+                      2,
+                      4
+                    ]
+                  }
+                ],
+                "notes": [
+                  "둘째·넷째 수요일 휴무를 별도 적용해야 한다. 임시휴무 달력 재확인."
+                ]
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "local_evidence",
+              "value": {
+                "summary": "도쿄 공식 미식 가이드가 킷사텐·자가 로스팅 문화 사례로 소개한다. 방문자의 거주지는 조사하지 않았다.",
+                "source_groups": [
+                  "gotokyo.org"
+                ],
+                "evidence_type": "local_editorial"
+              },
+              "status": "provisional",
+              "source_key": "tourism",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_required",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_url",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_methods",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "booking_open_rule",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "min_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "max_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "children_rule",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "facility_capacity",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "cancellation_policy",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "deposit",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "live_availability",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "price",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "sensoji-asakusa-main-hall",
+          "name": "센소지",
+          "native_name": "浅草寺",
+          "address": "東京都台東区浅草2-3-1",
+          "category": "attraction",
+          "canonical_url": "https://www.senso-ji.jp/guide/",
+          "chain_id": null,
+          "neighborhood": "浅草",
+          "tags": [
+            "temple",
+            "history"
+          ],
+          "recommendation_types": [
+            "landmark"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "official",
+              "url": "https://www.senso-ji.jp/guide/",
+              "source_type": "official",
+              "source_group": "senso-ji.jp",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "사찰 본당 개당시간과 주소. 경내·다른 전각·기도 접수 시간과 구분."
+            },
+            {
+              "key": "tourism",
+              "url": "https://www.gotokyo.org/en/story/walks-and-tours/tokyo-itinerary/index.html",
+              "source_type": "tourism",
+              "source_group": "gotokyo.org",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "도쿄 공식 여행 가이드의 아사쿠사 대표 방문지. 페이지 갱신일 2026-03-11; 게시 시각은 미확인."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "attraction",
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "tags",
+              "value": [
+                "temple",
+                "history"
+              ],
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "opening_hours",
+              "value": {
+                "timezone": "Asia/Tokyo",
+                "scope": "published_regular_schedule",
+                "weekly": {},
+                "exceptions": [
+                  {
+                    "kind": "seasonal_hours",
+                    "months": [
+                      4,
+                      5,
+                      6,
+                      7,
+                      8,
+                      9
+                    ],
+                    "intervals": [
+                      {
+                        "start": "06:00",
+                        "end": "17:00",
+                        "end_day_offset": 0
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "seasonal_hours",
+                    "months": [
+                      10,
+                      11,
+                      12,
+                      1,
+                      2,
+                      3
+                    ],
+                    "intervals": [
+                      {
+                        "start": "06:30",
+                        "end": "17:00",
+                        "end_day_offset": 0
+                      }
+                    ]
+                  }
+                ],
+                "notes": [
+                  "본당: 4~9월 06:00–17:00, 10~3월 06:30–17:00. 경내 전체 운영시간으로 확대하지 않음."
+                ]
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "iconic_evidence",
+              "value": {
+                "summary": "도쿄 공식 대표 일정이 아사쿠사의 상징적 사찰로 소개한다.",
+                "source_groups": [
+                  "gotokyo.org"
+                ],
+                "evidence_type": "official_landmark"
+              },
+              "status": "verified",
+              "source_key": "tourism",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_required",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_url",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_methods",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "booking_open_rule",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "min_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "max_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "children_rule",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "facility_capacity",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "cancellation_policy",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "deposit",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "live_availability",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "price",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "tokyo-national-museum-ueno",
+          "name": "도쿄국립박물관",
+          "native_name": "東京国立博物館",
+          "address": "13-9 Ueno Park, Taito-ku, Tokyo 110-8712, Japan",
+          "category": "attraction",
+          "canonical_url": "https://www.tnm.jp/modules/r_free_page/index.php?id=113&lang=en",
+          "chain_id": null,
+          "neighborhood": "上野",
+          "tags": [
+            "museum",
+            "art",
+            "history"
+          ],
+          "recommendation_types": [
+            "landmark"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "official",
+              "url": "https://www.tnm.jp/modules/r_free_page/index.php?id=113&lang=en",
+              "source_type": "official",
+              "source_group": "tnm.jp",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "우에노 본관 캠퍼스 일반 소장품 전시 기준. 별전·구로다기념관·자료관의 조건을 섞지 않음."
+            },
+            {
+              "key": "tourism",
+              "url": "https://www.gotokyo.org/en/story/walks-and-tours/tokyo-itinerary/index.html",
+              "source_type": "tourism",
+              "source_group": "gotokyo.org",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "도쿄 공식 여행 가이드 우에노 문화 방문지 소개. 페이지 갱신일 2026-03-11; 게시 시각은 미확인."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "attraction",
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "tags",
+              "value": [
+                "museum",
+                "art",
+                "history"
+              ],
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "opening_hours",
+              "value": {
+                "timezone": "Asia/Tokyo",
+                "scope": "published_regular_schedule",
+                "weekly": {
+                  "monday": [],
+                  "tuesday": [
+                    {
+                      "start": "09:30",
+                      "end": "17:00",
+                      "end_day_offset": 0,
+                      "last_entry": "16:30"
+                    }
+                  ],
+                  "wednesday": [
+                    {
+                      "start": "09:30",
+                      "end": "17:00",
+                      "end_day_offset": 0,
+                      "last_entry": "16:30"
+                    }
+                  ],
+                  "thursday": [
+                    {
+                      "start": "09:30",
+                      "end": "17:00",
+                      "end_day_offset": 0,
+                      "last_entry": "16:30"
+                    }
+                  ],
+                  "sunday": [
+                    {
+                      "start": "09:30",
+                      "end": "17:00",
+                      "end_day_offset": 0,
+                      "last_entry": "16:30"
+                    }
+                  ],
+                  "friday": [
+                    {
+                      "start": "09:30",
+                      "end": "20:00",
+                      "end_day_offset": 0,
+                      "last_entry": "19:30"
+                    }
+                  ],
+                  "saturday": [
+                    {
+                      "start": "09:30",
+                      "end": "20:00",
+                      "end_day_offset": 0,
+                      "last_entry": "19:30"
+                    }
+                  ]
+                },
+                "exceptions": [
+                  {
+                    "kind": "closed_dates",
+                    "dates": [
+                      "2026-12-15",
+                      "2026-12-26",
+                      "2026-12-27",
+                      "2026-12-28",
+                      "2026-12-29",
+                      "2026-12-30",
+                      "2026-12-31"
+                    ]
+                  },
+                  {
+                    "kind": "partial_closure",
+                    "from": "2026-12-22",
+                    "through": "2026-12-25",
+                    "note": "법륭사보물관·구로다기념관만 개관."
+                  }
+                ],
+                "notes": [
+                  "월요일 공휴일 개관·다음 평일 휴관, 다음 월요일이 공휴일인 일요일은 연장. 특별전 별도."
+                ]
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "price",
+              "value": {
+                "currency": "JPY",
+                "amount_min": "1000",
+                "amount_max": "1000",
+                "basis": "per_person",
+                "period": "visit",
+                "tax_status": "unknown",
+                "conditions": "성인 일반 소장품 전시. 특별전 요금 제외."
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_url",
+              "value": "https://www.tnm.jp/modules/r_free_page/index.php?id=113&lang=en",
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_methods",
+              "value": {
+                "channels": [
+                  "official_website",
+                  "on_site"
+                ],
+                "conditions": "공식 안내에서 온라인 티켓 연결. 실제 구매/슬롯 조회 안 함."
+              },
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "children_rule",
+              "value": {
+                "conditions": "고등학생 이하 및 만18세 미만 일반 소장품 전시 무료; 증빙 필요. 특별전은 별도 확인."
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "iconic_evidence",
+              "value": {
+                "summary": "도쿄 공식 여행 가이드의 우에노 미술·역사 방문지.",
+                "source_groups": [
+                  "gotokyo.org"
+                ],
+                "evidence_type": "official_landmark"
+              },
+              "status": "verified",
+              "source_key": "tourism",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_required",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "booking_open_rule",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "min_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "max_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "facility_capacity",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "cancellation_policy",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "deposit",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "live_availability",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "hamarikyu-gardens-chuo",
+          "name": "하마리큐 온시 정원",
+          "native_name": "浜離宮恩賜庭園",
+          "address": "東京都中央区浜離宮庭園1-1",
+          "category": "attraction",
+          "canonical_url": "https://www.tokyo-park.or.jp/park/hama-rikyu/index.html",
+          "chain_id": null,
+          "neighborhood": "浜離宮庭園",
+          "tags": [
+            "garden",
+            "history",
+            "outdoors"
+          ],
+          "recommendation_types": [
+            "landmark"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "official",
+              "url": "https://www.tokyo-park.or.jp/park/hama-rikyu/index.html",
+              "source_type": "official",
+              "source_group": "tokyo-park.or.jp",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "공원 운영기관 기본 안내. 20인 단체 할인은 최소 예약 인원이나 시설 정원과 다름."
+            },
+            {
+              "key": "heritage",
+              "url": "https://www.tokyo-park.or.jp/teien/en/hama-rikyu/outline.html",
+              "source_type": "official",
+              "source_group": "tokyo-park.or.jp",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "운영기관 역사·문화재 지정 설명. 같은 운영자이므로 독립 근거 두 개로 세지 않음."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "attraction",
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "tags",
+              "value": [
+                "garden",
+                "history",
+                "outdoors"
+              ],
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "opening_hours",
+              "value": {
+                "timezone": "Asia/Tokyo",
+                "scope": "published_regular_schedule",
+                "weekly": {
+                  "monday": [
+                    {
+                      "start": "09:00",
+                      "end": "17:00",
+                      "end_day_offset": 0,
+                      "last_entry": "16:30"
+                    }
+                  ],
+                  "tuesday": [
+                    {
+                      "start": "09:00",
+                      "end": "17:00",
+                      "end_day_offset": 0,
+                      "last_entry": "16:30"
+                    }
+                  ],
+                  "wednesday": [
+                    {
+                      "start": "09:00",
+                      "end": "17:00",
+                      "end_day_offset": 0,
+                      "last_entry": "16:30"
+                    }
+                  ],
+                  "thursday": [
+                    {
+                      "start": "09:00",
+                      "end": "17:00",
+                      "end_day_offset": 0,
+                      "last_entry": "16:30"
+                    }
+                  ],
+                  "friday": [
+                    {
+                      "start": "09:00",
+                      "end": "17:00",
+                      "end_day_offset": 0,
+                      "last_entry": "16:30"
+                    }
+                  ],
+                  "saturday": [
+                    {
+                      "start": "09:00",
+                      "end": "17:00",
+                      "end_day_offset": 0,
+                      "last_entry": "16:30"
+                    }
+                  ],
+                  "sunday": [
+                    {
+                      "start": "09:00",
+                      "end": "17:00",
+                      "end_day_offset": 0,
+                      "last_entry": "16:30"
+                    }
+                  ]
+                },
+                "exceptions": [
+                  {
+                    "kind": "annual_closed_range",
+                    "start_month_day": "12-29",
+                    "end_month_day": "01-01"
+                  }
+                ],
+                "notes": [
+                  "행사 기간 연장·임시휴원을 별도 확인."
+                ]
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "price",
+              "value": {
+                "currency": "JPY",
+                "amount_min": "300",
+                "amount_max": "300",
+                "basis": "per_person",
+                "period": "visit",
+                "tax_status": "unknown",
+                "conditions": "일반 개인 입장권. 무료일·연령·단체 할인 제외."
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "children_rule",
+              "value": {
+                "conditions": "초등학생 이하 무료·보호자 동반 필요. 도쿄 거주/재학 중학생 무료 조건 별도."
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "iconic_evidence",
+              "value": {
+                "summary": "운영기관이 도쿠가와 정원과 국가 특별명승·특별사적 이력을 설명한다.",
+                "source_groups": [
+                  "tokyo-park.or.jp"
+                ],
+                "evidence_type": "heritage"
+              },
+              "status": "verified",
+              "source_key": "heritage",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_required",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_url",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_methods",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "booking_open_rule",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "min_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "max_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "facility_capacity",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "cancellation_policy",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "deposit",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "live_availability",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "official-barcelona-2026-10-01-v1",
+      "city": "barcelona",
+      "synthetic": false,
+      "places": [
+        {
+          "external_id": "can-culleretes-quintana",
+          "name": "칸 쿨레레테스",
+          "native_name": "Can Culleretes",
+          "address": "Carrer d’en Quintana, 5, 08002 Barcelona",
+          "category": "restaurant",
+          "canonical_url": "https://culleretes.com/en/contact/",
+          "chain_id": null,
+          "neighborhood": "Ciutat Vella",
+          "tags": [
+            "catalan_cuisine",
+            "historic_restaurant"
+          ],
+          "recommendation_types": [
+            "local_discovery"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "official",
+              "url": "https://culleretes.com/en/contact/",
+              "source_type": "official",
+              "source_group": "culleretes.com",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "공식 연락처 페이지에서 주소와 예약 전화·이메일 확인."
+            },
+            {
+              "key": "booking",
+              "url": "https://culleretes.com/en/",
+              "source_type": "official",
+              "source_group": "culleretes.com",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "예약/시간표 페이지는 최초 읽기에 성공했으나 재조회에 간헐적 오류. 현재 예약 완료를 의미하지 않는다."
+            },
+            {
+              "key": "spanish-lead",
+              "url": "https://culleretes.com/es/",
+              "source_type": "official",
+              "source_group": "culleretes.com",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": false,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "검색 결과에서 6인 기준 번역 차이 발견. 원문 fetch 실패로 확정 근거로 사용하지 않음."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "restaurant",
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "tags",
+              "value": [
+                "catalan_cuisine",
+                "historic_restaurant"
+              ],
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_url",
+              "value": "https://culleretes.com/en/",
+              "status": "verified",
+              "source_key": "booking",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_methods",
+              "value": {
+                "channels": [
+                  "telephone",
+                  "email",
+                  "official_website"
+                ],
+                "phones": [
+                  "+34-933173022",
+                  "+34-933176485"
+                ],
+                "email": "info@culleretes.com",
+                "conditions": "문의·예약 요청 경로이며 즉시 확정 아님."
+              },
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "opening_hours",
+              "value": {
+                "timezone": "Europe/Madrid",
+                "scope": "published_regular_schedule",
+                "weekly": {
+                  "monday": [],
+                  "tuesday": [
+                    {
+                      "start": "13:00",
+                      "end": "15:45",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "wednesday": [
+                    {
+                      "start": "13:00",
+                      "end": "15:45",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "sunday": [
+                    {
+                      "start": "13:00",
+                      "end": "15:45",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "thursday": [
+                    {
+                      "start": "13:00",
+                      "end": "15:45",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "20:00",
+                      "end": "22:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "friday": [
+                    {
+                      "start": "13:00",
+                      "end": "15:45",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "20:00",
+                      "end": "22:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "saturday": [
+                    {
+                      "start": "13:00",
+                      "end": "15:45",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "20:00",
+                      "end": "22:30",
+                      "end_day_offset": 0
+                    }
+                  ]
+                },
+                "exceptions": [],
+                "notes": [
+                  "월요일 공휴일 예외. 당일 임시 변경 재확인."
+                ]
+              },
+              "status": "provisional",
+              "source_key": "booking",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "local_evidence",
+              "value": {
+                "summary": "구시가지의 역사 있는 식당이라는 운영자 설명. 독립 지역 취재 본문은 확보하지 못해 선호 증거로 확정하지 않는다.",
+                "source_groups": [
+                  "culleretes.com"
+                ],
+                "evidence_type": "direct_confirmation"
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_required",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "booking_open_rule",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "min_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "max_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "children_rule",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "facility_capacity",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "cancellation_policy",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "deposit",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "live_availability",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "price",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "bar-la-plata-merce",
+          "name": "바 라 플라타",
+          "native_name": "La Plata",
+          "address": "Carrer de la Mercè, 28, 08002 Barcelona",
+          "category": "restaurant",
+          "canonical_url": "https://barlaplata.com/ubicacion-y-contacto/",
+          "chain_id": null,
+          "neighborhood": "Ciutat Vella",
+          "tags": [
+            "tapas",
+            "bar"
+          ],
+          "recommendation_types": [
+            "local_discovery"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "official",
+              "url": "https://barlaplata.com/ubicacion-y-contacto/",
+              "source_type": "official",
+              "source_group": "barlaplata.com",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "공식 지점 주소와 통상 시간표. 전화가 있다는 사실만으로 예약을 받는다고 추정하지 않음."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "restaurant",
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "tags",
+              "value": [
+                "tapas",
+                "bar"
+              ],
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "opening_hours",
+              "value": {
+                "timezone": "Europe/Madrid",
+                "scope": "published_regular_schedule",
+                "weekly": {
+                  "monday": [
+                    {
+                      "start": "11:00",
+                      "end": "15:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "18:00",
+                      "end": "23:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "tuesday": [
+                    {
+                      "start": "11:00",
+                      "end": "15:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "18:00",
+                      "end": "23:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "wednesday": [
+                    {
+                      "start": "11:00",
+                      "end": "15:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "18:00",
+                      "end": "23:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "thursday": [
+                    {
+                      "start": "11:00",
+                      "end": "15:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "18:00",
+                      "end": "23:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "friday": [
+                    {
+                      "start": "11:00",
+                      "end": "15:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "18:00",
+                      "end": "23:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "saturday": [
+                    {
+                      "start": "11:00",
+                      "end": "15:00",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "18:00",
+                      "end": "23:00",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "sunday": []
+                },
+                "exceptions": [],
+                "notes": [
+                  "일요일·공휴일 휴무."
+                ]
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "local_evidence",
+              "value": {
+                "summary": "운영자가 1945년 창업을 안내하는 구시가지 바 후보. 수상·주민 선호 주장은 독립 검증 전 제외.",
+                "source_groups": [
+                  "barlaplata.com"
+                ],
+                "evidence_type": "direct_confirmation"
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_required",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_url",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_methods",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "booking_open_rule",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "min_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "max_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "children_rule",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "facility_capacity",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "cancellation_policy",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "deposit",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "live_availability",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "price",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "granja-viader-xucla",
+          "name": "그란하 비아데르",
+          "native_name": "Granja Viader",
+          "address": "Carrer Xuclà, 4, 08001 Barcelona",
+          "category": "cafe",
+          "canonical_url": "https://granjaviader.cat/contacte/",
+          "chain_id": null,
+          "neighborhood": "El Raval",
+          "tags": [
+            "cafe",
+            "dairy",
+            "chocolate"
+          ],
+          "recommendation_types": [
+            "local_discovery"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "official",
+              "url": "https://granjaviader.cat/contacte/",
+              "source_type": "official",
+              "source_group": "granjaviader.cat",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "공식 연락처는 Xuclà4. 월요일 시간은 명시되지 않아 자동 휴무로 확정하지 않음."
+            },
+            {
+              "key": "premises",
+              "url": "https://granjaviader.cat/el-local/",
+              "source_type": "official",
+              "source_group": "granjaviader.cat",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "동일 운영자 매장 소개는 Xuclà4–6. 같은 지점 문맥이나 정확한 출입 주소 재확인 필요."
+            },
+            {
+              "key": "heritage",
+              "url": "https://granjaviader.cat/patrimoni-viu/",
+              "source_type": "official",
+              "source_group": "granjaviader.cat",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "공식 자체 문화유산 설명. 시정부 원문 재조회 실패 자료는 독립 검증에 계산하지 않음."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "cafe",
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "tags",
+              "value": [
+                "cafe",
+                "dairy",
+                "chocolate"
+              ],
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "opening_hours",
+              "value": {
+                "timezone": "Europe/Madrid",
+                "scope": "published_regular_schedule",
+                "weekly": {
+                  "tuesday": [
+                    {
+                      "start": "09:00",
+                      "end": "13:15",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "17:00",
+                      "end": "20:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "wednesday": [
+                    {
+                      "start": "09:00",
+                      "end": "13:15",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "17:00",
+                      "end": "20:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "thursday": [
+                    {
+                      "start": "09:00",
+                      "end": "13:15",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "17:00",
+                      "end": "20:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "friday": [
+                    {
+                      "start": "09:00",
+                      "end": "13:15",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "17:00",
+                      "end": "20:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "saturday": [
+                    {
+                      "start": "09:00",
+                      "end": "13:15",
+                      "end_day_offset": 0
+                    },
+                    {
+                      "start": "17:00",
+                      "end": "20:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "sunday": []
+                },
+                "exceptions": [],
+                "notes": [
+                  "공휴일 휴무. 월요일은 원문 미기재로 unknown."
+                ]
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "local_evidence",
+              "value": {
+                "summary": "라발의 오래된 유제품·초콜릿 카페라는 운영자 설명. 주소4/4–6 표기는 검토 필요. 주민 비율은 알 수 없다.",
+                "source_groups": [
+                  "granjaviader.cat"
+                ],
+                "evidence_type": "direct_confirmation"
+              },
+              "status": "provisional",
+              "source_key": "heritage",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_required",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_url",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_methods",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "booking_open_rule",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "min_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "max_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "children_rule",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "facility_capacity",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "cancellation_policy",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "deposit",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "live_availability",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "price",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "sagrada-familia-basilica",
+          "name": "사그라다 파밀리아",
+          "native_name": "Basílica de la Sagrada Família",
+          "address": "Carrer de Mallorca, 401, 08013 Barcelona; visitor entrance: Carrer de la Marina",
+          "category": "attraction",
+          "canonical_url": "https://sagradafamilia.org/en/sagrada-familia-ticket?inheritRedirect=true",
+          "chain_id": null,
+          "neighborhood": "Eixample",
+          "tags": [
+            "architecture",
+            "gaudi",
+            "basilica"
+          ],
+          "recommendation_types": [
+            "landmark"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "official",
+              "url": "https://sagradafamilia.org/en/sagrada-familia-ticket?inheritRedirect=true",
+              "source_type": "official",
+              "source_group": "sagradafamilia.org",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "기본 성당·박물관 티켓 안내. 탑·지하묘역은 이 상품에 포함되지 않음."
+            },
+            {
+              "key": "hours",
+              "url": "https://sagradafamilia.org/en/schedules-how-to-get?inheritRedirect=true",
+              "source_type": "official",
+              "source_group": "sagradafamilia.org",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "성당 입구와 계절 시간표. 같은 페이지의 Gaudí House Museum 정보는 별도 장소."
+            },
+            {
+              "key": "terms",
+              "url": "https://sagradafamilia.org/en/general-condition-purchase",
+              "source_type": "official",
+              "source_group": "sagradafamilia.org",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "구매조건2.1의 up to10과2.3의 구매 최대9 차이를 보존."
+            },
+            {
+              "key": "ticket-types",
+              "url": "https://sagradafamilia.org/en/tickets/?lang=en",
+              "source_type": "official",
+              "source_group": "sagradafamilia.org",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "개인≤9 안내와 날짜 없는 임시 폐쇄 fallback 문구가 함께 추출되어 현재 폐쇄 여부 확인 필요."
+            },
+            {
+              "key": "unesco",
+              "url": "https://whc.unesco.org/en/list/320/",
+              "source_type": "official",
+              "source_group": "unesco.org",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "UNESCO 등재 범위는 성당 전체가 아니라 탄생의 파사드와 지하예배당을 포함하는 Works of Antoni Gaudí."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "attraction",
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "tags",
+              "value": [
+                "architecture",
+                "gaudi",
+                "basilica"
+              ],
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_required",
+              "value": true,
+              "status": "provisional",
+              "source_key": "hours",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_url",
+              "value": "https://sagradafamilia.org/en/sagrada-familia-ticket?inheritRedirect=true",
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_methods",
+              "value": {
+                "channels": [
+                  "official_website"
+                ],
+                "conditions": "온라인 시간 지정 티켓. 잔여석은 조회하지 않음."
+              },
+              "status": "verified",
+              "source_key": "hours",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "price",
+              "value": {
+                "currency": "EUR",
+                "amount_min": "26",
+                "amount_max": "26",
+                "basis": "per_person",
+                "period": "visit",
+                "tax_status": "unknown",
+                "conditions": "성인 기본 성당·박물관·앱 오디오가이드. 탑 제외."
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "children_rule",
+              "value": {
+                "conditions": "16세 미만 성인 동반; 3세 미만 티켓 불필요, 11세 미만 기본 무료 조건. 탑 조건과 구분."
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "max_party",
+              "value": 9,
+              "status": "conflict",
+              "source_key": "ticket-types",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "max_party",
+              "value": 10,
+              "status": "conflict",
+              "source_key": "terms",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "opening_hours",
+              "value": {
+                "timezone": "Europe/Madrid",
+                "scope": "published_regular_schedule",
+                "weekly": {},
+                "exceptions": [
+                  {
+                    "kind": "annual_special_hours",
+                    "month_days": [
+                      "12-25",
+                      "12-26",
+                      "01-01",
+                      "01-06"
+                    ],
+                    "intervals": [
+                      {
+                        "start": "09:00",
+                        "end": "14:00",
+                        "end_day_offset": 0
+                      }
+                    ]
+                  }
+                ],
+                "notes": [
+                  "11~2월 월~토09:00–18:00/일10:30–18:00; 3·10월 평일09:00–19:00/토09:00–18:00/일10:30–19:00; 4~9월 평일09:00–20:00/토09:00–18:00/일10:30–20:00. 특별행사 변경 가능."
+                ]
+              },
+              "status": "provisional",
+              "source_key": "hours",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "closed",
+              "value": null,
+              "status": "conflict",
+              "source_key": "ticket-types",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "iconic_evidence",
+              "value": {
+                "summary": "UNESCO Works of Antoni Gaudí에는 이 성당의 탄생 파사드·지하예배당이 포함된다. 등재를 건물 전체에 확대하지 않는다.",
+                "source_groups": [
+                  "unesco.org"
+                ],
+                "evidence_type": "heritage"
+              },
+              "status": "verified",
+              "source_key": "unesco",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "booking_open_rule",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "min_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "facility_capacity",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "cancellation_policy",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "deposit",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "live_availability",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "park-guell-monumental",
+          "name": "구엘 공원",
+          "native_name": "Park Güell",
+          "address": "Park Güell, Barcelona; entrances at Carretera del Carmel and Avinguda del Santuari de Sant Josep de la Muntanya",
+          "category": "attraction",
+          "canonical_url": "https://parkguell.barcelona/en/planning-your-visit/prices-and-times",
+          "chain_id": null,
+          "neighborhood": "Gràcia",
+          "tags": [
+            "park",
+            "architecture",
+            "gaudi",
+            "outdoors"
+          ],
+          "recommendation_types": [
+            "landmark"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "official",
+              "url": "https://parkguell.barcelona/en/planning-your-visit/prices-and-times",
+              "source_type": "official",
+              "source_group": "parkguell.barcelona",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "일반 관광 방문 시간대·시간지정 입장·부가세 포함 티켓가격. 이웃 전용 시간과 구분."
+            },
+            {
+              "key": "access",
+              "url": "https://parkguell.barcelona/en/planning-your-visit/how-to-get-there",
+              "source_type": "official",
+              "source_group": "parkguell.barcelona",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "복수 입구 안내. 특정 숙소 기준 동선이나 확인하지 않은 번지·좌표를 만들지 않음."
+            },
+            {
+              "key": "unesco",
+              "url": "https://whc.unesco.org/en/list/320/",
+              "source_type": "official",
+              "source_group": "unesco.org",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "공원이 포함된 Gaudí 세계유산 목록. Sagrada와 같은 UNESCO 출처군."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "attraction",
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "tags",
+              "value": [
+                "park",
+                "architecture",
+                "gaudi",
+                "outdoors"
+              ],
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_url",
+              "value": "https://parkguell.barcelona/en/buy-tickets",
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_methods",
+              "value": {
+                "channels": [
+                  "official_website"
+                ],
+                "conditions": "시간 지정 티켓. 정해진 시간 후30분까지 입장, 재입장 불가."
+              },
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "price",
+              "value": {
+                "currency": "EUR",
+                "amount_min": "18",
+                "amount_max": "18",
+                "basis": "per_person",
+                "period": "visit",
+                "tax_status": "included",
+                "conditions": "일반 개인 입장권. 21%VAT 포함."
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "children_rule",
+              "value": {
+                "conditions": "0~6세 무료여도 입장권 필요; 7~12세 할인13.50EUR. 잔여석 의미 아님."
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "opening_hours",
+              "value": {
+                "timezone": "Europe/Madrid",
+                "scope": "published_regular_schedule",
+                "weekly": {},
+                "exceptions": [],
+                "notes": [
+                  "현재 공지의 관광 티켓 시작 시간09:30, 마지막 티켓 시간19:30.19:30을 시설 폐장으로 변환하지 않음. 07:00–09:30 및20:00–22:00은 이웃/Passi Verd 전용. 날짜별 달력 재확인."
+                ]
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "iconic_evidence",
+              "value": {
+                "summary": "UNESCO Works of Antoni Gaudí에 포함된 공원.",
+                "source_groups": [
+                  "unesco.org"
+                ],
+                "evidence_type": "heritage"
+              },
+              "status": "verified",
+              "source_key": "unesco",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_required",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "booking_open_rule",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "min_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "max_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "facility_capacity",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "cancellation_policy",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "deposit",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "live_availability",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "palau-musica-catalana-main",
+          "name": "카탈루냐 음악당",
+          "native_name": "Palau de la Música Catalana",
+          "address": "Carrer del Palau de la Música, 4-6, 08003 Barcelona",
+          "category": "attraction",
+          "canonical_url": "https://www.palaumusica.cat/en/practical-information_1642451",
+          "chain_id": null,
+          "neighborhood": "Ciutat Vella",
+          "tags": [
+            "architecture",
+            "music",
+            "modernisme"
+          ],
+          "recommendation_types": [
+            "landmark"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "official",
+              "url": "https://www.palaumusica.cat/en/practical-information_1642451",
+              "source_type": "official",
+              "source_group": "palaumusica.cat",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "건축 방문과 매표소·공연·카페 시간을 구분. 보관소 관련 본문 내부 상충은 별도 확인 필요."
+            },
+            {
+              "key": "about",
+              "url": "https://www.palaumusica.cat/en/discover-the-palau_1633301",
+              "source_type": "official",
+              "source_group": "palaumusica.cat",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "운영자 건축·방문 소개. 관람권은 공연 티켓을 포함하지 않음."
+            },
+            {
+              "key": "unesco",
+              "url": "https://whc.unesco.org/en/list/804/",
+              "source_type": "official",
+              "source_group": "unesco.org",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "read_confirmed": true,
+              "display_permitted": false,
+              "published_at": null,
+              "evidence_note": "음악당과 Sant Pau 병원의 UNESCO 공동 등재. 이 후보는 음악당 한 지점."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "attraction",
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "tags",
+              "value": [
+                "architecture",
+                "music",
+                "modernisme"
+              ],
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "opening_hours",
+              "value": {
+                "timezone": "Europe/Madrid",
+                "scope": "published_regular_schedule",
+                "weekly": {
+                  "monday": [
+                    {
+                      "start": "09:00",
+                      "end": "15:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "tuesday": [
+                    {
+                      "start": "09:00",
+                      "end": "15:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "wednesday": [
+                    {
+                      "start": "09:00",
+                      "end": "15:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "thursday": [
+                    {
+                      "start": "09:00",
+                      "end": "15:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "friday": [
+                    {
+                      "start": "09:00",
+                      "end": "15:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "saturday": [
+                    {
+                      "start": "09:00",
+                      "end": "15:30",
+                      "end_day_offset": 0
+                    }
+                  ],
+                  "sunday": [
+                    {
+                      "start": "09:00",
+                      "end": "15:30",
+                      "end_day_offset": 0
+                    }
+                  ]
+                },
+                "exceptions": [],
+                "notes": [
+                  "건축 방문 시간이며 매표소·공연 시간 아님. 구매 단계 변경 확인."
+                ]
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_url",
+              "value": "https://www.palaumusica.cat/en/buy-tickets_1641072",
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_methods",
+              "value": {
+                "channels": [
+                  "official_website",
+                  "on_site"
+                ],
+                "conditions": "사전 예약 권장. 현장 당일 판매 여부와 실제 슬롯은 별도 확인."
+              },
+              "status": "verified",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "price",
+              "value": {
+                "currency": "EUR",
+                "amount_min": "20",
+                "amount_max": "20",
+                "basis": "per_person",
+                "period": "visit",
+                "tax_status": "unknown",
+                "conditions": "브로슈어 제공 셀프가이드 방문 기본가격. 가이드24EUR·현장2EUR추가·공연별도."
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "children_rule",
+              "value": {
+                "conditions": "성인 동반10세 미만 무료. 구체적 상품·날짜 재확인."
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "cancellation_policy",
+              "value": {
+                "summary": "일반 방문 안내는 교환·환불 불가로 공지. 예외와 결제 최종약관 재확인."
+              },
+              "status": "provisional",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "iconic_evidence",
+              "value": {
+                "summary": "UNESCO에 등재된 Palau de la Música Catalana 건축물. 별도 Sant Pau 장소와 병합하지 않는다.",
+                "source_groups": [
+                  "unesco.org"
+                ],
+                "evidence_type": "heritage"
+              },
+              "status": "verified",
+              "source_key": "unesco",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "reservation_required",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "booking_open_rule",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "min_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "max_party",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "facility_capacity",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "deposit",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            },
+            {
+              "field": "live_availability",
+              "value": null,
+              "status": "unknown",
+              "source_key": "official",
+              "checked_at": "2026-10-01T08:47:51.062052+00:00",
+              "valid_for_date": null,
+              "expires_at": "2026-10-08T08:47:51.062052+00:00"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

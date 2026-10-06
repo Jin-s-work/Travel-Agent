@@ -1,0 +1,14 @@
+{
+  "version": "REPLACE_WITH_REVIEWED_ACCOUNT_PRICING_VERSION",
+  "confirmed_at": "REPLACE_WITH_UTC_ISO_TIMESTAMP",
+  "timezone": "UTC",
+  "prices": {
+    "apify/review_start": {"currency":"USD","rates_per_million":{"usd_micros":"1"},"max_units":{"usd_micros":3000000}},
+    "apify/review_poll": {"currency":"USD","rates_per_million":{"requests":null},"max_units":{"requests":1}},
+    "apify/review_page": {"currency":"USD","rates_per_million":{"requests":null},"max_units":{"requests":1}},
+    "apify/review_abort": {"currency":"USD","rates_per_million":{"requests":null},"max_units":{"requests":1}},
+    "apify/review_delete_dataset": {"currency":"USD","rates_per_million":{"requests":null},"max_units":{"requests":1}},
+    "apify/review_delete_run": {"currency":"USD","rates_per_million":{"requests":null},"max_units":{"requests":1}}
+  },
+  "limits": {"USD":{"user_daily":3000000,"user_monthly":3000000,"global_daily":3000000,"global_monthly":3000000}}
+}

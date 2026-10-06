@@ -12,3 +12,19 @@ langchain-tavily>=0.2.0
 fastapi>=0.115.0
 uvicorn[standard]>=0.32.0
 python-multipart>=0.0.9
+
+# OIDC 검증 및 일회성 OAuth 상태 쿠키
+Authlib>=1.8.0,<2
+itsdangerous>=2.2,<3
+httpx>=0.27,<1
+
+# Offline language identification; bundled models, no runtime download
+lingua-language-detector==2.2.0
+
+# Streaming encrypted off-host backup; S3 client retries explicitly bounded.
+cryptography==50.0.2
+boto3>=1.40,<2
+
+# Supabase PostgreSQL (session pooler); SQLite remains a local backend.
+psycopg[binary]==3.2.13
+psycopg-pool==3.2.8

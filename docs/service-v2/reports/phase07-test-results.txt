@@ -1,0 +1,87 @@
+2026-10-06 phase07; local synthetic fixtures, no paid provider calls
+
+FULL PYTHON
+...............................................sssssssssss.............. [  9%]
+........................................................................ [ 19%]
+........................................................................ [ 29%]
+........................................................................ [ 39%]
+........................................................................ [ 49%]
+........................................................................ [ 59%]
+........................................................................ [ 69%]
+........................................................................ [ 79%]
+........................................................................ [ 89%]
+........................................................................ [ 99%]
+..                                                                       [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.13/site-packages/fastapi/testclient.py:1
+  /Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag/.venv/lib/python3.13/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+.venv/lib/python3.13/site-packages/authlib/integrations/httpx_client/assertion_client.py:5
+  /Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag/.venv/lib/python3.13/site-packages/authlib/integrations/httpx_client/assertion_client.py:5: AuthlibDeprecationWarning: The httpx module is deprecated; please use httpx2 instead.
+    from ._compat import httpx2
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+711 passed, 11 skipped, 2 warnings in 72.59s (0:01:12)
+
+PHASE07 POSTGRES
+.................                                                        [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.13/site-packages/fastapi/testclient.py:1
+  /Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag/.venv/lib/python3.13/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/test_travel_preparation.py::test_task_transitions_scope_idempotency_version_and_persistence
+  /Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag/.venv/lib/python3.13/site-packages/authlib/integrations/httpx_client/assertion_client.py:5: AuthlibDeprecationWarning: The httpx module is deprecated; please use httpx2 instead.
+    from ._compat import httpx2
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+17 passed, 2 warnings in 15.37s
+
+CLOUD STORAGE REGRESSION
+...........                                                              [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.13/site-packages/fastapi/testclient.py:1
+  /Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag/.venv/lib/python3.13/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/test_cloud_storage.py::test_ephemeral_loss_keeps_originals_vectors_sessions_jobs_and_bookings
+  /Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag/.venv/lib/python3.13/site-packages/authlib/integrations/httpx_client/assertion_client.py:5: AuthlibDeprecationWarning: The httpx module is deprecated; please use httpx2 instead.
+    from ._compat import httpx2
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+11 passed, 2 warnings in 16.59s
+
+JS
+✔ apply posts the captured trip and versions once while a request is pending (2.633083ms)
+✔ unknown submit outcome preserves the idempotency key for an explicit retry (2.307834ms)
+✔ late submit response cannot activate results in another trip scope (0.622625ms)
+✔ comparison selection deduplicates, caps at three, and resets for another run (0.995167ms)
+✔ comparison facts never display unusable or conflicting numeric evidence as zero (0.805542ms)
+✔ unavailable review evidence does not become a 0 percent language claim (0.700917ms)
+✔ saved bookmark selections never inherit an unrelated or stale recommendation run (0.852042ms)
+✔ timeline dates include empty days through DST without device timezone arithmetic (9.251792ms)
+✔ keyboard time movement leaves local clocks for server DST validation (1.001166ms)
+✔ booking locks remain read only while user-locked places can use explicit unlock (0.852458ms)
+✔ structured conflict codes are rendered as user explanations instead of raw codes (0.718083ms)
+✔ refresh restores an existing itinerary by GET without creating another job (1.034375ms)
+✔ large text persists only a public preference and invalid values fall back to normal (1.484125ms)
+✔ planned rest has no reservation assertion while a place retains its booking state (0.5965ms)
+✔ zero travel is labeled same-place only with explicit identity evidence, never unknown duration (0.574042ms)
+✔ stale unknown travel hides retained identity claims while valid zero-minute legs keep them (1.056375ms)
+✔ all private API, download, query, cross-origin and mutation requests bypass the cache (31.195917ms)
+✔ activation removes prior caches, and only a public shell response can be cached (1.309541ms)
+✔ public asset URLs carry their current content hash to prevent mixed HTML and stale scripts (2.337291ms)
+✔ staged snapshots atomically activate and isolate accounts (13.125916ms)
+✔ quota failure during final activation preserves the previous valid snapshot (3.502459ms)
+✔ logout fences a download even after staging has completed (2.166541ms)
+✔ expiry, checksum corruption and sensitive fields fail closed (1.957583ms)
+✔ trip removal and revoked marker block local reads (3.843959ms)
+ℹ tests 24
+ℹ suites 0
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 129.693875

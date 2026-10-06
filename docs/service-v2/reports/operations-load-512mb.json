@@ -1,0 +1,109 @@
+{
+  "synthetic": true,
+  "external_provider_calls": 0,
+  "users": 5,
+  "read_requests": 1200,
+  "seconds_including_restart": 15.811,
+  "read_p50_ms": 46.23,
+  "read_p95_ms": 90.42,
+  "errors": [],
+  "idle_cgroup": {
+    "memory.current": "71110656",
+    "memory.peak": "71589888",
+    "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+    "cpu.stat": "usage_usec 1556755\nuser_usec 1283553\nsystem_usec 273202\ncore_sched.force_idle_usec 0\nnr_periods 202\nnr_throttled 23\nthrottled_usec 897822\nnr_bursts 0\nburst_usec 0",
+    "rss_bytes": 85200896,
+    "disk_bytes": 730208
+  },
+  "peak_cgroup": {
+    "memory.current": "109486080",
+    "memory.peak": "110264320",
+    "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+    "cpu.stat": "usage_usec 8156928\nuser_usec 6320063\nsystem_usec 1836865\ncore_sched.force_idle_usec 0\nnr_periods 337\nnr_throttled 156\nthrottled_usec 10851363\nnr_bursts 0\nburst_usec 0",
+    "rss_bytes": 150687744,
+    "disk_bytes": 1216147
+  },
+  "disk_growth_bytes": 485939,
+  "operations": {
+    "health": {
+      "ready": true,
+      "checks": {
+        "schema": true,
+        "storage": true,
+        "dispatcher": true,
+        "identity": true,
+        "restore": true
+      }
+    },
+    "observations": {
+      "window_samples": 1264,
+      "requests_by_status": {
+        "2xx": 1264
+      },
+      "readiness_excluded": true,
+      "http_ms_p50": 14.57,
+      "http_ms_p95": 87.15,
+      "peak_rss_bytes": 150556672,
+      "cpu_seconds": 7.91,
+      "disk": {
+        "total_bytes": 41954803712,
+        "free_bytes": 28318380032
+      },
+      "backup_events": [],
+      "queue": {
+        "succeeded": 2
+      },
+      "oldest_queue_seconds": 0,
+      "budgets": [
+        {
+          "currency": "USD",
+          "period": "global_daily",
+          "used_or_reserved_micros": 0,
+          "limit_micros": 1000000,
+          "remaining_micros": 1000000
+        },
+        {
+          "currency": "USD",
+          "period": "global_monthly",
+          "used_or_reserved_micros": 0,
+          "limit_micros": 1000000,
+          "remaining_micros": 1000000
+        }
+      ],
+      "billing_outside_app_observed": false,
+      "provider_errors": [],
+      "job_retries": 0,
+      "job_errors": [],
+      "provider_attempts": [
+        {
+          "provider": "fake",
+          "state": "settled",
+          "count": 2
+        }
+      ],
+      "uncertain_charges": 0
+    }
+  },
+  "jobs": [
+    {
+      "operation": "documents",
+      "state": "succeeded",
+      "attempt": 1,
+      "created_at": "2026-10-05T16:16:32.537595+00:00",
+      "started_at": "2026-10-05T16:16:32.613431+00:00",
+      "finished_at": "2026-10-05T16:16:36.934724+00:00"
+    },
+    {
+      "operation": "recommendations",
+      "state": "succeeded",
+      "attempt": 1,
+      "created_at": "2026-10-05T16:16:32.556847+00:00",
+      "started_at": "2026-10-05T16:16:36.940700+00:00",
+      "finished_at": "2026-10-05T16:16:37.632211+00:00"
+    }
+  ],
+  "restart_preserved_bookings": true,
+  "cross_user_404": true,
+  "duplicate_reused_job": true,
+  "sse_reconnected": true
+}

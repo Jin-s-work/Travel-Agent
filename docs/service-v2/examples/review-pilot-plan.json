@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "state": "prepared_not_run",
+  "provider": "apify",
+  "actor": "compass/google-maps-reviews-scraper",
+  "pinned_build": "0.0.527",
+  "approved_payment": false,
+  "proposed_experiment_cap_usd": "3.00",
+  "account_credit_verified": false,
+  "data_use_review_complete": false,
+  "stages": [
+    {"stage":"A","max_records_per_place":100,"tokyo_places":3,"barcelona_places":3,"max_pages":20,"max_attempts_per_page":2,"window_days":180,"max_seconds_per_place":300,"suggested_total_cap_usd":"0.75","verified_place_ids":[],"required_original_structure_checks":30},
+    {"stage":"B","requires_stage_A_review":"passed","max_records_per_place":200,"tokyo_places":5,"barcelona_places":5,"max_pages":20,"max_attempts_per_page":2,"window_days":180,"max_seconds_per_place":300,"suggested_total_cap_usd":"2.25","verified_place_ids":[],"required_original_checks_per_city":20,"required_heldout_review_labels_per_city":100}
+  ],
+  "stop_conditions": ["policy_or_identity_unverified","account_or_price_unverified","budget_exhausted","captcha_or_auth_required","response_outcome_unknown","repeated_cursor","sort_inversion","ambiguous_dates","remote_retention_cleanup_failed"],
+  "note": "Empty target IDs must be filled with verified branch records before any live run. Suggested dollar amounts are neither payment authorization nor pricing guarantees. Stage B must not run automatically from synthetic Stage A results."
+}

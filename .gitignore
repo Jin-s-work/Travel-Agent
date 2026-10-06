@@ -34,3 +34,13 @@ reports/agent_*.txt
 .vscode/
 .claude/
 .cursor/
+
+# Host-only secret files for the free VM deployment
+deploy/free-vm/.env
+
+# JavaScript test dependencies
+node_modules/
+
+# Private Render/Supabase handoff files
+deploy/render-supabase/.env
+deploy/render-supabase/.env.render

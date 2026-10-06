@@ -1,0 +1,246 @@
+{
+  "checked_at": "2026-10-05T16:15:30.190309+00:00",
+  "app_revision": "aefee57 + uncommitted phase 01–06",
+  "live_deployment": "not_run",
+  "pack_version": "official-candidate-audit-2026-10-01-v1",
+  "cities": [
+    {
+      "city": "tokyo",
+      "pack_version": "official-tokyo-2026-10-01-v1",
+      "candidates": 6,
+      "recommendation_types": {
+        "local_discovery": 3,
+        "landmark": 3
+      },
+      "facts": {
+        "verified": 19,
+        "provisional": 13,
+        "unknown": 64
+      },
+      "sources": 10,
+      "display_permitted_sources": 0,
+      "expired_facts": 0,
+      "production_valid_candidates": 0,
+      "unapproved_candidates": 6,
+      "missing_coordinates": 6,
+      "field_status": {
+        "booking_open_rule": {
+          "unknown": 6
+        },
+        "cancellation_policy": {
+          "unknown": 6
+        },
+        "category": {
+          "verified": 6
+        },
+        "children_rule": {
+          "unknown": 4,
+          "provisional": 2
+        },
+        "deposit": {
+          "unknown": 6
+        },
+        "facility_capacity": {
+          "unknown": 5,
+          "verified": 1
+        },
+        "iconic_evidence": {
+          "verified": 3
+        },
+        "live_availability": {
+          "unknown": 6
+        },
+        "local_evidence": {
+          "provisional": 3
+        },
+        "max_party": {
+          "unknown": 6
+        },
+        "min_party": {
+          "unknown": 6
+        },
+        "opening_hours": {
+          "provisional": 6
+        },
+        "price": {
+          "unknown": 4,
+          "provisional": 2
+        },
+        "reservation_methods": {
+          "unknown": 4,
+          "verified": 2
+        },
+        "reservation_required": {
+          "unknown": 6
+        },
+        "reservation_url": {
+          "unknown": 5,
+          "verified": 1
+        },
+        "tags": {
+          "verified": 6
+        }
+      },
+      "places": [
+        {
+          "name": "간다 마쓰야",
+          "native_name": "神田まつや",
+          "address": "東京都千代田区神田須田町1-13",
+          "source": "https://visit-chiyoda.tokyo/app/spot/detail/359"
+        },
+        {
+          "name": "니혼바시 타마이 본점",
+          "native_name": "日本橋 玉ゐ 本店",
+          "address": "東京都中央区日本橋2-9-9",
+          "source": "https://anago-tamai.com/nihonbashi/"
+        },
+        {
+          "name": "카페 바흐",
+          "native_name": "カフェ・バッハ",
+          "address": "東京都台東区日本堤1-23-9",
+          "source": "https://www.bach-kaffee.co.jp/カフェ・バッハについて/"
+        },
+        {
+          "name": "센소지",
+          "native_name": "浅草寺",
+          "address": "東京都台東区浅草2-3-1",
+          "source": "https://www.senso-ji.jp/guide/"
+        },
+        {
+          "name": "도쿄국립박물관",
+          "native_name": "東京国立博物館",
+          "address": "13-9 Ueno Park, Taito-ku, Tokyo 110-8712, Japan",
+          "source": "https://www.tnm.jp/modules/r_free_page/index.php?id=113&lang=en"
+        },
+        {
+          "name": "하마리큐 온시 정원",
+          "native_name": "浜離宮恩賜庭園",
+          "address": "東京都中央区浜離宮庭園1-1",
+          "source": "https://www.tokyo-park.or.jp/park/hama-rikyu/index.html"
+        }
+      ]
+    },
+    {
+      "city": "barcelona",
+      "pack_version": "official-barcelona-2026-10-01-v1",
+      "candidates": 6,
+      "recommendation_types": {
+        "local_discovery": 3,
+        "landmark": 3
+      },
+      "facts": {
+        "verified": 23,
+        "provisional": 17,
+        "unknown": 55,
+        "conflict": 3
+      },
+      "sources": 18,
+      "display_permitted_sources": 0,
+      "expired_facts": 0,
+      "production_valid_candidates": 0,
+      "unapproved_candidates": 6,
+      "missing_coordinates": 6,
+      "field_status": {
+        "booking_open_rule": {
+          "unknown": 6
+        },
+        "cancellation_policy": {
+          "unknown": 5,
+          "provisional": 1
+        },
+        "category": {
+          "verified": 6
+        },
+        "children_rule": {
+          "unknown": 3,
+          "provisional": 3
+        },
+        "closed": {
+          "conflict": 1
+        },
+        "deposit": {
+          "unknown": 6
+        },
+        "facility_capacity": {
+          "unknown": 6
+        },
+        "iconic_evidence": {
+          "verified": 3
+        },
+        "live_availability": {
+          "unknown": 6
+        },
+        "local_evidence": {
+          "provisional": 3
+        },
+        "max_party": {
+          "unknown": 5,
+          "conflict": 2
+        },
+        "min_party": {
+          "unknown": 6
+        },
+        "opening_hours": {
+          "provisional": 6
+        },
+        "price": {
+          "unknown": 3,
+          "provisional": 3
+        },
+        "reservation_methods": {
+          "verified": 4,
+          "unknown": 2
+        },
+        "reservation_required": {
+          "unknown": 5,
+          "provisional": 1
+        },
+        "reservation_url": {
+          "verified": 4,
+          "unknown": 2
+        },
+        "tags": {
+          "verified": 6
+        }
+      },
+      "places": [
+        {
+          "name": "칸 쿨레레테스",
+          "native_name": "Can Culleretes",
+          "address": "Carrer d’en Quintana, 5, 08002 Barcelona",
+          "source": "https://culleretes.com/en/contact/"
+        },
+        {
+          "name": "바 라 플라타",
+          "native_name": "La Plata",
+          "address": "Carrer de la Mercè, 28, 08002 Barcelona",
+          "source": "https://barlaplata.com/ubicacion-y-contacto/"
+        },
+        {
+          "name": "그란하 비아데르",
+          "native_name": "Granja Viader",
+          "address": "Carrer Xuclà, 4, 08001 Barcelona",
+          "source": "https://granjaviader.cat/contacte/"
+        },
+        {
+          "name": "사그라다 파밀리아",
+          "native_name": "Basílica de la Sagrada Família",
+          "address": "Carrer de Mallorca, 401, 08013 Barcelona; visitor entrance: Carrer de la Marina",
+          "source": "https://sagradafamilia.org/en/sagrada-familia-ticket?inheritRedirect=true"
+        },
+        {
+          "name": "구엘 공원",
+          "native_name": "Park Güell",
+          "address": "Park Güell, Barcelona; entrances at Carretera del Carmel and Avinguda del Santuari de Sant Josep de la Muntanya",
+          "source": "https://parkguell.barcelona/en/planning-your-visit/prices-and-times"
+        },
+        {
+          "name": "카탈루냐 음악당",
+          "native_name": "Palau de la Música Catalana",
+          "address": "Carrer del Palau de la Música, 4-6, 08003 Barcelona",
+          "source": "https://www.palaumusica.cat/en/practical-information_1642451"
+        }
+      ]
+    }
+  ]
+}

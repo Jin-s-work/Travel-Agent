@@ -1,32 +1,19 @@
-# chromadb 1.5.x의 공식 지원 범위가 3.13까지다. 3.14에서는 import가 멈춘다.
-FROM python:3.13-slim
-
-# Spaces는 컨테이너를 UID 1000으로 실행한다. root로 만든 파일에는 쓸 수 없으므로
-# 같은 사용자를 만들어 두고 그 홈 아래에서 작업한다.
-RUN useradd -m -u 1000 user
-USER user
-ENV HOME=/home/user \
-    PATH=/home/user/.local/bin:$PATH \
-    PYTHONUNBUFFERED=1
-
-WORKDIR $HOME/app
-
-COPY --chown=user requirements.txt .
-RUN pip install --no-cache-dir --user -r requirements.txt
-
-COPY --chown=user api.py .
-COPY --chown=user src/ ./src/
-COPY --chown=user web/ ./web/
-
-# 인덱스 자동 복구용. 추출 결과와 그 근거가 되는 데모 메일이 함께 있어야 한다.
-COPY --chown=user seed/ ./seed/
-COPY --chown=user tests/sample_emails/ ./tests/sample_emails/
-COPY --chown=user tests/demo_emails/ ./tests/demo_emails/
-
-# 업로드한 메일과 벡터 인덱스가 쌓이는 곳. 영구 저장은 아니다.
-RUN mkdir -p data/emails data/chroma
-
-# 호스트마다 포트 지정 방식이 다르다. Render는 PORT를 주입하고,
-# 지정이 없으면 7860(Spaces 관례)으로 뜬다. 셸 형식이라야 변수가 확장된다.
+# Production service. Python 3.13 matches the supported Chroma runtime.
+FROM python:3.13.12-slim@sha256:f1927c75e81efd1e091dbd64b6c0ecaa5630b38635a3d1c04034ac636e1f94c8
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 PIP_NO_CACHE_DIR=1 \
+    APP_ENV=production SEED_ON_EMPTY=0 WEB_CONCURRENCY=1 \
+    PERSISTENT_STORAGE_ROOT=/var/data \
+    DATABASE_PATH=/var/data/sql/service.sqlite3 \
+    DOCUMENTS_DIR=/var/data/documents VECTORS_DIR=/var/data/vectors \
+    EMAILS_DIR=/var/data/legacy-emails CHROMA_DIR=/var/data/legacy-chroma
+RUN useradd --create-home --uid 1000 user && mkdir -p /var/data /app && chown user:user /var/data /app
+WORKDIR /app
+COPY requirements.lock ./requirements.lock
+RUN pip install --no-cache-dir -r requirements.lock
+COPY --chown=user:user api.py ./
+COPY --chown=user:user src/ ./src/
+COPY --chown=user:user web/ ./web/
+COPY --chown=user:user deploy/render-supabase/pricing-zero.json ./deploy/render-supabase/pricing-zero.json
+USER 1000:1000
 EXPOSE 7860
-CMD uvicorn api:app --host 0.0.0.0 --port ${PORT:-7860}
+CMD ["python", "-m", "src.operations.launch"]

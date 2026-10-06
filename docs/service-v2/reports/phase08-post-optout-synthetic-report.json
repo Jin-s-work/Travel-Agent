@@ -1,0 +1,74 @@
+{
+  "period": {
+    "start": "2026-10-01T00:00:00+00:00",
+    "end": "2026-10-07T00:00:00+00:00",
+    "interval": "[start,end)",
+    "timezone": "UTC"
+  },
+  "cohort": {
+    "city": null,
+    "ranker_version": null,
+    "recommendation_type": null,
+    "language_required": null,
+    "synthetic": true,
+    "analytics": "explicit_opt_in",
+    "retention_days": 30,
+    "users": 0,
+    "completed_runs": 0,
+    "exposed_runs": 0,
+    "candidate_count": 0
+  },
+  "metrics": {
+    "candidate_shortage": {
+      "numerator": 0,
+      "denominator": 0,
+      "ratio": null,
+      "display": "미측정",
+      "emphasize_ratio": false
+    },
+    "language_unsupported": {
+      "numerator": 0,
+      "denominator": 0,
+      "ratio": null,
+      "display": "미측정",
+      "emphasize_ratio": false
+    },
+    "exposure_to_save": {
+      "numerator": 0,
+      "denominator": 0,
+      "ratio": null,
+      "display": "미측정",
+      "emphasize_ratio": false
+    },
+    "itinerary_adoption": {
+      "numerator": 0,
+      "denominator": 0,
+      "ratio": null,
+      "display": "미측정",
+      "emphasize_ratio": false
+    }
+  },
+  "currently_saved_exposed_pairs": 0,
+  "feedback_cohort": {
+    "users": 0,
+    "without_recommendation_run": 0,
+    "basis": "current_unwithdrawn_updated_in_period"
+  },
+  "feedback_current": {},
+  "reason_counts": {},
+  "fact_report_counts": {},
+  "source_link_opens": 0,
+  "booking_completion_transitions": {},
+  "operating_cost_by_currency": {},
+  "failed_cancelled_unattributed_costs": {},
+  "excluded_events": {},
+  "measurement_limits": [
+    "완료 시각이 기간 안인 참여 run의 기간 내 노출만 집계",
+    "오프라인·분석 미참여·보관 기간 밖 자료 제외",
+    "브라우저 노출은 best-effort이며 차단/전송 실패는 측정하지 못함",
+    "source_open은 링크 열기이며 읽기/예약 완료가 아님",
+    "개인 메모는 분석 제외",
+    "소수 지인 베타이며 일반 여행자 선호나 인과 효과로 일반화 불가",
+    "실패/취소 비용은 미귀속 별도 표시; 공유 장소 조사 비용은 요청당 비용에 배분하지 않음"
+  ]
+}
