@@ -71,4 +71,13 @@ Chrome/macOS, 로컬 합성 OIDC/공급자 서버(`tests/browser_discovery_fixtu
 
 ### 이번 운영 반영
 
-배포 준비/백업/회귀 검증 완료. 실제 runtime revision/health는 배포 확인 뒤 아래에 기록한다.
+- URL: https://travel-inbox-rag.onrender.com . 기존 Render Free/Supabase hii 유지, 유료 설정 변경 없음.
+- runtime commit `a3c1285c7ac8688308bf8d4c5e70c5e155703be0`, branch `codex/private-beta-launch`; 수동 배포 `dep-db2aqve0tbcc738imafg`. Render 로그 **2026-10-06 17:13:57 KST Your service is live**, 화면 Deploy succeeded|Live 확인.
+- 실제 HTTPS `/health/ready`200: schema/storage/dispatcher/identity/restore 모두true, `/health/live`200, `/`200. 새 JS `7799ae6dcd8e`, CSS `3b1c57cc38c1` 확인. 로그인 없는 `/api/v2/trips`, `/api/v2/cities`401.
+- 운영 Supabase READ ONLY 조사: schema11, 기존 users/trips/stops/bookings 수가 백업 전과 일치, 신규 context/intent0개. 새 두 테이블 RLS 활성화. 기존 명시값/개인 자료를 배포 과정에서 바꾸지 않았다.
+- 실제 기존 로그인 세션에서 4메뉴→탐색→Madrid 체류일 칩/성인2명 상속, 후보0 안내, 새 여행 모달 New York 검색→뉴욕 선택, min/max 날짜 범위를 확인했다. 모달은 저장하지 않고 닫았으며 새로고침 후 선택 여행/탐색 화면 복원을 확인했다. 관측 console error0.
+- 기존 ‘바르셀로나’ 제목의 여행은 등록 도시가 Madrid다. 제목만 보고 도시를 자동 바꾸지 않았다. 실제 희망 도시가 다르면 여행 수정에서 사용자가 변경해야 한다.
+- 공개 health의 첫 시스템 Python 시도는 TLS 클라이언트 오류로 실패했으며 이를 서비스 성공으로 세지 않았다. 프로젝트 httpx의 정상 TLS 검증으로 위 결과를 재확인했다.
+- 운영 Google OAuth 신규 로그인/로그아웃 왕복을 이번 배포에서 다시 수행하지 않았다. 기존 실세션 인증과 보존 데이터 조회, 로컬 합성 OIDC 전체 흐름을 구분한다.
+- Render Free의 기동 대기 화면을 관측했다. 항상 즉시 응답/무중단 보장은 아니다. 전체 운영용 Supabase 복원 재주입과 실제 공급자 품질은 미검증.
+- 운영 화면 캡처는 개인 여행이 포함되어 로컬 출력 폴더에만 보관했다. 저장소 보고서 스크린샷은 합성 로컬 자료만 포함한다.
