@@ -468,3 +468,5 @@ node --test tests/*.cjs
 로컬 Docker native arm64 빌드 `travel-inbox-beta:20261006` 성공. amd64 지정 빌드는 호스트의 legacy Docker builder platform metadata 문제로 실패하여 Render Linux amd64 검증으로 간주하지 않는다. staged diff 검사는 기존 PRD의 의도된 Markdown hard-break 3줄을 제외하고 통과했다.
 
 DB 비밀번호 확인/필요 시 소유자의 직접 재설정과 Google 웹 클라이언트 발급/입력 대기다. 실제 새 배포·HTTPS 로그인·Supabase 왕복/재시작/외부 복원은 아직 미검증이다. 새 지출·지인 초대 발송 없음.
+
+배포용 코드 커밋 `039c63c`를 `origin/codex/private-beta-launch`에 push했다. `main` 및 기존 Render 서비스는 변경하지 않았다. Docker native 이미지의 UID1000·비밀 .env 미포함·최신 public shell v12 포함을 검증했고, 설정 없는 실제 launcher가 exit78로 거절하는 것을 확인했다. 입력 파일은 권한600이며 Git tracked 목록에서 제외됨을 재확인했다. 새 운영 서비스 배포는 아직 실행하지 않았고, Google 웹 클라이언트 및 hii 비밀값 입력이 남았다.
