@@ -957,7 +957,7 @@
     if(model.busy&&model.step!=null){const steps=make('ol','recommendation-steps');steps.setAttribute('aria-label','추천 진행 단계');['여행 조건','장소·이동 확인','결과 정리'].forEach((label,index)=>{const step=make('li');step.dataset.state=index<model.step?'complete':index===model.step?'current':'pending';if(index===model.step)step.setAttribute('aria-current','step');const mark=make('span','recommendation-step-mark',index<model.step?'✓':String(index+1));mark.setAttribute('aria-hidden','true');step.append(mark,make('span','',label));steps.append(step);});host.append(steps);}
     if(model.count)host.append(make('p','recommendation-progress-count',model.count));
     const actions=make('div','actions'),active=r.active,job=active?.job||{},jobId=active?.job_id||job.job_id;
-    if(busy&&jobId&&!job.cancel_requested_at&&!r.cancelPending){actions.append(button('그만 찾기',async()=>{r.cancelPending=true;renderRecommendationProgress();try{const cancelled=await api('/jobs/'+encodeURIComponent(jobId)+'/cancel',{method:'POST'});if(state.recommendations!==r)return;if(r.active?.run_id===active.run_id)r.active.job=cancelled;await loadRecommendations({runId:active.run_id});}catch(error){if(state.recommendations===r)fail(error,$('#recommendationError'));}finally{if(state.recommendations===r){r.cancelPending=false;renderRecommendationProgress();}}},'text-button'));}
+    if(model.state!=='validating'&&['queued','running'].includes(active?.state)&&jobId&&!job.cancel_requested_at&&!r.cancelPending){actions.append(button('그만 찾기',async()=>{r.cancelPending=true;renderRecommendationProgress();try{const cancelled=await api('/jobs/'+encodeURIComponent(jobId)+'/cancel',{method:'POST'});if(state.recommendations!==r)return;if(r.active?.run_id===active.run_id)r.active.job=cancelled;await loadRecommendations({runId:active.run_id});}catch(error){if(state.recommendations===r)fail(error,$('#recommendationError'));}finally{if(state.recommendations===r){r.cancelPending=false;renderRecommendationProgress();}}},'text-button'));}
     if(model.action==='refresh')actions.append(button('저장된 요청 확인',()=>{r.requestError=null;loadRecommendations().catch(error=>fail(error,$('#recommendationError')));},'secondary'));
     if(model.action==='retry')actions.append(button('다시 추천 찾기',applyRecommendations,'secondary'));
     if(model.action==='conditions')actions.append(button('방문 조건 확인',discoveryConditionsForm,'secondary'));
@@ -965,7 +965,7 @@
     if(model.action==='saved')actions.append(button('저장한 장소 보기',()=>setExploreView('saved'),'secondary'));
     if(r.needsInputRefresh)actions.append(button('최신 여행·조건 확인',async()=>{try{await Promise.all([loadBookings(),loadDiscovery({quiet:true})]);if(state.recommendations!==r)return;r.needsInputRefresh=false;renderRecommendationResults();}catch(e){fail(e,$('#recommendationError'));}},'secondary'));
     if(actions.children.length)host.append(actions);
-    if(active?.error_code||job.error_code)appendRecommendationReasons(host,[active?.error_code||job.error_code]);appendRecommendationReasons(host,active?.reason_codes||[]);
+    if(model.state!=='validating'){if(active?.error_code||job.error_code)appendRecommendationReasons(host,[active?.error_code||job.error_code]);appendRecommendationReasons(host,active?.reason_codes||[]);}
   }
   function renderRecommendationSummary(host,result){
     const counts=recommendationCounts(result);if(!counts.displayable)return;
