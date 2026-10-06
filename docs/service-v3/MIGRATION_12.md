@@ -1,6 +1,6 @@
 # V3 2단계 schema 12 이관과 복구
 
-작성일: 2026-10-06. **구현·격리 이관·사전 백업 검증 완료, 운영 배포는 대기 중**이다. 이 문서는 운영 Supabase에 schema 12가 적용됐다는 증거가 아니다. 배포 결과는 [진행 기록](IMPLEMENTATION_STATUS.md)에 별도로 기록한다.
+작성일: 2026-10-06. 아래 절차는 사전 검증 시 작성했다. 이후 **18:09:02 KST 운영 배포 완료**, READ ONLY 조회에서 schema12·RLS·기존 행 값 보존과 unresolved 숙소1건을 확인했다. 실제 배포 증거는 [진행 기록](IMPLEMENTATION_STATUS.md)의 V3 2단계 운영 반영을 기준으로 한다.
 
 ## 1. 변경 범위와 보존 계약
 
@@ -116,7 +116,7 @@ schema 11 원본 복원을 검증한 뒤 **격리 복원본의 별도 사본**�
 4. 지도 제공자가 OFF인 경우 저장·조회 가능, 좌표 없는 숙소의 위치 미확인 표시, 실제 외부 호출 0.
 5. 새로고침·서버 재시작 후 자료 유지, 숙소 변경 후 이전 추천·일정의 재확인 표시.
 
-현재 문서 작성 시 이 운영 배포 단계는 대기 상태다.
+사전 문서 작성 시에는 배포 대기였으며, 이후 확인한 운영 결과는 문서 상단과 진행 기록에 별도로 추가했다.
 
 ## 5. 기능 OFF, 이미지 변경, DB 복원은 다른 작업
 
@@ -191,4 +191,4 @@ PostgreSQL 시험에는 기존 `tests.postgres_plugin`과 임시 loopback Postgr
 PYTHON_DOTENV_DISABLED=1 .venv/bin/python -m pytest -p tests.postgres_plugin tests/test_accommodations_api.py tests/test_stage2_itinerary.py tests/test_itinerary_api.py -q
 ```
 
-전체 실제 실행 결과·기기 검증·배포 상태는 [진행 기록](IMPLEMENTATION_STATUS.md)의 마지막 실행 기록을 기준으로 한다. 이 문서는 운영 배포 대기 상태에서 작성했으며 배포 성공·라이브 지도 검증·운영 DB 재주입을 주장하지 않는다.
+전체 실제 실행 결과·기기 검증·배포 상태는 [진행 기록](IMPLEMENTATION_STATUS.md)의 마지막 실행 기록을 기준으로 한다. 절차 작성 이후 운영 배포와 이관은 확인했다. 라이브 지도 품질 검증·운영 DB 재주입은 수행하지 않았다.

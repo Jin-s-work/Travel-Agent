@@ -95,4 +95,15 @@ Chrome/macOS, 로컬 합성 OIDC/공급자 서버(`tests/browser_discovery_fixtu
 - 합성 geocoding1회·route8회10elements, 시험ledger11microUSD settled. **실제 Maps/신규 유료 호출0**.
 - 실제 schema11 운영 백업을 READ ONLY로 암호화해 운영 디스크 밖에 보관,13.12초. 격리복원0.04초, integrity/FK/소유권 정상, 기존 건수 동일. 실제 운영 복원 재주입은 하지 않았다.
 - 등록100도시의 실제 검수 후보는 각각0곳. 0원·지도/경로·엄격 리뷰OFF 유지. 기본 기능 구현과 공급자 활성화/실제 자료 확보는 별도다.
-- 배포는 아래 실제 결과를 추가하기 전까지 미완료 상태다.
+- 실제 운영 반영 결과는 아래와 같다.
+
+### V3 2단계 운영 반영
+
+- URL: https://travel-inbox-rag.onrender.com . 기존 Render Free/Supabase hii 유지, 새 지출·secret·공급자 활성화 없음.
+- 실행 commit `9a23999b81c6e587d4854852d228922744b9af4c`, branch `codex/private-beta-launch`. 수동 배포 `dep-db2bkm0ae00c739p61u0`, **2026-10-06 18:09:02 KST** Live 로그, Render **Deploy succeeded|Live**, 소요1분26초 확인.
+- HTTPS `/health/live`200, `/health/ready`200(schema/storage/dispatcher/identity/restore 모두true), `/`200, 운영 `accommodations.js` hash가 로컬 구현과 일치. 비로그인 `/api/v2/trips`, `/api/v2/cities`401. [집계 검증 JSON](reports/stage2-live-verification.json).
+- 운영 Supabase READ ONLY: schema12, 새 두 테이블 RLS true. 기존 users1/trips2/stops2/bookings1/docs0/recs0/itineraries0 유지. label-only 숙소1개 unresolved, identity 비어 있음·날짜 제안·resolution0. [원본 값 비교](reports/stage2-live-preservation.json)에서 여행·구간·예약·교정·문서의 모든 기존 행 값이 배포 전 격리 백업과 동일했다.
+- 실제 기존 로그인 세션으로 홈→숙소 관리→탐색→새로고침 확인. 위치 미확인, 지도 제공자OFF, 지점찾기 버튼disabled, 자료 없는 도시0후보 안내. 과금 job/합성 장소/실제 여행 변경 없이 조회했다. 새로고침 이후 선택 여행과 숙소 출발점 상태 복원, console error0.
+- Google OAuth 신규 로그인 왕복, 실제 Google 도보/지점 품질, 운영 Supabase 전체 복원 재주입은 이번 배포에서 미검증이다. 합성 로컬 흐름의 성공과 구분한다.
+- Render Free의 기동 대기 화면을 실제 관측했다. 항상 즉시 접속·무중단을 보장하지 않는다. 개인 여행이 포함된 운영 화면은 로컬 출력 폴더에만 저장하고 Git 보고서에는 합성 캡처만 포함했다.
+- 작업용 임시 PostgreSQL 컨테이너는 검증 후 제거했다. 운영 DB·다른 컨테이너에는 해당 정리를 적용하지 않았다.
