@@ -14,7 +14,7 @@ from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
-ASSETS = ('js/accommodations.js', 'js/foundation.js', 'js/travel-tools.js', 'js/product.js', 'js/offline-store.js', 'css/foundation.css', 'css/design-system.css')
+ASSETS = ('js/accommodations.js', 'js/foundation.js', 'js/travel-tools.js', 'js/product.js', 'js/offline-store.js', 'css/foundation.css', 'css/design-system.css', 'icon.svg')
 
 
 def updated_index():
@@ -25,8 +25,9 @@ def updated_index():
         revision = hashlib.sha256((ROOT / 'web' / asset).read_bytes()).hexdigest()[:12]
         pattern = r'(["\'])/' + re.escape(asset) + r'(?:\?[^"\']*)?(["\'])'
         updated, count = re.subn(pattern, lambda m: m[1] + '/' + asset + '?v=' + revision + m[2], updated)
-        if count != 1:
-            raise ValueError(f'Expected exactly one index reference for {asset}; found {count}')
+        expected = 4 if asset == 'icon.svg' else 1
+        if count != expected:
+            raise ValueError(f'Expected {expected} index references for {asset}; found {count}')
     return index, original, updated
 
 

@@ -17,6 +17,7 @@ def main():
     args=argparse.ArgumentParser(description=__doc__)
     args.add_argument('--run',action='store_true',help='Authorize real OpenAI requests against the small configured cap')
     args.add_argument('--report',type=Path)
+    args.add_argument('--case',choices=['single','eight'],default='single')
     opts=args.parse_args()
     if not opts.run: args.error('--run is required; this is a billable live smoke')
     from dotenv import dotenv_values
@@ -32,7 +33,7 @@ def main():
     from src.reliability.providers import ProviderGateway,metered_context
     from src.parser import parse_document_reservations
     from src.embedder import embed_texts
-    report={'synthetic_only':True,'models':['gpt-5-mini','text-embedding-3-small'],'ok':False}
+    report={'synthetic_only':True,'models':['gpt-5-mini','text-embedding-3-small'],'ok':False,'case':opts.case}
     with tempfile.TemporaryDirectory(prefix='travel-openai-smoke-') as temp:
         db=Database(Path(temp)/'smoke.sqlite3')
         with db.connect() as con:
@@ -44,12 +45,15 @@ def main():
         started=time.monotonic()
         try:
             mail='SYNTHETIC TEST ONLY. Tokyo walking tour confirmed. Provider: Synthetic Tokyo Tour. Reservation: TEST-ONLY-42. November 7, 2026 at 15:00 Japan local time (Asia/Tokyo). Ends 17:00 same day. Two adults. Meeting point: Shinjuku Station. Free cancellation until November 5, 2026. No real booking.'
+            if opts.case=='eight':
+                from src.loader import read_email_file
+                mail=read_email_file(ROOT/'examples/mail-test-pack/07-eight-bookings-one-day.eml')
             with metered_context(gateway,ctx,'live-extract'):
                 records=parse_document_reservations(mail,model='gpt-5-mini')
             report['extracted_records']=len(records)
-            report['correct_date_time']=any(r.get('date')=='2026-11-07' and r.get('time')=='15:00' for r in records)
+            report['correct_date_time']=(len(records)==8 and {r.get('time') for r in records}=={f'{i:02}:00' for i in range(8,16)} and all(r.get('date')=='2026-11-07' for r in records)) if opts.case=='eight' else any(r.get('date')=='2026-11-07' and r.get('time')=='15:00' for r in records)
             with metered_context(gateway,ctx,'live-embed'):
-                vectors=embed_texts(['Synthetic Tokyo tour, 2026-11-07 15:00 Asia/Tokyo.'])
+                vectors=embed_texts(['Synthetic Tokyo tour, 2026-11-07 15:00 Asia/Tokyo.'], show_progress=False)
             report['embedding_dimensions']=[len(v) for v in vectors]
             report['ok']=report['correct_date_time'] and report['embedding_dimensions']==[1536]
         except Exception as exc:

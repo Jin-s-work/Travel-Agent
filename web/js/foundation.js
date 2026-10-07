@@ -715,7 +715,8 @@
     const host=$('#homePlaces');if(!host)return;host.hidden=!state.trip;host.replaceChildren();
     ['#addBookmark','#editDiscoveryConditions','#refreshBookmarks'].forEach(s=>{if($(s))$(s).disabled=!state.trip;});
     if(!state.trip)return;
-    host.classList.toggle('has-bookings',state.bookings.length>0);
+    // Primary journeys stay in the same place after the first reservation.
+    host.classList.remove('has-bookings');
     const bookmarks=state.discovery.bookmarks,loaded=state.discovery.loaded,pending=bookmarks.filter(item=>item.resolve_state!=='resolved').length;
     const intro=make('div','home-places-copy');intro.append(make('h2','','어디부터 준비할까요?'),make('p','hint',loaded?`보관함 ${bookmarks.length}곳 · 지점 확인 필요 ${pending}곳`:'장소 보관함을 확인하고 있습니다.'));
     host.append(intro);

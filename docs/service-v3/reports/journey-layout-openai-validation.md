@@ -41,3 +41,12 @@
 2. 실 API 시험은 위 --run 명령만 별도로 실행한다. 원문은 합성 데이터이고 격리 임시 DB에 사용량을 기록한다.
 3. 운영키는 `deploy/render-supabase/.env`의 OPENAI_API_KEY에 두며 채팅/로그/Git에 복사하지 않는다. `.env.openai`는 이번 10개 설정만 담은 비공개 delta이다.
 4. 설정 오류 시 free 프로필로 AI OFF, UI 문제 시 직전 이미지로 rollback. DB restore와는 별개이며 이번 변경에 DB migration은 없다.
+
+
+## 추가 검증과 첫 운영 반영
+
+- 같은 live smoke에 `--case eight`를 추가: 기존 `07-eight-bookings-one-day.eml`의 8개를 모두 추출, 08:00~15:00 및 날짜 일치, 임베딩 1536차원. 30.81초 / $0.006829. 합성 단일 사례이며 임의 실제 메일 정확도를 보증하는 성과가 아니다.
+- Chrome CSS viewport390px, 큰 글자200%+다크 모드에서 가로 넘침 없음. 모바일 조건 dialog clientWidth=scrollWidth=350px, 적용 버튼 표시. Escape 후 조건 변경 버튼으로 초점 복귀. 실물 모바일/Safari는 미검증.
+- 첫 배포 `3483904`, Render `dep-db2qj80m7kps73buneng`, 2026-10-07 11:08:32 KST 시작, 1m07s 후 Live. 운영 메일 화면에서 AI 상세 분석 표시 확인.
+- 운영 자료가 있는 홈에서 이전 `.has-bookings` 스타일이 주요 행동을 축소하던 문제를 확인해 제거했다. 첫 예약 이후에도 같은 홈 구조를 유지한다.
+- 기존 브라우저 HTTP 캐시에 남은 과거 아이콘 방지를 위해 아이콘 참조도 내용 해시로 버전 관리한다. 최종 런타임 배포는 아래에 기록.
