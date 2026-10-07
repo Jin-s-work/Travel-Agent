@@ -521,3 +521,5 @@ DB 비밀번호 확인/필요 시 소유자의 직접 재설정과 Google 웹 �
 사용자 승인으로 메일 `gpt-5-mini`와 `text-embedding-3-small`을 월 전체 $3 상한으로 복구하는 명시적 프로필 추가. 서버/Supabase Free는 유지. 여행 중심 UI 구조를 개편했으며 실행 결과·라이브 상태는 [v3 검증 기록](../service-v3/reports/journey-layout-openai-validation.md)을 따른다. 리뷰 품질·실물 모바일 미검증은 별개로 유지한다. README 미수정.
 
 무료→AI 전환에서 기존 원문의 검색 벡터 누락으로 활성화가 막히던 문제를 수정했다. 안전한 전체 세대 검증·SQL 예약 보존은 유지하고 완료된 추출/임베딩을 재시도에서 재사용한다. 전체 Python1026 pass/15 skip; 최종 운영 결과는 v3 검증 기록 참조.
+
+최종 **d7a9fbf / dep-db2qt1d9fdbs738uqlb0** 실제Live. 기존키로 OpenAI합성8예약 분석·근거8건 확인,재시작후15예약유지·원문6개 검색세대활성. Python1026/Node122 pass,Python15 skip. 초기복구219초·실물모바일미검증 등 제한은 v3 보고서 참조. README 수정 없음.

@@ -1,0 +1,64 @@
+{
+  "other_booking_rows_unchanged": true,
+  "other_booking_count": 7,
+  "target_bookings": 8,
+  "target_active_parser": "foundation-v2",
+  "active_index": {
+    "model": "text-embedding-3-small",
+    "dimension": 1536,
+    "documents": 6,
+    "state": "active"
+  },
+  "latest_jobs": [
+    {
+      "state": "succeeded",
+      "stage": "succeeded",
+      "started_at": "2026-10-07T02:24:33.585823+00:00",
+      "finished_at": "2026-10-07T02:28:12.704918+00:00",
+      "error_code": null,
+      "file_states": [
+        {
+          "state": "succeeded",
+          "bookings_count": 8,
+          "error_code": null
+        }
+      ]
+    },
+    {
+      "state": "failed",
+      "stage": "failed",
+      "started_at": "2026-10-07T02:11:53.207828+00:00",
+      "finished_at": "2026-10-07T02:13:16.503962+00:00",
+      "error_code": null,
+      "file_states": [
+        {
+          "state": "failed",
+          "bookings_count": null,
+          "error_code": "INDEX_REBUILD_INPUT_REQUIRED"
+        }
+      ]
+    }
+  ],
+  "openai_calls": [
+    {
+      "sku": "gpt-5-mini",
+      "state": "settled",
+      "calls": 1,
+      "actual_micros": "6666"
+    },
+    {
+      "sku": "text-embedding-3-small",
+      "state": "settled",
+      "calls": 6,
+      "actual_micros": "87"
+    }
+  ],
+  "browser_verification": {
+    "day_question_bookings": 8,
+    "source_links": 8,
+    "source_document_opened": true,
+    "browser": "Chrome/macOS",
+    "real_mobile_devices_tested": false
+  },
+  "runtime_commit": "06e0c1fb0f786e4958afc5a4fd7b868b414cfd75"
+}

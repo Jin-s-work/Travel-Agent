@@ -187,3 +187,5 @@ Pretendard Variable v1.3.9를 자체 호스팅하고 굵기/자간/여백/버튼
 전체 Python 1023 pass / 15 skip, JS 119 pass. 실제 OpenAI 합성 메일·임베딩 2호출 성공, $0.002523 정산. 비용 상한과 브라우저 범위 및 운영 반영 상태는 [상세 검증](reports/journey-layout-openai-validation.md)에 기록한다. README 수정 없음. 이전 단계의 미검증 항목을 이번 변경으로 완료 처리하지 않는다.
 
 후속 운영 시험에서 무료 분석 자료의 검색 세대 누락을 발견해 수정했다. 누락된 벡터만 기존 SQL 추출값으로 보충하며 다른 예약·교정은 유지하고 실패 작업의 완료된 유료 호출을 재사용한다. 신규 전환/실패/재시도 회귀를 포함해 Python1026 passed/15 skipped. 실제 운영 재시도 결과는 연결된 검증 보고서의 최종 운영 절을 따른다.
+
+최종 운영 **d7a9fbf / dep-db2qt1d9fdbs738uqlb0**(2026-10-07 11:29:25 KST 시작,1m25s 후Live). OpenAI 메일8예약+근거8건·원문 확인 성공, 재시작 후 전체15예약/2여행/6메일 및 검색 활성 세대 유지. 운영 합성 분석·복구 총 $0.006753, GPT재시도 추가0회. Python1026 pass/15 skip, Node122 pass. 자세한 시간·비용·화면·제약은 위 검증 보고서 및 `reports/journey-layout-live-verification.json` 참조. README 수정 없음.

@@ -1,0 +1,116 @@
+{
+  "runtime_commit": "d7a9fbfed3b5842cc8964d87e7861f5e1ad08e87",
+  "render_deploy": "dep-db2qt1d9fdbs738uqlb0",
+  "http": {
+    "/health/live": {
+      "status": 200,
+      "body": {
+        "ok": true
+      }
+    },
+    "/health/ready": {
+      "status": 200,
+      "body": {
+        "ready": true,
+        "checks": {
+          "schema": true,
+          "storage": true,
+          "dispatcher": true,
+          "identity": true,
+          "restore": true
+        }
+      }
+    },
+    "/api/v2/trips": {
+      "status": 401,
+      "body": null
+    },
+    "/api/v2/cities": {
+      "status": 401,
+      "body": null
+    },
+    "/api/v2/mail-capabilities": {
+      "status": 401,
+      "body": null
+    },
+    "/": {
+      "status": 200,
+      "accommodations_script": true,
+      "brand_yeojeong": true
+    }
+  },
+  "asset_hash_matches": {
+    "js/accommodations.js": true,
+    "js/foundation.js": true,
+    "css/foundation.css": true,
+    "css/design-system.css": true,
+    "sw.js": true,
+    "manifest.webmanifest": true,
+    "icon.svg": true,
+    "fonts/PretendardVariable-v1.3.9.woff2": true
+  },
+  "schema": 12,
+  "booking_count": 15,
+  "trips": 2,
+  "all_private_tables_rls": true,
+  "browser_schema_usage": {
+    "anon": false,
+    "authenticated": false
+  },
+  "mail_recovery_after_restart": {
+    "other_booking_rows_unchanged": true,
+    "other_booking_count": 7,
+    "target_bookings": 8,
+    "target_active_parser": "foundation-v2",
+    "active_index": {
+      "model": "text-embedding-3-small",
+      "dimension": 1536,
+      "documents": 6,
+      "state": "active"
+    },
+    "latest_jobs": [
+      {
+        "state": "succeeded",
+        "stage": "succeeded",
+        "started_at": "2026-10-07T02:24:33.585823+00:00",
+        "finished_at": "2026-10-07T02:28:12.704918+00:00",
+        "error_code": null,
+        "file_states": [
+          {
+            "state": "succeeded",
+            "bookings_count": 8,
+            "error_code": null
+          }
+        ]
+      },
+      {
+        "state": "failed",
+        "stage": "failed",
+        "started_at": "2026-10-07T02:11:53.207828+00:00",
+        "finished_at": "2026-10-07T02:13:16.503962+00:00",
+        "error_code": null,
+        "file_states": [
+          {
+            "state": "failed",
+            "bookings_count": null,
+            "error_code": "INDEX_REBUILD_INPUT_REQUIRED"
+          }
+        ]
+      }
+    ],
+    "openai_calls": [
+      {
+        "sku": "gpt-5-mini",
+        "state": "settled",
+        "calls": 1,
+        "actual_micros": "6666"
+      },
+      {
+        "sku": "text-embedding-3-small",
+        "state": "settled",
+        "calls": 6,
+        "actual_micros": "87"
+      }
+    ]
+  }
+}
