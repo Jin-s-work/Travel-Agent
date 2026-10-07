@@ -186,7 +186,8 @@ class Recommendations:
         result['public_discovery']=result['external_discovery']
         if not candidates and snapshot.get('public_discovery'):
             status=snapshot['public_discovery']
-            result['summary']['empty_state']={'code':status.get('reason','PUBLIC_DISCOVERY_EMPTY'),'title':'공개지도에서 장소를 찾지 못했어요' if status['state']=='empty' else '공개지도 검색을 잠시 이용할 수 없어요','description':'도심 3km 안에 등록된 식당·카페가 없을 수 있어요. 장소 이름이나 링크를 보관함에 저장할 수 있어요.' if status['state']=='empty' else '잠시 후 다시 찾거나 원하는 장소의 이름·링크를 저장해 주세요. 무료 검색의 공유 한도나 제공 서버 상태에 따라 제한될 수 있어요.','actions':['retry','save_place']}
+            from src.discovery.public_places import empty_state
+            result['summary']['empty_state']=empty_state(status)
         if not candidates and result['external_discovery']['state']=='ready':
             result['summary']['empty_state']={'code':'PUBLIC_DISCOVERY_NO_MATCHES','title':'조건에 맞는 공개지도 장소가 없어요','description':'현재 표시할 수 있는 공개지도 후보 중 선택한 종류와 제외 조건에 맞는 장소가 없어요. 조건을 바꾸거나 가고 싶은 장소를 저장할 수 있어요.','actions':['edit_conditions','save_place']}
         if not candidates and result['external_discovery'].get('reason')=='PUBLIC_REVIEW_FILTER_UNSUPPORTED':

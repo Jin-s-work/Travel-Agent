@@ -10,6 +10,8 @@ from __future__ import annotations
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeout
 from dataclasses import dataclass
 import http.client
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 import ipaddress
 import socket
 import ssl
@@ -19,8 +21,10 @@ from urllib.parse import urlsplit, urlunsplit, urljoin
 
 
 class FetchRejected(ValueError):
-    def __init__(self, code):
+    def __init__(self, code, *, http_status=None, retry_after_seconds=None):
         self.code = code
+        self.http_status = http_status
+        self.retry_after_seconds = retry_after_seconds
         super().__init__(code)  # Never copy a private URL/response into errors.
 
 
@@ -90,7 +94,8 @@ def _resolve(host, port, deadline):
         raise FetchRejected('FETCH_TIMEOUT') from None
     except OSError:
         raise FetchRejected('DNS_FAILED') from None
-    ips = sorted({public_ip(record[4][0]) for record in records})
+    # Preserve DNS round-robin ordering instead of always pinning the smallest IP.
+    ips = list(dict.fromkeys(public_ip(record[4][0]) for record in records))
     if not ips:
         raise FetchRejected('DNS_FAILED')
     return ips
@@ -143,13 +148,31 @@ def fetch_public(url, *, max_bytes=1_048_576, timeout_seconds=8, max_redirects=3
             remaining = deadline - time.monotonic()
             if remaining <= 0:
                 raise FetchRejected('FETCH_TIMEOUT')
-            connection = connector(parsed, addresses[0], remaining)
-            # Connector is injectable only in tests; production verifies before
-            # sending any request bytes, including each redirect's peer.
+            # Connectivity fallback is only before any HTTP request is sent. Never
+            # retry an HTTP refusal (429/403/504) through another IP or mirror.
+            last_error = None
+            selected_ip = None
+            for ip in addresses[:2]:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise FetchRejected('FETCH_TIMEOUT')
+                try:
+                    connection = connector(parsed, ip, min(5, remaining))
+                    selected_ip = ip
+                    break
+                except ssl.SSLCertVerificationError:
+                    raise FetchRejected('TLS_CERTIFICATE_ERROR') from None
+                except ssl.SSLError:
+                    raise FetchRejected('TLS_FAILED') from None
+                except OSError as exc:
+                    last_error = exc
+            if connection is None:
+                raise FetchRejected('FETCH_TIMEOUT' if isinstance(last_error, TimeoutError) else 'CONNECT_FAILED')
             if connection.sock is not None:
                 peer = public_ip(connection.sock.getpeername()[0])
-                if ipaddress.ip_address(peer) != ipaddress.ip_address(addresses[0]):
+                if ipaddress.ip_address(peer) != ipaddress.ip_address(selected_ip):
                     raise FetchRejected('PEER_MISMATCH')
+                connection.sock.settimeout(max(.001, deadline - time.monotonic()))
             connection.request('GET', urlunsplit(('', '', parsed.path, parsed.query, '')),
                 headers={'Accept': ', '.join(sorted(MIMES)), 'Accept-Encoding': 'identity',
                          'User-Agent': 'TravelAgent-SourceCheck/1', 'Connection': 'close'})
@@ -161,7 +184,8 @@ def fetch_public(url, *, max_bytes=1_048_576, timeout_seconds=8, max_redirects=3
                 current = validate_public_url(urljoin(current, location))
                 continue
             if response.status != 200:
-                raise FetchRejected('HTTP_UNAVAILABLE')
+                raise FetchRejected('HTTP_UNAVAILABLE', http_status=response.status,
+                                    retry_after_seconds=retry_after(response.getheader('Retry-After')))
             mime = (response.getheader('Content-Type') or '').split(';', 1)[0].strip().lower()
             if mime not in MIMES or response.getheader('Content-Encoding', 'identity') not in {'identity', ''}:
                 raise FetchRejected('UNSUPPORTED_MIME')
@@ -185,9 +209,28 @@ def fetch_public(url, *, max_bytes=1_048_576, timeout_seconds=8, max_redirects=3
             return Page(current, mime, b''.join(chunks), redirect)
         except FetchRejected:
             raise
-        except (OSError, http.client.HTTPException, ValueError):
+        except TimeoutError:
+            raise FetchRejected('FETCH_TIMEOUT') from None
+        except ssl.SSLCertVerificationError:
+            raise FetchRejected('TLS_CERTIFICATE_ERROR') from None
+        except ssl.SSLError:
+            raise FetchRejected('TLS_FAILED') from None
+        except (ConnectionError, http.client.HTTPException):
+            raise FetchRejected('RESPONSE_INTERRUPTED') from None
+        except (OSError, ValueError):
             raise FetchRejected('FETCH_FAILED') from None
         finally:
             if connection is not None:
                 connection.close()
     raise FetchRejected('REDIRECT_LIMIT')
+
+
+def retry_after(value):
+    """Retain only a bounded numeric delay; no response body or headers in logs."""
+    if not isinstance(value, str) or len(value) > 100:
+        return None
+    try:
+        seconds = int(value) if value.strip().isdigit() else (parsedate_to_datetime(value) - datetime.now(timezone.utc)).total_seconds()
+        return max(0, min(604800, int(seconds)))
+    except (ValueError, TypeError, OverflowError):
+        return None

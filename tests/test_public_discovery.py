@@ -374,3 +374,42 @@ def test_public_ready_cache_with_no_matching_category_offers_condition_edit(publ
     assert result['summary']['empty_state']['code']=='PUBLIC_DISCOVERY_NO_MATCHES'
     assert result['summary']['empty_state']['actions']==['edit_conditions','save_place']
     assert public.calls_public==['paris']
+
+
+def test_provider_retry_after_applies_across_cities_and_is_persisted(public):
+    trip,base=prepare(public)
+    def refused(city):
+        public.calls_public.append(city)
+        raise FetchRejected('HTTP_UNAVAILABLE',http_status=429,retry_after_seconds=1800)
+    public.app.state.discovery.public_provider.fetcher=refused
+    first=run(public,trip,base)
+    assert first['result']['public_discovery']['reason']=='PUBLIC_DISCOVERY_RATE_LIMITED'
+    assert first['result']['public_discovery']['retry_after_seconds']==1800
+    other,other_base=prepare(public,'london')
+    public.clock[0]+=timedelta(seconds=60)
+    blocked=run(public,other,other_base,'blocked-other-city')
+    assert blocked['result']['public_discovery']['retry_after_seconds']==1740
+    assert public.calls_public==['paris']
+    with public.app.state.db.connect() as con:
+        units=json.loads(con.execute("SELECT actual_units_json FROM usage_reservations WHERE provider='openstreetmap'").fetchone()[0])
+        assert units['response_bytes'] is None and units['http_status']==429
+
+
+def test_network_wait_counts_down_and_daily_reset_is_next_utc_midnight(public,monkeypatch):
+    trip,base=prepare(public)
+    def failure(city):raise FetchRejected('CONNECT_FAILED')
+    public.app.state.discovery.public_provider.fetcher=failure
+    first=run(public,trip,base)
+    assert first['result']['public_discovery']['retry_after_seconds']==120
+    assert '연결하지' in first['result']['summary']['empty_state']['title']
+    public.clock[0]+=timedelta(seconds=30)
+    second=run(public,trip,base,'connection-cooldown')
+    assert second['result']['public_discovery']['retry_after_seconds']==90
+    assert '연결이 끊겨' in second['result']['summary']['empty_state']['description']
+    public.clock[0]+=timedelta(minutes=3)
+    monkeypatch.setattr('src.discovery.public_places.USER_DAILY',1)
+    last=run(public,trip,base,'public-day-cap')
+    status=last['result']['public_discovery']
+    assert status['reason']=='PUBLIC_DISCOVERY_DAILY_LIMIT'
+    assert status['retry_at'].endswith('T00:00:00+00:00')
+    assert '오늘' in last['result']['summary']['empty_state']['title']

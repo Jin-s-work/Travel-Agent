@@ -64,7 +64,9 @@
         if(draft.conditions.radius_m!=null)options.append(make('p','hint',`기존 직선 반경 ${draft.conditions.radius_m}m 조건도 유지 중입니다. 변경은 필터에서 할 수 있어요.`));
         if(draft.conditions.prefer_nearby)options.append(make('p','stay-draft-note','가까운 곳 우선'+(draft.conditions.meal_time==='dinner'?' · 저녁 18:00':'')+(ui.state.discovery.dirty?' · 추천 보기를 누르면 적용':' · 현재 추천 조건')));
       }
-      const shortcuts=make('div','actions stay-option-actions');const fast=button('숙소 근처 저녁',dinner,'secondary');fast.dataset.action='dinner';shortcuts.append(fast);options.append(shortcuts);if(selector==='#exploreOrigin')host.append(options);else actions.append(fast);
+      if(ready){const shortcuts=make('div','actions stay-option-actions');const fast=button('숙소 근처 저녁',dinner,'secondary');fast.dataset.action='dinner';shortcuts.append(fast);options.append(shortcuts);if(selector!=='#exploreOrigin')actions.append(fast);}
+      // Show distance controls only when useful, retaining explicit existing filters.
+      if(selector==='#exploreOrigin'&&(ready||items.length||draft?.conditions.distance_filter||draft?.conditions.radius_m!=null||draft?.conditions.prefer_nearby))host.append(options);
       if(prior)host.querySelector(`[data-action="${prior}"]`)?.focus({preventScroll:true});
     }
   }

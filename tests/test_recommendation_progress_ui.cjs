@@ -84,7 +84,7 @@ test('public discovery shows the city-center scope and attribution without upgra
   const c=load(['renderPublicDiscovery'],{make:node,reviewDate:v=>v?.slice(0,10)||'미확인',safeDiscoveryLink:(host,url,label)=>host.append({...node('a','',label),href:url})});
   const ready=node();c.renderPublicDiscovery(ready,{provider:'openstreetmap',state:'ready',cache_hit:true,fetched_at:'2026-10-07T00:00:00Z'});
   assert.match(textContent(ready),/도심 주변 3km/);assert.match(textContent(ready),/저장된 자료 재사용/);assert.match(textContent(ready),/숙소 주변 전체 검색이 아니에요/);assert.match(textContent(ready),/OpenStreetMap/);
-  const capped=node();c.renderPublicDiscovery(capped,{provider:'openstreetmap',state:'unavailable',reason:'PUBLIC_DISCOVERY_DAILY_LIMIT'});assert.match(textContent(capped),/조회 한도/);assert.doesNotMatch(textContent(capped),/0곳|검증 완료/);
+  const capped=node();c.renderPublicDiscovery(capped,{provider:'openstreetmap',state:'unavailable',reason:'PUBLIC_DISCOVERY_DAILY_LIMIT'});assert.equal(capped.children.length,0); // Failure appears once, in the progress region.
   const empty=node();c.renderPublicDiscovery(empty,{provider:'openstreetmap',state:'empty'});assert.match(textContent(empty),/찾지 못했/);
   const none=node();c.renderPublicDiscovery(none,{state:'unavailable',reason:'EXTERNAL_DISCOVERY_NOT_CONFIGURED'});assert.equal(none.children.length,0);c.renderPublicDiscovery(none,{provider:'openstreetmap',state:'not_needed'});assert.equal(none.children.length,0);
 });
@@ -139,3 +139,5 @@ test('manual terminal refresh shows loading before its response and an old trip 
   const before=progress.length;release({run_id:'r',state:'succeeded',result:result({items:[{place_id:'old'}]})});await pending;
   assert.equal(state.recommendations.active,null);assert.equal(state.recommendations.resultRecoveryPending,false);assert.equal(old.resultLoad,null);assert.equal(progress.length,before);
 });
+
+test('map failure preserves exact retry time and offers saved places, not irrelevant condition edits',()=>{const c=models(),value=result({});value.public_discovery={state:'unavailable',retry_at:'2026-10-07T03:00:00Z'};value.summary={empty_state:{title:'지도 서버에 연결하지 못했어요',description:'다시 연결해 주세요.'}};const m=c.recommendationProgressModel({active:{state:'succeeded',result:value}});assert.equal(m.action,'save');assert.equal(m.retryAt,value.public_discovery.retry_at);assert.equal(m.title,value.summary.empty_state.title);});

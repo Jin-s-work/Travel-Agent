@@ -107,3 +107,42 @@ def test_real_connector_pins_ip_and_keeps_tls_hostname(monkeypatch):
     connection = _connect(urlsplit('https://example.org/'), '93.184.216.34', 2)
     assert actions == [('connect', ('93.184.216.34', 443)), ('tls', 'example.org')]
     assert connection.sock is sock
+
+
+def test_connectivity_fallback_uses_only_validated_dns_before_http():
+    attempts=[]
+    con=Connection(Response(),peer='8.8.8.8')
+    def connect(parsed,ip,timeout):
+        attempts.append(ip)
+        if len(attempts)==1: raise OSError('network unreachable')
+        return con
+    page=fetch_public('https://example.org/',resolver=lambda *_:['93.184.216.34','8.8.8.8'],connector=connect)
+    assert page.content and attempts==['93.184.216.34','8.8.8.8'] and len(con.requests)==1
+
+
+@pytest.mark.parametrize('status',[403,429,504])
+def test_http_refusal_never_fails_over_to_another_ip(status):
+    attempts=[];con=Connection(Response(status=status,headers={'Retry-After':'1800'}))
+    def connect(*args):attempts.append(args[1]);return con
+    with pytest.raises(FetchRejected) as error:
+        fetch_public('https://example.org/',resolver=lambda *_:['93.184.216.34','8.8.8.8'],connector=connect)
+    assert error.value.http_status==status and error.value.retry_after_seconds==1800
+    assert attempts==['93.184.216.34'] and con.closed
+
+
+def test_tls_validation_failure_is_not_bypassed_or_retried():
+    import ssl
+    attempts=[]
+    def connect(*args):attempts.append(args[1]);raise ssl.SSLCertVerificationError('untrusted')
+    with pytest.raises(FetchRejected,match='TLS_CERTIFICATE_ERROR'):
+        fetch_public('https://example.org/',resolver=lambda *_:['93.184.216.34','8.8.8.8'],connector=connect)
+    assert len(attempts)==1
+
+
+def test_retry_after_accepts_dates_and_rejects_untrusted_text():
+    from src.discovery.safe_fetch import retry_after
+    from datetime import datetime,timedelta,timezone
+    from email.utils import format_datetime
+    assert retry_after('600')==600
+    assert 598<=retry_after(format_datetime(datetime.now(timezone.utc)+timedelta(seconds=600)))<=600
+    assert retry_after('<script>') is None and retry_after(None) is None

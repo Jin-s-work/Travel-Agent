@@ -164,7 +164,7 @@ test('self-hosted font keeps upstream bytes and license with consistent Korean a
   const html=fs.readFileSync('web/index.html','utf8'),css=fs.readFileSync('web/css/design-system.css','utf8');
   assert.match(html,/<link rel="preload" href="\/fonts\/PretendardVariable-v1\.3\.9\.woff2" as="font" type="font\/woff2" crossorigin>/);
   assert.match(css,/font-family:"Pretendard Variable"/);assert.match(css,/font-display:swap/);
-  assert.match(html,/<title>여정 · 나의 여행<\/title>/);
+  assert.match(html,/<title>고잉 · 나의 여행<\/title>/);
   const manifest=JSON.parse(fs.readFileSync('web/manifest.webmanifest','utf8'));
-  assert.equal(manifest.name,'여정');assert.equal(manifest.short_name,'여정');
+  assert.equal(manifest.name,'고잉');assert.equal(manifest.short_name,'고잉');
 });

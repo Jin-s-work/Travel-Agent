@@ -28,7 +28,8 @@ TTL = timedelta(days=7)
 GLOBAL_DAILY = 20
 USER_DAILY = 5
 COOLDOWN = timedelta(seconds=15)
-ERROR_TTL = timedelta(minutes=15)
+ERROR_TTL = timedelta(minutes=2)
+PROVIDER_ERROR_TTL = timedelta(minutes=15)
 ATTRIBUTION = {'text': '© OpenStreetMap contributors', 'url': 'https://www.openstreetmap.org/copyright',
                'license': 'ODbL 1.0', 'license_url': 'https://opendatacommons.org/licenses/odbl/1-0/'}
 FATAL = {'NOT_FOUND','LEASE_LOST','JOB_CANCELLED','JOB_DEADLINE','VERSION_CONFLICT','TRIP_DELETED','ACCESS_REVOKED'}
@@ -151,6 +152,17 @@ class PublicDiscovery:
                 'center': c, 'center_attribution':{'text':'GeoNames','url':'https://www.geonames.org/','license':'CC BY 4.0','license_url':CENTERS['license_url']}, 'attribution': ATTRIBUTION, 'policy_version': POLICY,
                 'notice': '도심 3km 주변 공개지도 장소예요. 지점·영업·가격·리뷰는 방문 전에 확인해 주세요.', **changes}
 
+    def _waiting(self, city, reason, until, now, **changes):
+        return self._status(city, 'unavailable', reason=reason,
+                            retry_at=until.isoformat(), retry_after_seconds=max(1, math.ceil((until-now).total_seconds())), **changes)
+
+    @staticmethod
+    def _retry_at(row):
+        units = json.loads(row['actual_units_json'] or '{}')
+        # Old records retain the original 15 minute backoff.
+        delay = units.get('retry_after_seconds', 900)
+        return stamp(row['updated_at']) + timedelta(seconds=delay)
+
     def ensure(self, actor, trip_id, city, ctx):
         """Called only by an authenticated recommendation job, never by GET."""
         if not center(city):
@@ -174,15 +186,22 @@ class PublicDiscovery:
             with self.db.connect() as con:
                 con.execute('BEGIN IMMEDIATE'); ctx.guard(con=con); Budget._scope(con, context)
                 recent = con.execute('SELECT * FROM usage_reservations WHERE provider=? AND request_hash=? ORDER BY created_at DESC LIMIT 1', (PROVIDER, request_hash)).fetchone()
-                if recent and (recent['state'] != 'settled' and stamp(recent['created_at']) + ERROR_TTL > now or recent['error_code'] and stamp(recent['updated_at']) + ERROR_TTL > now):
-                    return self._status(city, 'unavailable', reason='PUBLIC_DISCOVERY_COOLDOWN', retry_after_seconds=900)
+                if recent and recent['state'] != 'settled' and stamp(recent['created_at']) + PROVIDER_ERROR_TTL > now:
+                    return self._waiting(city, 'PUBLIC_DISCOVERY_COOLDOWN', stamp(recent['created_at'])+PROVIDER_ERROR_TTL, now)
+                if recent and recent['error_code'] and self._retry_at(recent) > now:
+                    return self._waiting(city, 'PUBLIC_DISCOVERY_COOLDOWN', self._retry_at(recent), now, last_error=recent['error_code'])
+                # Provider refusals apply to all cities, not just this query hash.
+                refused = con.execute("SELECT * FROM usage_reservations WHERE provider=? AND error_code IN ('PUBLIC_DISCOVERY_RATE_LIMITED','PUBLIC_DISCOVERY_BLOCKED','PUBLIC_DISCOVERY_SERVER_BUSY') ORDER BY updated_at DESC LIMIT 1", (PROVIDER,)).fetchone()
+                if refused and self._retry_at(refused) > now:
+                    return self._waiting(city, refused['error_code'], self._retry_at(refused), now)
                 day = now.date().isoformat()
                 totals = con.execute('SELECT owner_id,created_at FROM usage_reservations WHERE provider=? AND period_day=?', (PROVIDER, day)).fetchall()
                 if len(totals) >= GLOBAL_DAILY or sum(r['owner_id'] == actor.id for r in totals) >= USER_DAILY:
-                    return self._status(city, 'unavailable', reason='PUBLIC_DISCOVERY_DAILY_LIMIT', retry_after_seconds=86400)
+                    tomorrow = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+                    return self._waiting(city, 'PUBLIC_DISCOVERY_DAILY_LIMIT', tomorrow, now)
                 latest = con.execute('SELECT created_at FROM usage_reservations WHERE provider=? ORDER BY created_at DESC LIMIT 1', (PROVIDER,)).fetchone()
                 if latest and stamp(latest['created_at']) + COOLDOWN > now:
-                    return self._status(city, 'unavailable', reason='PUBLIC_DISCOVERY_COOLDOWN', retry_after_seconds=15)
+                    return self._waiting(city, 'PUBLIC_DISCOVERY_COOLDOWN', stamp(latest['created_at'])+COOLDOWN, now)
                 call_id = 'call_' + uuid4().hex
                 date = now.isoformat()
                 units = encode({'calls': 1, 'response_bytes': MAX_BYTES})
@@ -200,18 +219,28 @@ class PublicDiscovery:
                 return self._status(city, 'ready' if items else 'empty', calls=1, candidate_count=len(items), display_limit=DISPLAY_CANDIDATES, fetched_at=date, expires_at=(now+TTL).isoformat())
             except Exception as exc:
                 code = exc.code if isinstance(exc, (DomainError, FetchRejected)) else 'PUBLIC_DISCOVERY_UNAVAILABLE'
+                http_status = getattr(exc, 'http_status', None)
+                code = {429:'PUBLIC_DISCOVERY_RATE_LIMITED', 406:'PUBLIC_DISCOVERY_RATE_LIMITED',
+                        403:'PUBLIC_DISCOVERY_BLOCKED', 502:'PUBLIC_DISCOVERY_SERVER_BUSY',
+                        503:'PUBLIC_DISCOVERY_SERVER_BUSY', 504:'PUBLIC_DISCOVERY_SERVER_BUSY'}.get(http_status, code)
+                delay = max(int((PROVIDER_ERROR_TTL if http_status else ERROR_TTL).total_seconds()), getattr(exc, 'retry_after_seconds', None) or 0)
+                failed_at = self.clock().astimezone(timezone.utc)
                 with self.db.connect() as con:
-                    con.execute('BEGIN IMMEDIATE'); self._settle(con, call_id, MAX_BYTES, self.clock(), code)
+                    con.execute('BEGIN IMMEDIATE'); self._settle(con, call_id, None, failed_at, code, delay, http_status)
                 if isinstance(exc, DomainError) and exc.code in FATAL:
                     raise
-                return self._status(city, 'unavailable', calls=1, reason=code, retry_after_seconds=900)
+                return self._waiting(city, code, failed_at+timedelta(seconds=delay), failed_at, calls=1)
         except DomainError as exc:
             if exc.code in FATAL:
                 raise
             return self._status(city, 'unavailable', reason=exc.code, retry_after_seconds=900)
 
-    def _settle(self, con, call_id, received, now, code=None):
+    def _settle(self, con, call_id, received, now, code=None, delay=None, http_status=None):
         units = {'calls': 1, 'response_bytes': received}
+        if delay is not None:
+            units['retry_after_seconds'] = delay
+        if http_status is not None:
+            units['http_status'] = http_status
         con.execute("UPDATE usage_reservations SET state='settled',actual_units_json=?,actual_cost_micros=0,error_code=?,updated_at=? WHERE call_id=?", (encode(units), code, now.isoformat(), call_id))
         Budget._ledger(con, call_id, 'settled', 0, units, now.isoformat(), reason=code or 'EXPLICIT_FREE_PUBLIC_DATA')
 
@@ -242,3 +271,20 @@ class PublicDiscovery:
         con.executemany('INSERT INTO research_candidates(id,pack_id,place_id,status,category,recommendation_types_json,tags_json,native_name,canonical_url,chain_id,neighborhood,latitude,longitude,created_at,updated_at,sort_order) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET status=excluded.status,category=excluded.category,tags_json=excluded.tags_json,native_name=excluded.native_name,neighborhood=excluded.neighborhood,latitude=excluded.latitude,longitude=excluded.longitude,updated_at=excluded.updated_at,sort_order=excluded.sort_order', candidates)
         con.executemany('INSERT INTO evidence_sources VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET checked_at=excluded.checked_at,updated_at=excluded.updated_at,evidence_note=excluded.evidence_note', sources)
         con.executemany('INSERT INTO place_facts VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET value_json=excluded.value_json,checked_at=excluded.checked_at,expires_at=excluded.expires_at,created_at=excluded.created_at', facts)
+
+
+def empty_state(status):
+    reason = status.get('reason', 'PUBLIC_DISCOVERY_EMPTY')
+    if status['state'] == 'empty':
+        title, description = '도심 주변에서 장소를 찾지 못했어요', '도심 3km의 공개지도에 등록된 식당·카페가 없을 수 있어요. 가고 싶은 장소의 이름이나 링크를 저장해 보세요.'
+    elif reason == 'PUBLIC_DISCOVERY_DAILY_LIMIT':
+        title, description = '오늘의 새 장소 조회를 모두 사용했어요', '추가 비용을 막기 위한 하루 조회 한도예요. 저장된 장소는 계속 볼 수 있고, 아래 시각부터 새로 찾을 수 있어요.'
+    elif reason in {'PUBLIC_DISCOVERY_COOLDOWN', 'PUBLIC_DISCOVERY_RATE_LIMITED', 'PUBLIC_DISCOVERY_SERVER_BUSY'}:
+        title, description = '잠시 뒤 다시 찾을 수 있어요', '공개지도 서버에 요청이 몰려 새 조회를 잠시 쉬고 있어요. 반복해서 누르지 않아도 되며, 저장한 장소는 계속 볼 수 있어요.'
+        if status.get('last_error') in {'FETCH_FAILED','CONNECT_FAILED','FETCH_TIMEOUT','RESPONSE_INTERRUPTED','TLS_FAILED','TLS_CERTIFICATE_ERROR'}:
+            description = '지도 서버 연결이 끊겨 잠시 후 다시 연결할 수 있어요. 저장한 장소는 계속 볼 수 있어요.'
+    elif reason in {'EXTERNAL_CALLS_PAUSED', 'PROVIDER_PAUSED', 'OPERATIONS_PAUSED'}:
+        title, description = '새 장소 조회가 일시 중단됐어요', '서비스에서 외부 조회를 잠시 멈췄어요. 보관함과 예약은 계속 이용할 수 있어요.'
+    else:
+        title, description = '지도 서버에 연결하지 못했어요', '여행 조건의 문제는 아니에요. 잠시 뒤 다시 연결하거나, 원하는 장소의 이름·지도 링크를 보관함에 저장해 주세요.'
+    return {'code':reason, 'title':title, 'description':description, 'retry_at':status.get('retry_at'), 'actions':['retry','save_place']}
