@@ -1,0 +1,22 @@
+{
+  "as_of": "2026-10-07",
+  "slides": 10,
+  "notes": 10,
+  "target_seconds": 510,
+  "font": "Pretendard",
+  "source_runtime_commit": "9125150ef5c370e31c385fc6f6d3667779b51d95",
+  "validation": {
+    "pptx_package": "pass",
+    "layout": "pass",
+    "font": "pass",
+    "artifact_import": "pass",
+    "rendered_slides": 10,
+    "keynote_open_and_native_save": true,
+    "powerpoint_native": "not_tested"
+  },
+  "files": {
+    "going-class-presentation.pptx": "691373a0ce797b48fd5dcfbcbad4d72d9f0462a4b002ea936b10739259d867c1",
+    "going-class-presentation.key": "28af50942404a2fe24ad89dbe9d7e90c96b66bc2ae7c774055a91e41c0c3558b",
+    "SCRIPT.md": "9f7086e68ee60dddebe1286df33bc09dbc1923a11308a506ce02c5924b6c6b09"
+  }
+}
