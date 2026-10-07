@@ -81,3 +81,6 @@ GeoJSON→OSM 지점 ID·이름·주소·좌표만 정규화한다. 국가 불�
 | 이전 아이콘 캐시 | 콘텐츠 해시 갱신·공개 shell v23 | 헤더·로그인·파비콘·설치 아이콘의 일관된 갱신 |
 
 검증: 실제 Chrome SVG16/28/32/48px와 워드마크 조합 확인, 기존 관련 JS20개 통과, asset hash 및 diff 검사 통과. 비즈니스 로직 변경이 없는 자산 교체이므로 Python 전체 시험은 다시 실행하지 않았다. README 변경 없음. 기존 설치 앱의 런처 아이콘 갱신은 운영체제별 캐시 동작에 따르며 실제 iOS/Android 설치 갱신은 미검증이다. 배포 결과는 후속 기록한다.
+
+
+여행가방 운영 반영: `9125150ef5c370e31c385fc6f6d3667779b51d95` / Render `dep-db2rkb59fdbs7391cesg`, 2026-10-07 12:19:08 KST 시작·1m04s 후 **Deploy succeeded|Live**. HTTPS `/icon.svg`200, 로컬SVG와 바이트 동일(sha256 앞12자리 `4bbd16dbaddf`), readiness200/true 확인. 운영 헤더 새 아이콘을 확인한 화면은 개인 문맥이 있어 로컬 출력 폴더에만 보관한다.
