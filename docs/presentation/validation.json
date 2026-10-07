@@ -1,22 +1,48 @@
 {
-  "as_of": "2026-10-07",
+  "scope": "Document/package consistency only; not product tests or live quality",
+  "passed": true,
+  "local_links_checked": 60,
   "slides": 10,
-  "notes": 10,
-  "target_seconds": 510,
-  "font": "Pretendard",
-  "source_runtime_commit": "9125150ef5c370e31c385fc6f6d3667779b51d95",
-  "validation": {
-    "pptx_package": "pass",
-    "layout": "pass",
-    "font": "pass",
-    "artifact_import": "pass",
-    "rendered_slides": 10,
-    "keynote_open_and_native_save": true,
-    "powerpoint_native": "not_tested"
-  },
+  "pptx_notes_matching_script": 10,
+  "target_duration_seconds": 510,
+  "actual_spoken_duration_measured": false,
+  "native_keynote_visual_review": "Separate manual evidence: REVIEW.md",
   "files": {
-    "going-class-presentation.pptx": "691373a0ce797b48fd5dcfbcbad4d72d9f0462a4b002ea936b10739259d867c1",
-    "going-class-presentation.key": "28af50942404a2fe24ad89dbe9d7e90c96b66bc2ae7c774055a91e41c0c3558b",
-    "SCRIPT.md": "e9146d919f9899c7958fdf47acafa4739bdbd4e02663d17db635eb88fb2300d0"
+    "README.md": {
+      "bytes": 18373,
+      "sha256": "8dcdc2df0472c4c3bce7d3c687e9549121505c2c307346609f91a02397166e45"
+    },
+    "docs/presentation/README.md": {
+      "bytes": 2525,
+      "sha256": "3dbeb375f776cdb1ed7bb8c1e5ff6531b6b942c8f82f560033b9483bee866a0b"
+    },
+    "docs/presentation/SCRIPT.md": {
+      "bytes": 21077,
+      "sha256": "d13706a0c6564a276404c2c8f94776bd6ccacaf39ffdf7a837342c2c9be309ad"
+    },
+    "docs/presentation/CREDITS.md": {
+      "bytes": 4069,
+      "sha256": "07f7aa275292fbcdcdee8d83ab5dcb2e673dc584da3d08a957eef065df6f087d"
+    },
+    "docs/presentation/REVIEW.md": {
+      "bytes": 3754,
+      "sha256": "a5aad70f5f7c3e4afa93586a570ca66e0a02cc08c214baf58c480c376c7b93eb"
+    },
+    "docs/presentation/going-class-presentation.pptx": {
+      "bytes": 1269715,
+      "sha256": "e7d8d8c6723df2db09f00f55f82bd2cb609dcb26d013253e4b509eada13ff061"
+    },
+    "docs/presentation/going-class-presentation.key": {
+      "bytes": 2216471,
+      "sha256": "0eb79d099a889b6344e4ba6bf5b5a788ef42aae0e71a47850270f2d712ed1245"
+    },
+    "docs/presentation/slides-content.json": {
+      "bytes": 9986,
+      "sha256": "9381dc936f2d051d706ead13452b1e2b62aaff099abe9a0add211dfb7bde759f"
+    },
+    "docs/presentation/preview.webp": {
+      "bytes": 65886,
+      "sha256": "2e5abb6898d42b118d74c763ef3c14ca4dfe4e656e605e1f0a970a2750422e0f"
+    }
   }
 }

@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+"""Validate repository presentation links, packages and synchronized scripts.
+
+Standard library only. No network, provider calls or environment file loading.
+Native Keynote visual checks are recorded separately in docs/presentation/REVIEW.md.
+"""
+from pathlib import Path
+from urllib.parse import unquote, urlsplit
+import argparse
+import hashlib
+import json
+import re
+import unicodedata
+import xml.etree.ElementTree as ET
+import zipfile
+
+ROOT = Path(__file__).resolve().parents[1]
+PRESENTATION = ROOT / 'docs/presentation'
+NS = {'a': 'http://schemas.openxmlformats.org/drawingml/2006/main',
+      'p': 'http://schemas.openxmlformats.org/presentationml/2006/main'}
+
+def normalized(value):
+    return re.sub(r'\s+', '', unicodedata.normalize('NFC', value))
+
+def headings(text):
+    return {re.sub(r'[^\w\- ]', '', line.lower()).replace(' ', '-')
+            for line in re.findall(r'^#{1,6} (.+)$', text, re.M)}
+
+def validate():
+    docs = [ROOT/'README.md'] + [PRESENTATION/name for name in ('README.md','SCRIPT.md','CREDITS.md','REVIEW.md')]
+    errors, count = [], 0
+    for doc in docs:
+        body = doc.read_text()
+        targets = re.findall(r'!?\[[^\]]*\]\(([^\s)]+)', body)
+        targets += re.findall(r'(?:src|href)="([^"]+)"', body)
+        for value in targets:
+            parsed=urlsplit(value)
+            if parsed.scheme or parsed.netloc:
+                continue
+            target=(doc.parent/unquote(parsed.path)).resolve() if parsed.path else doc
+            count += 1
+            if not target.exists():
+                errors.append(f'{doc.relative_to(ROOT)}: missing {value}')
+            elif parsed.fragment and target.suffix=='.md':
+                if unquote(parsed.fragment) not in headings(target.read_text()):
+                    errors.append(f'{doc.relative_to(ROOT)}: missing heading {value}')
+    data=json.loads((PRESENTATION/'slides-content.json').read_text())
+    assert len(data)==10, 'Expected the existing ten-slide deck'
+    assert sum(x['seconds'] for x in data)==510, 'Timing allocation changed'
+    script=normalized((PRESENTATION/'SCRIPT.md').read_text())
+    with zipfile.ZipFile(PRESENTATION/'going-class-presentation.pptx') as z:
+        assert z.testzip() is None
+        slides=[n for n in z.namelist() if re.fullmatch(r'ppt/slides/slide\d+\.xml',n)]
+        notes=[n for n in z.namelist() if re.fullmatch(r'ppt/notesSlides/notesSlide\d+\.xml',n)]
+        assert len(slides)==len(notes)==10
+        size=ET.fromstring(z.read('ppt/presentation.xml')).find('p:sldSz',NS)
+        assert (size.get('cx'),size.get('cy'))==('12192000','6858000')
+        for i,d in enumerate(data,1):
+            note=normalized(''.join(ET.fromstring(z.read(f'ppt/notesSlides/notesSlide{i}.xml')).itertext()))
+            expected=normalized(d['notes'])
+            assert expected in note, f'Slide {i}: PPTX notes differ'
+            assert expected in script, f'Slide {i}: SCRIPT.md differs'
+            text=normalized(''.join(ET.fromstring(z.read(f'ppt/slides/slide{i}.xml')).itertext()))
+            assert normalized(d['title']) in text, f'Slide {i}: title differs'
+            assert normalized(d['subtitle']) in text, f'Slide {i}: subtitle differs'
+    with zipfile.ZipFile(PRESENTATION/'going-class-presentation.key') as z:
+        assert z.testzip() is None
+        assert any(n.startswith('Index/') for n in z.namelist())
+    assert not errors, '\n'.join(errors)
+    files = docs + [PRESENTATION/n for n in ('going-class-presentation.pptx','going-class-presentation.key','slides-content.json','preview.webp')]
+    return {'scope':'Document/package consistency only; not product tests or live quality',
+            'passed':True,'local_links_checked':count,'slides':10,'pptx_notes_matching_script':10,
+            'target_duration_seconds':510,'actual_spoken_duration_measured':False,
+            'native_keynote_visual_review':'Separate manual evidence: REVIEW.md',
+            'files':{str(p.relative_to(ROOT)):{'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in files}}
+
+if __name__=='__main__':
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--write-manifest',action='store_true')
+    args=parser.parse_args()
+    result=validate()
+    text=json.dumps(result,ensure_ascii=False,indent=2)+'\n'
+    if args.write_manifest:
+        (PRESENTATION/'validation.json').write_text(text)
+    print(text,end='')
