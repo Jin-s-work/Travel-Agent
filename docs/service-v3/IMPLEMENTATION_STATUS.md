@@ -174,6 +174,6 @@ Chrome/macOS, 로컬 합성 OIDC/공급자 서버(`tests/browser_discovery_fixtu
 
 Pretendard Variable v1.3.9를 자체 호스팅하고 굵기/자간/여백/버튼을 정돈했다. 필터를 방문·인원/취향·예산/이동·필수/리뷰 기준 탭으로 통합하고 취소 시 기존값, 적용 시 새 추천을 유지한다. 메일 화면은 업로드→파일별 결과→예약→원문 순서로 연결했다. 대표/구간 시각의 교정 불일치를 비교 표시하고 일정 확정을 차단한다.
 
-최종 Python 1020 passed/15 skipped/2 warnings, Node115 passed, 임시 PostgreSQL58 passed. Chrome 실제 업로드/교정/재분석/날짜질문/새로고침/실패안내, 390px/960px/큰글자200%/다크/키보드 필터를 검증했다. 합성 로그인과 운영 로그인은 구분한다. DB schema 변경·비밀·플랜·유료 API 활성화 없음.
+최종 Python 1020 passed/15 skipped/2 warnings, Node119 passed, 임시 PostgreSQL58 passed. Chrome 실제 업로드/교정/재분석/날짜질문/새로고침/실패안내, 390px/960px/큰글자200%/다크/키보드 필터를 검증했다. 합성 로그인과 운영 로그인은 구분한다. DB schema 변경·비밀·플랜·유료 API 활성화 없음.
 
 상세: [메일·디자인 검증 보고서](reports/mail-recovery-pretendard-validation.md). 운영 배포 결과는 이 보고서의 배포 표를 따른다.

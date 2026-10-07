@@ -383,19 +383,25 @@
     const summaryMatch=b.date&&b.date<=date&&(b.date_end||b.date)>=date;
     return eventMatch || ((['숙소','hotel','lodging','accommodation'].includes(b.kind)||!events.length)&&summaryMatch);
   }
+  function bookingKindLabel(kind) {
+    if (kind == null) return null;
+    const value=String(kind).trim(), alias=value.toLowerCase().replace(/[\s-]+/g,'_');
+    const labels={flight:'항공',air:'항공',hotel:'숙소',lodging:'숙소',accommodation:'숙소',car_rental:'렌터카',rental_car:'렌터카',rentcar:'렌터카',tour:'투어',activity:'투어',restaurant:'음식점',dining:'음식점',cafe:'음식점',other:'기타',etc:'기타','식당':'음식점','호텔':'숙소','항공편':'항공'};
+    return Object.hasOwn(labels,alias) ? labels[alias] : value;
+  }
   function renderBookings() {
     renderBookingDays();
     const host = $('#bookingList'); host.replaceChildren(); if (!state.trip) return;
     const date = $('#dateFilter').value, kind = $('#kindFilter').value, review = $('#needsReview').checked;
-    const list = state.bookings.filter(b => (!date || bookingOnDate(b,date)) && (!kind || b.kind === kind) && (!review || isReview(b))).sort((a,b) => (a.date || '9999').localeCompare(b.date || '9999') || (a.time || '').localeCompare(b.time || ''));
+    const list = state.bookings.filter(b => (!date || bookingOnDate(b,date)) && (!kind || bookingKindLabel(b.kind) === kind) && (!review || isReview(b))).sort((a,b) => (a.date || '9999').localeCompare(b.date || '9999') || (a.time || '').localeCompare(b.time || ''));
     $('#bookingFilterBrief').textContent = [date,kind,review?'확인 필요만':''].filter(Boolean).join(' · ');
     $('#bookingCount').textContent = `${list.length} / ${state.bookings.length}건`;
     if (!list.length) { const empty = make('div','panel empty'); empty.append(make('h2','',state.bookings.length ? '이 조건에 맞는 예약이 없어요' : '아직 예약이 없어요'),make('p','',state.bookings.length ? '날짜나 종류 필터를 바꿔보세요.' : '예약 메일을 추가하거나 예약을 직접 입력해 보세요.')); if (!state.bookings.length) empty.append(button('메일 추가하기',() => setTab('mail'),'primary')); else empty.append(button('모든 예약 보기',()=>{ $('#dateFilter').value=''; $('#kindFilter').value=''; $('#needsReview').checked=false; renderBookings(); },'secondary')); host.append(empty); return; }
     let previous;
     list.forEach(b => {
       const day = b.date || '날짜 확인 필요'; if (day !== previous) { host.append(make('h3','date-heading',day)); previous = day; }
-      const card = button('',() => bookingDetail(b),'booking-card'); const icon = make('span','kind-mark',kindMark[b.kind] || '◇'); icon.setAttribute('aria-hidden','true');
-      const mid = make('div','booking-body'); mid.append(make('strong','',b.provider || '이름 확인 필요'),make('p','',[b.kind,b.location].filter(Boolean).join(' · ')));
+      const card = button('',() => bookingDetail(b),'booking-card'); const icon = make('span','kind-mark',kindMark[bookingKindLabel(b.kind)] || '◇'); icon.setAttribute('aria-hidden','true');
+      const mid = make('div','booking-body'); mid.append(make('strong','',b.provider || '이름 확인 필요'),make('p','',[bookingKindLabel(b.kind),b.location].filter(Boolean).join(' · ')));
       const badges = make('div','badges'); if (!b.document_id) badges.append(make('span','badge','직접 입력'));
       if (isReview(b)) badges.append(make('span','badge warn','확인 필요'));
       if (b.date && (b.date < state.trip.start_date || b.date > state.trip.end_date)) badges.append(make('span','badge warn','여행 기간 밖'));
@@ -447,10 +453,10 @@
       const dl = make('dl','detail-list');
       Object.entries(labels).forEach(([key,label]) => {
         let note=''; const extracted = b.extracted || b.extracted_json || {};
-        if (Object.hasOwn(extracted,key) && JSON.stringify(extracted[key]) !== JSON.stringify(b[key])) note = '원문 추출: ' + valueText(key==='status' ? statusText[extracted[key]]||extracted[key] : extracted[key]) + ' · 사용자 수정 적용';
-        pair(dl,label,key === 'status' ? statusText[b[key]] || b[key] : b[key],note);
+        if (Object.hasOwn(extracted,key) && JSON.stringify(extracted[key]) !== JSON.stringify(b[key])) note = '원문 추출: ' + valueText(key==='status' ? statusText[extracted[key]]||extracted[key] : key==='kind' ? bookingKindLabel(extracted[key]) : extracted[key]) + ' · 사용자 수정 적용';
+        pair(dl,label,key === 'status' ? statusText[b[key]] || b[key] : key==='kind' ? bookingKindLabel(b[key]) : b[key],note);
       }); body.append(dl);
-      if (b.events?.length) { body.append(make('h3','detail-section','예약 구간')); b.events.forEach((e,i) => { const box=make('div','source-card'); box.append(make('strong','',`${i+1}. ${({outbound:'가는 편',return:'오는 편',flight:'항공 이동',stay:'숙박',pickup:'대여·반납',activity:'방문'})[e.event_type] || e.event_type || b.kind || '구간'}`)); const ev=make('dl','detail-list'); pair(ev,'출발·시작',e.start_local,e.start_timezone || '시간대 미확인'); pair(ev,'도착·종료',e.end_local,e.end_timezone || '시간대 미확인'); if(e.location)pair(ev,'장소',e.location); box.append(ev); body.append(box); }); }
+      if (b.events?.length) { body.append(make('h3','detail-section','예약 구간')); b.events.forEach((e,i) => { const box=make('div','source-card'); box.append(make('strong','',`${i+1}. ${({outbound:'가는 편',return:'오는 편',flight:'항공 이동',stay:'숙박',pickup:'대여·반납',activity:'방문'})[e.event_type] || e.event_type || bookingKindLabel(b.kind) || '구간'}`)); const ev=make('dl','detail-list'); pair(ev,'출발·시작',e.start_local,e.start_timezone || '시간대 미확인'); pair(ev,'도착·종료',e.end_local,e.end_timezone || '시간대 미확인'); if(e.location)pair(ev,'장소',e.location); box.append(ev); body.append(box); }); }
       const conflicts = b.conflicts || b.review_conflicts || [];
       if (conflicts.length) { body.append(make('h3','detail-section','새 추출값과 수정값 비교')); conflicts.forEach(c => body.append(make('p','form-note',`${c.field_path || c.field}: 새 추출 ${valueText(c.new_extracted ?? c.extracted_value ?? c.extracted)} · 내 수정 ${valueText(c.override_value ?? c.override)}`))); }
       const source = make('div','source-card');
@@ -477,7 +483,7 @@
         catch(err){if(err.status===409&&!form.querySelector('.conflict-action')){const reload=button('최신 예약과 비교',async()=>{try{const list=await allPages(tripPath(trip)+'/bookings');const latest=effective(list.find(x=>x.id===b.id)||{});if(!latest.id)throw new Error('예약이 삭제되었거나 접근할 수 없습니다.');const comparison=make('div','source-card');comparison.append(make('h3','','변경된 서버 내용과 내 입력 비교'));
           const dl=make('dl','detail-list');
           const labels={kind:'예약 종류',status:'확인 상태',provider:'예약 이름·업체',date:'시작 날짜',date_end:'종료 날짜',time:'시작 시각',time_end:'종료 시각',location:'장소',confirmation_number:'예약번호',refund_policy:'취소·환불',event_type:'구간 종류',start_local:'시작 현지 날짜·시각',end_local:'종료 현지 날짜·시각',start_timezone:'시작 시간대',end_timezone:'종료 시간대'};
-          const renderValue=(key,value)=>valueText(key==='status'?(statusText[value]||value):value);
+          const renderValue=(key,value)=>valueText(key==='status'?(statusText[value]||value):key==='kind'?bookingKindLabel(value):value);
           function compareValue(label,key,oldValue,currentValue,inputValue){
             pair(dl,label,`기존 값: ${renderValue(key,oldValue)}\n서버 최신 값: ${renderValue(key,currentValue)}\n내 입력: ${renderValue(key,inputValue)}`);
           }
@@ -505,7 +511,7 @@
           if(removedEditedEvent)form.querySelector('[type="submit"]').disabled=true;else expectedVersion=latest.version;
           reload.remove();}catch(e){formError(form,e);}},'secondary conflict-action');footer.prepend(reload);}throw err;}
       });
-      const fields=[['kind','예약 종류',b.kind||'기타',{select:Object.keys(kindMark),required:true}],['status','확인 상태',b.status||'user_confirmed',{select:[['needs_review','확인 필요'],['user_confirmed','사용자가 직접 확인'],...(b.document_id?[['source_verified','메일 근거 확인']]:[]),['cancelled','취소됨']]}],['provider','예약 이름·업체',b.provider||'',{wide:true,required:true,maxLength:300}],['date','시작 날짜',b.date||'',{type:'date'}],['date_end','종료 날짜',b.date_end||'',{type:'date'}],['time','시작 시각',b.time||'',{type:'time'}],['time_end','종료 시각',b.time_end||'',{type:'time'}],['location','장소',b.location||'',{wide:true,maxLength:1000}],['confirmation_number','예약번호',b.confirmation_number||'',{wide:true,maxLength:200}],['refund_policy','취소·환불 규정',b.refund_policy||'',{wide:true,textarea:true,maxLength:5000}]];
+      const fields=[['kind','예약 종류',b.kind||'기타',{select:Object.keys(kindMark).map(label=>[b.kind&&label===bookingKindLabel(b.kind)?b.kind:label,label]),required:true}],['status','확인 상태',b.status||'user_confirmed',{select:[['needs_review','확인 필요'],['user_confirmed','사용자가 직접 확인'],...(b.document_id?[['source_verified','메일 근거 확인']]:[]),['cancelled','취소됨']]}],['provider','예약 이름·업체',b.provider||'',{wide:true,required:true,maxLength:300}],['date','시작 날짜',b.date||'',{type:'date'}],['date_end','종료 날짜',b.date_end||'',{type:'date'}],['time','시작 시각',b.time||'',{type:'time'}],['time_end','종료 시각',b.time_end||'',{type:'time'}],['location','장소',b.location||'',{wide:true,maxLength:1000}],['confirmation_number','예약번호',b.confirmation_number||'',{wide:true,maxLength:200}],['refund_policy','취소·환불 규정',b.refund_policy||'',{wide:true,textarea:true,maxLength:5000}]];
       fields.forEach(([key,label,v,o])=>inputs[key]=field(grid,key,label,v,o));
       const evHost=make('div','field wide');evHost.append(make('h3','detail-section','구간별 시각과 시간대'),make('p','hint','위의 날짜·시각을 수정했다면 해당 구간도 함께 확인해 주세요. 항공의 출발지·도착지 시간대는 각각 유지합니다.'));
       const rows=make('div');evHost.append(rows);
@@ -571,11 +577,19 @@
     return [...new Set(reasons||[])].map(reason=>labels[reason]).filter(Boolean).join(' ');
   }
   function renderUploads(){const host=$('#uploadResults');host.replaceChildren();if(!state.uploads.length)return;host.append(make('h2','','파일별 처리 결과'));state.uploads.forEach(r=>{const row=make('div','file-row');const mid=make('div');mid.append(make('strong','',r.filename||'예약 메일'),make('p','hint',r.analysis_mode==='local'&&['succeeded','active','needs_review'].includes(r.state)?'기본 분석 완료 · 내용 확인 필요':statusText[r.state]||r.state||'대기 중'));if(r.error_code||r.reason)mid.append(make('p','error',fileError(r.error_code||r.reason)));const reviewNote=mailReviewReasonText(r.review_reasons);if(reviewNote)mid.append(make('p','hint',reviewNote));if(r.bookings_count!=null)mid.append(make('p','hint',`예약 ${r.bookings_count}건`));row.append(mid);if(['failed','error','rejected'].includes(r.state)&&!['LOCAL_EXTRACTION_UNSUPPORTED','MAIL_BODY_EMPTY'].includes(r.error_code||r.reason)&&!budgetCodes.has(r.error_code||r.reason)){row.append(button('이 파일만 재시도',()=>{if(r.document_id)reprocessDocument(r.document_id,r.filename);else if(r.file)uploadFiles([r.file]);else{$('#mailFiles').click();}},'text-button'));}if(r.document_id&&['LOCAL_EXTRACTION_UNSUPPORTED','MAIL_BODY_EMPTY'].includes(r.error_code||r.reason))row.append(button('원문 보기',()=>viewDocument(r.document_id,r.filename),'text-button'),button('예약 직접 입력',()=>bookingForm(),'text-button'));if(r.bookings_count>0&&['succeeded','active','needs_review'].includes(r.state))row.append(button('예약 확인',()=>{$('#dateFilter').value='';$('#kindFilter').value='';$('#needsReview').checked=false;renderBookings();$('#bookingArea').scrollIntoView({block:'start'});$('#bookingArea').focus({preventScroll:true});},'secondary'));host.append(row);});}
-  function updateUpload(file){
+  function updateUpload(file,{authoritative=true}={}){
     // Filenames are display labels, never identity: two different mails can have the same name.
     let r=file.document_id ? state.uploads.find(x=>x.document_id===file.document_id) : file.file ? state.uploads.find(x=>x.file===file.file) : null;
     if(!r)r=state.uploads.find(x=>!x.document_id&&x.filename===file.filename&&(!file.file||x.file===file.file));
-    if(r)Object.assign(r,file);else state.uploads.push({...file});
+    if(r){
+      const newAttempt=file.job_id&&file.job_id!==r.job_id;
+      // Polling can jump directly to a retry's final result. Only same-job partial
+      // snapshots may inherit omitted fields; final results describe the new outcome.
+      if(newAttempt||file.state==='queued'||(authoritative&&file.state&&file.state!=='running')){
+        Object.assign(r,{error_code:null,reason:null,bookings_count:null,review_reasons:[],analysis_mode:null});
+      }
+      Object.assign(r,file);
+    }else state.uploads.push({...file});
   }
   const terminal = j => ['succeeded','partial','failed','cancelled'].includes(j.state);
   const stageText = {queued:'실행 대기',running:'작업 준비',recovering:'중단된 작업 복구',extracting:'원문 분석',reviewing_facts:'예약 항목 확인',resuming_files:'중단된 파일 이어서 처리',embedding:'검색 자료 준비',building_index:'검색 데이터 구성',activating:'결과 저장',document_complete:'파일 처리',rebuilding_index:'검색 복구',cleanup:'삭제 정리',candidate_snapshot:'저장된 장소 확인',route_snapshot:'출발점과 이동 확인',constraints_and_scoring:'방문 조건과 추천 근거 확인',source_revalidation:'출처와 확인 기한 재확인',recommendation_complete:'추천 결과 저장',result_ready:'추천 결과 준비',fixed_booking_validation:'고정 예약 확인',itinerary_saved:'검증한 일정 저장'};
@@ -583,7 +597,7 @@
   function canRetryJob(j){if([...state.jobs.values()].some(child=>child.submission?.resume_from===j.job_id))return false;if(j.operation==='reindex')return j.state==='failed'&&!budgetCodes.has(j.error_code);return ['partial','failed','cancelled'].includes(j.state)&&!budgetCodes.has(j.error_code)&&(j.files||[]).some(f=>f.state==='failed'&&!budgetCodes.has(f.error_code));}
   function nextAction(j){const code=j.error_code||(j.files||[]).find(f=>budgetCodes.has(f.error_code))?.error_code;if(code?.includes('BUDGET')||code==='GLOBAL_OPERATIONS_STOPPED')return '새로운 외부 호출이 중단되었습니다. 운영자가 단가·예산을 확인한 뒤 새 작업을 요청할 수 있습니다. 저장된 예약·일정은 계속 볼 수 있어요.';if(code?.includes('UNKNOWN')||code?.includes('RECONCILIATION'))return '공급자의 처리·과금 여부를 확인 중입니다. 중복 과금을 피하기 위해 자동 재시도하지 않습니다.';if(j.cancel_requested_at&&!terminal(j))return '취소를 요청했습니다. 이미 전송된 외부 요청은 끝날 수 있으며 비용이 발생할 수 있습니다.';if(j.state==='cancelled')return '작업이 중단되었습니다. 이미 저장된 결과는 유지됩니다.';if(j.state==='partial'){if(j.operation==='itinerary_generate')return '일정에서 미배치 장소와 확인이 필요한 조건을 살펴보세요. 고정 예약은 유지됩니다.';if(j.operation==='recommendation_generate')return '확인된 후보만 저장했습니다. 추천 화면에서 부족한 근거와 조건을 확인해 주세요.';return '저장된 결과와 확인이 필요한 항목을 확인해 주세요.';}return '';}
   function stopWatchers(){for(const w of state.watchers.values()){w.stream?.close();clearTimeout(w.timer);}state.watchers.clear();}
-  function mergeJob(j){state.jobs.set(j.job_id,j);(j.files||[]).forEach(f=>{const current=state.uploads.find(x=>x.document_id===f.document_id);const prior=current?.job_id&&state.jobs.get(current.job_id);if(!prior||prior.created_at<=j.created_at)updateUpload({...f,job_id:j.job_id});});renderJobs();renderUploads();if(j.operation==='documents')renderDocuments();
+  function mergeJob(j){state.jobs.set(j.job_id,j);(j.files||[]).forEach(f=>{const current=state.uploads.find(x=>x.document_id===f.document_id);const prior=current?.job_id&&state.jobs.get(current.job_id);if(!prior||prior.created_at<=j.created_at)updateUpload({...f,job_id:j.job_id},{authoritative:terminal(j)});});renderJobs();renderUploads();if(j.operation==='documents')renderDocuments();
     const active=state.recommendations.active;
     if(active&&(active.job_id||active.job?.job_id)===j.job_id){
       const finished=terminal(j)&&!terminal(active);active.job=j;active.state=j.state;state.recommendations.connectionError=null;
@@ -720,7 +734,7 @@
       action.append(document.querySelector('.sidebar [data-tab="'+tab+'"] svg').cloneNode(true),make('strong','',title),make('span','hint',note),make('span','shortcut-arrow','↗'));
       shortcuts.append(action);
     }
-    host.append(shortcuts);const next=state.bookings.filter(b=>b.date&&b.date>=new Date().toISOString().slice(0,10)&&b.status!=='cancelled').sort((a,b)=>(a.date||'').localeCompare(b.date||''))[0];if(next)host.append(make('p','form-note',`다음 예약 · ${next.date} ${next.time||'시각 미확인'} · ${next.provider||next.kind||'예약'}`));const checks=state.bookings.filter(b=>b.status==='needs_review').slice(0,3);if(checks.length){const list=make('ul','warning-list');for(const b of checks){const li=make('li');li.append(button(`${b.provider||b.kind||'예약'} 확인하기`,()=>setTab('mail'),'text-button'));list.append(li);}host.append(list);}
+    host.append(shortcuts);const next=state.bookings.filter(b=>b.date&&b.date>=new Date().toISOString().slice(0,10)&&b.status!=='cancelled').sort((a,b)=>(a.date||'').localeCompare(b.date||''))[0];if(next)host.append(make('p','form-note',`다음 예약 · ${next.date} ${next.time||'시각 미확인'} · ${next.provider||bookingKindLabel(next.kind)||'예약'}`));const checks=state.bookings.filter(b=>b.status==='needs_review').slice(0,3);if(checks.length){const list=make('ul','warning-list');for(const b of checks){const li=make('li');li.append(button(`${b.provider||bookingKindLabel(b.kind)||'예약'} 확인하기`,()=>setTab('mail'),'text-button'));list.append(li);}host.append(list);}
   }
   async function loadDiscovery({quiet=false}={}){
     clearTimeout(discoveryPollTimer);if(!state.session?.authenticated)return;loadDiscoveryAdmin().catch(e=>fail(e,$('#discoveryAdminError')));if(!state.trip){renderDiscoveryConditions();renderBookmarks();renderHomePlaces();return;}

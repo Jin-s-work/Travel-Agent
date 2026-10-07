@@ -512,4 +512,4 @@ DB 비밀번호 확인/필요 시 소유자의 직접 재설정과 Google 웹 �
 
 ## 22. 무료 메일 분석 복구·Pretendard·필터 개편 (2026-10-07)
 
-기존 유료 추출/임베딩 의존 때문에 실패하던 메일 흐름에 무료 기본 분석·SQL 질문을 추가했다. 사용자 교정 및 원문 보존, 형식 미지원 안내, 교정 시각 충돌 비교/일정 확정 차단을 적용했다. Pretendard와 탭형 필터를 사용한다. 최종 회귀는 Python1020/Node115/PostgreSQL58 통과, Python15건 외부 환경 의존 skip이다. 라이브 AI 호출은 수행하지 않았다. 상세 구현·실제 브라우저·배포 상태는 [검증 보고서](../service-v3/reports/mail-recovery-pretendard-validation.md)를 따른다. schema migration 없이 기존 무료 인프라를 유지한다.
+기존 유료 추출/임베딩 의존 때문에 실패하던 메일 흐름에 무료 기본 분석·SQL 질문을 추가했다. 사용자 교정 및 원문 보존, 형식 미지원 안내, 교정 시각 충돌 비교/일정 확정 차단을 적용했다. Pretendard와 탭형 필터를 사용한다. 최종 회귀는 Python1020/Node119/PostgreSQL58 통과, Python15건 외부 환경 의존 skip이다. 라이브 AI 호출은 수행하지 않았다. 상세 구현·실제 브라우저·배포 상태는 [검증 보고서](../service-v3/reports/mail-recovery-pretendard-validation.md)를 따른다. schema migration 없이 기존 무료 인프라를 유지한다.

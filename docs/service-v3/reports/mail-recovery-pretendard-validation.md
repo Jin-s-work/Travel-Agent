@@ -45,7 +45,7 @@
 | 실패와 데이터 보존 | 재분석 실패, 사용자 교정, 중복, 소유권, 삭제/완료 경합 | 회귀 통과. 무료 경로에서 provider/build 호출 시 시험이 실패하도록 검증 |
 | 무료 경로 | 외부 AI/임베딩 호출 0, 날짜별 예약 질문, 원문 근거 | 실제 로컬 브라우저 DB usage 0행. 하루 8개 + 수동 예약은 API 시험에서 9개 모두 반환 |
 | 필터 | 취소·임시값·적용, 잘못된 입력 탭 이동, 키보드, 늦은 응답 | 신규 필터 9개 + 기존 흐름 + Chrome 실제 취소/적용/End 키 통과 |
-| 전체 회귀 | 위 실행 명령 참조 | Python **1020 passed / 15 skipped / 2 warnings, 143.80s**. Node **115 passed, 0 failed** |
+| 전체 회귀 | 위 실행 명령 참조 | Python **1020 passed / 15 skipped / 2 warnings, 143.80s**. Node **119 passed, 0 failed** |
 | PostgreSQL | 시간 충돌·무료 메일·외부 호출 없는 재색인 | 임시 PostgreSQL 58 passed, 15.79s. 시험 전용 컨테이너 정리 |
 | 브라우저 | Chrome 실제 메일 업로드→예약 확인·교정→재분석→질문→새로고침, 필터 편집·취소 | 실제 무료 parser로 3메일/10예약. 날짜 질문 8방문+숙박=9근거. 미지원 메일 실패/원문/직접입력 안내, 기존10예약 보존 |
 | 반응형/접근성 | Chrome 390px·960px, 200% 글자·다크, 키보드/초점, font-family/font ready | 390px scrollWidth=390, 200% 모달 clientWidth=scrollWidth=318. Pretendard 로드 확인. 실제 iOS/Android/Safari 미검증 |
@@ -73,6 +73,15 @@ PYTHON_DOTENV_DISABLED=1 PUBLIC_DISCOVERY_ENABLED=0 TRAVEL_TEST_POSTGRES_DSN='<d
 ZIP은 기존 파일명·경로 14개를 보존하여 다시 묶었다. 합성 메일·참고 의미 JSON과 최신 사용 안내만 포함한다. 개인정보·비밀키·실제 예약 데이터는 포함하지 않는다. `expected-results.json`은 목표 의미 설명이며 모든 필드의 무료 자동 추출을 보장하지 않는다. ZIP 자체를 메일로 업로드하지 않고 `.eml`을 선택한다.
 
 ZIP 무결성·내부 경로/README 일치 검사는 완료했다. 실제 사용자 업로드는 위 브라우저 검증 결과에 기록한다.
+
+## 실제 무료 서비스 복구 확인
+
+- 최초 무료 분석 배포: 코드 `b3d2bb2`, Render `dep-db2ppb0m7kps73brodl0`, 2026-10-07 10:14:30 KST Live 로그 확인. 기존 Render Free/Supabase hii 재사용.
+- 기존 사용자 계정에 남아 있던 실패 메일 6개의 ‘다시 분석’을 실제 Chrome에서 실행했다. 6개 모두 기본 분석 완료/내용 확인 필요로 바뀌고 선택 여행에서 14개 예약이 보였다. 새로고침 후 동일했다. 기존 다른 여행의 수동 예약 1개를 합쳐 DB 예약은 총 15개다. 새 합성 메일을 운영에 추가한 시험이 아니라 이미 업로드된 테스트팩의 복구다.
+- 변경 요청 메일에는 확정 아님, DST 메일에는 시각 모호함 안내가 표시됐다. 사용자의 여행 기간·도시를 자동 변경하지 않았으며 기간 밖 예약은 그대로 표시한다.
+- 운영 DB 읽기 전용 확인: 문서6 `needs_review`, 활성 `local-mail-v1` 세대6, schema12, usage 예약/정산0행. 모든 개인 테이블 RLS true, browser `anon`/`authenticated`의 travel schema USAGE false. 유료 AI·임베딩 호출과 플랜 변경 없음.
+- HTTPS live/ready 200, 익명 trips/cities/mail-capabilities API 401. 운영 기존 세션으로 확인했으며 이번 수정에서 Google OAuth 신규 로그인 왕복은 반복하지 않았다.
+- 운영 복구 중 이전 오류 문구가 성공 뒤 남는 화면 문제를 찾아 재시도별 결과 초기화를 보완했다. 같은 job의 부분 결과는 보존하고 새 시도/최종 결과에서만 오래된 안내·건수를 지운다. 영어 restaurant로 저장된 식당도 음식점 필터/상세/편집에 표시하며 저장값을 임의로 교정하지 않는다. 후속 최종 배포와 자산 해시 결과는 위 배포 표를 따른다.
 
 ## 운영 경계와 복구
 
