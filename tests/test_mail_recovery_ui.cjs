@@ -43,3 +43,18 @@ test('editing an English-kind booking labels its option in Korean without silent
   const c=load(['bookingKindLabel','bookingForm'],{state,effective:x=>x,openDialog:(title,build)=>build(node('div')),make:node,kindMark:marks,formBase:(body,label,handler)=>{submit=handler;return {form:node('form'),grid:node('div'),footer:node('div')}},field:(grid,name,label,value,config)=>{options[name]=config;return inputs[name]={value}},api:async(path,request)=>{payload=request.body;return {id:'b'}},tripPath:()=>'/trips/t',closeDialog(){},loadBookings:async()=>{},notice(){}});
   c.bookingForm(booking);assert.equal(inputs.kind.value,'restaurant');assert.equal(options.kind.select.find(([value])=>value==='restaurant')[1],'음식점');inputs.provider.value='Corrected name';await submit();assert.equal(payload.changes.length,1);assert.equal(payload.changes[0].field_path,'provider');assert.equal(payload.changes[0].value,'Corrected name');assert.equal(booking.kind,'restaurant');
 });
+
+
+test('accepted documents stay busy before the first file result arrives',()=>{
+  const state={reprocessing:new Set(),jobs:new Map([['j',{state:'running',submission:{accepted:[{document_id:'d'}]},files:[]}]])};
+  const c=load(['documentProcessing'],{state});assert.equal(c.documentProcessing('d'),true);assert.equal(c.documentProcessing('other'),false);
+  state.jobs.get('j').state='succeeded';assert.equal(c.documentProcessing('d'),false);
+});
+
+test('single failed file resumes its original job instead of paying for a new extraction',async()=>{
+  const state={epoch:1,reprocessing:new Set(),jobs:new Map([['j',{job_id:'j',files:[{document_id:'d',state:'failed'}]}]])};let path,polled,fresh=0;
+  const c=load(['retryUpload'],{state,canRetryJob:()=>true,documentProcessing:()=>false,renderDocuments(){},uid:()=> 'retry-id',
+    api:async p=>{path=p;return {job_id:'next'}},pollJob:async id=>{polled=id},reprocessDocument:()=>{fresh++}});
+  await c.retryUpload({document_id:'d',filename:'test.eml',job_id:'j'});
+  assert.equal(path,'/jobs/j/retry');assert.equal(polled,'next');assert.equal(fresh,0);assert.equal(state.reprocessing.size,0);
+});

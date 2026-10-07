@@ -201,7 +201,10 @@ class Operations:
             for entry in accepted:
                 old_unit=previous_units.get(entry['document_id'],{})
                 units[entry['document_id']]={key:old_unit[key] for key in ('extracted_ref','vectors_ref','review_reasons') if key in old_unit}
-            ctx.checkpoint({'documents':units},stage='resuming_files',done=0,total=len(accepted))
+            inherited = {'documents': units}
+            if previous_cp.get('pipeline_signature') == signature:
+                inherited['index_repair_refs'] = previous_cp.get('index_repair_refs', {})
+            ctx.checkpoint(inherited,stage='resuming_files',done=0,total=len(accepted))
         results=[]
         for index, entry in enumerate(accepted):
             ctx.guard(); did=entry['document_id']; saved=dict(units.get(did,{}))
@@ -270,10 +273,20 @@ class Operations:
                             saved['vectors_ref']=self.artifact(job,did+'-vectors',{'texts':texts,'vectors':vectors,'model':EMBEDDING_MODEL},ctx,document_id=did)
                             units[did]=saved; ctx.checkpoint({'documents':units},stage='building_index',done=index,total=len(accepted))
                         material=self.read_artifact(saved['vectors_ref'])
-                        generation=self.generations.build(user,trip,job['id'],job['fencing_token'],[
-                            {'document_id':did,'generation_id':saved['generation_id'],'content_hash':doc['content_hash'],
-                             'parse_version':'foundation-v2','chunks':[{'text':t,'embedding':v} for t,v in zip(material['texts'],material['vectors'])]}],
-                             embedding_model=material['model'],embedding_dimension=len(material['vectors'][0]))
+                        incoming = [{'document_id':did,'generation_id':saved['generation_id'],'content_hash':doc['content_hash'],
+                            'parse_version':'foundation-v2','chunks':[{'text':t,'embedding':v} for t,v in zip(material['texts'],material['vectors'])]}]
+                        try:
+                            generation=self.generations.build(user,trip,job['id'],job['fencing_token'],incoming,
+                                embedding_model=material['model'],embedding_dimension=len(material['vectors'][0]))
+                        except DomainError as exc:
+                            if exc.code != 'INDEX_REBUILD_INPUT_REQUIRED':
+                                raise
+                            # A trip previously analysed locally has SQL facts but
+                            # no vectors. Fill the missing search material without
+                            # re-extracting or replacing those existing bookings.
+                            recovered = self.missing_index_material(job,ctx,{did},material['model'],len(material['vectors'][0]))
+                            generation=self.generations.build(user,trip,job['id'],job['fencing_token'],incoming+recovered,
+                                embedding_model=material['model'],embedding_dimension=len(material['vectors'][0]))
                         saved['index_id']=generation['id']; units[did]=saved
                         ctx.checkpoint({'documents':units},stage='activating',done=index,total=len(accepted))
                         self.fault('after_ready',job)
@@ -326,6 +339,68 @@ class Operations:
         except Exception:
             pass  # Reclamation is retried on startup/read completion; activation already committed.
         return {'state':state,'result':{**payload,'files':results,'analysis_mode':mode,'review_required':any(item['state']=='needs_review' for item in results)}}
+
+    def missing_index_material(self, job, ctx, incoming_ids, model, dimension):
+        """Recover only unrepresented active facts; preserve bookings and overrides.
+
+        GenerationManager retains its complete-manifest, version and fencing
+        checks. Receipts handle process crashes and persisted artifact references
+        also survive an explicit failed-job retry under the same pipeline.
+        """
+        from src.indexer import _chunk
+        user, trip = job['actor_id'], job['trip_id']
+        if model != EMBEDDING_MODEL:
+            raise DomainError('CHECKPOINT_INCOMPATIBLE','저장된 검색 모델과 현재 설정이 다릅니다.',409)
+        reusable = set()
+        try:
+            with self.generations.reader(user,trip) as reader:
+                if reader.generation['embedding_model'] == model and reader.generation['embedding_dimension'] == dimension:
+                    reusable = {(d['document_id'],d['generation_id']) for d in reader.generation['manifest']['documents']}
+        except DomainError as exc:
+            if exc.code != 'SEARCH_REBUILDING':
+                raise
+        docs = [d for d in self.repo.list_documents(user,trip)
+                if d['id'] not in incoming_ids and d.get('active_generation_id')
+                and (d['id'],d['active_generation_id']) not in reusable]
+        refs = dict(job['checkpoint'].get('index_repair_refs',{}))
+        recovered = []
+        for index, doc in enumerate(docs):
+            did, gid = doc['id'], doc['active_generation_id']
+            guard = self.document_guard(ctx,user,trip,did)
+            try:
+                current = guard()
+                if current['active_generation_id'] != gid:
+                    raise DomainError('VERSION_CONFLICT','메일이 변경되어 검색 자료를 다시 준비해야 합니다.',409)
+                with self.repo.db.connect() as con:
+                    row = con.execute('SELECT extracted_json,parse_version FROM document_generations WHERE id=? AND document_id=?',(gid,did)).fetchone()
+                if not row or not row['extracted_json']:
+                    raise DomainError('REEXTRACTION_REQUIRED','기존 메일의 재분석이 필요합니다.',409)
+                texts = _chunk(row['extracted_json'])
+                fingerprint = stable_hash({'model':model,'texts':texts})
+                cached = refs.get(gid)
+                if cached and (cached.get('fingerprint') != fingerprint or cached.get('dimension') != dimension):
+                    raise DomainError('CHECKPOINT_INCOMPATIBLE','기존 검색 자료의 모델·내용이 변경되었습니다.',409)
+                if cached:
+                    vectors = self.read_artifact(cached['ref'])
+                else:
+                    ctx.checkpoint({},stage='rebuilding_index',done=index,total=len(docs))
+                    vectors = []
+                    for batch_no, start in enumerate(range(0,len(texts),32)):
+                        vectors.extend(self.embed(self.context(user,trip,job['id']),
+                            gid+':repair:'+fingerprint+':'+str(batch_no),texts[start:start+32],guard))
+                    if not vectors or len(vectors) != len(texts) or any(len(v) != dimension for v in vectors):
+                        raise DomainError('EMBEDDING_INVALID','기존 메일의 검색 자료를 완성하지 못했습니다.')
+                    ref = self.artifact(job,gid+'-'+fingerprint[:12]+'-repair',vectors,ctx,document_id=did)
+                    refs[gid] = {'ref':ref,'fingerprint':fingerprint,'dimension':dimension}
+                    ctx.checkpoint({'index_repair_refs':refs},stage='rebuilding_index',done=index+1,total=len(docs))
+                if not vectors or len(vectors) != len(texts) or any(len(v) != dimension for v in vectors):
+                    raise DomainError('EMBEDDING_INVALID','기존 메일의 검색 자료를 확인할 수 없습니다.')
+                recovered.append({'document_id':did,'generation_id':gid,'content_hash':doc['content_hash'],
+                    'parse_version':row['parse_version'],'chunks':[{'text':t,'embedding':v} for t,v in zip(texts,vectors)]})
+            except DomainError as exc:
+                if exc.code != 'DOCUMENT_DELETED':
+                    raise
+        return recovered
 
     def reindex(self, job, ctx):
         user,trip=job['actor_id'],job['trip_id']; documents=[]
