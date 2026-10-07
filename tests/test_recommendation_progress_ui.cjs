@@ -141,3 +141,10 @@ test('manual terminal refresh shows loading before its response and an old trip 
 });
 
 test('map failure preserves exact retry time and offers saved places, not irrelevant condition edits',()=>{const c=models(),value=result({});value.public_discovery={state:'unavailable',retry_at:'2026-10-07T03:00:00Z'};value.summary={empty_state:{title:'지도 서버에 연결하지 못했어요',description:'다시 연결해 주세요.'}};const m=c.recommendationProgressModel({active:{state:'succeeded',result:value}});assert.equal(m.action,'save');assert.equal(m.retryAt,value.public_discovery.retry_at);assert.equal(m.title,value.summary.empty_state.title);});
+
+test('completed detail state updates a history row fetched before the job completed',async()=>{
+ const finished={run_id:'r',state:'succeeded',result:result({items:[{place_id:'p'}]})};
+ const state={session:{authenticated:true},trip:{id:'t'},epoch:1,tab:'explore',recommendations:{serial:0}};
+ const c=load(['loadRecommendations'],{state,recommendationPollTimer:null,clearTimeout(){},setTimeout(){throw Error('No finished job polling');},tripPath:()=>'/trips/t',allPages:async()=>[{run_id:'r',state:'running'}],api:async()=>finished,restoreRecommendationOptions(){},renderRecommendationResults(){},renderRecommendationProgress(){}});
+ await c.loadRecommendations();assert.equal(state.recommendations.runs[0].state,'succeeded');
+});

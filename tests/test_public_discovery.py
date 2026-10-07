@@ -9,7 +9,7 @@ from types import SimpleNamespace
 import pytest
 
 from src.discovery.public_places import (PublicDiscovery, CENTERS, ATTRIBUTION, MAX_BYTES, POLICY,
-                                        center, normalize, query, fetch, MAX_CANDIDATES)
+                                        center, normalize, normalize_photon, query, fetch, MAX_CANDIDATES)
 from src.discovery.safe_fetch import FetchRejected
 from src.destinations import CITIES
 from src.foundation.repository import DomainError
@@ -62,7 +62,10 @@ def test_all_100_sourced_centers_and_constant_bounded_queries():
         assert c['country_code']==CITIES[city]['country_code']
         assert -90<=c['latitude']<=90 and -180<=c['longitude']<=180
         assert c['source_url']=='https://www.geonames.org/'+c['geonames_id']+'/'
-        assert c['radius_m']==3000 and '[timeout:10]' in query(city) and 'out center tags 60;' in query(city)
+        from urllib.parse import parse_qs
+        params=parse_qs(query(city))
+        assert c['radius_m']==3000 and params['radius']==['3.0'] and params['limit']==['60']
+        assert params['osm_tag']==['amenity:restaurant','amenity:cafe']
     assert center('new-delhi')['geonames_id']=='1261481'
     with pytest.raises(DomainError):query('paris);out;')
 
@@ -85,12 +88,12 @@ def test_normalizer_rejects_bad_geography_tags_ids_and_deduplicates():
 def test_transport_uses_fixed_https_no_redirect_bounds(monkeypatch):
     seen=[]
     def fake(url,**kwargs):
-        seen.append((url,kwargs));return SimpleNamespace(mime='application/json',content=json.dumps(payload()).encode())
+        seen.append((url,kwargs));return SimpleNamespace(mime='application/json',content=json.dumps(photon_payload()).encode())
     monkeypatch.setattr('src.discovery.public_places.fetch_public',fake)
     result,size=fetch('paris')
     assert len(result)==2 and size>0
     url,limits=seen[0]
-    assert url.startswith('https://overpass-api.de/api/interpreter?data=')
+    assert url.startswith('https://photon.komoot.io/reverse?lat=')
     assert limits=={'max_bytes':350000,'timeout_seconds':15,'max_redirects':0}
     assert 'hotel' not in url and '2026' not in url
 
@@ -407,9 +410,52 @@ def test_network_wait_counts_down_and_daily_reset_is_next_utc_midnight(public,mo
     assert second['result']['public_discovery']['retry_after_seconds']==90
     assert '연결이 끊겨' in second['result']['summary']['empty_state']['description']
     public.clock[0]+=timedelta(minutes=3)
-    monkeypatch.setattr('src.discovery.public_places.USER_DAILY',1)
+    monkeypatch.setattr('src.discovery.public_places.USER_DAILY',0)
     last=run(public,trip,base,'public-day-cap')
     status=last['result']['public_discovery']
     assert status['reason']=='PUBLIC_DISCOVERY_DAILY_LIMIT'
     assert status['retry_at'].endswith('T00:00:00+00:00')
     assert '오늘' in last['result']['summary']['empty_state']['title']
+
+
+def photon_payload(city='paris'):
+    c=center(city)
+    return {'type':'FeatureCollection','features':[{'type':'Feature','properties':{'osm_type':'N','osm_id':800000000+i,'osm_key':'amenity','osm_value':'restaurant','name':'Synthetic Photon '+str(i),'street':'Fixture Street','housenumber':str(i),'countrycode':c['country_code'].lower()},'geometry':{'type':'Point','coordinates':[c['longitude'],c['latitude']+.001*i]}} for i in range(2)]}
+
+
+def test_photon_adapter_keeps_osm_identity_radius_and_unconfirmed_metadata():
+    raw=photon_payload(); raw['features'][1]['properties']['osm_type']='W'
+    out=normalize_photon(raw,'paris')
+    assert len(out)==2 and out[1]['external_id']=='way/800000001'
+    assert out[0]['source_url']=='https://www.openstreetmap.org/node/800000000'
+    assert out[0]['observed_tags']=={} and 'rating' not in out[0]
+    raw['features'][0]['geometry']['coordinates']=[0,0]
+    raw['features'][1]['properties']['countrycode']='JP'
+    assert normalize_photon(raw,'paris')==[]
+    with pytest.raises(DomainError):normalize_photon({'features':'broken'},'paris')
+    with pytest.raises(DomainError):normalize_photon({'features':photon_payload()['features']*31},'paris')
+
+
+def test_photon_does_not_invent_identity_for_unclassified_or_malformed_results():
+    raw=photon_payload()
+    raw['features'][0]['properties']['osm_key']='tourism'
+    raw['features'][1]['geometry']['type']='Polygon'
+    assert normalize_photon(raw,'paris')==[]
+    raw=photon_payload();raw['features'][0]['properties']['extra']={'opening_hours':'Mo-Fr 09:00-18:00','rating':5,'author':'private'}
+    out=normalize_photon(raw,'paris')
+    assert out[0]['observed_tags']=={'opening_hours':'Mo-Fr 09:00-18:00'}
+
+
+def test_known_unsent_connection_failures_do_not_consume_http_quota(public,monkeypatch):
+    trip,base=prepare(public)
+    monkeypatch.setattr('src.discovery.public_places.USER_DAILY',1)
+    def failure(city):raise FetchRejected('CONNECT_FAILED',network_errno=111)
+    public.app.state.discovery.public_provider.fetcher=failure
+    run(public,trip,base,'unsent-first')
+    public.clock[0]+=timedelta(minutes=3)
+    public.app.state.discovery.public_provider.fetcher=lambda city:(normalize(payload(city),city),1000)
+    out=run(public,trip,base,'sent-after-connect-failure')
+    assert out['result']['public_discovery']['state']=='ready'
+    with public.app.state.db.connect() as con:
+        row=con.execute("SELECT actual_units_json FROM usage_reservations WHERE error_code='CONNECT_FAILED'").fetchone()
+        assert json.loads(row[0])['calls']==0

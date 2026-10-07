@@ -20,7 +20,9 @@ from .safe_fetch import fetch_public, FetchRejected, validate_public_url
 CENTERS = json.loads(Path(__file__).parents[1].joinpath('destinations/centers.json').read_text())
 POLICY = 'osm-public-beta-v1'
 PROVIDER = 'openstreetmap'
-ENDPOINT = 'https://overpass-api.de/api/interpreter'
+# Photon permits moderate project use; fixed endpoint, no fallback host rotation.
+ENDPOINT = 'https://photon.komoot.io/reverse'
+QUERY_VERSION = 'photon-reverse-v1'
 MAX_BYTES = 350_000
 MAX_CANDIDATES = 60
 DISPLAY_CANDIDATES = 12
@@ -51,10 +53,11 @@ def query(city):
     c = center(city)
     if not c:
         raise DomainError('CITY_UNSUPPORTED', '등록된 도시를 선택해 주세요.', 422)
-    # No user text, private location, date or address is interpolated.
-    return (f'[out:json][timeout:10][maxsize:16777216];'
-            f'nwr(around:{c["radius_m"]},{c["latitude"]},{c["longitude"]})'
-            '[amenity~"^(restaurant|cafe)$"][name];out center tags 60;')
+    # No user text, private location, date or address leaves the server.
+    return urlencode({'lat': c['latitude'], 'lon': c['longitude'],
+                      'radius': c['radius_m']/1000, 'limit': MAX_CANDIDATES,
+                      'osm_tag': ['amenity:restaurant', 'amenity:cafe']}, doseq=True)
+
 
 
 def _text(value, limit=300):
@@ -120,8 +123,43 @@ def normalize(payload, city):
     return sorted(result, key=lambda p: (p['center_distance_m'], p['external_id']))
 
 
+def normalize_photon(payload, city):
+    """Adapt documented GeoJSON only; reuse branch, radius and tag validation."""
+    features = payload.get('features') if isinstance(payload, dict) else None
+    if not isinstance(features, list):
+        raise DomainError('PUBLIC_DISCOVERY_INCOMPLETE', '공개지도 응답이 불완전해요.', 503)
+    if len(features) > MAX_CANDIDATES:
+        raise DomainError('PUBLIC_DISCOVERY_OVERSIZED', '공개지도 응답이 허용 크기를 넘었어요.', 503)
+    elements = []
+    for feature in features:
+        if not isinstance(feature, dict):
+            continue
+        props, geom = feature.get('properties'), feature.get('geometry')
+        if not isinstance(props, dict) or not isinstance(geom, dict) or geom.get('type') != 'Point':
+            continue
+        coords = geom.get('coordinates')
+        if not isinstance(coords, list) or len(coords) != 2 or props.get('osm_key') != 'amenity':
+            continue
+        if props.get('countrycode') and str(props['countrycode']).upper() != center(city)['country_code']:
+            continue
+        tags = {'name': props.get('name'), 'amenity': props.get('osm_value')}
+        for source, target in [('street','addr:street'), ('housenumber','addr:housenumber'),
+                               ('postcode','addr:postcode'), ('city','addr:city'), ('district','addr:suburb')]:
+            if props.get(source):
+                tags[target] = props[source]
+        extra = props.get('extra')
+        if isinstance(extra, dict):
+            for key in ('cuisine','opening_hours','wheelchair','website','phone'):
+                if isinstance(extra.get(key), str):
+                    tags[key] = extra[key]
+        point = {'lat': coords[1], 'lon': coords[0]}
+        kind = {'N':'node','W':'way','R':'relation'}.get(props.get('osm_type'))
+        elements.append({'type':kind, 'id':props.get('osm_id'), **point, 'center':point, 'tags':tags})
+    return normalize({'elements': elements}, city)
+
+
 def fetch(city):
-    page = fetch_public(ENDPOINT + '?' + urlencode({'data': query(city)}), max_bytes=MAX_BYTES,
+    page = fetch_public(ENDPOINT + '?' + query(city), max_bytes=MAX_BYTES,
                         timeout_seconds=15, max_redirects=0)
     if page.mime != 'application/json':
         raise FetchRejected('UNSUPPORTED_MIME')
@@ -129,7 +167,7 @@ def fetch(city):
         payload = json.loads(page.content)
     except (ValueError, UnicodeError):
         raise DomainError('PUBLIC_DISCOVERY_INVALID', '공개지도 응답을 읽을 수 없어요. 잠시 후 다시 찾아 주세요.', 503) from None
-    return normalize(payload, city), len(page.content)
+    return normalize_photon(payload, city), len(page.content)
 
 
 def is_public_candidate(candidate):
@@ -148,7 +186,7 @@ class PublicDiscovery:
     def _status(self, city, state, **changes):
         c = center(city)
         return {'state': state, 'provider': PROVIDER, 'calls': 0, 'cost': {'currency': 'USD', 'micros': 0},
-                'cache_hit': False, 'endpoint': ENDPOINT, 'scope': 'city_center', 'radius_m': c['radius_m'] if c else None,
+                'cache_hit': False, 'endpoint': ENDPOINT, 'query_service': 'Photon', 'query_version': QUERY_VERSION, 'scope': 'city_center', 'radius_m': c['radius_m'] if c else None,
                 'center': c, 'center_attribution':{'text':'GeoNames','url':'https://www.geonames.org/','license':'CC BY 4.0','license_url':CENTERS['license_url']}, 'attribution': ATTRIBUTION, 'policy_version': POLICY,
                 'notice': '도심 3km 주변 공개지도 장소예요. 지점·영업·가격·리뷰는 방문 전에 확인해 주세요.', **changes}
 
@@ -169,7 +207,7 @@ class PublicDiscovery:
             return self._status(city, 'unavailable', reason='CITY_UNSUPPORTED')
         ctx.guard()
         now = self.clock().astimezone(timezone.utc)
-        request_hash = hashlib.sha256((POLICY + ':' + ENDPOINT + ':' + query(city)).encode()).hexdigest()
+        request_hash = hashlib.sha256((POLICY + ':' + QUERY_VERSION + ':' + ENDPOINT + ':' + query(city)).encode()).hexdigest()
         pack_id = 'osm_pack_' + city
         context = CallContext(actor.id, trip_id, trip_id, job_id=ctx.job['id'])
         try:
@@ -195,7 +233,9 @@ class PublicDiscovery:
                 if refused and self._retry_at(refused) > now:
                     return self._waiting(city, refused['error_code'], self._retry_at(refused), now)
                 day = now.date().isoformat()
-                totals = con.execute('SELECT owner_id,created_at FROM usage_reservations WHERE provider=? AND period_day=?', (PROVIDER, day)).fetchall()
+                # A refused TCP connection sends no provider request. It still gets the
+                # per-city backoff; HTTP errors/timeouts/unknown outcomes consume quota.
+                totals = con.execute("SELECT owner_id,created_at FROM usage_reservations WHERE provider=? AND period_day=? AND (error_code IS NULL OR error_code NOT IN ('CONNECT_FAILED','DNS_FAILED','DNS_BUSY'))", (PROVIDER, day)).fetchall()
                 if len(totals) >= GLOBAL_DAILY or sum(r['owner_id'] == actor.id for r in totals) >= USER_DAILY:
                     tomorrow = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
                     return self._waiting(city, 'PUBLIC_DISCOVERY_DAILY_LIMIT', tomorrow, now)
@@ -236,7 +276,7 @@ class PublicDiscovery:
             return self._status(city, 'unavailable', reason=exc.code, retry_after_seconds=900)
 
     def _settle(self, con, call_id, received, now, code=None, delay=None, http_status=None, network_errno=None):
-        units = {'calls': 1, 'response_bytes': received}
+        units = {'calls': 0 if code in {'CONNECT_FAILED','DNS_FAILED','DNS_BUSY'} else 1, 'response_bytes': received}
         if delay is not None:
             units['retry_after_seconds'] = delay
         if http_status is not None:
