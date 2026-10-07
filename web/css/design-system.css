@@ -1,9 +1,9 @@
 /* 여정: a quiet travel notebook, informed by the supplied Airbnb analysis.
-   Palette -> semantic roles -> component aliases. SUIT is self-hosted under OFL-1.1.
+   Palette -> semantic roles -> component aliases. Pretendard is self-hosted under OFL-1.1.
    See docs/service-v3/DESIGN_SYSTEM.md for component and evidence contracts. */
 @font-face {
-  font-family:"SUIT Variable"; font-style:normal; font-weight:100 900; font-display:swap;
-  src:url("/fonts/SUIT-Variable-v2.0.5.woff2") format("woff2");
+  font-family:"Pretendard Variable"; font-style:normal; font-weight:100 900; font-display:swap;
+  src:url("/fonts/PretendardVariable-v1.3.9.woff2") format("woff2");
 }
 :root {
   --petrol-50:#edf2f4;
@@ -24,10 +24,10 @@
   --radius-card:14px; --radius-photo:12px; --radius-sheet:24px; --radius-pill:999px;
   --type-caption:calc(13px * var(--text-scale,1));
   --type-body:calc(16px * var(--text-scale,1));
-  --type-label:calc(15px * var(--text-scale,1));
+  --type-label:calc(14px * var(--text-scale,1));
   --type-title:calc(20px * var(--text-scale,1));
   --type-page:calc(28px * var(--text-scale,1));
-  --font:"SUIT Variable",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Segoe UI","Noto Sans KR",Roboto,Arial,sans-serif;
+  --font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,"Apple SD Gothic Neo","Segoe UI","Noto Sans KR",Roboto,Arial,sans-serif;
   --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
   --ease-out:cubic-bezier(.23,1,.32,1);
   --duration-press:140ms;
@@ -149,7 +149,7 @@ input,select,textarea { min-width:0; }
 }
 .recommendation-progress-heading { display:flex; align-items:flex-start; gap:var(--space-4); }
 .recommendation-progress-heading>div { min-width:0; }
-.recommendation-progress-title { margin:0 0 6px; font-size:var(--type-title); line-height:1.5; }
+.recommendation-progress-title { margin:0 0 6px; font-size:calc(18px * var(--text-scale,1)); font-weight:600; line-height:1.5; }
 .recommendation-progress-heading .hint { margin:0; }
 .recommendation-loader { display:flex; align-items:center; justify-content:center; gap:4px; width:48px; min-width:48px; height:48px; border-radius:var(--radius-control); background:var(--fill-brand-weak); color:var(--text-brand); }
 .recommendation-loader span { display:block; width:5px; height:5px; flex:0 0 5px; border-radius:50%; background:currentColor; }
@@ -160,7 +160,7 @@ input,select,textarea { min-width:0; }
 .recommendation-steps { display:flex; flex-wrap:wrap; gap:12px 24px; padding:20px 0 0; margin:20px 0 0; border-top:1px solid var(--border-subtle); list-style:none; }
 .recommendation-steps li { display:flex; align-items:center; gap:8px; color:var(--text-tertiary); font-size:var(--type-caption); line-height:1.6; }
 .recommendation-step-mark { display:grid; place-items:center; min-width:24px; width:24px; min-height:24px; border-radius:50%; background:var(--fill-secondary); color:var(--text-secondary); font-variant-numeric:tabular-nums; font-weight:600; }
-.recommendation-steps li[data-state="current"] { color:var(--text-brand); font-weight:650; }
+.recommendation-steps li[data-state="current"] { color:var(--text-brand); font-weight:600; }
 .recommendation-steps li[data-state="current"] .recommendation-step-mark { color:var(--text-on-brand); background:var(--fill-brand); }
 .recommendation-steps li[data-state="complete"] .recommendation-step-mark { color:var(--text-success); background:var(--fill-success-weak); }
 .recommendation-progress-count { font-size:var(--type-caption); color:var(--text-secondary); margin:16px 0 0; font-variant-numeric:tabular-nums; }
@@ -172,7 +172,8 @@ input,select,textarea { min-width:0; }
 .recommendation-result-summary strong { display:block; font-size:var(--type-title); }
 .recommendation-result-summary .hint { margin:6px 0 0; }
 .recommendation-result-counts { display:flex; flex-wrap:wrap; gap:8px; font-variant-numeric:tabular-nums; font-size:var(--type-caption); }
-.recommendation-result-counts>span { padding:6px 10px; border-radius:var(--radius-badge); background:var(--fill-secondary); color:var(--text-secondary); }
+.recommendation-result-counts>span { padding:2px 0; color:var(--text-secondary); }
+.recommendation-result-counts>span+span { padding-left:10px; border-left:1px solid var(--border-default); }
 @media(max-width:800px) {
   .sidebar { box-shadow:var(--shadow-dock); }
   .topbar-actions { min-width:0; flex-wrap:wrap; }

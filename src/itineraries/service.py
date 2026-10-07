@@ -60,12 +60,17 @@ class Itineraries:
             value['coordinate_permitted']=bool(value['latitude'] is not None and value['longitude'] is not None and any(s.get('status')=='active' and s.get('display_permitted') and s.get('read_confirmed') for s in value['sources']))
             candidates[value['place_id']]=value
         bookings=[]
+        from src.foundation.booking_times import booking_time_conflicts
+        booking_overrides={}
+        for override in con.execute('SELECT o.booking_id,o.field_path FROM booking_overrides o JOIN bookings b ON b.id=o.booking_id WHERE b.trip_id=? AND b.deleted_at IS NULL AND o.active=1',(trip_id,)):
+            booking_overrides.setdefault(override['booking_id'],set()).add(override['field_path'])
         for row in con.execute('SELECT * FROM bookings WHERE trip_id=? AND deleted_at IS NULL ORDER BY id',(trip_id,)):
             value=json.loads(row['effective_json'])
+            time_conflicts=booking_time_conflicts(json.loads(row['extracted_json']),value,booking_overrides.get(row['id'],set()))
             events=[dict(r) for r in con.execute('SELECT * FROM booking_events WHERE booking_id=? ORDER BY id',(row['id'],))]
             bookings.append({'booking_id':row['id'],'id':row['id'],'version':row['version'],
                 'kind':value.get('kind'),'status':value.get('status'),'name':value.get('provider') or value.get('kind') or '예약',
-                'date':value.get('date'),'date_end':value.get('date_end'),'events':events})
+                'date':value.get('date'),'date_end':value.get('date_end'),'events':events,'time_conflicts':time_conflicts})
         data={'candidates':list(candidates.values()),'bookings':bookings,'missing_place_ids':sorted(ids-candidates.keys()),'route_policy':self._route_policy(con)}
         if 'origin_contexts' in snapshot:
             from src.accommodations.origin import context_in_connection

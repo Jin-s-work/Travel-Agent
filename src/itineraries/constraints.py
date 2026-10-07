@@ -12,7 +12,7 @@ DAYS = ('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sun
 def issue(code, item_ids=(), *, state='unknown', constraint=None, interval=None, source_refs=()):
     return {'code': code, 'state': state, 'item_ids': list(item_ids), 'interval': interval,
             'constraint': constraint or code.lower(), 'reason': code, 'source_refs': list(source_refs),
-            'possible_actions': ['correct_booking'] if code in {'CONFLICTING_LOCKS', 'BOOKING_CHANGED', 'BOOKING_REMOVED'} else ['change_time', 'remove_optional_item', 'verify_information']}
+            'possible_actions': ['correct_booking'] if code in {'CONFLICTING_LOCKS', 'BOOKING_CHANGED', 'BOOKING_REMOVED', 'BOOKING_TIME_CONFLICT'} else ['change_time', 'remove_optional_item', 'verify_information']}
 
 
 def _fact_rows(facts, field):
@@ -357,6 +357,13 @@ def validate(items, candidates, snapshot, legs, now, bookings=None):
         from .scheduler import booking_items
         authoritative, _ = booking_items(bookings, snapshot)
         expected = {item['booking_event_id']: item for item in authoritative}
+        for booking in bookings:
+            booking_id = booking.get('booking_id', booking.get('id'))
+            for conflict in booking.get('time_conflicts', []):
+                affected = [item['item_id'] for item in authoritative if item['booking_id'] == booking_id and (conflict['event_id'] is None or item['booking_event_id'] == conflict['event_id'])]
+                corrected_day = (conflict.get('summary') or {}).get('date')
+                if affected or corrected_day and snapshot['start_date'] <= corrected_day <= snapshot['end_date']:
+                    checks.append(issue('BOOKING_TIME_CONFLICT', affected, state='violated'))
         actual = {item['booking_event_id']: item for item in normalized if item.get('booking_event_id')}
         for event_id, item in actual.items():
             current = expected.get(event_id)

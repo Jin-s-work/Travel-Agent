@@ -6,6 +6,7 @@ import os
 
 @dataclass
 class Settings:
+    mail_analysis_mode: str = field(default_factory=lambda: os.getenv("MAIL_ANALYSIS_MODE", "auto").lower())
     public_discovery_enabled: bool | None = field(default_factory=lambda: None if 'PUBLIC_DISCOVERY_ENABLED' not in os.environ else os.getenv('PUBLIC_DISCOVERY_ENABLED','').lower() in {'true','1'})
     preparation_enabled: bool = field(default_factory=lambda: os.getenv('PREPARATION_ENABLED', 'true').lower() == 'true')
     plan_b_enabled: bool = field(default_factory=lambda: os.getenv('PLAN_B_ENABLED', 'true').lower() == 'true')

@@ -253,7 +253,9 @@ class Repository:
         effective = json.loads(row['effective_json'])
         source = con.execute('SELECT display_filename FROM source_documents WHERE id=?', (row['document_id'],)).fetchone() if row['document_id'] else None
         overrides = {r['field_path']: json.loads(r['value_json']) for r in con.execute('SELECT * FROM booking_overrides WHERE booking_id=? AND active=1', (row['id'],))}
-        return {**effective, 'id': row['id'], 'trip_id': row['trip_id'], 'document_id': row['document_id'],
+        from .booking_times import booking_time_conflicts
+        time_conflicts = booking_time_conflicts(json.loads(row['extracted_json']), effective, overrides)
+        return {**effective, 'time_conflicts':time_conflicts, 'id': row['id'], 'trip_id': row['trip_id'], 'document_id': row['document_id'],
                 'source': 'document' if row['document_id'] else 'manual', 'source_file': source['display_filename'] if source else None,
                 'version': row['version'], 'extracted': json.loads(row['extracted_json']), 'overrides': overrides,
                 'conflicts': json.loads(row['conflicts_json']), 'created_at': row['created_at'], 'updated_at': row['updated_at']}
@@ -306,6 +308,10 @@ class Repository:
             lower, upper = date_from or '0001-01-01', date_to or '9999-12-31'
             clauses.append('(((b.kind IN (\'숙소\',\'hotel\',\'lodging\',\'accommodation\') OR NOT EXISTS (SELECT 1 FROM booking_events dated WHERE dated.booking_id=b.id AND (dated.start_local IS NOT NULL OR dated.end_local IS NOT NULL))) AND b.date_start<=? AND COALESCE(b.date_end,b.date_start)>=?) OR EXISTS (SELECT 1 FROM booking_events e WHERE e.booking_id=b.id AND ((substr(e.start_local,1,10)<=? AND COALESCE(substr(e.end_local,1,10),substr(e.start_local,1,10))>=?) OR (e.start_local IS NULL AND substr(e.end_local,1,10) BETWEEN ? AND ?))))')
             args.extend((upper, lower, upper, lower, lower, upper))
+            # A conflicting summary-date correction must still be discoverable
+            # on that date; present its conflict rather than only the old leg day.
+            clauses[-1] = '(' + clauses[-1] + " OR EXISTS (SELECT 1 FROM booking_overrides o WHERE o.booking_id=b.id AND o.active=1 AND ((o.field_path='date' AND b.date_start BETWEEN ? AND ?) OR (o.field_path='date_end' AND b.date_end BETWEEN ? AND ?))))"
+            args.extend((lower, upper, lower, upper))
         with self.db.connect() as con:
             self._trip(con, user_id, trip_id)
             rows = con.execute('SELECT b.* FROM bookings b WHERE ' + ' AND '.join(clauses) + ' ORDER BY COALESCE(b.date_start,\'9999\'),b.created_at,b.id', args).fetchall()

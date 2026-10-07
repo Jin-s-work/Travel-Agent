@@ -60,6 +60,11 @@ def session(request:Request):
     return {'authenticated':True,'auth_configured':configured,'user':{'id':actor.id,'display_name':actor.display_name,'role':actor.role},'expires_at':actor.expires_at,'csrf_token':actor.csrf_token,'login_url':'/api/v2/auth/login'}
 
 
+@router.get('/mail-capabilities')
+def mail_capabilities(request:Request,actor:Actor=Depends(require_actor)):
+    return request.app.state.operations.mail_capabilities()
+
+
 @router.get('/auth/login')
 async def login(request:Request):
     return await start_login(request,'')
@@ -317,10 +322,14 @@ def readiness(request:Request,actor:Actor=Depends(require_actor)):
     version=request.app.state.db.schema_version()
     paths=[settings.database_path.parent,settings.documents_dir,settings.vectors_dir,settings.artifacts_dir]
     writable=all(os.access(path if path.exists() else path.parent,os.W_OK) for path in paths)
-    search={'ready':0,'rebuilding':0}
+    search={'ready':0,'rebuilding':0,'structured':0}
+    structured=request.app.state.operations.structured_only()
     for trip in request.app.state.repo.list_trips(actor.id):
         active=[d for d in request.app.state.repo.list_documents(actor.id,trip['id']) if d.get('active_generation_id')]
         if not active: continue
+        if structured:
+            search['structured']+=1
+            continue
         try:
             with request.app.state.generations.reader(actor.id,trip['id']): pass
             search['ready']+=1

@@ -1,6 +1,6 @@
 # Travel Agent 구현·검증 상태
 
-마지막 갱신: **2026-10-06**. 1~18절 구현의 기준 Git revision은 `aefee57`이며 당시에는 미커밋 변경이었다. 현재 배포 준비와 Git 반영 상태는 19절을 따른다. 현재 Render Free + Supabase Free 전환은 14절을 따른다. Supabase hii의 private 버킷은 생성했다. 작업 시작 당시 `docs/service-v2/`가 사용자 미추적 자료였으며 이 상태 문서는 없어 새로 작성했다. 기존 PRD·기술 명세·상세 프롬프트를 보존했다. 적용되는 AGENTS.md는 저장소와 조사한 상위 경로에서 발견되지 않았다.
+마지막 갱신: **2026-10-07**. 1~18절 구현의 기준 Git revision은 `aefee57`이며 당시에는 미커밋 변경이었다. 현재 배포 준비와 Git 반영 상태는 19절을 따른다. 현재 Render Free + Supabase Free 전환은 14절을 따른다. Supabase hii의 private 버킷은 생성했다. 작업 시작 당시 `docs/service-v2/`가 사용자 미추적 자료였으며 이 상태 문서는 없어 새로 작성했다. 기존 PRD·기술 명세·상세 프롬프트를 보존했다. 적용되는 AGENTS.md는 저장소와 조사한 상위 경로에서 발견되지 않았다.
 
 구현 상태 값: `not_started / partial / complete / blocked`. 실환경 검증 값: `not_run / partial / verified / not_required`.
 
@@ -509,3 +509,7 @@ DB 비밀번호 확인/필요 시 소유자의 직접 재설정과 Google 웹 �
 후속 현재 구현은 [V3 진행 기록](../service-v3/IMPLEMENTATION_STATUS.md)과 [실제 검증 보고서](../service-v3/reports/yeojeong-design-validation.md)를 따른다. 이름·폰트·사진3장·공개지도100도시 보조 검색을 구현했고, 기존 인증/개인 여행/무료 정책과schema12를 유지한다. 이전 절의 후보0/배포 전 상태는 당시 이력이며 최신 배포 여부는 연결한 보고서에서 별도로 확인한다.
 
 여정 최종 운영 revision은 `9c97e86`, 배포 `dep-db2i79mgekts73cfodrg`(2026-10-07 Live)다. 디자인·사진·무료도시탐색과 결과 조회 중 진행 표시를 반영했다. 최종 시험 Python962passed/15skipped·Node99passed 및 실제 운영 검증 범위는 위 V3보고서에 기록한다.
+
+## 22. 무료 메일 분석 복구·Pretendard·필터 개편 (2026-10-07)
+
+기존 유료 추출/임베딩 의존 때문에 실패하던 메일 흐름에 무료 기본 분석·SQL 질문을 추가했다. 사용자 교정 및 원문 보존, 형식 미지원 안내, 교정 시각 충돌 비교/일정 확정 차단을 적용했다. Pretendard와 탭형 필터를 사용한다. 최종 회귀는 Python1020/Node115/PostgreSQL58 통과, Python15건 외부 환경 의존 skip이다. 라이브 AI 호출은 수행하지 않았다. 상세 구현·실제 브라우저·배포 상태는 [검증 보고서](../service-v3/reports/mail-recovery-pretendard-validation.md)를 따른다. schema migration 없이 기존 무료 인프라를 유지한다.

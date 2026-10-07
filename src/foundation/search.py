@@ -117,11 +117,28 @@ def _event_description(event, kind):
     return f"{label}: {local('start_local', 'start_timezone')} → {local('end_local', 'end_timezone')}"
 
 
+def _time_conflict_note(conflicts):
+    values = []
+    for conflict in conflicts:
+        side = '시작' if conflict['side'] == 'start' else '종료'
+        summary = conflict['summary']
+        if conflict.get('summary_origin') == 'user':
+            values.append(f"사용자 수정 {side}: {summary.get('date') or '날짜 미확인'} · {summary.get('time') or '시각 미확인'}")
+        if conflict.get('event_origin') == 'user':
+            values.append(f"사용자 수정 구간 {side}: {conflict.get('event_local') or '날짜·시각 미확인'}")
+    return '; '.join(values) + ' · 대표 시각과 구간별 시각이 달라 확인이 필요합니다.'
+
+
 def _daily_booking_line(booking, day):
     events = [event for event in booking.get('events', []) if _event_on_day(event, day)]
     label = f"- {booking.get('provider') or '이름 미확인'} · {booking.get('kind') or '기타'}"
     if booking.get('status') == 'cancelled':
         label += ' · 취소됨'
+    elif booking.get('status') == 'needs_review':
+        label += ' · 확인 필요'
+    conflicts = [entry for entry in booking.get('time_conflicts', []) if not events or entry['event_id'] is None or any(event.get('id') == entry['event_id'] for event in events)]
+    if conflicts:
+        return label + '\n  ' + _time_conflict_note(conflicts)
     # A round-trip booking's aggregate time can belong to the outbound flight.
     # When there is an event for this day, show its corrected time instead.
     if not events:
@@ -132,6 +149,33 @@ def _daily_booking_line(booking, day):
     return label
 
 
+def _structured_answer(question, rows):
+    """Read known current SQL fields verbatim; never infer policy or availability."""
+    lines = []
+    for booking in rows:
+        label = booking.get('provider') or '이름 미확인'
+        if re.search(r'환불|취소|수수료|규정|정책', question):
+            value = booking.get('refund_policy') or '원문에서 취소·환불 규정을 확인하지 못했습니다.'
+        elif re.search(r'예약번호|확인번호', question):
+            value = booking.get('confirmation_number') or '예약번호 미확인'
+        elif re.search(r'주소|집합\s*장소|위치', question):
+            value = booking.get('location') or '주소·집합 장소 미확인'
+        elif re.search(r'인원|몇\s*명', question):
+            party = booking.get('party')
+            value = (f"성인 {party['adults']}명 · " + (f"아동 {len(party['children'])}명" if party.get('children_status') != 'unknown' else '아동 인원 미확인')) if party else '예약 인원 미확인'
+        else:
+            value = f"{booking.get('date') or '날짜 미확인'} · {booking.get('time') or '시각 미확인'}"
+            if booking.get('date_end'):
+                value += f" → {booking['date_end']} · {booking.get('time_end') or '시각 미확인'}"
+            if booking.get('time_conflicts'):
+                value = _time_conflict_note(booking['time_conflicts'])
+            elif booking.get('events'):
+                value += '\n  ' + '; '.join(_event_description(event, booking.get('kind')) for event in booking['events'])
+        status = ' · 확인 필요' if booking.get('status') == 'needs_review' else ' · 취소됨' if booking.get('status') == 'cancelled' else ''
+        lines.append(f'- {label}{status}: {value}')
+    return '\n'.join(lines)
+
+
 def answer(repo, documents, context, question, history, generator=None):
     with ExitStack() as readers:
         return _answer(repo,documents,context,question,history,generator,readers)
@@ -139,6 +183,8 @@ def answer(repo, documents, context, question, history, generator=None):
 
 def _answer(repo, documents, context, question, history, generator, readers):
     trip = repo.get_trip(context.user_id,context.trip_id)
+    operations = getattr(documents, 'operations', None)
+    basic = operations is not None and generator is None and operations.structured_only()
     day = resolve_day(question,trip,history)
     detail_day = resolve_day(question,trip,history,listing_only=False) if _DATE_REFERENCE.search(question) else None
     if _DATE_REFERENCE.search(question) and not (day or detail_day):
@@ -155,8 +201,11 @@ def _answer(repo, documents, context, question, history, generator, readers):
     eligible = repo.list_bookings(context.user_id,context.trip_id,date_from=detail_day,date_to=detail_day) if detail_day else all_rows
     from src.rag import detect_reservation_type
     kind = detect_reservation_type(question)
+    if basic and re.search(r'식당|레스토랑|저녁\s*식사', question):
+        kind = 'restaurant'
     if kind:
-        eligible = [b for b in eligible if b.get('kind') == kind]
+        aliases = {'숙소': {'숙소','hotel'}, '항공': {'항공','flight','air'}, '렌터카': {'렌터카','car_rental'}, '투어': {'투어','tour','activity'}, 'restaurant': {'restaurant','식당'}}
+        eligible = [b for b in eligible if b.get('kind') in aliases.get(kind, {kind})]
     eligible_ids = {b['id'] for b in eligible}
     exact = _exact_references(question, all_rows)
     if exact:
@@ -172,6 +221,10 @@ def _answer(repo, documents, context, question, history, generator, readers):
     elif detail_day:
         # Date-qualified policy/time questions need every matching SQL fact,
         # including manual rows and more than the semantic top-k limit.
+        rows = eligible
+    elif basic:
+        if not kind and not re.search(r'예약|일정|체크인|체크아웃|환불|취소|수수료|규정|정책|몇\s*시|인원|몇\s*명|주소|집합\s*장소', question):
+            return {'answer':'기본 분석에서는 날짜별 예약, 예약 시간·번호·주소와 원문 취소 규정을 확인할 수 있습니다. 필요한 예약 이름과 항목을 알려주세요.', 'sources':[], 'tools_used':['structured_bookings'], 'answer_mode':'structured'}
         rows = eligible
     else:
         docs = repo.list_documents(context.user_id,context.trip_id)
@@ -204,6 +257,8 @@ def _answer(repo, documents, context, question, history, generator, readers):
         rows = [b for b in eligible if b.get('document_id') in document_ids or b.get('document_id') is None]
     if not rows:
         return {'answer':'이 여행의 예약 자료에서 해당 정보를 찾지 못했습니다.','sources':[],'tools_used':['search_bookings']}
+    if basic or any(booking.get('time_conflicts') for booking in rows):
+        return {'answer':_structured_answer(question, rows),'sources':[source(b,context.trip_id) for b in rows], 'tools_used':['structured_bookings'], 'answer_mode':'structured'}
     # Pass only current effective facts, never stale raw chunk times or a tool instruction from mail.
     hits=[{'metadata':{**facts(b),'type':b.get('kind'),'source_file':b.get('source_file') or '직접 입력'},'document':json.dumps(facts(b),ensure_ascii=False),'similarity':1.0} for b in rows]
     from src.rag import generate

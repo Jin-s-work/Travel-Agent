@@ -10,14 +10,14 @@
 <meta name="theme-color" content="#25485A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="여정">
-<link rel="preload" href="/fonts/SUIT-Variable-v2.0.5.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/foundation.css?v=c4031b6bcb9b">
-<link rel="stylesheet" href="/css/design-system.css?v=5bf449e9158e">
+<link rel="preload" href="/fonts/PretendardVariable-v1.3.9.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/foundation.css?v=ff6f5bbc4e16">
+<link rel="stylesheet" href="/css/design-system.css?v=4c78a3be0835">
 <script src="/js/offline-store.js?v=f2e23f13122c" defer></script>
 <script src="/js/product.js?v=a8fe8457aace" defer></script>
 <script src="/js/travel-tools.js?v=babbf4751245" defer></script>
 <script src="/js/accommodations.js?v=70220802978c" defer></script>
-<script src="/js/foundation.js?v=62fcf96495ce" defer></script>
+<script src="/js/foundation.js?v=5062431fb550" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">본문으로 이동</a>
@@ -117,13 +117,16 @@
         <div id="discoveryMessage" class="form-note" role="status" hidden></div>
         <section id="recommendationWorkspace" class="recommendation-workspace" aria-labelledby="recommendationTitle">
           <div class="section-heading"><h2 id="recommendationTitle">어디에 가볼까요?</h2><button id="applyRecommendations" type="button" class="primary">장소 찾아보기</button></div>
-          <details class="panel recommendation-options disclosure"><summary><span>필터 더 보기</span><span id="recommendationFilterSummary" class="disclosure-description">리뷰·평점 조건과 추천 수</span></summary><div class="disclosure-content">
-            <label class="check"><input id="reviewStrictFilter" type="checkbox"><span>현지 탐색에서 검증된 최근 리뷰 언어 조건 필수</span></label>
-            <p class="hint">언어 품질·이용 범위가 확인된 관측 자료만 사용합니다. 기능이 꺼져 있거나 자료가 없으면 미지원으로 남기며 다른 조건으로 몰래 바꾸지 않습니다.</p>
-            <label class="check"><input id="ratingFilterEnabled" type="checkbox"><span>현지 탐색에 평점·전체 평가 수 조건 적용</span></label>
-            <div class="recommendation-rating-fields"><div><label for="recommendationMinRating">같은 플랫폼의 최소 평점 · 5점 기준</label><input id="recommendationMinRating" type="number" min="0" max="5" step="0.1" value="4.2"></div><div><label for="recommendationMinCount">최소 전체 별점 평가 수</label><input id="recommendationMinCount" type="number" min="0" max="100000000" step="1" value="200"></div><div><label for="recommendationLimit">관점별 최대 추천 수</label><input id="recommendationLimit" type="number" min="1" max="12" step="1" value="6"></div></div>
-            <p class="hint">전체 평가 수는 언어 비율의 분모가 아닙니다. 대표 명소에는 위의 두 현지 탐색 조건을 적용하지 않습니다.</p>
-          </div></details>
+          <section class="recommendation-filter-bar discovery-conditions" aria-labelledby="discoveryConditionsTitle">
+            <div class="filter-summary-copy"><h3 id="discoveryConditionsTitle">추천 조건</h3><p id="discoveryConditionBrief" class="hint"></p><p id="recommendationFilterSummary" class="hint">관점별 최대 6곳</p><div id="discoveryConditions"></div></div>
+            <button id="editDiscoveryConditions" type="button" class="secondary filter-trigger" aria-haspopup="dialog">필터</button>
+          </section>
+          <div id="recommendationOptionState" hidden aria-hidden="true">
+            <input id="reviewStrictFilter" type="checkbox"><input id="ratingFilterEnabled" type="checkbox">
+            <input id="recommendationMinRating" type="number" min="0" max="5" step="0.1" value="4.2">
+            <input id="recommendationMinCount" type="number" min="0" max="100000000" step="1" value="200">
+            <input id="recommendationLimit" type="number" min="1" max="12" step="1" value="6">
+          </div>
           <p id="recommendationDraft" class="form-note" role="status" hidden></p>
           <p id="recommendationError" class="banner error" role="alert" hidden></p>
           <div id="recommendationRunStatus" class="recommendation-run-status" role="status"></div>
@@ -132,7 +135,6 @@
           <div id="exploreItinerarySelection" class="form-note" hidden></div>
           <section id="comparisonTray" class="panel comparison-tray" aria-label="비교할 장소" aria-live="polite" hidden></section>
         </section>
-        <details class="panel discovery-conditions disclosure"><summary><span>여행 조건</span><span id="discoveryConditionBrief" class="disclosure-description"></span></summary><div class="section-heading"><h2 id="discoveryConditionsTitle">적용한 방문 조건</h2><button id="editDiscoveryConditions" type="button" class="secondary">필터 변경</button></div><div id="discoveryConditions"></div><p class="hint">필터를 바꾼 뒤 ‘장소 찾아보기’를 누르면 적용돼요.</p></details>
         <section id="bookmarkWorkspace" hidden>
         <div class="section-heading"><h2>장소 보관함 <span id="bookmarkCount" class="count"></span></h2><button id="refreshBookmarks" class="text-button" type="button">보관함 새로고침</button></div>
         <div class="filters"><div><label for="bookmarkFilter">보관함 표시</label><select id="bookmarkFilter"><option value="all">모든 장소</option><option value="resolved">지점 확인 완료</option><option value="needs_confirmation">지점 확인 필요</option><option value="excluded">추천에서 제외한 장소</option></select></div></div>
@@ -153,15 +155,19 @@
       <section id="view-mail" class="view" aria-labelledby="mailTitle" hidden>
 
         <div class="page-heading"><div><h1 id="mailTitle">예약</h1><p class="muted scope-text"></p></div></div>
-        <p class="form-note">처음 사용하시나요? <a href="/examples/mail-test-pack.zip" download>테스트 메일 12개 받기</a> · 합성 자료와 확인 안내가 들어 있어요. 무료 운영에서는 AI 분석이 제한될 수 있습니다.</p>
-                <div id="bookingArea">
+        <section class="mail-intro" aria-labelledby="mailImportTitle">
+          <div class="mail-import-header"><h2 id="mailImportTitle">메일로 예약 추가</h2><a href="/examples/mail-test-pack.zip" download>테스트 메일 받기</a></div>
+          <div id="mailAnalysisInfo" class="mail-analysis-info" role="status"><strong class="mail-analysis-label">분석 방식 확인 중</strong><p class="hint">메일에 적힌 내용을 예약으로 정리합니다.</p></div>
+<form id="uploadForm" class="panel upload-panel"><label id="dropzone" for="mailFiles" class="dropzone"><strong>파일을 선택하거나 여기로 끌어오세요</strong><span>.txt 또는 .eml · 파일당 최대 1 MiB · 한 번에 10개</span><input id="mailFiles" name="files" type="file" accept=".txt,.eml,text/plain,message/rfc822" multiple></label><p class="hint">메일의 링크·첨부 파일은 실행하지 않습니다. 같은 여행의 중복 메일은 다시 저장하지 않습니다.</p><div id="selectedFiles"></div><button id="uploadButton" type="submit" class="primary">선택한 메일 분석</button><p id="uploadError" class="error" role="alert" hidden></p></form>
+        </section>
+        <div id="uploadResults" class="upload-results" aria-live="polite"></div>
+                <div id="bookingArea" tabindex="-1">
           <div class="section-heading"><h2>예약 모아보기 <span id="bookingCount" class="count"></span></h2><button id="addBooking" class="secondary" type="button">＋ 예약 직접 추가</button></div>
           <div id="bookingDays" class="day-strip" role="group" aria-label="여행 날짜별 예약"></div>
-          <details id="bookingFilterOptions" class="booking-filter-options"><summary>날짜·종류 필터 <span id="bookingFilterBrief" class="hint"></span></summary><form id="bookingFilters" class="filters" aria-label="예약 필터"><div><label for="dateFilter">날짜</label><input type="date" id="dateFilter" min="0001-01-01" max="9999-12-31"></div><div><label for="kindFilter">예약 종류</label><select id="kindFilter"><option value="">전체 종류</option><option>항공</option><option>숙소</option><option>렌터카</option><option>투어</option><option>음식점</option><option>기타</option></select></div><label class="check"><input type="checkbox" id="needsReview"> 확인 필요만</label><button id="clearFilters" class="text-button" type="button">필터 초기화</button></form>
-          </details><div id="bookingList" aria-live="polite"></div>
+          <div id="bookingFilterOptions" class="booking-filter-options"><span id="bookingFilterBrief" class="hint" hidden></span><form id="bookingFilters" class="filters" aria-label="예약 필터"><div><label for="dateFilter">날짜</label><input type="date" id="dateFilter" min="0001-01-01" max="9999-12-31"></div><div><label for="kindFilter">예약 종류</label><select id="kindFilter"><option value="">전체 종류</option><option>항공</option><option>숙소</option><option>렌터카</option><option>투어</option><option>음식점</option><option>기타</option></select></div><label class="check"><input type="checkbox" id="needsReview"> 확인 필요만</label><button id="clearFilters" class="text-button" type="button">필터 초기화</button></form>
+          </div><div id="bookingList" aria-live="polite"></div>
         </div>
-<form id="uploadForm" class="panel upload-panel"><label id="dropzone" for="mailFiles" class="dropzone"><span aria-hidden="true">↥</span><strong>예약 메일을 여기에 추가하세요</strong><span>.txt 또는 .eml · 파일당 최대 1 MiB · 한 번에 10개</span><input id="mailFiles" name="files" type="file" accept=".txt,.eml,text/plain,message/rfc822" multiple></label><p class="hint">메일 안의 링크나 첨부 파일은 실행하지 않습니다. 같은 여행에 이미 넣은 메일은 중복으로 알려드려요.</p><div id="selectedFiles"></div><button id="uploadButton" type="submit" class="primary">선택한 메일 분석</button><p id="uploadError" class="error" role="alert" hidden></p></form>
-        <div id="uploadResults" class="upload-results" aria-live="polite"></div>
+
         <div class="section-heading"><h2>저장된 메일</h2><button id="refreshDocuments" class="text-button" type="button">새로고침</button></div><div id="documentList"></div>
       </section>
       <section id="view-reviews" class="view" aria-labelledby="reviewTitle" hidden>

@@ -134,6 +134,7 @@ def test_online_snapshot_later_deletion_checkpoint_and_restore_keeps_corrections
             records=reader.collection.get(include=['metadatas'])
             assert records['ids']
             assert all(m['trip_id']==trip['id'] for m in records['metadatas'])
+    assert rebuild_calls, 'The injected offline embedder must rebuild the restored index'
     report.update(reindex_seconds=round(time.monotonic()-started,3),reindex_fake_calls=len(rebuild_calls),paid_calls=0,correction_preserved=True,itinerary_preserved=True,deleted_trip_absent_from_chroma=True)
     if os.getenv('OPS_RESTORE_REPORT'):
         Path(os.environ['OPS_RESTORE_REPORT']).write_text(json.dumps({k:v for k,v in report.items() if k not in ('database_path','documents_dir','vectors_dir')},indent=2)+'\n')
@@ -169,3 +170,30 @@ def test_production_filters_preexisting_synthetic_catalog_detail_and_resolution(
     assert availability['synthetic_test_candidates']==0
     response=discovery.client.patch('/api/v2/admin/discovery-packs/'+data['id'],json={'status':'approved','evidence':'Attempt synthetic activation'})
     assert response.status_code==422,response.text
+
+
+def test_local_reindex_without_adapter_preserves_sql_and_never_invokes_provider(service,monkeypatch):
+    from src.foundation.auth import digest
+    user=service.login('offline-reindex');trip=_trip(user.client)
+    _upload(user.client,trip['id'])
+    base=f"/api/v2/trips/{trip['id']}"
+    before=user.client.get(base+'/bookings').json()['items']
+    assert before and user.client.get(base).json()['active_index_id']
+    service.settings.mail_analysis_mode='local'
+    service.app.state.documents.parser=None
+    service.app.state.documents.embedder=None
+    def never(*args,**kwargs):
+        pytest.fail('Local reindex attempted provider work without an injected adapter')
+    monkeypatch.setattr(service.app.state.gateway,'run',never)
+    monkeypatch.setattr(service.app.state.generations,'build',never)
+    with service.app.state.db.connect() as con:
+        sid=con.execute('SELECT id FROM sessions WHERE token_hash=?',(digest(user.token),)).fetchone()[0]
+        usage_before=con.execute('SELECT COUNT(*) FROM usage_reservations').fetchone()[0]
+    current=service.app.state.repo.get_trip(user.user['id'],trip['id'])
+    queued=service.app.state.jobs.enqueue(user.user['id'],sid,'personal_trip',trip['id'],'reindex',{},current['version'],'offline-reindex')
+    job=_job(user.client,queued)
+    assert job['state']=='succeeded' and job['search_mode']=='structured'
+    assert user.client.get(base).json()['active_index_id'] is None
+    assert user.client.get(base+'/bookings').json()['items']==before
+    with service.app.state.db.connect() as con:
+        assert con.execute('SELECT COUNT(*) FROM usage_reservations').fetchone()[0]==usage_before

@@ -41,6 +41,65 @@ class Operations:
             lambda: ProviderResult(fn(),{'calls':1}),request_hash=stable_hash(value),guard=guard,
             provider='fake',sku=operation)
 
+    def mail_capabilities(self):
+        """Availability is descriptive; the paid gateway still checks every call."""
+        from src.config import OPENAI_API_KEY, ANSWER_MODEL
+        requested = getattr(self.documents.settings, 'mail_analysis_mode', 'auto')
+        if requested not in {'auto', 'local', 'ai'}:
+            requested = 'local'  # Invalid configuration must never enable billing.
+        available, reason = True, None
+        if not self.documents.parser:
+            if not OPENAI_API_KEY:
+                available, reason = False, 'AI_KEY_NOT_CONFIGURED'
+            else:
+                try:
+                    policy = self.gateway.budget.policy
+                    prices = [policy.price('openai', model) for model in {EXTRACTION_MODEL, EMBEDDING_MODEL, ANSWER_MODEL}]
+                    with self.repo.db.connect() as con:
+                        currencies = {price['currency'] for price in prices}
+                        controls = con.execute('SELECT currency,halted FROM cost_controls').fetchall()
+                    if policy.config.get('halted') or any(row['halted'] and row['currency'] in currencies for row in controls):
+                        available, reason = False, 'AI_BUDGET_PAUSED'
+                    elif any(any(policy.config['limits'][currency][key] <= 0 for key in ('user_daily','user_monthly','global_daily','global_monthly')) for currency in currencies):
+                        available, reason = False, 'AI_BUDGET_NOT_CONFIGURED'
+                    from src.operations.controls import external_guard
+                    external_guard(self.repo.db, 'openai')
+                except DomainError as error:
+                    available, reason = False, error.code
+        mode = 'ai' if requested != 'local' and available else 'local'
+        return {'analysis_mode': mode, 'requested_mode': requested,
+                'label': 'AI 상세 분석' if mode == 'ai' else '기본 분석',
+                'semantic_search': mode == 'ai', 'ai_available': available,
+                'reason_code': reason if requested != 'local' else 'LOCAL_MODE_SELECTED',
+                'external_calls': mode == 'ai', 'review_required': True,
+                'supported_formats': ['.txt', '.eml'],
+                'supported_questions': ['날짜별 예약', '예약 시간', '예약번호', '주소', '원문 취소 규정'],
+                'limitations': [] if mode == 'ai' else ['명시된 날짜·장소와 예약 항목을 기본 규칙으로 추출합니다.', '복잡한 형식은 직접 확인이 필요하며 모든 문장을 이해하는 AI 분석은 아닙니다.']}
+
+    def structured_only(self):
+        # Index-only injected maintenance fixtures do not provide a gateway.
+        return hasattr(self.gateway, 'budget') and self.mail_capabilities()['analysis_mode'] == 'local'
+
+    def activate_structured(self, job, ctx, document_id, generation_id, bookings):
+        """Commit facts under the same job/deletion fence without invented vectors."""
+        user, trip = job['actor_id'], job['trip_id']
+        with self.repo.db.connect() as con:
+            con.execute('BEGIN IMMEDIATE')
+            self.document_guard(ctx, user, trip, document_id)(con=con)
+            self.repo.activate_generation(user, trip, document_id, generation_id, bookings,
+                session_id=job['session_id'], connection=con)
+            active = con.execute('SELECT active_generation_id FROM source_documents WHERE id=?', (document_id,)).fetchone()
+            if active['active_generation_id'] != generation_id:
+                raise DomainError('AMBIGUOUS_MATCH', '이전 예약과 기본 분석 결과의 대응을 확인해 주세요.', 409)
+            con.execute("UPDATE source_documents SET status='needs_review' WHERE id=?", (document_id,))
+            self._retire_search_pointer(con, trip)
+
+    def _retire_search_pointer(self, con, trip):
+        row = con.execute('SELECT active_index_id FROM trips WHERE id=?', (trip,)).fetchone()
+        if row and row['active_index_id']:
+            con.execute("UPDATE trip_index_generations SET state='retired',retired_at=? WHERE id=? AND state='active'", (utcnow(), row['active_index_id']))
+            con.execute('UPDATE trips SET active_index_id=NULL WHERE id=?', (trip,))
+
     def extract(self, call_context, key, raw, guard):
         if self.documents.parser:
             return self.fake_call(call_context,'extract',key,raw,lambda:self.documents.parser(raw),guard)
@@ -125,10 +184,12 @@ class Operations:
     def process_documents(self, job, ctx):
         user,trip=job['actor_id'],job['trip_id']
         payload=job['payload']; cp=dict(job['checkpoint']); units=dict(cp.get('documents',{}))
-        signature=stable_hash({'parser':'foundation-v2','chunker':'v1','extraction_model':EXTRACTION_MODEL,'embedding_model':EMBEDDING_MODEL})
+        mode = cp.get('analysis_mode') or self.mail_capabilities()['analysis_mode']
+        parse_version = 'local-mail-v1' if mode == 'local' else 'foundation-v2'
+        signature=stable_hash({'parser':parse_version,'chunker':'v1','extraction_model':EXTRACTION_MODEL if mode == 'ai' else None,'embedding_model':EMBEDDING_MODEL if mode == 'ai' else None})
         if cp.get('pipeline_signature') and cp['pipeline_signature']!=signature:
             raise DomainError('CHECKPOINT_INCOMPATIBLE','모델·추출 규칙이 변경되었습니다. 새 분석 작업으로 실행해 주세요.',409)
-        ctx.checkpoint({'pipeline_signature':signature})
+        ctx.checkpoint({'pipeline_signature':signature, 'analysis_mode':mode})
         accepted=payload.get('accepted',[])
         if not units and payload.get('resume_from'):
             previous=self.jobs.get(payload['resume_from'],user,job['session_id'])
@@ -139,12 +200,12 @@ class Operations:
             previous_units=previous_cp.get('documents',{}) if previous_cp.get('pipeline_signature')==signature else {}
             for entry in accepted:
                 old_unit=previous_units.get(entry['document_id'],{})
-                units[entry['document_id']]={key:old_unit[key] for key in ('extracted_ref','vectors_ref') if key in old_unit}
+                units[entry['document_id']]={key:old_unit[key] for key in ('extracted_ref','vectors_ref','review_reasons') if key in old_unit}
             ctx.checkpoint({'documents':units},stage='resuming_files',done=0,total=len(accepted))
         results=[]
         for index, entry in enumerate(accepted):
             ctx.guard(); did=entry['document_id']; saved=dict(units.get(did,{}))
-            item={**entry,'state':'running'}
+            item={**entry,'state':'running','analysis_mode':mode,'search_mode':'structured' if mode == 'local' else 'semantic'}
             doc_guard=self.document_guard(ctx,user,trip,did)
             # The pointer is authoritative if a crash happened after SQL commit.
             try:
@@ -165,14 +226,19 @@ class Operations:
                     if not saved.get('generation_id'):
                         with self.repo.db.connect() as con:
                             con.execute('BEGIN IMMEDIATE'); self.jobs.guard(job['id'],job['fencing_token'],con=con)
-                            generation=self.repo.create_generation(user,trip,did,parse_version='foundation-v2',connection=con)
+                            generation=self.repo.create_generation(user,trip,did,parse_version=parse_version,connection=con)
                             saved['generation_id']=generation['id']; units[did]=saved
                             con.execute('UPDATE document_generations SET job_id=? WHERE id=?',(job['id'],generation['id']))
                             self.jobs.checkpoint(job['id'],job['fencing_token'],{'documents':units},stage='extracting',done=index,total=len(accepted),con=con)
                     if not saved.get('extracted_ref'):
-                        from src.loader import read_email_file
                         raw=self.documents.raw_text(doc)
-                        parsed=self.extract(self.context(user,trip,job['id']),did+':extract',raw,doc_guard)
+                        if mode == 'local':
+                            from src.foundation.local_mail import parse_local_document
+                            doc_guard()
+                            parsed, reasons = parse_local_document(raw)
+                            saved['review_reasons'] = reasons
+                        else:
+                            parsed=self.extract(self.context(user,trip,job['id']),did+':extract',raw,doc_guard)
                         if not isinstance(parsed,list) or not parsed:
                             raise DomainError('EXTRACTION_INVALID','예약 정보를 확인할 수 없습니다.')
                         cleaned=[]
@@ -182,31 +248,37 @@ class Operations:
                                 value.setdefault('kind',value.pop('type'))
                             cleaned.append(BookingCreate.model_validate(value).model_dump())
                         saved['extracted_ref']=self.artifact(job,did+'-facts',cleaned,ctx,document_id=did)
-                        units[did]=saved; ctx.checkpoint({'documents':units},stage='embedding',done=index,total=len(accepted))
+                        units[did]=saved; ctx.checkpoint({'documents':units},stage='reviewing_facts' if mode == 'local' else 'embedding',done=index,total=len(accepted))
                         self.fault('after_extraction',job)
                     cleaned=self.read_artifact(saved['extracted_ref'])
-                    if not saved.get('vectors_ref'):
-                        from src.indexer import _chunk
-                        texts=_chunk(json.dumps(cleaned,ensure_ascii=False))
-                        # Each batch has its own result artifact and billing identity.
-                        vectors=[]
-                        for batch_no,start in enumerate(range(0,len(texts),32)):
-                            vectors.extend(self.embed(self.context(user,trip,job['id']),did+':embed:'+str(batch_no),texts[start:start+32],doc_guard))
-                            self.fault('after_embedding_batch',job)
-                        if len(vectors)!=len(texts) or not vectors or any(not v for v in vectors):
-                            raise DomainError('EMBEDDING_INVALID','검색 자료를 완성하지 못했습니다.')
-                        saved['vectors_ref']=self.artifact(job,did+'-vectors',{'texts':texts,'vectors':vectors,'model':EMBEDDING_MODEL},ctx,document_id=did)
-                        units[did]=saved; ctx.checkpoint({'documents':units},stage='building_index',done=index,total=len(accepted))
-                    material=self.read_artifact(saved['vectors_ref'])
-                    generation=self.generations.build(user,trip,job['id'],job['fencing_token'],[
-                        {'document_id':did,'generation_id':saved['generation_id'],'content_hash':doc['content_hash'],
-                         'parse_version':'foundation-v2','chunks':[{'text':t,'embedding':v} for t,v in zip(material['texts'],material['vectors'])]}],
-                         embedding_model=material['model'],embedding_dimension=len(material['vectors'][0]))
-                    saved['index_id']=generation['id']; units[did]=saved
-                    ctx.checkpoint({'documents':units},stage='activating',done=index,total=len(accepted))
-                    self.fault('after_ready',job)
-                    self.generations.activate(user,trip,generation['id'],job['id'],job['fencing_token'],staged_documents=[
-                        {'document_id':did,'generation_id':saved['generation_id'],'bookings':cleaned}],session_id=job['session_id'])
+                    if mode == 'local':
+                        ctx.checkpoint({'documents':units},stage='activating',done=index,total=len(accepted))
+                        self.fault('after_ready',job)
+                        self.activate_structured(job,ctx,did,saved['generation_id'],cleaned)
+                        item['review_reasons'] = saved.get('review_reasons', ['BASIC_EXTRACTION_REVIEW'])
+                    else:
+                        if not saved.get('vectors_ref'):
+                            from src.indexer import _chunk
+                            texts=_chunk(json.dumps(cleaned,ensure_ascii=False))
+                            # Each batch has its own result artifact and billing identity.
+                            vectors=[]
+                            for batch_no,start in enumerate(range(0,len(texts),32)):
+                                vectors.extend(self.embed(self.context(user,trip,job['id']),did+':embed:'+str(batch_no),texts[start:start+32],doc_guard))
+                                self.fault('after_embedding_batch',job)
+                            if len(vectors)!=len(texts) or not vectors or any(not v for v in vectors):
+                                raise DomainError('EMBEDDING_INVALID','검색 자료를 완성하지 못했습니다.')
+                            saved['vectors_ref']=self.artifact(job,did+'-vectors',{'texts':texts,'vectors':vectors,'model':EMBEDDING_MODEL},ctx,document_id=did)
+                            units[did]=saved; ctx.checkpoint({'documents':units},stage='building_index',done=index,total=len(accepted))
+                        material=self.read_artifact(saved['vectors_ref'])
+                        generation=self.generations.build(user,trip,job['id'],job['fencing_token'],[
+                            {'document_id':did,'generation_id':saved['generation_id'],'content_hash':doc['content_hash'],
+                             'parse_version':'foundation-v2','chunks':[{'text':t,'embedding':v} for t,v in zip(material['texts'],material['vectors'])]}],
+                             embedding_model=material['model'],embedding_dimension=len(material['vectors'][0]))
+                        saved['index_id']=generation['id']; units[did]=saved
+                        ctx.checkpoint({'documents':units},stage='activating',done=index,total=len(accepted))
+                        self.fault('after_ready',job)
+                        self.generations.activate(user,trip,generation['id'],job['id'],job['fencing_token'],staged_documents=[
+                            {'document_id':did,'generation_id':saved['generation_id'],'bookings':cleaned}],session_id=job['session_id'])
                     self.fault('after_activation',job)
                     doc=doc_guard()
                     item.update(state='needs_review' if doc['status']=='needs_review' else 'succeeded',bookings_count=len(cleaned))
@@ -245,7 +317,7 @@ class Operations:
                 usable_duplicates+=bool(self.repo.get_document(user,trip,duplicate['document_id']).get('active_generation_id'))
             except DomainError:
                 pass
-        state=('succeeded' if successes==len(results) and not rejected and all(x['state']=='succeeded' for x in results)
+        state=('succeeded' if successes==len(results) and not rejected and all(x['state']=='succeeded' or mode=='local' and x['state']=='needs_review' for x in results)
                else 'partial' if successes or usable_duplicates else 'failed')
         if not results: state='succeeded' if duplicates and usable_duplicates==len(duplicates) and not rejected else 'partial' if usable_duplicates else 'failed'
         if results and all(item['state']=='cancelled' for item in results) and not rejected: state='cancelled'
@@ -253,7 +325,7 @@ class Operations:
             self.generations.cleanup(trip)
         except Exception:
             pass  # Reclamation is retried on startup/read completion; activation already committed.
-        return {'state':state,'result':{**payload,'files':results}}
+        return {'state':state,'result':{**payload,'files':results,'analysis_mode':mode,'review_required':any(item['state']=='needs_review' for item in results)}}
 
     def reindex(self, job, ctx):
         user,trip=job['actor_id'],job['trip_id']; documents=[]
@@ -265,6 +337,16 @@ class Operations:
             raise DomainError('CHECKPOINT_INCOMPATIBLE','이전 검색 체크포인트의 모델을 확인할 수 없습니다. 새 복구 작업으로 실행해 주세요.',409)
         ctx.checkpoint({'pipeline_signature':signature})
         self.cleanup_documents(job,ctx)
+        # An explicitly injected adapter can rebuild an offline/test index.
+        # Without one, local mode must never fall through to paid embedding.
+        if self.structured_only() and self.documents.embedder is None:
+            with self.repo.db.connect() as con:
+                con.execute('BEGIN IMMEDIATE')
+                self.jobs.guard(job['id'],job['fencing_token'],con=con)
+                self.repo._trip(con,user,trip)
+                self._retire_search_pointer(con,trip)
+            self.generations.cleanup(trip)
+            return {'state':'succeeded','result':{'index_id':None,'search_mode':'structured'}}
         # Healthy source vectors can be copied without any external call.
         trip_row=self.repo.get_trip(user,trip)
         previous=self.generations.get(user,trip,trip_row['active_index_id']) if trip_row.get('active_index_id') else None

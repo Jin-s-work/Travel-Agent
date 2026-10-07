@@ -167,3 +167,13 @@ Chrome/macOS, 로컬 합성 OIDC/공급자 서버(`tests/browser_discovery_fixtu
 - 최종 운영 검증·자료 범위·배포 중간 이력은 [검증 보고서](reports/yeojeong-design-validation.md), [검증 JSON](reports/yeojeong-live-verification.json). 무료 공개지도는 도심3km/식당·카페 보조 탐색이며 모든 도시 맛집·영업·사진 검수를 뜻하지 않는다. 엄격 리뷰/유료 API/실시간 잔여석은OFF.
 
 - 최종HTTPS/live/ready/개인API차단·8자산해시·RLS/권한유지 확인. 기존여행/원문/예약/숙소건수유지,검증추천2회만증가. 실제새추천54.92초 후 결과조회중busy/중복방지→3카드자동표시·console error0. 처리는 무료환경에서여전히대기가있다.
+
+## 2026-10-07 — 무료 메일 복구 · Pretendard · 명시적 필터
+
+무료 배포에서 OpenAI 키/예산이 꺼졌지만 기존 메일 처리가 유료 추출·임베딩을 필수로 요구하던 문제를 수정했다. 무료 기본 분석과 SQL 근거 질문을 연결하고 실패 원문·사용자 교정·삭제/lease 방어를 유지했다. `MAIL_ANALYSIS_MODE` 및 인증된 분석 방식 API 추가. 모호한 정책/결제일·변경 요청·DST·미제공 주소는 확정하지 않는다.
+
+Pretendard Variable v1.3.9를 자체 호스팅하고 굵기/자간/여백/버튼을 정돈했다. 필터를 방문·인원/취향·예산/이동·필수/리뷰 기준 탭으로 통합하고 취소 시 기존값, 적용 시 새 추천을 유지한다. 메일 화면은 업로드→파일별 결과→예약→원문 순서로 연결했다. 대표/구간 시각의 교정 불일치를 비교 표시하고 일정 확정을 차단한다.
+
+최종 Python 1020 passed/15 skipped/2 warnings, Node115 passed, 임시 PostgreSQL58 passed. Chrome 실제 업로드/교정/재분석/날짜질문/새로고침/실패안내, 390px/960px/큰글자200%/다크/키보드 필터를 검증했다. 합성 로그인과 운영 로그인은 구분한다. DB schema 변경·비밀·플랜·유료 API 활성화 없음.
+
+상세: [메일·디자인 검증 보고서](reports/mail-recovery-pretendard-validation.md). 운영 배포 결과는 이 보고서의 배포 표를 따른다.

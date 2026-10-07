@@ -157,13 +157,13 @@ test('failed views are skipped by swipe and all-failed gallery hides type and cr
 });
 
 test('self-hosted font keeps upstream bytes and license with consistent Korean app name',()=>{
-  const font=fs.readFileSync('web/fonts/SUIT-Variable-v2.0.5.woff2');
-  assert.equal(font.subarray(0,4).toString(),'wOF2');assert.equal(font.length,624536);
-  assert.equal(crypto.createHash('sha256').update(font).digest('hex'),'aa894a204d5a6fbae259dac6868d350cbd373a390caee0313f92946af741df23');
-  assert.match(fs.readFileSync('web/fonts/OFL.txt','utf8'),/SIL OPEN FONT LICENSE Version 1\.1/);
+  const font=fs.readFileSync('web/fonts/PretendardVariable-v1.3.9.woff2');
+  assert.equal(font.subarray(0,4).toString(),'wOF2');assert.equal(font.length,2057688);
+  assert.equal(crypto.createHash('sha256').update(font).digest('hex'),'9599f12fd42fc0bce1cd50b47a0c022e108d7aa64dd0d1bb0ed44f3282d900b4');
+  assert.match(fs.readFileSync('web/fonts/Pretendard-OFL.txt','utf8'),/SIL OPEN FONT LICENSE Version 1\.1/);
   const html=fs.readFileSync('web/index.html','utf8'),css=fs.readFileSync('web/css/design-system.css','utf8');
-  assert.match(html,/<link rel="preload" href="\/fonts\/SUIT-Variable-v2\.0\.5\.woff2" as="font" type="font\/woff2" crossorigin>/);
-  assert.match(css,/font-family:"SUIT Variable"/);assert.match(css,/font-display:swap/);
+  assert.match(html,/<link rel="preload" href="\/fonts\/PretendardVariable-v1\.3\.9\.woff2" as="font" type="font\/woff2" crossorigin>/);
+  assert.match(css,/font-family:"Pretendard Variable"/);assert.match(css,/font-display:swap/);
   assert.match(html,/<title>여정 · 나의 여행<\/title>/);
   const manifest=JSON.parse(fs.readFileSync('web/manifest.webmanifest','utf8'));
   assert.equal(manifest.name,'여정');assert.equal(manifest.short_name,'여정');
