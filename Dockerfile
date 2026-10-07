@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir -r requirements.lock
 COPY --chown=user:user api.py ./
 COPY --chown=user:user src/ ./src/
 COPY --chown=user:user web/ ./web/
-COPY --chown=user:user deploy/render-supabase/pricing-zero.json ./deploy/render-supabase/pricing-zero.json
+COPY --chown=user:user deploy/render-supabase/pricing-zero.json deploy/render-supabase/pricing-openai.json ./deploy/render-supabase/
 COPY --chown=user:user deploy/render-supabase/prod-ca-2021.crt ./deploy/render-supabase/prod-ca-2021.crt
 USER 1000:1000
 EXPOSE 7860

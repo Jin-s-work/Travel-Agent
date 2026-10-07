@@ -35,8 +35,17 @@ RUNTIME_DEFAULTS = {
 }
 
 
-def render_values(source):
+def render_values(source, profile="free"):
+    if profile not in {"free", "openai"}:
+        raise ValueError("알 수 없는 배포 프로필")
     values = {**RUNTIME_DEFAULTS, **{key: value or '' for key, value in source.items()}}
+    if profile == 'openai':
+        values.update(ZERO_SPEND='0', MAIL_ANALYSIS_MODE='ai',
+            PRICING_CONFIG='/app/deploy/render-supabase/pricing-openai.json',
+            EXTRACTION_MODEL='gpt-5-mini', ANSWER_MODEL='gpt-5-mini', AGENT_MODEL='gpt-5-mini',
+            EMBEDDING_MODEL='text-embedding-3-small')
+        if not values.get('OPENAI_API_KEY'):
+            raise ValueError('입력 필요: OPENAI_API_KEY (openai 프로필)')
     missing = [key for key in REQUIRED if not values.get(key)]
     if not values.get('DATABASE_URL'):
         if not values.get('SUPABASE_DB_PASSWORD'):
@@ -57,23 +66,27 @@ def render_values(source):
         valid = False
     if not valid:
         raise ValueError('DATABASE_URL: hii Session pooler 5432/TLS 설정을 확인하세요')
-    for key, expected in {'APP_ENV':'production','STORAGE_BACKEND':'supabase','ZERO_SPEND':'1','SEED_ON_EMPTY':'0','WEB_CONCURRENCY':'1','PUBLIC_BASE_URL':'https://travel-inbox-rag.onrender.com','SUPABASE_URL':'https://whudlguhvmrbxudybnme.supabase.co'}.items():
+    for key, expected in {'APP_ENV':'production','STORAGE_BACKEND':'supabase','ZERO_SPEND':'0' if profile=='openai' else '1','SEED_ON_EMPTY':'0','WEB_CONCURRENCY':'1','PUBLIC_BASE_URL':'https://travel-inbox-rag.onrender.com','SUPABASE_URL':'https://whudlguhvmrbxudybnme.supabase.co'}.items():
         if values.get(key) != expected:
             raise ValueError(key + ': 기존 무료 비공개 배포 설정을 유지하세요')
     # Existing paid credentials on Render must be overridden when importing this profile.
-    values.update(OPENAI_API_KEY='', TAVILY_API_KEY='', APIFY_TOKEN='')
+    values.update(TAVILY_API_KEY='', APIFY_TOKEN='')
+    if profile == 'free':
+        values.update(OPENAI_API_KEY='', MAIL_ANALYSIS_MODE='local',
+            PRICING_CONFIG=RUNTIME_DEFAULTS['PRICING_CONFIG'])
     return {key:value for key,value in values.items() if key not in LOCAL_ONLY}
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--check', action='store_true', help='값을 노출하거나 파일을 생성하지 않고 검사')
+    parser.add_argument('--profile', choices=['free','openai'], default='free', help='free: 외부 과금 OFF / openai: 월 3 USD 상한으로 메일 AI 활성화')
     args = parser.parse_args()
     path = ROOT / 'deploy/render-supabase/.env'
     if not path.exists():
         print('입력 필요: deploy/render-supabase/.env'); return 2
     try:
-        values = render_values(dotenv_values(path, interpolate=False))
+        values = render_values(dotenv_values(path, interpolate=False), args.profile)
     except ValueError as exc:
         print(str(exc)); return 2
     if args.check:

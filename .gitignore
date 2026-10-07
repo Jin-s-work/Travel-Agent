@@ -43,4 +43,5 @@ node_modules/
 
 # Private Render/Supabase handoff files
 deploy/render-supabase/.env
-deploy/render-supabase/.env.render
+deploy/render-supabase/.env.*
+!deploy/render-supabase/.env.example

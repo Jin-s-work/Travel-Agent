@@ -12,12 +12,12 @@
 <meta name="apple-mobile-web-app-title" content="여정">
 <link rel="preload" href="/fonts/PretendardVariable-v1.3.9.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/foundation.css?v=ff6f5bbc4e16">
-<link rel="stylesheet" href="/css/design-system.css?v=4c78a3be0835">
+<link rel="stylesheet" href="/css/design-system.css?v=1874e676b8ab">
 <script src="/js/offline-store.js?v=f2e23f13122c" defer></script>
 <script src="/js/product.js?v=a8fe8457aace" defer></script>
 <script src="/js/travel-tools.js?v=babbf4751245" defer></script>
-<script src="/js/accommodations.js?v=70220802978c" defer></script>
-<script src="/js/foundation.js?v=515b0d15ba0e" defer></script>
+<script src="/js/accommodations.js?v=43c77ed0e2f8" defer></script>
+<script src="/js/foundation.js?v=9fcb21f68f0e" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">본문으로 이동</a>
@@ -40,8 +40,9 @@
   </form>
 </main>
 <main id="offlineApp" class="main" hidden aria-label="오프라인 저장 여행"></main>
-<div id="app" class="app" hidden>
-  <aside class="sidebar">
+<dialog id="jobsDialog" aria-labelledby="jobsTitle"><header class="dialog-heading"><h2 id="jobsTitle">여행 작업 내역</h2><button id="closeJobs" type="button" class="icon-button" aria-label="작업 내역 닫기">×</button></header><div class="jobs-body"><p class="hint">다른 화면을 보거나 새로고침해도 여기에서 이어서 확인할 수 있어요.</p><button id="refreshJobs" type="button" class="text-button">새로고침</button><div id="jobList" aria-live="polite"></div></div></dialog>
+<div id="app" class="app journey-layout" hidden>
+  <header class="sidebar journey-header">
     <a class="brand" href="/" aria-label="여정 홈"><img class="brand-symbol" src="/icon.svg" alt="" width="28" height="28"><span class="brand-wordmark">여정</span></a>
     <nav aria-label="주 메뉴">
       <p class="nav-label">내 여행</p>
@@ -61,11 +62,11 @@
       <button type="button" id="openMore" class="nav-more" aria-haspopup="dialog"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16 M4 12h16 M4 18h16"/></svg><span class="nav-text">더보기</span></button>
     </nav>
     <div class="sidebar-note"><p>내 여행을 차근차근.</p></div>
-  </aside>
+  </header>
   <div class="workspace">
     <header class="topbar">
       <div class="trip-switch"><label for="tripSelect">현재 여행</label><select id="tripSelect" aria-label="현재 여행 선택"></select><p id="tripScope" class="topbar-scope"></p></div>
-      <div class="topbar-actions"><details id="jobsPanel" class="panel jobs-panel" hidden><summary><span class="job-indicator" aria-hidden="true"></span><span id="jobSummary" role="status">여행 작업</span></summary><div class="jobs-body"><div class="section-heading"><h2>여행 작업 내역</h2><div class="actions"><button id="refreshJobs" type="button" class="text-button">새로고침</button><button id="closeJobs" type="button" class="icon-button" aria-label="작업 내역 닫기">×</button></div></div><p class="hint">화면을 닫아도 작업 상태가 저장됩니다. 이 여행에서 다시 확인할 수 있어요.</p><div id="jobList" aria-live="polite"></div></div></details>
+      <div class="topbar-actions"><div id="jobsPanel" class="jobs-panel" hidden><button id="openJobs" type="button" class="text-button" aria-haspopup="dialog"><span class="job-indicator" aria-hidden="true"></span><span id="jobSummary" role="status">여행 작업</span></button></div>
       <button id="createTrip" type="button" class="secondary compact">＋ 여행 만들기</button></div>
     </header>
     <main id="main" class="main" tabindex="-1">
@@ -98,9 +99,9 @@
         <div class="page-heading"><div><h1 id="itineraryTitle">여행 일정</h1><p class="muted scope-text"></p></div><button id="createItinerary" type="button" class="primary">일정 만들기</button></div>
         <p class="form-note">일정에 넣은 장소는 아직 예약된 상태가 아니에요. 확정한 예약은 그대로 유지해요.</p>
         <p id="itineraryError" class="banner error" role="alert" hidden></p>
-        <details id="itinerarySelections" class="panel itinerary-selections disclosure"><summary><span id="itinerarySelectionTitle">일정에 넣을 장소</span><span id="itineraryCandidateCount" class="disclosure-description"></span></summary><div class="section-heading"><h2>후보와 체류시간</h2><button id="pickItineraryPlaces" type="button" class="secondary">선택·체류시간 확인</button></div><div id="itinerarySelectionSummary"></div></details>
+        <section id="itinerarySelections" class="panel itinerary-selections disclosure"><h3 class="section-label"><span id="itinerarySelectionTitle">일정에 넣을 장소</span><span id="itineraryCandidateCount" class="disclosure-description"></span></h3><div class="section-heading"><h2>후보와 체류시간</h2><button id="pickItineraryPlaces" type="button" class="secondary">선택·체류시간 확인</button></div><div id="itinerarySelectionSummary"></div></section>
         <div id="itineraryJobStatus" role="status"></div>
-        <details id="itineraryHistoryWrap" class="history-disclosure" hidden><summary>이전 일정 기록</summary><div class="filters"><div><label for="itineraryHistory">저장된 일정 요청</label><select id="itineraryHistory"></select></div><button id="refreshItineraries" type="button" class="text-button">일정 상태 새로고침</button></div></details>
+        <section id="itineraryHistoryWrap" class="history-disclosure" hidden><h3 class="section-label">이전 일정 기록</h3><div class="filters"><div><label for="itineraryHistory">저장된 일정 요청</label><select id="itineraryHistory"></select></div><button id="refreshItineraries" type="button" class="text-button">일정 상태 새로고침</button></div></section>
         <div id="itineraryValidation" aria-live="polite"></div>
         <div id="itineraryDayControls" class="filters itinerary-day-controls" hidden><div><label for="itineraryDay">볼 날짜 · 해당 도시 현지 시각</label><select id="itineraryDay"></select></div><button id="itineraryDayTop" type="button" class="text-button">선택한 날짜 맨 위로</button><button id="editItineraryAdd" type="button" class="secondary">장소 추가 미리보기</button><button id="undoItinerary" type="button" class="secondary">편집 되돌리기</button></div>
         <div id="itineraryDays" class="day-strip" role="group" aria-label="여행 일정 날짜" hidden></div>
@@ -108,18 +109,18 @@
         <section id="itineraryUnplaced" class="panel itinerary-unplaced" hidden></section>
       </section>
       <section id="view-explore" class="view" aria-labelledby="exploreTitle" hidden>
-        <div class="page-heading"><div><h1 id="exploreTitle">장소 찾기</h1><p class="muted scope-text"></p></div><button id="addBookmark" type="button" class="secondary">＋ 장소 저장</button></div>
-        <section id="exploreOrigin" class="panel stay-summary" aria-label="탐색 출발점" hidden></section>
+        <div class="page-heading"><div><h1 id="exploreTitle">어디로 가볼까요?</h1><p class="muted scope-text"></p></div><button id="addBookmark" type="button" class="secondary">링크로 장소 저장</button></div>
         <div class="section-switch" role="group" aria-label="탐색 보기"><button type="button" data-explore-view="recommend" aria-pressed="true">추천 찾기</button><button type="button" data-explore-view="saved" aria-pressed="false">저장한 장소</button></div>
         <div id="discoveryQuick" class="panel discovery-quick"></div>
+        <section id="exploreOrigin" class="panel stay-summary" aria-label="탐색 출발점" hidden></section>
         <p id="discoveryError" class="banner error" role="alert" hidden></p>
 <div id="discoveryAvailability"></div>
         <div id="discoveryMessage" class="form-note" role="status" hidden></div>
         <section id="recommendationWorkspace" class="recommendation-workspace" aria-labelledby="recommendationTitle">
-          <div class="section-heading"><h2 id="recommendationTitle">어디에 가볼까요?</h2><button id="applyRecommendations" type="button" class="primary">장소 찾아보기</button></div>
+          <div class="section-heading"><h2 id="recommendationTitle">이번 여행에서 가볼 곳</h2><button id="applyRecommendations" type="button" class="primary">장소 찾아보기</button></div>
           <section class="recommendation-filter-bar discovery-conditions" aria-labelledby="discoveryConditionsTitle">
-            <div class="filter-summary-copy"><h3 id="discoveryConditionsTitle">추천 조건</h3><p id="discoveryConditionBrief" class="hint"></p><p id="recommendationFilterSummary" class="hint">관점별 최대 6곳</p><div id="discoveryConditions"></div></div>
-            <button id="editDiscoveryConditions" type="button" class="secondary filter-trigger" aria-haspopup="dialog">필터</button>
+            <div class="filter-summary-copy"><h3 id="discoveryConditionsTitle">나에게 맞는 조건</h3><p id="discoveryConditionBrief" class="hint"></p><p id="recommendationFilterSummary" class="hint">관점별 최대 6곳</p><div id="discoveryConditions"></div></div>
+            <button id="editDiscoveryConditions" type="button" class="secondary filter-trigger" aria-haspopup="dialog">조건 변경</button>
           </section>
           <div id="recommendationOptionState" hidden aria-hidden="true">
             <input id="reviewStrictFilter" type="checkbox"><input id="ratingFilterEnabled" type="checkbox">
@@ -130,7 +131,7 @@
           <p id="recommendationDraft" class="form-note" role="status" hidden></p>
           <p id="recommendationError" class="banner error" role="alert" hidden></p>
           <div id="recommendationRunStatus" class="recommendation-run-status" role="status"></div>
-          <details id="recommendationHistoryWrap" class="history-disclosure" hidden><summary>이전 추천 기록</summary><div class="filters"><div><label for="recommendationHistory">저장된 추천 요청</label><select id="recommendationHistory"></select></div><button id="refreshRecommendations" type="button" class="text-button">결과 상태 새로고침</button></div></details>
+          <section id="recommendationHistoryWrap" class="history-disclosure" hidden><h3 class="section-label">이전 추천 기록</h3><div class="filters"><div><label for="recommendationHistory">저장된 추천 요청</label><select id="recommendationHistory"></select></div><button id="refreshRecommendations" type="button" class="text-button">결과 상태 새로고침</button></div></section>
           <div id="recommendationResults" aria-live="polite"></div>
           <div id="exploreItinerarySelection" class="form-note" hidden></div>
           <section id="comparisonTray" class="panel comparison-tray" aria-label="비교할 장소" aria-live="polite" hidden></section>
@@ -140,12 +141,7 @@
         <div class="filters"><div><label for="bookmarkFilter">보관함 표시</label><select id="bookmarkFilter"><option value="all">모든 장소</option><option value="resolved">지점 확인 완료</option><option value="needs_confirmation">지점 확인 필요</option><option value="excluded">추천에서 제외한 장소</option></select></div></div>
         <div id="bookmarkList" aria-live="polite"></div>
         </section>
-        <details id="discoveryAdmin" class="discovery-admin disclosure" hidden><summary>운영자 도구 <span class="disclosure-description">도시 후보·출처 검수</span></summary>
-          <div class="section-heading"><h2 id="discoveryAdminTitle">관리자 · 도시 후보 검수</h2><button id="importDiscoveryPack" type="button" class="secondary">후보 자료 가져오기</button></div>
-          <p class="hint">도시·지점·출처·사용 범위를 확인한 자료만 승인하세요. 합성팩은 계산과 화면 시험용이며 실제 여행지 조사 결과가 아닙니다.</p>
-          <p id="discoveryAdminError" class="banner error" role="alert" hidden></p>
-          <div id="discoveryPacks"></div>
-        </details>
+
       </section>
       <section id="view-ask" class="view" aria-labelledby="askTitle" hidden>
         <div class="page-heading"><div><h1 id="askTitle">내 여행에 물어보기</h1><p class="muted scope-text"></p></div><button id="clearChat" type="button" class="text-button">대화 지우기</button></div>
@@ -182,7 +178,12 @@
           <div class="section-heading"><h3>등록한 지점</h3></div><div id="reviewPlaces"></div>
           <details class="panel review-details"><summary>이용 범위와 보관 기한</summary><div id="reviewPolicies"></div></details>
           <div class="section-heading"><h3>수집 작업</h3></div><div id="reviewRuns" aria-live="polite"></div>
-        </section>
+                <section id="discoveryAdmin" class="discovery-admin disclosure" hidden><h3 class="section-label">운영자 도구 <span class="disclosure-description">도시 후보·출처 검수</span></h3>
+          <div class="section-heading"><h2 id="discoveryAdminTitle">관리자 · 도시 후보 검수</h2><button id="importDiscoveryPack" type="button" class="secondary">후보 자료 가져오기</button></div>
+          <p class="hint">도시·지점·출처·사용 범위를 확인한 자료만 승인하세요. 합성팩은 계산과 화면 시험용이며 실제 여행지 조사 결과가 아닙니다.</p>
+          <p id="discoveryAdminError" class="banner error" role="alert" hidden></p>
+          <div id="discoveryPacks"></div>
+        </section></section>
       </section>
       <section id="view-settings" class="view" aria-labelledby="settingsTitle" hidden>
         <div class="page-heading"><div><h1 id="settingsTitle">설정</h1><p class="muted">계정과 화면을 관리합니다.</p></div></div>

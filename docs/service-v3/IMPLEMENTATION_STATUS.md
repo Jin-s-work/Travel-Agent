@@ -179,3 +179,9 @@ Pretendard Variable v1.3.9를 자체 호스팅하고 굵기/자간/여백/버튼
 상세: [메일·디자인 검증 보고서](reports/mail-recovery-pretendard-validation.md). 운영 배포 결과는 이 보고서의 배포 표를 따른다.
 
 최종 무료 운영 반영: `64ee184`, Render `dep-db2pu9om7kps73bsa17g`(2026-10-07 10:23:51 KST 시작·1m06s 후 Deploy succeeded). 기존 실패 메일6개→14예약 복구, 운영 재시작 후 총15예약 유지, 유료 usage0. 최종 UI119/Python1020/PostgreSQL58 통과, Python15skip. HTTPS·익명 개인API 차단·8개 자산해시·Pretendard/음식점 필터를 실제 확인했다. 상세 결과는 메일·디자인 검증 보고서와 연결된 운영 JSON에 기록한다.
+
+## 2026-10-07 — 주요 탐색 구조 개편·OpenAI 복구
+
+상단 여행 메뉴, 모바일 하단 메뉴, 직접 선택하는 종류/추천 관점/숙소 거리, 3/2/1열 카드, 바로 보이는 일정 담기, 연속 상세 정보, 별도 작업 dialog를 구현했다. 기존 무료 운영 지침 중 AI OFF는 사용자의 이번 명시적 승인으로 OpenAI 두 모델만 소액 한도 내 활성화하는 것으로 변경한다. 서버·DB Free와 다른 유료 공급자 OFF는 유지한다.
+
+전체 Python 1023 pass / 15 skip, JS 119 pass. 실제 OpenAI 합성 메일·임베딩 2호출 성공, $0.002523 정산. 비용 상한과 브라우저 범위 및 운영 반영 상태는 [상세 검증](reports/journey-layout-openai-validation.md)에 기록한다. README 수정 없음. 이전 단계의 미검증 항목을 이번 변경으로 완료 처리하지 않는다.

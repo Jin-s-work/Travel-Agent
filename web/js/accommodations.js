@@ -41,7 +41,6 @@
     for(const selector of ['#homeOrigin','#exploreOrigin']){
       const host=document.querySelector(selector);if(!host)continue;
       const prior=host.contains(document.activeElement)?document.activeElement.dataset.action:null;
-      const optionsOpen=Boolean(host.querySelector('.stay-options')?.open);
       host.replaceChildren();host.hidden=!active();if(!active())continue;
       const {make,button}=ui;const top=make('div','stay-summary-row'),copy=make('div','stay-summary-copy');
       const ready=context?.status==='ready'&&context.origin;
@@ -53,8 +52,8 @@
       copy.append(make('h3','',title),make('p','hint',brief));
       const actions=make('div','actions');const manage=button(items.length?'숙소 관리':'숙소 추가',()=>items.length?manager():editor(),'secondary');manage.dataset.action='manage';actions.append(manage);top.append(copy,actions);host.append(top);
       const draft=ui.ensureDiscoveryDraft();
-      const options=make('details','stay-options');options.open=optionsOpen;
-      const summary=make('summary');summary.dataset.action='options';summary.append(make('span','','출발점·거리 옵션'));
+      const options=make('section','stay-options');
+      const summary=make('h4','stay-options-label');summary.append(make('span','','출발점과 거리'));
       if(draft?.conditions.distance_filter||draft?.conditions.radius_m!=null)summary.append(make('span','stay-option-hint','거리 제한 적용 중'));
       else if(draft?.conditions.prefer_nearby)summary.append(make('span','stay-option-hint','가까운 곳 우선'));
       options.append(summary,make('p','hint',detail));
@@ -65,7 +64,7 @@
         if(draft.conditions.radius_m!=null)options.append(make('p','hint',`기존 직선 반경 ${draft.conditions.radius_m}m 조건도 유지 중입니다. 변경은 필터에서 할 수 있어요.`));
         if(draft.conditions.prefer_nearby)options.append(make('p','stay-draft-note','가까운 곳 우선'+(draft.conditions.meal_time==='dinner'?' · 저녁 18:00':'')+(ui.state.discovery.dirty?' · 추천 보기를 누르면 적용':' · 현재 추천 조건')));
       }
-      const shortcuts=make('div','actions stay-option-actions');const fast=button('숙소 근처 저녁',dinner,'secondary');fast.dataset.action='dinner';shortcuts.append(fast);options.append(shortcuts);host.append(options);
+      const shortcuts=make('div','actions stay-option-actions');const fast=button('숙소 근처 저녁',dinner,'secondary');fast.dataset.action='dinner';shortcuts.append(fast);options.append(shortcuts);if(selector==='#exploreOrigin')host.append(options);else actions.append(fast);
       if(prior)host.querySelector(`[data-action="${prior}"]`)?.focus({preventScroll:true});
     }
   }
@@ -80,7 +79,7 @@
         await ui.api(path(trip)+(stay?'/'+encodeURIComponent(stay.id):''),{method:stay?'PATCH':'POST',body:payload});if(e!==epoch)return;ui.closeDialog(true);await load();ui.notice(stay?'숙소를 수정했어요. 이전 추천의 출발점은 다시 확인해 주세요.':'숙소를 저장했어요. 정확한 지점 확인은 별도로 할 수 있어요.');manager();
       });
       input=field(grid,'input_value','숙소 이름 또는 지도 링크',stay?.input_value||suggestion?.display_name||'',{required:!suggestion,wide:true,maxLength:2000,placeholder:'예: 호텔 이름, Google 지도 링크'});
-      const details=make('details','stay-more');details.append(make('summary','','숙박 날짜·메모 확인'));const more=make('div','form-grid');details.append(more);form.insertBefore(details,footer);
+      const details=make('section','stay-more');details.append(make('h3','','숙박 날짜와 메모')); const more=make('div','form-grid');details.append(more);form.insertBefore(details,footer);
       stop=field(more,'stop_id','도시 구간',initialStop?.id,{select:trip.stops.map(x=>[x.id,`${x.city} · ${x.start_date} ~ ${x.end_date}`]),required:true,wide:true});
       start=field(more,'checkin_date','체크인 날짜',stay?.checkin_date||suggestion?.checkin_date||initialStop?.start_date||'',{type:'date'});end=field(more,'checkout_date','체크아웃 날짜',stay?.checkout_date||suggestion?.checkout_date||initialStop?.end_date||'',{type:'date'});
       const confirmation=make('label','stay-confirmation');confirmed=make('input');confirmed.type='checkbox';confirmed.checked=Boolean(stay?.dates_confirmed);confirmation.append(confirmed,make('span','','실제 체크인·체크아웃 날짜를 확인했어요'));more.append(confirmation);

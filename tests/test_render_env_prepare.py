@@ -71,3 +71,27 @@ def test_minimal_six_value_input_generates_full_free_runtime():
     assert values['OIDC_CLIENT_SECRET']==minimal['OIDC_CLIENT_SECRET']
     assert 'SUPABASE_DB_PASSWORD' not in values
     assert 'DEPLOY_ADMIN_EMAIL' not in values
+
+
+def test_openai_profile_is_explicit_and_keeps_other_paid_providers_off():
+    values=module.render_values(config(), 'openai')
+    assert values['OPENAI_API_KEY']=='fixture-paid'
+    assert values['ZERO_SPEND']=='0' and values['MAIL_ANALYSIS_MODE']=='ai'
+    assert values['EXTRACTION_MODEL']==values['ANSWER_MODEL']==values['AGENT_MODEL']=='gpt-5-mini'
+    assert values['EMBEDDING_MODEL']=='text-embedding-3-small'
+    assert values['PRICING_CONFIG'].endswith('pricing-openai.json')
+    assert values['TAVILY_API_KEY']==values['APIFY_TOKEN']==''
+
+def test_openai_profile_requires_key_and_free_remains_default():
+    data=config(); data['OPENAI_API_KEY']=''
+    with pytest.raises(ValueError,match='OPENAI_API_KEY'): module.render_values(data,'openai')
+    assert module.render_values(data)['ZERO_SPEND']=='1'
+
+def test_openai_policy_caps_are_small_and_reservation_can_fit():
+    import json
+    from src.reliability.budget import BudgetPolicy
+    policy=BudgetPolicy.from_file(Path(__file__).parents[1]/'deploy/render-supabase/pricing-openai.json')
+    assert policy.valid and not policy.config['halted']
+    assert policy.config['limits']['USD']['global_monthly']==3_000_000
+    assert policy.config['limits']['USD']['global_daily']==500_000
+    assert set(policy.config['prices'])=={'openai/gpt-5-mini','openai/text-embedding-3-small'}

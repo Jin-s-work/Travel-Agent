@@ -297,3 +297,163 @@ input,select,textarea { min-width:0; }
 .recommendation-result-summary .recommendation-result-counts { margin:0; line-height:1.5; }
 :root[data-text-size="large"] #recommendationRunStatus:is([data-state="complete"],[data-state="partial"]) .recommendation-progress-heading>div { display:block; }
 :root[data-text-size="large"] #recommendationRunStatus:is([data-state="complete"],[data-state="partial"]) .recommendation-progress-heading .hint { margin-top:4px; }
+
+/* Journey layout v2 — browse first, with a single horizontal navigation.
+   Airbnb reference: quiet canvas, photo-led listings and explicit search criteria.
+   Petrol is an accent for decisions; it is not used as a page-wide decoration. */
+:root, :root[data-theme="light"] { --fill-page:#fff; --grey-900:#24292c; --grey-100:#f5f5f3; }
+.journey-layout { display:block; }
+.journey-layout .sidebar { position:relative; inset:auto; z-index:12; width:100%; height:auto; padding:0 max(24px,calc((100vw - 1280px)/2)); display:flex; flex-direction:row; align-items:center; gap:40px; border:0; border-bottom:1px solid var(--border-subtle); background:var(--fill-surface); }
+.journey-layout .brand { flex:none; margin:0; padding:24px 0; }
+.journey-layout .sidebar nav { display:flex; align-items:center; gap:12px; flex:1; }
+.journey-layout .sidebar nav button { width:auto; min-width:84px; min-height:80px; padding:18px 16px; border:0; border-radius:0; display:flex; flex-direction:row; gap:8px; justify-content:center; background:transparent; color:var(--text-secondary); font-size:15px; font-weight:500; position:relative; }
+.journey-layout .sidebar nav button[aria-current="page"],.journey-layout #openMore[data-current] { color:var(--text-primary); background:transparent; }
+.journey-layout .sidebar nav button[aria-current="page"]::after,.journey-layout #openMore[data-current]::after { content:""; position:absolute; bottom:0; height:3px; border-radius:2px; background:var(--text-primary); left:16px; right:16px; }
+.journey-layout .sidebar .nav-secondary,.journey-layout .sidebar .nav-label,.journey-layout .sidebar-note { display:none; }
+.journey-layout .sidebar .nav-more { display:flex; margin-left:auto; }
+.journey-layout .nav-icon { width:21px; height:21px; flex:none; }
+.journey-layout .workspace { margin:0; min-width:0; width:100%; }
+.journey-layout .topbar { position:relative; top:auto; width:min(1280px,calc(100% - 48px)); margin:0 auto; padding:20px 0; border:0; border-bottom:1px solid var(--border-subtle); background:var(--fill-surface); box-shadow:none; display:flex; gap:20px; align-items:center; }
+.journey-layout .trip-switch { display:flex; align-items:center; flex-wrap:wrap; gap:8px 16px; min-width:0; }
+.journey-layout .trip-switch label { font-size:13px; color:var(--text-tertiary); margin:0; }
+.journey-layout .trip-switch select { min-width:160px; max-width:300px; width:auto; border-color:transparent; font-size:16px; font-weight:600; padding-left:4px; }
+.journey-layout .topbar-scope { margin:0; font-size:13px; }
+.journey-layout .topbar-actions { margin-left:auto; flex-shrink:0; gap:12px; }
+.journey-layout .main { width:min(1280px,calc(100% - 48px)); max-width:1280px; margin:0 auto; padding:36px 0 64px; }
+.journey-layout .page-heading { margin-bottom:28px; gap:24px; }
+.journey-layout h1 { font-size:calc(30px * var(--text-scale,1)); line-height:1.3; letter-spacing:-.035em; font-weight:600; }
+.journey-layout .page-heading .muted { margin-top:8px; }
+.journey-layout .trip-overview { padding:0; background:none; border:0; border-radius:0; }
+.journey-layout .summary-grid { display:flex; flex-wrap:wrap; gap:32px; padding:20px 0; border-top:1px solid var(--border-subtle); border-bottom:1px solid var(--border-subtle); margin-bottom:28px; }
+.journey-layout .summary-grid>div { padding:0; background:none; border:0; box-shadow:none; min-width:140px; }
+.journey-layout .home-places { border:0; padding:24px 0 0; box-shadow:none; background:none; }
+.journey-layout .home-places-copy h2 { font-size:22px; }
+.journey-layout .journey-shortcuts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; margin:20px 0; }
+.journey-layout .journey-shortcut { min-height:152px; border:1px solid var(--border-default); border-radius:14px; padding:24px; background:var(--fill-surface); text-align:left; align-items:start; }
+.journey-layout .journey-shortcut svg { width:26px; height:26px; color:var(--text-brand); }
+.journey-layout .journey-shortcut strong { font-size:18px; font-weight:600; }
+.journey-layout .section-switch { width:fit-content; max-width:100%; border:0; border-bottom:1px solid var(--border-default); background:none; border-radius:0; padding:0; gap:24px; margin:0 0 24px; }
+.journey-layout .section-switch button { padding:12px 0; border:0; border-radius:0; box-shadow:none; background:none; color:var(--text-secondary); border-bottom:2px solid transparent; }
+.journey-layout .section-switch button[aria-pressed="true"],.journey-layout .section-switch button[aria-current="page"] { background:none; color:var(--text-primary); border-bottom-color:var(--text-primary); }
+.journey-layout .discovery-quick { border:1px solid var(--border-default); border-radius:16px; padding:24px; box-shadow:none; margin:0 0 16px; display:grid; grid-template-columns:1fr 1fr; gap:18px 32px; }
+.journey-layout .quick-context { margin:0; align-items:center; justify-content:flex-start; gap:16px; }
+.journey-layout .quick-city { font-size:20px; font-weight:600; }
+.journey-layout .discovery-dates { margin:0; display:flex; align-items:center; grid-column:1/-1; order:3; }
+.journey-layout .discovery-dates .date-chip { border-radius:8px; min-height:44px; min-width:52px; }
+.journey-layout .quick-filters { display:grid; grid-template-columns:1fr 1fr; margin:0; gap:16px; }
+.journey-layout .quick-choice { display:grid; gap:6px; font-size:13px; color:var(--text-secondary); min-width:0; }
+.journey-layout .quick-choice select { margin:0; width:100%; color:var(--text-primary); }
+.journey-layout .discovery-quick>.hint,.journey-layout .discovery-quick>.form-note { grid-column:1/-1; margin:0; }
+.journey-layout .stay-summary { border:0; border-radius:12px; padding:20px 24px; background:var(--fill-secondary); margin:0 0 24px; box-shadow:none; }
+.journey-layout .stay-options { margin-top:16px; padding-top:16px; border-top:1px solid var(--border-default); display:grid; grid-template-columns:minmax(160px,1fr) 2fr auto; align-items:center; gap:8px 20px; }
+.journey-layout .stay-options-label { font-size:14px; font-weight:500; margin:0; }
+.journey-layout .stay-options>.hint { grid-column:1/-1; grid-row:2; margin:0; }
+.journey-layout .stay-explore-controls { display:flex; gap:16px; margin:0; align-items:end; }
+.journey-layout .stay-explore-controls label { flex:1; min-width:0; }
+.journey-layout .stay-option-actions { margin:0; }
+.journey-layout .stay-draft-note { grid-column:1/-1; margin:0; }
+.journey-layout .recommendation-filter-bar { background:none; border:0; border-bottom:1px solid var(--border-default); padding:0 0 20px; border-radius:0; margin:0 0 24px; box-shadow:none; }
+.journey-layout .recommendation-workspace>.section-heading { margin-top:32px; }
+.journey-layout .recommendation-filter-bar h3 { font-size:14px; margin:0; }
+.journey-layout .recommendation-filter-bar .hint { margin:4px 0; }
+.journey-layout .recommendation-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:32px 24px; align-items:stretch; }
+.journey-layout .recommendation-card { padding:0 0 20px; border:0; border-bottom:1px solid var(--border-default); box-shadow:none; border-radius:0; background:transparent; min-width:0; display:flex; flex-direction:column; gap:10px; }
+.journey-layout .recommendation-card .place-photo-gallery { margin:0 0 4px; }
+.journey-layout .recommendation-card h3 { font-size:19px; font-weight:600; line-height:1.45; }
+.journey-layout .recommendation-card p { margin:0; }
+.journey-layout .recommendation-card-heading { gap:8px; }
+.journey-layout .recommendation-rank { display:none; }
+.journey-layout .recommendation-primary-actions { margin-top:auto; padding-top:14px; display:flex; gap:8px; }
+.journey-layout .recommendation-primary-actions button { flex:1; }
+.journey-layout .recommendation-selection-actions { margin-top:0; }
+.journey-layout .recommendation-selection-actions button { flex:1; border-color:transparent; background:var(--fill-secondary); font-size:14px; }
+.journey-layout .card-secondary { border:0; margin:0; padding:0; }
+.journey-layout .card-secondary .hint { font-size:12px; }
+.journey-layout .card-secondary .actions { margin:4px 0 0; gap:8px; }
+.journey-layout .card-secondary button { font-size:13px; padding:8px 0; }
+.journey-layout .recommendation-reference { border:0; padding:0; margin:28px 0; }
+.journey-layout .recommendation-reference>h3 { font-size:18px; }
+.journey-layout .recommendation-reference>.hint { margin:8px 0 20px; }
+.journey-layout .recommendation-reference .recommendation-grid { margin-top:20px; }
+.journey-layout .history-disclosure { border:0; padding:16px 0; margin:12px 0 24px; background:none; display:flex; align-items:center; flex-wrap:wrap; gap:12px 24px; }
+.journey-layout .history-disclosure .section-label { font-size:13px; font-weight:500; margin:0; color:var(--text-tertiary); }
+.journey-layout .history-disclosure .filters { margin:0; }
+.journey-layout .history-disclosure label { display:none; }
+.journey-layout .itinerary-selections { padding:20px; }
+.journey-layout .itinerary-selections>.section-label { margin:0 0 16px; font-size:16px; }
+.journey-layout .jobs-panel { padding:0; border:0; background:none; }
+#openJobs { display:flex; align-items:center; gap:8px; font-size:13px; }
+#jobsDialog { width:min(620px,calc(100% - 32px)); max-height:85dvh; padding:0; border:1px solid var(--border-default); border-radius:18px; color:var(--text-primary); background:var(--fill-surface); box-shadow:var(--shadow-dialog); }
+#jobsDialog::backdrop { background:var(--overlay-scrim); }
+#jobsDialog .dialog-heading { display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:1px solid var(--border-subtle); }
+#jobsDialog .jobs-body { position:static; display:block; padding:20px 24px; width:auto; border:0; box-shadow:none; max-height:none; }
+#jobsDialog h2 { margin:0; font-size:20px; }
+#dialog .form-footer { position:sticky; bottom:-24px; z-index:2; background:var(--fill-surface); padding:16px 0; border-top:1px solid var(--border-subtle); margin-top:24px; }
+#dialogBody .fact-group { border:0; border-top:1px solid var(--border-subtle); padding:20px 0; }
+#dialogBody .fact-group>h3 { margin:0 0 12px; }
+@media(hover:hover) and (pointer:fine) {
+ .journey-layout .journey-shortcut:hover { border-color:var(--text-tertiary); background:var(--fill-secondary); }
+ .journey-layout .sidebar nav button:hover { background:var(--fill-secondary); }
+}
+@media(max-width:1128px) {
+ .journey-layout .sidebar { gap:24px; }
+ .journey-layout .topbar-scope { flex-basis:100%; }
+ .journey-layout .recommendation-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .journey-layout .stay-options { grid-template-columns:1fr; }
+ .journey-layout .stay-options>.hint { grid-row:auto; }
+ .journey-layout .discovery-quick { grid-template-columns:1fr; }
+}
+@media(max-width:743px) {
+ .journey-layout .sidebar { padding:0 20px; min-height:64px; }
+ .journey-layout .brand { padding:16px 0; }
+ .journey-layout .sidebar nav { position:fixed; left:0; right:0; bottom:0; z-index:30; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:0; padding:4px 8px max(4px,env(safe-area-inset-bottom)); background:var(--fill-surface); border-top:1px solid var(--border-default); }
+ .journey-layout .sidebar nav button { min-width:0; min-height:58px; padding:6px 2px; flex-direction:column; gap:3px; font-size:12px; line-height:1.4; }
+ .journey-layout .sidebar .nav-more { margin:0; }
+ .journey-layout .sidebar nav button[aria-current="page"]::after,.journey-layout #openMore[data-current]::after { top:-4px; bottom:auto; left:24%; right:24%; height:2px; }
+ .journey-layout .topbar { width:calc(100% - 40px); padding:12px 0; align-items:start; gap:8px; }
+ .journey-layout .trip-switch { gap:0 8px; flex:1; }
+ .journey-layout .trip-switch label { display:none; }
+ .journey-layout .trip-switch select { max-width:100%; min-width:0; width:100%; font-size:15px; }
+ .journey-layout .topbar-actions { flex-direction:column-reverse; align-items:end; gap:2px; }
+ .journey-layout #createTrip { font-size:13px; padding:8px; }
+ .journey-layout .main { width:calc(100% - 40px); padding:28px 0 110px; }
+ .journey-layout h1 { font-size:calc(26px * var(--text-scale,1)); }
+ .journey-layout .page-heading { flex-wrap:wrap; margin-bottom:24px; gap:12px; }
+ .journey-layout .summary-grid { gap:20px; }
+ .journey-layout .summary-grid>div { min-width:100px; }
+ .journey-layout .journey-shortcuts { grid-template-columns:1fr; gap:12px; }
+ .journey-layout .journey-shortcut { min-height:96px; padding:20px; }
+ .journey-layout .discovery-quick { padding:16px; gap:16px; }
+ .journey-layout .quick-filters { gap:12px; }
+ .journey-layout .quick-context { flex-wrap:wrap; }
+ .journey-layout .stay-summary { padding:16px; }
+ .journey-layout .stay-summary-row { flex-wrap:wrap; gap:12px; }
+ .journey-layout .stay-explore-controls { flex-wrap:wrap; }
+ .journey-layout .stay-explore-controls label { flex-basis:100%; }
+ .journey-layout .recommendation-grid { grid-template-columns:1fr; gap:32px; }
+ .journey-layout .recommendation-workspace>.section-heading { align-items:start; }
+ .journey-layout .history-disclosure select { max-width:100%; }
+ .journey-layout .comparison-tray { bottom:80px; }
+ #dialog .form-footer { bottom:-18px; }
+}
+
+:root[data-text-size="large"] .journey-layout .recommendation-grid { grid-template-columns:1fr; }
+:root[data-text-size="large"] .journey-layout .quick-filters { grid-template-columns:1fr; }
+
+.journey-layout #exploreOrigin { display:block; padding:20px 24px; margin:0 0 24px; }
+.journey-layout #exploreOrigin .stay-options { margin-top:16px; }
+.journey-layout .history-disclosure { background:transparent; }
+@media(max-width:743px) { .journey-layout #exploreOrigin { padding:16px; } }
+.journey-layout .brand { display:flex; }
+.journey-layout .topbar { flex-direction:row; flex-wrap:nowrap; }
+.journey-layout .topbar-actions { width:auto; }
+.journey-layout .home-places.has-bookings .home-places-copy { display:block; }
+.journey-layout .home-places.has-bookings .journey-shortcut { display:grid; padding:24px; min-height:152px; }
+@media(max-width:743px) {
+ .journey-layout .sidebar .brand { display:flex; }
+ .journey-layout .topbar { gap:12px; }
+ .journey-layout .trip-switch { flex-basis:0; }
+ .journey-layout .topbar-actions { flex-basis:auto; }
+ .journey-layout .home-places.has-bookings .journey-shortcut { padding:20px; min-height:96px; }
+ .journey-layout .stay-summary-row { display:flex; }
+}
