@@ -9,6 +9,14 @@ from .intervals import bounds, contains, normalize_item, overlaps, subtract, tim
 DAYS = ('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday')
 
 
+def identity_eligible(candidate):
+    if not candidate:return False
+    return (candidate.get('identity_status')=='verified' and candidate.get('pack_status')=='approved') or (
+        candidate.get('source_kind')=='public_map' and candidate.get('provider')=='openstreetmap'
+        and candidate.get('pack_status')=='public_data' and candidate.get('identity_status')=='needs_confirmation'
+        and candidate.get('identity_basis')=='provider_location' and candidate.get('coordinate_permitted') is True)
+
+
 def issue(code, item_ids=(), *, state='unknown', constraint=None, interval=None, source_refs=()):
     return {'code': code, 'state': state, 'item_ids': list(item_ids), 'interval': interval,
             'constraint': constraint or code.lower(), 'reason': code, 'source_refs': list(source_refs),
@@ -159,7 +167,9 @@ def assess_visit(item, candidate, snapshot, now, distance_evidence=None):
     def add(code, state='unknown', refs=(), field=None):
         result.append(issue(code, [ident], state=state, constraint=field, source_refs=refs))
 
-    if candidate.get('identity_status') != 'verified' or candidate.get('pack_status') != 'approved':
+    if identity_eligible(candidate) and candidate.get('source_kind')=='public_map':
+        add('PUBLIC_MAP_VISIT_UNCONFIRMED')
+    elif not identity_eligible(candidate):
         add('PLACE_UNAVAILABLE', 'violated')
     if candidate.get('city') != snapshot['city']:
         add('CITY_MISMATCH', 'violated')

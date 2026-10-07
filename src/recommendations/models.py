@@ -11,6 +11,8 @@ class LanguageFilter(Input):
     apply_only_if_qualified: Literal[True] = True
     apply_to: list[Literal['local_discovery','landmark']] = Field(default=['local_discovery'], min_length=1,max_length=2)
     mode: Literal['observed_window'] = 'observed_window'
+    min_local_share: float = Field(default=.6,ge=0,le=1,allow_inf_nan=False)
+    max_korean_share: float = Field(default=.1,ge=0,le=1,allow_inf_nan=False)
 
 
 class RatingFilter(Input):
@@ -21,6 +23,7 @@ class RatingFilter(Input):
 
 
 class RecommendationInput(Input):
+    ordering_profile: Literal['evidence','nearby'] = 'evidence'
     trip_version: int = Field(ge=1)
     conditions_version: int = Field(ge=0)
     review_language_filter: LanguageFilter = Field(default_factory=LanguageFilter)

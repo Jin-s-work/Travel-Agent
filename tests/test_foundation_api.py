@@ -7,8 +7,10 @@ from __future__ import annotations
 
 import copy
 import json
+import sys
 import threading
 import time
+import traceback
 from uuid import uuid4
 from concurrent.futures import ThreadPoolExecutor
 from types import SimpleNamespace
@@ -110,7 +112,15 @@ def _job(client, receipt):
         value = response.json()
         if value["state"] in {"succeeded", "partial", "failed", "cancelled"}:
             return value
-        assert time.monotonic() < deadline, value
+        if time.monotonic() >= deadline:
+            # Keep the ten-second contract. Failure-only evidence has no locals,
+            # prompts, original contents, tokens, result payloads or SQL values.
+            frames=sys._current_frames()
+            workers=[{'thread':thread.name,'stack':[{'file':frame.filename.rsplit('/',1)[-1],
+                       'function':frame.name,'line':frame.lineno} for frame in traceback.extract_stack(frames[thread.ident])[-12:]]}
+                     for thread in threading.enumerate() if thread.name.startswith('travel-job') and thread.ident in frames]
+            fields=('state','stage','attempt','max_attempts','error_code','retryable','created_at','updated_at','started_at','deadline_at','lease_expires_at')
+            pytest.fail(json.dumps({'timeout_seconds':10,'job':{key:value.get(key) for key in fields},'worker_stacks':workers},ensure_ascii=False))
         time.sleep(0.01)
 
 

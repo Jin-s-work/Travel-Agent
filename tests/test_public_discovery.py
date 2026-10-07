@@ -106,7 +106,7 @@ def test_public_candidates_are_provisional_saved_and_cached_while_paid_halted(pu
     assert availability['public_discovery_enabled'] and availability['state']=='public_search_available'
     assert public.calls_public==[] # reading never fetches
     output=run(public,trip,base)
-    result=output['result'];cards=result['sections']['local_discovery']['needs_confirmation']
+    result=output['result'];cards=result['sections']['reference']['needs_confirmation']
     assert len(cards)==2 and result['summary']['qualified_count']==0
     assert result['sections']['local_discovery']['items']==[]
     assert result['public_discovery']['calls']==1 and result['public_discovery']['cost']['micros']==0
@@ -192,7 +192,7 @@ def test_display_is_bounded_without_fabricating_ranking(public):
     trip,base=prepare(public)
     public.app.state.discovery.public_provider.fetcher=lambda city:(normalize(payload(city,60),city),MAX_BYTES)
     output=run(public,trip,base)
-    cards=output['result']['sections']['local_discovery']['needs_confirmation']
+    cards=output['result']['sections']['reference']['needs_confirmation']
     assert len(cards)==12 and all(p['score'] is None for p in cards)
     assert output['result']['public_discovery']['display_limit']==12
 
@@ -237,7 +237,8 @@ def test_expired_public_snapshot_is_not_servable_and_requests_fresh_data(public)
         con.execute("UPDATE candidate_packs SET updated_at=? WHERE id='osm_pack_paris'",(cutoff,))
         con.execute('UPDATE place_facts SET expires_at=? WHERE policy_version=?',(cutoff,POLICY))
     current=public.client.get(base+'/recommendations/'+first['run_id']).json()
-    assert current['result'] is None and current['data_status']=='stale'
+    assert current['data_status']=='stale' and current['result']['withheld_place_ids']
+    assert not current['result']['sections']['reference']['needs_confirmation']
     assert public.calls_public==['paris']
     public.clock[0]+=timedelta(minutes=16)
     refreshed=run(public,trip,base,'public-refreshed')
@@ -252,7 +253,7 @@ def test_strict_filter_skips_fresh_public_call(public):
     assert out['result']['summary']['empty_state']['actions']==['edit_conditions','save_place']
 
 
-def test_curated_city_skips_fresh_public_call(public):
+def test_insufficient_curated_city_supplements_with_public_call(public):
     from tests.discovery_synthetic import pack
     from tests.test_discovery_foundation import import_pack
     public.admin=SimpleNamespace(id=public.user['id'])
@@ -265,8 +266,8 @@ def test_curated_city_skips_fresh_public_call(public):
         con.execute('UPDATE candidate_packs SET synthetic=0 WHERE id=?',(imported['id'],))
     trip,base=prepare(public,'tokyo')
     out=run(public,trip,base)
-    assert public.calls_public==[]
-    assert out['result']['public_discovery']['reason']=='REVIEWED_CATALOG_AVAILABLE'
+    assert public.calls_public==['tokyo']
+    assert out['result']['public_discovery']['calls']==1
     assert out['result']['summary']['catalog_count']>0
 
 
@@ -314,20 +315,20 @@ def test_public_display_cap_applies_after_requested_category(public):
         return normalize(raw,city),2000
     public.app.state.discovery.public_provider.fetcher=mixed
     restaurants=run(public,trip,base,'public-restaurants-before-cafe')
-    assert len(restaurants['result']['sections']['local_discovery']['needs_confirmation'])==12
+    assert len(restaurants['result']['sections']['reference']['needs_confirmation'])==12
     conditions=public.client.get(base+'/discovery-conditions').json()['conditions']
     conditions['categories']=['cafe']
     patched=public.client.patch(base+'/discovery-conditions',json={'expected_version':1,'conditions':conditions})
     assert patched.status_code==200,patched.text
     cafes=run(public,trip,base,'public-cafe-after-twelve-restaurants',conditions_version=2)
-    cards=cafes['result']['sections']['local_discovery']['needs_confirmation']
+    cards=cafes['result']['sections']['reference']['needs_confirmation']
     assert [p['place_id'] for p in cards]==['osm_node_700000012']
     assert cards[0]['category']=='cafe' and cafes['result']['public_discovery']['cache_hit']
     assert public.calls_public==['paris']
     # Revalidation uses each run's captured categories, not today's conditions.
     prior=public.client.get(base+'/recommendations/'+restaurants['run_id']).json()
     assert prior['data_status']=='current'
-    assert len(prior['result']['sections']['local_discovery']['needs_confirmation'])==12
+    assert len(prior['result']['sections']['reference']['needs_confirmation'])==12
 
 
 @pytest.mark.parametrize('removed_by',['user_exclusion','source_withdrawal'])
@@ -338,7 +339,7 @@ def test_public_display_replenishes_after_exclusion_or_source_withdrawal(public,
         return normalize(payload(city,14),city),2000
     public.app.state.discovery.public_provider.fetcher=many
     first=run(public,trip,base,'public-before-removal')
-    cards=first['result']['sections']['local_discovery']['needs_confirmation']
+    cards=first['result']['sections']['reference']['needs_confirmation']
     initial={p['place_id'] for p in cards}
     assert len(initial)==12 and 'osm_node_700000012' not in initial
     removed='osm_node_700000000'
@@ -353,9 +354,10 @@ def test_public_display_replenishes_after_exclusion_or_source_withdrawal(public,
             'policy_version':POLICY,'evidence':'Synthetic source withdrawal for bounded selection test'})
         assert response.status_code==200,response.text
     stale=public.client.get(base+'/recommendations/'+first['run_id']).json()
-    assert stale['data_status']=='stale' and stale['result'] is None
+    assert stale['data_status']=='stale' and removed in stale['result']['withheld_place_ids']
+    assert removed not in {p['place_id'] for p in stale['result']['sections']['reference']['needs_confirmation']}
     refreshed=run(public,trip,base,'public-after-removal')
-    cards=refreshed['result']['sections']['local_discovery']['needs_confirmation']
+    cards=refreshed['result']['sections']['reference']['needs_confirmation']
     assert {p['place_id'] for p in cards}==initial-{removed}|{'osm_node_700000012'}
     assert len(cards)==12 and all(not p.get('excluded') for p in cards)
     assert refreshed['result']['public_discovery']['cache_hit']

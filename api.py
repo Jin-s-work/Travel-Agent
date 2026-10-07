@@ -72,55 +72,43 @@ def create_app(settings=None, *, parser=None, embedder=None, vector_factory=None
     @asynccontextmanager
     async def lifespan(app):
         from src.reliability.maintenance import reconcile_storage
+        from src.operations.maintenance import Maintenance
+        app.state.maintenance=Maintenance(app)
+        async def leader_startup(operation):
+            try:
+                await asyncio.to_thread(operation,guard=app.state.maintenance.guard)
+            except DomainError as exc:
+                if exc.code!='LEASE_LOST': raise
         leader=await asyncio.to_thread(app.state.jobs.acquire_dispatcher,app.state.dispatcher.owner)
         if app.state.documents.objects:
             try:
                 await asyncio.to_thread(app.state.documents.objects.verify_private)
-                if leader: await asyncio.to_thread(app.state.documents.objects.reconcile)
+                if leader: await leader_startup(app.state.documents.objects.reconcile)
             except DomainError:
                 logging.getLogger(__name__).warning('private_storage_degraded')
         app.state.storage_reconciliation=await asyncio.to_thread(reconcile_storage,app.state.db,settings,
             dispatcher_owner=app.state.dispatcher.owner if leader else None)
         if leader:
-            await asyncio.to_thread(app.state.generations.cleanup)
-            await asyncio.to_thread(app.state.reviews.purge)
+            await leader_startup(app.state.generations.cleanup)
+            await leader_startup(app.state.reviews.purge)
         def purge_product():
             from src.product.events import purge
             with app.state.db.connect() as con:purge(con)
         await asyncio.to_thread(purge_product)
         await app.state.dispatcher.start()
-        async def review_maintenance():
-            cloud_swept=0
-            while True:
-                await asyncio.sleep(30)
-                try:
-                    await asyncio.to_thread(purge_product)
-                    await asyncio.to_thread(app.state.reviews.purge)
-                    await asyncio.to_thread(app.state.reviews.cleanup_remote)
-                    if app.state.documents.objects and time.monotonic()-cloud_swept>1800:
-                        await asyncio.to_thread(app.state.documents.objects.reconcile)
-                        cloud_swept=time.monotonic()
-                except asyncio.CancelledError:
-                    raise
-                except Exception:
-                    import logging
-                    logging.getLogger(__name__).warning('review_maintenance_failed')
-        review_task=asyncio.create_task(review_maintenance()) if leader else None
+        await app.state.maintenance.start()
         backup_task=None
-        if leader and os.getenv('BACKUP_ENABLED','0')=='1':
+        if os.getenv('BACKUP_ENABLED','0')=='1':
             from src.operations.remote import loop as backup_loop
-            backup_task=asyncio.create_task(backup_loop(app))
+            backup_task=asyncio.create_task(backup_loop(app,guard=app.state.maintenance.guard))
         try:
             yield
         finally:
+            await app.state.maintenance.stop()
             if backup_task:
                 backup_task.cancel()
                 try:await backup_task
                 except asyncio.CancelledError:pass
-            if review_task:
-                review_task.cancel()
-                try: await review_task
-                except asyncio.CancelledError: pass
             await app.state.dispatcher.stop()
             if app.state.documents.objects: app.state.documents.objects.close()
             app.state.db.close()

@@ -1,0 +1,694 @@
+{
+  "version": "iconic-pilot-2026-10-07-v1",
+  "synthetic": false,
+  "packs": [
+    {
+      "version": "iconic-pilot-tokyo-2026-10-07-v1",
+      "city": "tokyo",
+      "synthetic": false,
+      "places": [
+        {
+          "external_id": "kanda-matsuya-sudacho",
+          "name": "간다 마쓰야",
+          "native_name": "神田まつや",
+          "address": "東京都千代田区神田須田町1-13",
+          "category": "restaurant",
+          "canonical_url": "https://visit-chiyoda.tokyo/app/spot/detail/359",
+          "neighborhood": null,
+          "tags": [],
+          "recommendation_types": [
+            "local_discovery",
+            "landmark"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "recognition-20261007",
+              "url": "https://visit-chiyoda.tokyo/app/spot/detail/359",
+              "source_type": "tourism",
+              "source_group": "visit-chiyoda.tokyo",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 지점명·주소·소개 사실의 짧은 요약과 링크만 제공. 사진·원문 전문·리뷰를 재배포하지 않음. 현재 영업·가격·잔여석은 미확인."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "restaurant",
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            },
+            {
+              "field": "iconic_evidence",
+              "value": {
+                "evidence_type": "editorial_recognition",
+                "source_groups": [
+                  "visit-chiyoda.tokyo"
+                ],
+                "summary": "치요다 관광협회가 소개하는 간다의 전통 소바 식당입니다."
+              },
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "nihonbashi-tamai-honten",
+          "name": "니혼바시 타마이 본점",
+          "native_name": "日本橋 玉ゐ 本店",
+          "address": "東京都中央区日本橋2-9-9",
+          "category": "restaurant",
+          "canonical_url": "https://anago-tamai.com/nihonbashi/",
+          "neighborhood": null,
+          "tags": [],
+          "recommendation_types": [
+            "local_discovery",
+            "landmark"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "recognition-20261007",
+              "url": "https://www.nihonbashi-tokyo.jp/restaurants/gourmet-201308/",
+              "source_type": "editorial",
+              "source_group": "www.nihonbashi-tokyo.jp",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 지점명·주소·소개 사실의 짧은 요약과 링크만 제공. 사진·원문 전문·리뷰를 재배포하지 않음. 현재 영업·가격·잔여석은 미확인."
+            },
+            {
+              "key": "branch-20261007",
+              "url": "https://anago-tamai.com/nihonbashi/",
+              "source_type": "official",
+              "source_group": "anago-tamai.com",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 지점명·주소·소개 사실의 짧은 요약과 링크만 제공. 사진·원문 전문·리뷰를 재배포하지 않음. 현재 영업·가격·잔여석은 미확인."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "restaurant",
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            },
+            {
+              "field": "iconic_evidence",
+              "value": {
+                "evidence_type": "editorial_recognition",
+                "source_groups": [
+                  "www.nihonbashi-tokyo.jp"
+                ],
+                "summary": "니혼바시 지역 매체가 본점과 아나고 요리를 소개했습니다. 2013년 소개 자료이며 현재 가격 근거로 사용하지 않습니다."
+              },
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "daikokuya-asakusa13810",
+          "name": "다이코쿠야 본점",
+          "native_name": "大黒家",
+          "address": "東京都台東区浅草1-38-10",
+          "category": "restaurant",
+          "canonical_url": "https://asakusa-shoren.jp/stores/819/",
+          "neighborhood": null,
+          "tags": [],
+          "recommendation_types": [
+            "local_discovery",
+            "landmark"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "recognition-20261007",
+              "url": "https://asakusa-shoren.jp/stores/819/",
+              "source_type": "editorial",
+              "source_group": "asakusa-shoren.jp",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 지점명·주소·소개 사실의 짧은 요약과 링크만 제공. 사진·원문 전문·리뷰를 재배포하지 않음. 현재 영업·가격·잔여석은 미확인."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "restaurant",
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            },
+            {
+              "field": "iconic_evidence",
+              "value": {
+                "evidence_type": "editorial_recognition",
+                "source_groups": [
+                  "asakusa-shoren.jp"
+                ],
+                "summary": "아사쿠사 상점연합회가 텐동으로 알려진 본점을 소개합니다."
+              },
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "sensoji-asakusa-main-hall",
+          "name": "센소지",
+          "native_name": "浅草寺",
+          "address": "東京都台東区浅草2-3-1",
+          "category": "attraction",
+          "canonical_url": "https://www.senso-ji.jp/guide/",
+          "neighborhood": "浅草",
+          "tags": [],
+          "recommendation_types": [
+            "local_discovery",
+            "landmark"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "recognition-20261007",
+              "url": "https://www.senso-ji.jp/guide/",
+              "source_type": "official",
+              "source_group": "www.senso-ji.jp",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 지점명·주소·소개 사실의 짧은 요약과 링크만 제공. 사진·원문 전문·리뷰를 재배포하지 않음. 현재 영업·가격·잔여석은 미확인."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "attraction",
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            },
+            {
+              "field": "iconic_evidence",
+              "value": {
+                "evidence_type": "official_landmark",
+                "source_groups": [
+                  "www.senso-ji.jp"
+                ],
+                "summary": "센소지 공식 경내 안내에 소개된 본당입니다."
+              },
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "tokyo-national-museum-ueno",
+          "name": "도쿄국립박물관",
+          "native_name": "東京国立博物館",
+          "address": "13-9 Ueno Park, Taito-ku, Tokyo 110-8712, Japan",
+          "category": "attraction",
+          "canonical_url": "https://www.tnm.jp/modules/r_free_page/index.php?id=113&lang=en",
+          "neighborhood": "上野",
+          "tags": [],
+          "recommendation_types": [
+            "local_discovery",
+            "landmark"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "recognition-20261007",
+              "url": "https://www.tnm.jp/modules/r_free_page/index.php?id=113&lang=en",
+              "source_type": "official",
+              "source_group": "www.tnm.jp",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 지점명·주소·소개 사실의 짧은 요약과 링크만 제공. 사진·원문 전문·리뷰를 재배포하지 않음. 현재 영업·가격·잔여석은 미확인."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "attraction",
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            },
+            {
+              "field": "iconic_evidence",
+              "value": {
+                "evidence_type": "official_landmark",
+                "source_groups": [
+                  "www.tnm.jp"
+                ],
+                "summary": "도쿄국립박물관의 우에노 본관 방문 안내를 확인했습니다."
+              },
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "hamarikyu-gardens-chuo",
+          "name": "하마리큐 온시 정원",
+          "native_name": "浜離宮恩賜庭園",
+          "address": "東京都中央区浜離宮庭園1-1",
+          "category": "attraction",
+          "canonical_url": "https://www.tokyo-park.or.jp/park/hama-rikyu/index.html",
+          "neighborhood": "浜離宮庭園",
+          "tags": [],
+          "recommendation_types": [
+            "local_discovery",
+            "landmark"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "recognition-20261007",
+              "url": "https://www.tokyo-park.or.jp/park/hama-rikyu/index.html",
+              "source_type": "official",
+              "source_group": "www.tokyo-park.or.jp",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 지점명·주소·소개 사실의 짧은 요약과 링크만 제공. 사진·원문 전문·리뷰를 재배포하지 않음. 현재 영업·가격·잔여석은 미확인."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "attraction",
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            },
+            {
+              "field": "iconic_evidence",
+              "value": {
+                "evidence_type": "official_landmark",
+                "source_groups": [
+                  "www.tokyo-park.or.jp"
+                ],
+                "summary": "도쿄 공원 운영기관이 관리하는 하마리큐 정원입니다."
+              },
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "iconic-pilot-barcelona-2026-10-07-v1",
+      "city": "barcelona",
+      "synthetic": false,
+      "places": [
+        {
+          "external_id": "can-culleretes-quintana5",
+          "name": "칸 쿨레레테스",
+          "native_name": "Can Culleretes",
+          "address": "Carrer d’en Quintana, 5, 08002 Barcelona",
+          "category": "restaurant",
+          "canonical_url": "https://culleretes.com/en/contact/",
+          "neighborhood": null,
+          "tags": [],
+          "recommendation_types": [
+            "local_discovery",
+            "landmark"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "recognition-20261007",
+              "url": "https://thisisbarcelona.com/gastronomy/restaurants/can-culleretes",
+              "source_type": "tourism",
+              "source_group": "thisisbarcelona.com",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 지점명·주소·소개 사실의 짧은 요약과 링크만 제공. 사진·원문 전문·리뷰를 재배포하지 않음. 현재 영업·가격·잔여석은 미확인."
+            },
+            {
+              "key": "branch-20261007",
+              "url": "https://culleretes.com/en/contact/",
+              "source_type": "official",
+              "source_group": "culleretes.com",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 지점명·주소·소개 사실의 짧은 요약과 링크만 제공. 사진·원문 전문·리뷰를 재배포하지 않음. 현재 영업·가격·잔여석은 미확인."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "restaurant",
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            },
+            {
+              "field": "iconic_evidence",
+              "value": {
+                "evidence_type": "editorial_recognition",
+                "source_groups": [
+                  "thisisbarcelona.com"
+                ],
+                "summary": "바르셀로나 관광 자료가 전통 카탈루냐 요리와 오래된 식당의 역사를 소개합니다."
+              },
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "7-portes-isabel14",
+          "name": "세븐 포르테스",
+          "native_name": "7 Portes",
+          "address": "Passeig Isabel II, 14, 08003 Barcelona",
+          "category": "restaurant",
+          "canonical_url": "https://7portes.com/en/",
+          "neighborhood": null,
+          "tags": [],
+          "recommendation_types": [
+            "local_discovery",
+            "landmark"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "recognition-20261007",
+              "url": "https://thisisbarcelona.com/fr/gastronomie/restaurants/7-portes",
+              "source_type": "tourism",
+              "source_group": "thisisbarcelona.com",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 지점명·주소·소개 사실의 짧은 요약과 링크만 제공. 사진·원문 전문·리뷰를 재배포하지 않음. 현재 영업·가격·잔여석은 미확인."
+            },
+            {
+              "key": "branch-20261007",
+              "url": "https://7portes.com/en/",
+              "source_type": "official",
+              "source_group": "7portes.com",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 지점명·주소·소개 사실의 짧은 요약과 링크만 제공. 사진·원문 전문·리뷰를 재배포하지 않음. 현재 영업·가격·잔여석은 미확인."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "restaurant",
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            },
+            {
+              "field": "iconic_evidence",
+              "value": {
+                "evidence_type": "editorial_recognition",
+                "source_groups": [
+                  "thisisbarcelona.com"
+                ],
+                "summary": "바르셀로나 관광 자료에 소개된 7 Portes입니다."
+              },
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "bar-la-plata-merce28",
+          "name": "바 라 플라타",
+          "native_name": "Bar La Plata",
+          "address": "Carrer de la Mercè, 28, 08002 Barcelona",
+          "category": "restaurant",
+          "canonical_url": "https://barlaplata.com/ubicacion-y-contacto/",
+          "neighborhood": null,
+          "tags": [],
+          "recommendation_types": [
+            "local_discovery",
+            "landmark"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "recognition-20261007",
+              "url": "https://cadenaser.com/cataluna/2026/09/28/80-anys-del-bar-la-plata-un-reflex-de-la-historia-de-barcelona-des-de-la-postguerra-fins-avui-sercat/",
+              "source_type": "editorial",
+              "source_group": "cadenaser.com",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 지점명·주소·소개 사실의 짧은 요약과 링크만 제공. 사진·원문 전문·리뷰를 재배포하지 않음. 현재 영업·가격·잔여석은 미확인."
+            },
+            {
+              "key": "branch-20261007",
+              "url": "https://barlaplata.com/ubicacion-y-contacto/",
+              "source_type": "official",
+              "source_group": "barlaplata.com",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 지점명·주소·소개 사실의 짧은 요약과 링크만 제공. 사진·원문 전문·리뷰를 재배포하지 않음. 현재 영업·가격·잔여석은 미확인."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "restaurant",
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            },
+            {
+              "field": "iconic_evidence",
+              "value": {
+                "evidence_type": "editorial_recognition",
+                "source_groups": [
+                  "cadenaser.com"
+                ],
+                "summary": "2026년 9월 인터뷰에서 역사와 타파스를 소개한 La Plata입니다."
+              },
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "sagrada-familia-basilica",
+          "name": "사그라다 파밀리아",
+          "native_name": "Basílica de la Sagrada Família",
+          "address": "Carrer de Mallorca, 401, 08013 Barcelona; visitor entrance: Carrer de la Marina",
+          "category": "attraction",
+          "canonical_url": "https://sagradafamilia.org/en/sagrada-familia-ticket?inheritRedirect=true",
+          "neighborhood": "Eixample",
+          "tags": [],
+          "recommendation_types": [
+            "local_discovery",
+            "landmark"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "recognition-20261007",
+              "url": "https://sagradafamilia.org/en/",
+              "source_type": "official",
+              "source_group": "sagradafamilia.org",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 지점명·주소·소개 사실의 짧은 요약과 링크만 제공. 사진·원문 전문·리뷰를 재배포하지 않음. 현재 영업·가격·잔여석은 미확인."
+            },
+            {
+              "key": "branch-20261007",
+              "url": "https://sagradafamilia.org/en/sagrada-familia-ticket?inheritRedirect=true",
+              "source_type": "official",
+              "source_group": "sagradafamilia.org",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 지점명·주소·소개 사실의 짧은 요약과 링크만 제공. 사진·원문 전문·리뷰를 재배포하지 않음. 현재 영업·가격·잔여석은 미확인."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "attraction",
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            },
+            {
+              "field": "iconic_evidence",
+              "value": {
+                "evidence_type": "official_landmark",
+                "source_groups": [
+                  "sagradafamilia.org"
+                ],
+                "summary": "사그라다 파밀리아 성당 공식 방문 안내를 확인했습니다."
+              },
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "park-guell-monumental",
+          "name": "구엘 공원",
+          "native_name": "Park Güell",
+          "address": "Park Güell, Barcelona; entrances at Carretera del Carmel and Avinguda del Santuari de Sant Josep de la Muntanya",
+          "category": "attraction",
+          "canonical_url": "https://parkguell.barcelona/en/planning-your-visit/prices-and-times",
+          "neighborhood": "Gràcia",
+          "tags": [],
+          "recommendation_types": [
+            "local_discovery",
+            "landmark"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "recognition-20261007",
+              "url": "https://parkguell.barcelona/en/planning-your-visit/prices-and-times",
+              "source_type": "official",
+              "source_group": "parkguell.barcelona",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 지점명·주소·소개 사실의 짧은 요약과 링크만 제공. 사진·원문 전문·리뷰를 재배포하지 않음. 현재 영업·가격·잔여석은 미확인."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "attraction",
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            },
+            {
+              "field": "iconic_evidence",
+              "value": {
+                "evidence_type": "official_landmark",
+                "source_groups": [
+                  "parkguell.barcelona"
+                ],
+                "summary": "구엘 공원 공식 관람 안내를 확인했습니다."
+              },
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            }
+          ]
+        },
+        {
+          "external_id": "palau-musica-catalana-main",
+          "name": "카탈루냐 음악당",
+          "native_name": "Palau de la Música Catalana",
+          "address": "Carrer del Palau de la Música, 4-6, 08003 Barcelona",
+          "category": "attraction",
+          "canonical_url": "https://www.palaumusica.cat/en/practical-information_1642451",
+          "neighborhood": "Ciutat Vella",
+          "tags": [],
+          "recommendation_types": [
+            "local_discovery",
+            "landmark"
+          ],
+          "latitude": null,
+          "longitude": null,
+          "sources": [
+            {
+              "key": "recognition-20261007",
+              "url": "https://www.palaumusica.cat/en/practical-information_1642451",
+              "source_type": "official",
+              "source_group": "www.palaumusica.cat",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "read_confirmed": true,
+              "display_permitted": true,
+              "evidence_note": "공개 지점명·주소·소개 사실의 짧은 요약과 링크만 제공. 사진·원문 전문·리뷰를 재배포하지 않음. 현재 영업·가격·잔여석은 미확인."
+            }
+          ],
+          "facts": [
+            {
+              "field": "category",
+              "value": "attraction",
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            },
+            {
+              "field": "iconic_evidence",
+              "value": {
+                "evidence_type": "official_landmark",
+                "source_groups": [
+                  "www.palaumusica.cat"
+                ],
+                "summary": "카탈루냐 음악당의 공식 방문 안내를 확인했습니다."
+              },
+              "status": "verified",
+              "source_key": "recognition-20261007",
+              "checked_at": "2026-10-07T06:26:01.664199+00:00",
+              "expires_at": "2026-11-06T06:26:01.664546+00:00"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

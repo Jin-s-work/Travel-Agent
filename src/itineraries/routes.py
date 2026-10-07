@@ -1,6 +1,6 @@
 from fastapi import APIRouter,Depends,Query,Request
 from src.foundation.auth import require_actor
-from .models import Generation,Preview,Apply,Undo,Intent
+from .models import Generation,Preview,Apply,Undo,Intent,GenerationApply
 
 router=APIRouter(prefix='/api/v2/trips/{trip_id}/itineraries')
 
@@ -15,6 +15,18 @@ def listing(trip_id:str,request:Request,actor=Depends(require_actor),limit:int=Q
 @router.get('/{ident}')
 def detail(trip_id:str,ident:str,request:Request,actor=Depends(require_actor)):
     return request.app.state.itineraries.get(actor,trip_id,ident)
+
+@router.post('/generation-previews',status_code=202)
+def generation_preview(trip_id:str,body:Generation,request:Request,actor=Depends(require_actor)):
+    return request.app.state.itineraries.submit(actor,trip_id,body.model_dump(mode='json'),request.headers.get('idempotency-key'),preview_only=True)
+
+@router.get('/{ident}/generation-preview')
+def generation_preview_result(trip_id:str,ident:str,request:Request,actor=Depends(require_actor)):
+    return request.app.state.itineraries.generation_preview(actor,trip_id,ident)
+
+@router.post('/{ident}/generation-preview/apply')
+def generation_preview_apply(trip_id:str,ident:str,body:GenerationApply,request:Request,actor=Depends(require_actor)):
+    return request.app.state.itineraries.apply_generation(actor,trip_id,ident,body.model_dump())
 
 @router.post('/{ident}/edit-previews')
 def preview(trip_id:str,ident:str,body:Preview,request:Request,actor=Depends(require_actor)):

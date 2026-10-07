@@ -57,5 +57,6 @@ def summary(app):
         backups=[dict(r) for r in con.execute("SELECT action,created_at FROM operations_audit WHERE action IN ('offhost_backup','backup_failed') ORDER BY id DESC LIMIT 3")]
     oldest=max(0,(now-datetime.fromisoformat(row['stamp'])).total_seconds()) if row['stamp'] else 0
     disk=shutil.disk_usage(app.state.settings.database_path.parent)
-    return {**app.state.metrics.snapshot(),'disk':{'total_bytes':disk.total,'free_bytes':disk.free},'backup_events':backups,'queue':counts,'oldest_queue_seconds':round(oldest,3),
+    maintenance=app.state.maintenance.snapshot() if hasattr(app.state,'maintenance') else {'state':'not_started','healthy':False}
+    return {**app.state.metrics.snapshot(),'maintenance':maintenance,'disk':{'total_bytes':disk.total,'free_bytes':disk.free},'backup_events':backups,'queue':counts,'oldest_queue_seconds':round(oldest,3),
             'budgets':budgets,'billing_outside_app_observed':False,'provider_errors':provider_errors,'job_retries':retries,'job_errors':errors,'provider_attempts':calls,'uncertain_charges':pending}

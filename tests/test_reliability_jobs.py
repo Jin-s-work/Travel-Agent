@@ -17,6 +17,7 @@ from src.foundation.db import Database, SCHEMA
 from src.foundation.repository import DomainError, Repository
 from src.reliability.dispatcher import Dispatcher, RetryableJobError
 from src.reliability.jobs import Jobs
+from tests.job_diagnostics import claim_required, snapshot as job_snapshot
 
 
 @pytest.fixture
@@ -262,7 +263,7 @@ def test_one_retry_child_per_parent_even_for_concurrent_different_keys(work):
     with ThreadPoolExecutor(max_workers=6) as pool:
         children = list(pool.map(retry, range(12)))
     assert len({child['id'] for child in children}) == 1
-    child = jobs.claim('worker')
+    child = claim_required(jobs,'worker')
     jobs.finish(child['id'], child['fencing_token'])
     assert retry(20)['id'] == child['id']
     assert retry(20)['submission']['resume_from'] == original['id']
@@ -368,13 +369,16 @@ def test_dispatcher_keeps_event_loop_responsive_and_two_dispatchers_do_not_overl
         with lock:
             activity['active'] += 1
             activity['max'] = max(activity['max'], activity['active'])
-        context.checkpoint({'artifact_ref': 'fake'}, stage='provider', done=0, total=1)
-        time.sleep(.12)
-        context.guard()
-        with lock:
-            activity['active'] -= 1
-            activity['calls'] += 1
-        return {'done': True}
+        try:
+            context.checkpoint({'artifact_ref': 'fake'}, stage='provider', done=0, total=1)
+            time.sleep(.12)
+            context.guard()
+            with lock:activity['calls'] += 1
+            return {'done': True}
+        finally:
+            # A fenced attempt has exited too. Counting it forever creates a
+            # false overlap when a later valid attempt starts after it returns.
+            with lock:activity['active'] -= 1
     async def scenario():
         first = Dispatcher(jobs, handler, poll_seconds=.01, heartbeat_seconds=.05)
         second = Dispatcher(Jobs(db, lease_seconds=.3), handler, poll_seconds=.01, heartbeat_seconds=.05)
@@ -389,7 +393,26 @@ def test_dispatcher_keeps_event_loop_responsive_and_two_dispatchers_do_not_overl
         await second.stop()
         return ticks
     ticks = asyncio.run(scenario())
-    assert ticks >= 10 and activity == {'active': 0, 'max': 1, 'calls': 2}
+    assert ticks >= 10 and activity == {'active': 0, 'max': 1, 'calls': 2}, {'activity':activity,**job_snapshot(jobs)}
+
+
+def test_wall_clock_rollback_keeps_future_job_queued_without_weakening_lease(work):
+    db,_,_,jobs=work
+    clock=[datetime.now(timezone.utc)]
+    jobs.clock=lambda:clock[0]
+    submitted=enqueue(work)
+    created=clock[0]
+    clock[0]-=timedelta(seconds=2)
+    assert jobs.claim('clock-regression-worker') is None
+    status=job_snapshot(jobs)
+    assert status['controls_mode']=='normal'
+    assert status['jobs'][0]['available_delta_seconds']==2
+    assert status['jobs'][0]['state']=='queued' and status['jobs'][0]['attempt']==0
+    assert status['jobs'][0]['scope_error'] is None
+    assert status['dispatcher']['lease_expires_at']>jobs.now()
+    clock[0]=created
+    claimed=jobs.claim('clock-regression-worker')
+    assert claimed['id']==submitted['id'] and claimed['attempt']==1
 
 
 def test_real_sigkill_resumes_checkpoint_without_repeating_completed_provider(work, tmp_path):

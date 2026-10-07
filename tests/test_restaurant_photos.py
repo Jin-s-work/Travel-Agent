@@ -2,6 +2,7 @@
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -113,6 +114,91 @@ def test_manifest_failure_is_local_and_replacement_is_read(monkeypatch,tmp_path)
     assert photos.load_manifest() is None
     target.write_text(json.dumps({**manifest(),'version':'replacement-v2'}))
     assert photos.load_manifest()['version']=='replacement-v2'
+
+
+def test_manifest_same_metadata_replacement_revokes_cached_photo_permission(monkeypatch,tmp_path):
+    target=tmp_path/'photos.json';monkeypatch.setattr(photos,'MANIFEST_PATH',target)
+    original=manifest()
+    original['places'][0]['photos']=[picture()]
+    encoded=json.dumps(original).encode()
+    target.write_bytes(encoded)
+    stat=target.stat()
+    before=photos.load_manifest()
+    assert select(before)['photos']
+    # Same-length values and restored nanosecond timestamps reproduce the old
+    # cache collision without depending on the filesystem clock's resolution.
+    replacement=encoded.replace(b'test-photos-v1',b'test-photos-v2')
+    assert len(replacement)==len(encoded)
+    target.write_bytes(replacement)
+    os.utime(target,ns=(stat.st_atime_ns,stat.st_mtime_ns))
+    current=target.stat()
+    assert (current.st_size,current.st_mtime_ns)==(stat.st_size,stat.st_mtime_ns)
+    after=photos.load_manifest()
+    assert after['version']=='test-photos-v2'
+    assert select(after)['photos']
+    # Permission changes must also work without a manifest version change.
+    revoked=replacement.replace(b'"enabled": true',b'"enabled":false')
+    assert len(revoked)==len(encoded)
+    target.write_bytes(revoked)
+    os.utime(target,ns=(stat.st_atime_ns,stat.st_mtime_ns))
+    assert target.stat().st_mtime_ns==stat.st_mtime_ns
+    after=photos.load_manifest()
+    assert after['version']=='test-photos-v2'
+    assert select(after)['photos']==[]
+    assert select(after)['photo_status']['reason_codes']==['PHOTO_DISABLED']
+
+
+def test_manifest_open_failure_cannot_reuse_cached_permissions(monkeypatch,tmp_path):
+    target=tmp_path/'photos.json';monkeypatch.setattr(photos,'MANIFEST_PATH',target)
+    target.write_text(json.dumps(manifest()))
+    assert photos.load_manifest()['version']=='test-photos-v1'
+    original_open=Path.open
+    def denied(path,*args,**kwargs):
+        if path==target:raise PermissionError('Synthetic manifest access revoked')
+        return original_open(path,*args,**kwargs)
+    monkeypatch.setattr(Path,'open',denied)
+    assert photos.load_manifest() is None
+
+
+def test_manifest_reads_are_bounded_and_reject_oversize_before_caching(monkeypatch,tmp_path):
+    from io import BytesIO
+    target=tmp_path/'photos.json';monkeypatch.setattr(photos,'MANIFEST_PATH',target)
+    content=json.dumps({'version':'bounded-manifest','places':[]}).encode()
+    content+=b' '*(photos.MAX_MANIFEST_BYTES-len(content))
+    current=[content];read_sizes=[]
+    class Snapshot(BytesIO):
+        def read(self,size=-1):
+            read_sizes.append(size)
+            return super().read(size)
+    original_open=Path.open
+    def bounded_open(path,*args,**kwargs):
+        if path==target:return Snapshot(current[0])
+        return original_open(path,*args,**kwargs)
+    monkeypatch.setattr(Path,'open',bounded_open)
+    photos._read_manifest.cache_clear()
+    try:
+        assert photos.load_manifest()['version']=='bounded-manifest'
+        current[0]+=b' '
+        assert photos.load_manifest() is None
+        assert read_sizes==[photos.MAX_MANIFEST_BYTES+1]*2
+        assert photos._read_manifest.cache_info().currsize==1
+    finally:
+        photos._read_manifest.cache_clear()
+
+
+def test_manifest_parse_cache_has_four_entries_and_reuses_identical_bytes(monkeypatch,tmp_path):
+    target=tmp_path/'photos.json';monkeypatch.setattr(photos,'MANIFEST_PATH',target)
+    photos._read_manifest.cache_clear()
+    try:
+        for n in range(6):
+            target.write_text(json.dumps({'version':f'test-{n}','places':[]}))
+            assert photos.load_manifest()['version']==f'test-{n}'
+        before=photos._read_manifest.cache_info()
+        assert before.maxsize==4 and before.currsize==4
+        assert photos.load_manifest()['version']=='test-5'
+        assert photos._read_manifest.cache_info().hits==before.hits+1
+    finally:
+        photos._read_manifest.cache_clear()
 
 
 def prepare(discovery,monkeypatch):

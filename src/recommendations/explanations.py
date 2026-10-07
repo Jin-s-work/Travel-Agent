@@ -6,6 +6,8 @@ from copy import deepcopy
 
 
 def render(candidate):
+    if candidate.get('ranker_version','').endswith('_general_v3'):
+        return render_general(candidate)
     reasons = []
     components = candidate.get("score_components", {})
     labels = {
@@ -55,3 +57,25 @@ def fallback(ordered_candidates, proposed=None):
     if proposed is not None and validate(ordered_candidates, proposed):
         return {**deepcopy(proposed), "explanation_mode": "validated"}
     return {"recommendations": [_entry(candidate) for candidate in ordered_candidates], "explanation_mode": "server_template"}
+
+
+def render_general(candidate):
+    reasons=[]
+    def add(code,text,refs=(),aggregates=()):
+        reasons.append({'code':code,'text':text,'source_ids':sorted(set(refs)),'aggregate_refs':list(aggregates)})
+    if candidate.get('language_qualified'):
+        review=candidate.get('review_evidence') or {};c=review.get('counts') or {};aggregate=[review['aggregate_id']] if review.get('aggregate_id') else []
+        add('OBSERVED_LOCAL_COUNT',f"판별한 리뷰 {c['classified_count']}건 중 현지어 원문 {c['local_count']}건을 확인했어요.",aggregates=aggregate)
+        add('OBSERVED_SCOPE',f"관측 본문 {c['text_count']}건 · 한국어 {c['korean_count']}건 · 미판별 {c['unknown_count']}건이에요.",aggregates=aggregate)
+    iconic=candidate.get('iconic_evidence') or {};kind=iconic.get('kind')
+    labels={'official_landmark':'공식 자료가 소개하는 대표 장소예요.','editorial_recognition':'검토한 편집 자료가 선정한 장소예요.'}
+    if kind in labels:add('ICONIC_'+kind.upper(),labels[kind],iconic['source_ids'])
+    elif kind=='platform_popular':
+        rating=iconic['platform_rating']
+        add('PLATFORM_POPULAR',f"{rating['platform']}에서 전체 평가 {rating['total_rating_count']}건 · {rating['scale']}점 만점 {rating['rating']:g}점이에요.",iconic['source_ids'])
+        add('POPULARITY_BASIS','동일 플랫폼·도시·분류 안에서 가까운 곳 우선으로 살펴봤어요.' if candidate.get('ordering_profile')=='nearby' else '동일 플랫폼·도시·분류 안에서 평가 수를 기준으로 살펴봤어요.',iconic['source_ids'])
+    distance=((candidate.get('features') or {}).get('straight_distance') or {}).get('value')
+    if distance is not None and len(reasons)<3:
+        add('STRAIGHT_DISTANCE',f"선택한 출발점에서 직선거리 약 {round(distance):,}m예요. 실제 이동 경로와는 달라요.")
+    if not reasons:add('REFERENCE_ONLY','지점 자료를 확인한 주변 장소예요. 리뷰 언어나 유명함을 보장하지 않아요.',[r['id'] for r in candidate.get('source_refs',[])])
+    return reasons[:3]

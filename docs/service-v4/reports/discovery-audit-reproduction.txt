@@ -1,0 +1,18 @@
+PUBLIC_ITINERARY {'http_status': 404, 'error': 'NOT_FOUND', 'message': '사용 가능한 선택 장소를 찾을 수 없습니다.'}
+.CAP_BEFORE_DISTANCE {'stored': 13, 'summary': {'catalog_count': 12, 'confirmation_count': 0, 'confirmation_notice': None, 'count_basis': 'distinct_place_ids', 'displayable_count': 0, 'empty_state': {'actions': ['edit_conditions', 'save_place'], 'code': 'CONDITIONS_NOT_MET', 'description': '휴무·인원·거리 등 확인된 조건을 지키며 찾았어요. 조건을 직접 바꿔 다시 찾거나 원하는 장소를 저장해 주세요.', 'title': '선택한 조건에 맞는 장소를 찾지 못했어요'}, 'excluded_count': 12, 'matching_category_count': 12, 'qualified_count': 0, 'reason_codes': ['CONDITIONS_NOT_MET'], 'reference_count': 0, 'state': 'no_results', 'version': 'catalog_presentation_v1'}, 'excluded': 12}
+.CURATED_CATEGORY_GATE {'summary': {'catalog_count': 6, 'confirmation_count': 0, 'confirmation_notice': None, 'count_basis': 'distinct_place_ids', 'displayable_count': 0, 'empty_state': {'actions': ['edit_conditions', 'save_place'], 'code': 'CATEGORY_NO_CANDIDATES', 'description': '이 도시의 다른 종류를 살펴보거나, 가고 싶은 장소를 보관함에 저장해 주세요.', 'title': '선택한 종류의 장소가 아직 없어요'}, 'excluded_count': 6, 'matching_category_count': 0, 'qualified_count': 0, 'reason_codes': ['CATEGORY_NO_CANDIDATES'], 'reference_count': 0, 'state': 'no_matching_candidates', 'version': 'catalog_presentation_v1'}, 'public_status': 'REVIEWED_CATALOG_AVAILABLE', 'calls': []}
+.REVIEW_IDENTITY_GATE {'same_name_address': True, 'ids_differ': True, 'editorial_collect_error': 'REVIEW_POLICY_UNAVAILABLE', 'review_id_catalog_membership': 0, 'default_contract_verified': False, 'default_sort_basis': 'unknown', 'default_continuity': False, 'external_calls': 0}
+.OPTIONAL_INPUT_SCORE_GATE {'local_discovery': {'ranked': 0, 'reference': 2}, 'landmark': {'ranked': 0, 'reference': 2}}
+.SINGLE_FACT_EXPIRY {'previous_displayable': 2, 'result': None, 'data_status': 'stale', 'public_fetch_calls': 1}
+.
+=============================== warnings summary ===============================
+.venv/lib/python3.13/site-packages/fastapi/testclient.py:1
+  /Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag/.venv/lib/python3.13/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+test_going_discovery_audit.py::test_public_card_accepted_but_not_scheduled
+  /Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag/.venv/lib/python3.13/site-packages/authlib/integrations/httpx_client/assertion_client.py:5: AuthlibDeprecationWarning: The httpx module is deprecated; please use httpx2 instead.
+    from ._compat import httpx2
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+6 passed, 2 warnings in 2.28s

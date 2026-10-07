@@ -1,0 +1,1170 @@
+{
+  "version": "frozen_ranker_evaluation_v3",
+  "input_hash": "bf0ab2ea5fae6e9779a220ca20776c525cacca317ab6f4d4c7b6f7d4a3097e2b",
+  "clock": "2026-10-05T12:00:00+00:00",
+  "city": "tokyo",
+  "synthetic": true,
+  "baseline": {
+    "version": "ranker-hypotheses-v1",
+    "chain_limit": 2,
+    "neighborhood_limit": 3,
+    "category_limit": 4,
+    "distance_scale_m": 5000,
+    "walking_scale_minutes": 60,
+    "movement_version": "v1"
+  },
+  "candidate": {
+    "version": "ranker-general-v3",
+    "chain_limit": 2,
+    "neighborhood_limit": 3,
+    "category_limit": 4,
+    "distance_scale_m": 5000,
+    "walking_scale_minutes": 60,
+    "movement_version": "v2"
+  },
+  "model_versions": {
+    "before": null,
+    "after": {
+      "local_discovery": "local_observed_general_v3",
+      "landmark": "iconic_general_v3",
+      "reference": "reference_general_v3"
+    }
+  },
+  "comparison": [
+    {
+      "type": "local_discovery",
+      "top_overlap": 0,
+      "union_count": 2,
+      "rank_changes": [
+        {
+          "place_id": "place_tokyo_1",
+          "place_name": "합성 東京 1 · 非常に長い名前の地域食堂と文化散歩",
+          "before": null,
+          "after": 1,
+          "before_components": {
+            "local_evidence": {
+              "value": 1.0,
+              "weight": 0.35,
+              "source_ids": [
+                "source_1_official",
+                "source_1_regional_a",
+                "source_1_regional_b"
+              ],
+              "reason_codes": []
+            },
+            "preference": {
+              "value": null,
+              "weight": 0.25,
+              "source_ids": [],
+              "reason_codes": [
+                "PREFERENCE_UNKNOWN"
+              ]
+            },
+            "movement": {
+              "value": null,
+              "weight": 0.2,
+              "source_ids": [],
+              "reason_codes": [
+                "ORIGIN_OR_COORDINATES_UNKNOWN"
+              ]
+            },
+            "visit_fit": {
+              "value": 1.0,
+              "weight": 0.1,
+              "source_ids": [
+                "source_1_official"
+              ],
+              "reason_codes": []
+            },
+            "price": {
+              "value": null,
+              "weight": 0.1,
+              "source_ids": [
+                "source_1_official"
+              ],
+              "reason_codes": [
+                "BUDGET_UNKNOWN"
+              ]
+            }
+          },
+          "after_components": {
+            "local_evidence": {
+              "value": 1.0,
+              "weight": null,
+              "source_ids": [
+                "source_1_official",
+                "source_1_regional_a",
+                "source_1_regional_b"
+              ],
+              "reason_codes": []
+            },
+            "preference": {
+              "value": null,
+              "weight": null,
+              "source_ids": [],
+              "reason_codes": [
+                "PREFERENCE_UNKNOWN"
+              ]
+            },
+            "movement": {
+              "value": null,
+              "weight": null,
+              "source_ids": [],
+              "reason_codes": [
+                "ORIGIN_OR_COORDINATES_UNKNOWN"
+              ]
+            },
+            "visit_fit": {
+              "value": 1.0,
+              "weight": null,
+              "source_ids": [
+                "source_1_official"
+              ],
+              "reason_codes": []
+            },
+            "price": {
+              "value": null,
+              "weight": null,
+              "source_ids": [
+                "source_1_official"
+              ],
+              "reason_codes": [
+                "BUDGET_UNKNOWN"
+              ]
+            }
+          },
+          "before_features": null,
+          "after_features": {
+            "local_lower": {
+              "value": 0.75,
+              "status": "verified",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": null
+            },
+            "korean_upper": {
+              "value": 0.07,
+              "status": "verified",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": null
+            },
+            "language_unknown": {
+              "value": 0.05,
+              "status": "verified",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": null
+            },
+            "straight_distance": {
+              "value": null,
+              "status": "unspecified",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "INPUT_UNSPECIFIED"
+            },
+            "iconic_evidence": {
+              "value": null,
+              "status": "unknown",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "ICONIC_EVIDENCE_UNKNOWN"
+            },
+            "rating": {
+              "value": 4.5,
+              "status": "verified",
+              "source_ids": [
+                "source_1_official"
+              ],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": null
+            },
+            "rating_count": {
+              "value": 300,
+              "status": "verified",
+              "source_ids": [
+                "source_1_official"
+              ],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": null
+            },
+            "visit_fit": {
+              "value": "satisfied",
+              "status": "verified",
+              "source_ids": [
+                "source_1_official"
+              ],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": null
+            },
+            "preference_match": {
+              "value": null,
+              "status": "unspecified",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "INPUT_UNSPECIFIED"
+            }
+          },
+          "before_missing": [
+            "preference",
+            "movement",
+            "price"
+          ],
+          "after_missing": {
+            "straight_distance": "INPUT_UNSPECIFIED",
+            "iconic_evidence": "ICONIC_EVIDENCE_UNKNOWN",
+            "preference_match": "INPUT_UNSPECIFIED"
+          }
+        },
+        {
+          "place_id": "place_tokyo_2",
+          "place_name": "합성 東京 2 · 非常に長い名前の地域食堂と文化散歩",
+          "before": null,
+          "after": 2,
+          "before_components": {
+            "local_evidence": {
+              "value": 1.0,
+              "weight": 0.35,
+              "source_ids": [
+                "source_2_official",
+                "source_2_regional_a",
+                "source_2_regional_b"
+              ],
+              "reason_codes": []
+            },
+            "preference": {
+              "value": null,
+              "weight": 0.25,
+              "source_ids": [],
+              "reason_codes": [
+                "PREFERENCE_UNKNOWN"
+              ]
+            },
+            "movement": {
+              "value": null,
+              "weight": 0.2,
+              "source_ids": [],
+              "reason_codes": [
+                "ORIGIN_OR_COORDINATES_UNKNOWN"
+              ]
+            },
+            "visit_fit": {
+              "value": 1.0,
+              "weight": 0.1,
+              "source_ids": [
+                "source_2_official"
+              ],
+              "reason_codes": []
+            },
+            "price": {
+              "value": null,
+              "weight": 0.1,
+              "source_ids": [
+                "source_2_official"
+              ],
+              "reason_codes": [
+                "BUDGET_UNKNOWN"
+              ]
+            }
+          },
+          "after_components": {
+            "local_evidence": {
+              "value": 1.0,
+              "weight": null,
+              "source_ids": [
+                "source_2_official",
+                "source_2_regional_a",
+                "source_2_regional_b"
+              ],
+              "reason_codes": []
+            },
+            "preference": {
+              "value": null,
+              "weight": null,
+              "source_ids": [],
+              "reason_codes": [
+                "PREFERENCE_UNKNOWN"
+              ]
+            },
+            "movement": {
+              "value": null,
+              "weight": null,
+              "source_ids": [],
+              "reason_codes": [
+                "ORIGIN_OR_COORDINATES_UNKNOWN"
+              ]
+            },
+            "visit_fit": {
+              "value": 1.0,
+              "weight": null,
+              "source_ids": [
+                "source_2_official"
+              ],
+              "reason_codes": []
+            },
+            "price": {
+              "value": null,
+              "weight": null,
+              "source_ids": [
+                "source_2_official"
+              ],
+              "reason_codes": [
+                "BUDGET_UNKNOWN"
+              ]
+            }
+          },
+          "before_features": null,
+          "after_features": {
+            "local_lower": {
+              "value": 0.7,
+              "status": "verified",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": null
+            },
+            "korean_upper": {
+              "value": 0.07,
+              "status": "verified",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": null
+            },
+            "language_unknown": {
+              "value": 0.05,
+              "status": "verified",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": null
+            },
+            "straight_distance": {
+              "value": null,
+              "status": "unspecified",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "INPUT_UNSPECIFIED"
+            },
+            "iconic_evidence": {
+              "value": null,
+              "status": "unknown",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "ICONIC_EVIDENCE_UNKNOWN"
+            },
+            "rating": {
+              "value": 4.5,
+              "status": "verified",
+              "source_ids": [
+                "source_2_official"
+              ],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": null
+            },
+            "rating_count": {
+              "value": 300,
+              "status": "verified",
+              "source_ids": [
+                "source_2_official"
+              ],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": null
+            },
+            "visit_fit": {
+              "value": "satisfied",
+              "status": "verified",
+              "source_ids": [
+                "source_2_official"
+              ],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": null
+            },
+            "preference_match": {
+              "value": null,
+              "status": "unspecified",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "INPUT_UNSPECIFIED"
+            }
+          },
+          "before_missing": [
+            "preference",
+            "movement",
+            "price"
+          ],
+          "after_missing": {
+            "straight_distance": "INPUT_UNSPECIFIED",
+            "iconic_evidence": "ICONIC_EVIDENCE_UNKNOWN",
+            "preference_match": "INPUT_UNSPECIFIED"
+          }
+        }
+      ],
+      "top_k": {
+        "before": [],
+        "after": [
+          "place_tokyo_1",
+          "place_tokyo_2"
+        ]
+      },
+      "confirmation_groups": {
+        "before": [],
+        "after": []
+      },
+      "hard_violations": {
+        "before": 0,
+        "after": 0
+      },
+      "diversity": {
+        "before": {
+          "places": 0,
+          "categories": {},
+          "neighborhoods": {},
+          "chains": {}
+        },
+        "after": {
+          "places": 2,
+          "categories": {
+            "restaurant": 2
+          },
+          "neighborhoods": {
+            "synthetic_neighborhood": 2
+          },
+          "chains": {
+            "synthetic_chain": 2
+          }
+        }
+      },
+      "missing_data": {
+        "before": 2,
+        "after": 0
+      },
+      "support": {
+        "label": "현지어 리뷰로 찾기",
+        "model": "local_observed_general_v3",
+        "state": "ready",
+        "reason_codes": [],
+        "displayable_count": 2,
+        "criteria_group": "default_strict",
+        "personalized": false,
+        "ordering_profile": "evidence",
+        "insufficient_count": 0
+      }
+    },
+    {
+      "type": "landmark",
+      "top_overlap": 0,
+      "union_count": 2,
+      "rank_changes": [
+        {
+          "place_id": "place_tokyo_1",
+          "place_name": "합성 東京 1 · 非常に長い名前の地域食堂と文化散歩",
+          "before": null,
+          "after": 1,
+          "before_components": {
+            "iconic_evidence": {
+              "value": 0.6,
+              "weight": 0.3,
+              "source_ids": [
+                "source_1_official"
+              ],
+              "reason_codes": []
+            },
+            "preference": {
+              "value": null,
+              "weight": 0.25,
+              "source_ids": [],
+              "reason_codes": [
+                "PREFERENCE_UNKNOWN"
+              ]
+            },
+            "movement": {
+              "value": null,
+              "weight": 0.2,
+              "source_ids": [],
+              "reason_codes": [
+                "ORIGIN_OR_COORDINATES_UNKNOWN"
+              ]
+            },
+            "visit_fit": {
+              "value": 1.0,
+              "weight": 0.15,
+              "source_ids": [
+                "source_1_official"
+              ],
+              "reason_codes": []
+            },
+            "price": {
+              "value": null,
+              "weight": 0.1,
+              "source_ids": [
+                "source_1_official"
+              ],
+              "reason_codes": [
+                "BUDGET_UNKNOWN"
+              ]
+            }
+          },
+          "after_components": {
+            "iconic_evidence": {
+              "value": 0.6,
+              "weight": null,
+              "source_ids": [
+                "source_1_official"
+              ],
+              "reason_codes": []
+            },
+            "preference": {
+              "value": null,
+              "weight": null,
+              "source_ids": [],
+              "reason_codes": [
+                "PREFERENCE_UNKNOWN"
+              ]
+            },
+            "movement": {
+              "value": null,
+              "weight": null,
+              "source_ids": [],
+              "reason_codes": [
+                "ORIGIN_OR_COORDINATES_UNKNOWN"
+              ]
+            },
+            "visit_fit": {
+              "value": 1.0,
+              "weight": null,
+              "source_ids": [
+                "source_1_official"
+              ],
+              "reason_codes": []
+            },
+            "price": {
+              "value": null,
+              "weight": null,
+              "source_ids": [
+                "source_1_official"
+              ],
+              "reason_codes": [
+                "BUDGET_UNKNOWN"
+              ]
+            }
+          },
+          "before_features": null,
+          "after_features": {
+            "straight_distance": {
+              "value": null,
+              "status": "unspecified",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "INPUT_UNSPECIFIED"
+            },
+            "iconic_evidence": {
+              "value": "official_landmark",
+              "status": "verified",
+              "source_ids": [
+                "source_1_official"
+              ],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": null
+            },
+            "rating": {
+              "value": null,
+              "status": "unknown",
+              "source_ids": [
+                "source_1_official"
+              ],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "RATING_UNSUPPORTED"
+            },
+            "rating_count": {
+              "value": null,
+              "status": "unknown",
+              "source_ids": [
+                "source_1_official"
+              ],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "RATING_UNSUPPORTED"
+            },
+            "visit_fit": {
+              "value": "satisfied",
+              "status": "verified",
+              "source_ids": [
+                "source_1_official"
+              ],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": null
+            },
+            "preference_match": {
+              "value": null,
+              "status": "unspecified",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "INPUT_UNSPECIFIED"
+            }
+          },
+          "before_missing": [
+            "preference",
+            "movement",
+            "price"
+          ],
+          "after_missing": {
+            "straight_distance": "INPUT_UNSPECIFIED",
+            "rating": "RATING_UNSUPPORTED",
+            "rating_count": "RATING_UNSUPPORTED",
+            "preference_match": "INPUT_UNSPECIFIED"
+          }
+        },
+        {
+          "place_id": "place_tokyo_2",
+          "place_name": "합성 東京 2 · 非常に長い名前の地域食堂と文化散歩",
+          "before": null,
+          "after": 2,
+          "before_components": {
+            "iconic_evidence": {
+              "value": 0.6,
+              "weight": 0.3,
+              "source_ids": [
+                "source_2_official"
+              ],
+              "reason_codes": []
+            },
+            "preference": {
+              "value": null,
+              "weight": 0.25,
+              "source_ids": [],
+              "reason_codes": [
+                "PREFERENCE_UNKNOWN"
+              ]
+            },
+            "movement": {
+              "value": null,
+              "weight": 0.2,
+              "source_ids": [],
+              "reason_codes": [
+                "ORIGIN_OR_COORDINATES_UNKNOWN"
+              ]
+            },
+            "visit_fit": {
+              "value": 1.0,
+              "weight": 0.15,
+              "source_ids": [
+                "source_2_official"
+              ],
+              "reason_codes": []
+            },
+            "price": {
+              "value": null,
+              "weight": 0.1,
+              "source_ids": [
+                "source_2_official"
+              ],
+              "reason_codes": [
+                "BUDGET_UNKNOWN"
+              ]
+            }
+          },
+          "after_components": {
+            "iconic_evidence": {
+              "value": 0.6,
+              "weight": null,
+              "source_ids": [
+                "source_2_official"
+              ],
+              "reason_codes": []
+            },
+            "preference": {
+              "value": null,
+              "weight": null,
+              "source_ids": [],
+              "reason_codes": [
+                "PREFERENCE_UNKNOWN"
+              ]
+            },
+            "movement": {
+              "value": null,
+              "weight": null,
+              "source_ids": [],
+              "reason_codes": [
+                "ORIGIN_OR_COORDINATES_UNKNOWN"
+              ]
+            },
+            "visit_fit": {
+              "value": 1.0,
+              "weight": null,
+              "source_ids": [
+                "source_2_official"
+              ],
+              "reason_codes": []
+            },
+            "price": {
+              "value": null,
+              "weight": null,
+              "source_ids": [
+                "source_2_official"
+              ],
+              "reason_codes": [
+                "BUDGET_UNKNOWN"
+              ]
+            }
+          },
+          "before_features": null,
+          "after_features": {
+            "straight_distance": {
+              "value": null,
+              "status": "unspecified",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "INPUT_UNSPECIFIED"
+            },
+            "iconic_evidence": {
+              "value": "official_landmark",
+              "status": "verified",
+              "source_ids": [
+                "source_2_official"
+              ],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": null
+            },
+            "rating": {
+              "value": null,
+              "status": "unknown",
+              "source_ids": [
+                "source_2_official"
+              ],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "RATING_UNSUPPORTED"
+            },
+            "rating_count": {
+              "value": null,
+              "status": "unknown",
+              "source_ids": [
+                "source_2_official"
+              ],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "RATING_UNSUPPORTED"
+            },
+            "visit_fit": {
+              "value": "satisfied",
+              "status": "verified",
+              "source_ids": [
+                "source_2_official"
+              ],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": null
+            },
+            "preference_match": {
+              "value": null,
+              "status": "unspecified",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "INPUT_UNSPECIFIED"
+            }
+          },
+          "before_missing": [
+            "preference",
+            "movement",
+            "price"
+          ],
+          "after_missing": {
+            "straight_distance": "INPUT_UNSPECIFIED",
+            "rating": "RATING_UNSUPPORTED",
+            "rating_count": "RATING_UNSUPPORTED",
+            "preference_match": "INPUT_UNSPECIFIED"
+          }
+        }
+      ],
+      "top_k": {
+        "before": [],
+        "after": [
+          "place_tokyo_1",
+          "place_tokyo_2"
+        ]
+      },
+      "confirmation_groups": {
+        "before": [],
+        "after": []
+      },
+      "hard_violations": {
+        "before": 0,
+        "after": 0
+      },
+      "diversity": {
+        "before": {
+          "places": 0,
+          "categories": {},
+          "neighborhoods": {},
+          "chains": {}
+        },
+        "after": {
+          "places": 2,
+          "categories": {
+            "restaurant": 2
+          },
+          "neighborhoods": {
+            "synthetic_neighborhood": 2
+          },
+          "chains": {
+            "synthetic_chain": 2
+          }
+        }
+      },
+      "missing_data": {
+        "before": 2,
+        "after": 0
+      },
+      "support": {
+        "label": "유명한 곳",
+        "model": "iconic_general_v3",
+        "state": "ready",
+        "reason_codes": [],
+        "displayable_count": 2,
+        "criteria_group": "landmark",
+        "personalized": false,
+        "ordering_profile": "evidence",
+        "insufficient_count": 0
+      }
+    },
+    {
+      "type": "reference",
+      "top_overlap": 0,
+      "union_count": 2,
+      "rank_changes": [
+        {
+          "place_id": "place_tokyo_1",
+          "place_name": "합성 東京 1 · 非常に長い名前の地域食堂と文化散歩",
+          "before": null,
+          "after": 1,
+          "before_components": null,
+          "after_components": {
+            "local_evidence": {
+              "value": 1.0,
+              "weight": null,
+              "source_ids": [
+                "source_1_official",
+                "source_1_regional_a",
+                "source_1_regional_b"
+              ],
+              "reason_codes": []
+            },
+            "preference": {
+              "value": null,
+              "weight": null,
+              "source_ids": [],
+              "reason_codes": [
+                "PREFERENCE_UNKNOWN"
+              ]
+            },
+            "movement": {
+              "value": null,
+              "weight": null,
+              "source_ids": [],
+              "reason_codes": [
+                "ORIGIN_OR_COORDINATES_UNKNOWN"
+              ]
+            },
+            "visit_fit": {
+              "value": 1.0,
+              "weight": null,
+              "source_ids": [
+                "source_1_official"
+              ],
+              "reason_codes": []
+            },
+            "price": {
+              "value": null,
+              "weight": null,
+              "source_ids": [
+                "source_1_official"
+              ],
+              "reason_codes": [
+                "BUDGET_UNKNOWN"
+              ]
+            }
+          },
+          "before_features": null,
+          "after_features": {
+            "straight_distance": {
+              "value": null,
+              "status": "unspecified",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "INPUT_UNSPECIFIED"
+            },
+            "iconic_evidence": {
+              "value": null,
+              "status": "unknown",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "ICONIC_EVIDENCE_UNKNOWN"
+            },
+            "rating": {
+              "value": null,
+              "status": "unknown",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "RATING_UNSUPPORTED"
+            },
+            "rating_count": {
+              "value": null,
+              "status": "unknown",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "RATING_UNSUPPORTED"
+            },
+            "visit_fit": {
+              "value": "satisfied",
+              "status": "verified",
+              "source_ids": [
+                "source_1_official"
+              ],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": null
+            },
+            "preference_match": {
+              "value": null,
+              "status": "unspecified",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "INPUT_UNSPECIFIED"
+            }
+          },
+          "before_missing": [],
+          "after_missing": {
+            "straight_distance": "INPUT_UNSPECIFIED",
+            "iconic_evidence": "ICONIC_EVIDENCE_UNKNOWN",
+            "rating": "RATING_UNSUPPORTED",
+            "rating_count": "RATING_UNSUPPORTED",
+            "preference_match": "INPUT_UNSPECIFIED"
+          }
+        },
+        {
+          "place_id": "place_tokyo_2",
+          "place_name": "합성 東京 2 · 非常に長い名前の地域食堂と文化散歩",
+          "before": null,
+          "after": 2,
+          "before_components": null,
+          "after_components": {
+            "local_evidence": {
+              "value": 1.0,
+              "weight": null,
+              "source_ids": [
+                "source_2_official",
+                "source_2_regional_a",
+                "source_2_regional_b"
+              ],
+              "reason_codes": []
+            },
+            "preference": {
+              "value": null,
+              "weight": null,
+              "source_ids": [],
+              "reason_codes": [
+                "PREFERENCE_UNKNOWN"
+              ]
+            },
+            "movement": {
+              "value": null,
+              "weight": null,
+              "source_ids": [],
+              "reason_codes": [
+                "ORIGIN_OR_COORDINATES_UNKNOWN"
+              ]
+            },
+            "visit_fit": {
+              "value": 1.0,
+              "weight": null,
+              "source_ids": [
+                "source_2_official"
+              ],
+              "reason_codes": []
+            },
+            "price": {
+              "value": null,
+              "weight": null,
+              "source_ids": [
+                "source_2_official"
+              ],
+              "reason_codes": [
+                "BUDGET_UNKNOWN"
+              ]
+            }
+          },
+          "before_features": null,
+          "after_features": {
+            "straight_distance": {
+              "value": null,
+              "status": "unspecified",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "INPUT_UNSPECIFIED"
+            },
+            "iconic_evidence": {
+              "value": null,
+              "status": "unknown",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "ICONIC_EVIDENCE_UNKNOWN"
+            },
+            "rating": {
+              "value": null,
+              "status": "unknown",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "RATING_UNSUPPORTED"
+            },
+            "rating_count": {
+              "value": null,
+              "status": "unknown",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "RATING_UNSUPPORTED"
+            },
+            "visit_fit": {
+              "value": "satisfied",
+              "status": "verified",
+              "source_ids": [
+                "source_2_official"
+              ],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": null
+            },
+            "preference_match": {
+              "value": null,
+              "status": "unspecified",
+              "source_ids": [],
+              "as_of": "2026-10-05T12:00:00+00:00",
+              "version": "evidence_features_v3",
+              "missing_reason": "INPUT_UNSPECIFIED"
+            }
+          },
+          "before_missing": [],
+          "after_missing": {
+            "straight_distance": "INPUT_UNSPECIFIED",
+            "iconic_evidence": "ICONIC_EVIDENCE_UNKNOWN",
+            "rating": "RATING_UNSUPPORTED",
+            "rating_count": "RATING_UNSUPPORTED",
+            "preference_match": "INPUT_UNSPECIFIED"
+          }
+        }
+      ],
+      "top_k": {
+        "before": [],
+        "after": [
+          "place_tokyo_1",
+          "place_tokyo_2"
+        ]
+      },
+      "confirmation_groups": {
+        "before": [],
+        "after": []
+      },
+      "hard_violations": {
+        "before": 0,
+        "after": 0
+      },
+      "diversity": {
+        "before": {
+          "places": 0,
+          "categories": {},
+          "neighborhoods": {},
+          "chains": {}
+        },
+        "after": {
+          "places": 2,
+          "categories": {
+            "restaurant": 2
+          },
+          "neighborhoods": {
+            "synthetic_neighborhood": 2
+          },
+          "chains": {
+            "synthetic_chain": 2
+          }
+        }
+      },
+      "missing_data": {
+        "before": 0,
+        "after": 0
+      },
+      "support": {
+        "label": "주변 장소 참고하기",
+        "model": "reference_general_v3",
+        "state": "ready",
+        "reason_codes": [],
+        "displayable_count": 2,
+        "criteria_group": "reference",
+        "personalized": false,
+        "ordering_profile": "evidence"
+      }
+    }
+  ],
+  "optional_inputs_omitted": {
+    "local_discovery": {
+      "ranked": 2,
+      "confirmation": 0
+    },
+    "landmark": {
+      "ranked": 2,
+      "confirmation": 0
+    },
+    "reference": {
+      "ranked": 2,
+      "confirmation": 0
+    }
+  },
+  "deterministic": true,
+  "language_gate_unchanged": false,
+  "language_gate_change": "strict_only_no_editorial_fallback",
+  "automatic_winner": null,
+  "learning_status": "insufficient_evidence",
+  "relevance_evaluation": {
+    "ndcg": null,
+    "satisfaction": null,
+    "status": "unmeasured",
+    "reason": "NO_INDEPENDENT_RELEVANCE_LABELS"
+  },
+  "explanation_evaluation": {
+    "mode": "separate_contract_test",
+    "live_llm": "not_run"
+  },
+  "retrieval_calls": 0,
+  "observed_user_outcome": "unmeasured"
+}

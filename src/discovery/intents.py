@@ -1,5 +1,6 @@
 """One durable discovery intent: conditions + immutable run + job in one SQL commit."""
 from copy import deepcopy
+from typing import Literal
 import hashlib
 import json
 from pydantic import Field, field_validator, model_validator
@@ -11,6 +12,7 @@ from .context import load, resolve, enrich_origin
 
 
 class Filters(Input):
+    ordering_profile: Literal['evidence','nearby'] = 'evidence'
     review_language_filter: LanguageFilter = Field(default_factory=LanguageFilter)
     rating_filter: RatingFilter = Field(default_factory=RatingFilter)
     limit: int = Field(default=6, ge=1, le=12)
@@ -96,6 +98,8 @@ def submit(service, actor, trip_id, body, key):
             'pipeline_version':'discovery_pipeline_v2','movement_version':'v2','origin_context':resolved['origin_context'],'ranker_versions':VERSIONS,'explanation_version':'server_templates_v1','evaluation_at':stamp,
             'analytics_opt_in':consented(con,actor.id),'feedback_policy_version':'soft_avoid_half_v1',
             'soft_avoid_place_ids':[r['place_id'] for r in con.execute('SELECT place_id,payload_json FROM visit_feedback WHERE owner_id=? AND trip_id=? AND withdrawn_at IS NULL',(actor.id,trip_id)) if json.loads(r['payload_json']).get('reflect_preference')]}
+        from src.recommendations.registry import model_snapshot
+        snapshot.update(model_snapshot(snapshot))
         job=service.jobs.enqueue(actor.id,actor.session_id,'personal_trip',trip_id,'recommendations',{'run_id':run},trip['version'],'discovery-intent:'+key_hash,request_fingerprint=fingerprint,con=con)
         con.execute('INSERT INTO recommendation_runs(id,trip_id,owner_id,job_id,trip_version,conditions_version,snapshot_json,ranker_versions_json,created_at) VALUES(?,?,?,?,?,?,?,?,?)',
             (run,trip_id,actor.id,job['id'],trip['version'],cv,dump(snapshot),dump(VERSIONS),stamp))

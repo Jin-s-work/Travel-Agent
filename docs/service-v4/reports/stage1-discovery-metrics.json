@@ -1,0 +1,679 @@
+{
+  "schema": "going.stage1.discovery-metrics.v1",
+  "measured_at": "2026-10-07",
+  "baseline_ref": "e8ea36faadac4912a523ae7bea5f02368d7f1ba1",
+  "production_data": false,
+  "live_external_calls": 0,
+  "methodology": {
+    "measurement": "Application Connection.execute/executemany calls on handler/request thread; connection initialization SQL and HTTP auth/SSE polling excluded. executemany is one batch, not one count per row.",
+    "backend": "Temporary SQLite and disposable loopback PostgreSQL, separate fixtures and schemas; no production backend.",
+    "fixture": "6/12/50/100 synthetic approved restaurant candidates, each with three sources and 14 facts; no review aggregates and no enabled external provider.",
+    "stages": [
+      "fresh_execute",
+      "cached_execute",
+      "get"
+    ],
+    "timing_limitations": "Single sample per size/version/backend. Earlier tests stalled on macOS iCloud dataless dependency files and pytest plugin autoload. These measurements completed after recovery; elapsed/queue/checkout timing remains host-sensitive and is not a production latency or p95 claim.",
+    "pool_wait": "psycopg pool-wide wait-ms delta; background tasks may contribute. null for SQLite.",
+    "queue_wait": "Fresh job creation-to-handler-start, null when no queue was entered.",
+    "baseline": "Only DiscoveryService, Recommendations, ReviewService class code is loaded from the fixed Git baseline; the same current engine, jobs, database adapter and fixture are used to isolate this change."
+  },
+  "records": [
+    {
+      "version": "before",
+      "candidate_count": 100,
+      "backend": "postgres",
+      "fresh_execute": {
+        "selects": 2256,
+        "writes": 835,
+        "transactions": 229,
+        "execute_calls": 3320,
+        "checkouts": 638,
+        "checkout_elapsed_ms": 4.948,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": 21.86,
+        "elapsed_ms": 2965.921
+      },
+      "cached_execute": {
+        "selects": 3,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 3,
+        "checkouts": 1,
+        "checkout_elapsed_ms": 0.008,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": null,
+        "elapsed_ms": 18.321
+      },
+      "get": {
+        "selects": 1132,
+        "writes": 405,
+        "transactions": 102,
+        "execute_calls": 1639,
+        "checkouts": 309,
+        "checkout_elapsed_ms": 2.822,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": null,
+        "elapsed_ms": 1455.306
+      }
+    },
+    {
+      "version": "after",
+      "candidate_count": 100,
+      "backend": "postgres",
+      "fresh_execute": {
+        "selects": 157,
+        "writes": 27,
+        "transactions": 25,
+        "execute_calls": 209,
+        "checkouts": 28,
+        "checkout_elapsed_ms": 0.29,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": 18.84,
+        "elapsed_ms": 659.321
+      },
+      "cached_execute": {
+        "selects": 3,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 3,
+        "checkouts": 1,
+        "checkout_elapsed_ms": 0.02,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": null,
+        "elapsed_ms": 17.956
+      },
+      "get": {
+        "selects": 32,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 32,
+        "checkouts": 4,
+        "checkout_elapsed_ms": 0.07,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": null,
+        "elapsed_ms": 168.568
+      }
+    },
+    {
+      "version": "before",
+      "candidate_count": 12,
+      "backend": "postgres",
+      "fresh_execute": {
+        "selects": 408,
+        "writes": 131,
+        "transactions": 53,
+        "execute_calls": 592,
+        "checkouts": 110,
+        "checkout_elapsed_ms": 1.072,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": 22.076,
+        "elapsed_ms": 540.504
+      },
+      "cached_execute": {
+        "selects": 3,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 3,
+        "checkouts": 1,
+        "checkout_elapsed_ms": 0.009,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": null,
+        "elapsed_ms": 4.113
+      },
+      "get": {
+        "selects": 164,
+        "writes": 53,
+        "transactions": 14,
+        "execute_calls": 231,
+        "checkouts": 45,
+        "checkout_elapsed_ms": 0.376,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": null,
+        "elapsed_ms": 165.736
+      }
+    },
+    {
+      "version": "after",
+      "candidate_count": 12,
+      "backend": "postgres",
+      "fresh_execute": {
+        "selects": 157,
+        "writes": 27,
+        "transactions": 25,
+        "execute_calls": 209,
+        "checkouts": 28,
+        "checkout_elapsed_ms": 0.292,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": 17.552,
+        "elapsed_ms": 268.237
+      },
+      "cached_execute": {
+        "selects": 3,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 3,
+        "checkouts": 1,
+        "checkout_elapsed_ms": 0.013,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": null,
+        "elapsed_ms": 5.202
+      },
+      "get": {
+        "selects": 32,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 32,
+        "checkouts": 4,
+        "checkout_elapsed_ms": 0.056,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": null,
+        "elapsed_ms": 46.248
+      }
+    },
+    {
+      "version": "before",
+      "candidate_count": 50,
+      "backend": "postgres",
+      "fresh_execute": {
+        "selects": 1206,
+        "writes": 435,
+        "transactions": 129,
+        "execute_calls": 1770,
+        "checkouts": 338,
+        "checkout_elapsed_ms": 2.676,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": 22.436,
+        "elapsed_ms": 1528.448
+      },
+      "cached_execute": {
+        "selects": 3,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 3,
+        "checkouts": 1,
+        "checkout_elapsed_ms": 0.007,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": null,
+        "elapsed_ms": 29.294
+      },
+      "get": {
+        "selects": 582,
+        "writes": 205,
+        "transactions": 52,
+        "execute_calls": 839,
+        "checkouts": 159,
+        "checkout_elapsed_ms": 1.393,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": null,
+        "elapsed_ms": 649.691
+      }
+    },
+    {
+      "version": "after",
+      "candidate_count": 50,
+      "backend": "postgres",
+      "fresh_execute": {
+        "selects": 157,
+        "writes": 27,
+        "transactions": 25,
+        "execute_calls": 209,
+        "checkouts": 28,
+        "checkout_elapsed_ms": 0.265,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": 20.168,
+        "elapsed_ms": 395.678
+      },
+      "cached_execute": {
+        "selects": 3,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 3,
+        "checkouts": 1,
+        "checkout_elapsed_ms": 0.011,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": null,
+        "elapsed_ms": 12.455
+      },
+      "get": {
+        "selects": 32,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 32,
+        "checkouts": 4,
+        "checkout_elapsed_ms": 0.063,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": null,
+        "elapsed_ms": 93.395
+      }
+    },
+    {
+      "version": "before",
+      "candidate_count": 6,
+      "backend": "postgres",
+      "fresh_execute": {
+        "selects": 282,
+        "writes": 83,
+        "transactions": 41,
+        "execute_calls": 406,
+        "checkouts": 74,
+        "checkout_elapsed_ms": 0.678,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": 19.147,
+        "elapsed_ms": 360.413
+      },
+      "cached_execute": {
+        "selects": 3,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 3,
+        "checkouts": 1,
+        "checkout_elapsed_ms": 0.012,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": null,
+        "elapsed_ms": 6.416
+      },
+      "get": {
+        "selects": 98,
+        "writes": 29,
+        "transactions": 8,
+        "execute_calls": 135,
+        "checkouts": 27,
+        "checkout_elapsed_ms": 0.278,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": null,
+        "elapsed_ms": 111.37
+      }
+    },
+    {
+      "version": "after",
+      "candidate_count": 6,
+      "backend": "postgres",
+      "fresh_execute": {
+        "selects": 157,
+        "writes": 27,
+        "transactions": 25,
+        "execute_calls": 209,
+        "checkouts": 28,
+        "checkout_elapsed_ms": 0.307,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": 16.169,
+        "elapsed_ms": 245.93
+      },
+      "cached_execute": {
+        "selects": 3,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 3,
+        "checkouts": 1,
+        "checkout_elapsed_ms": 0.011,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": null,
+        "elapsed_ms": 3.607
+      },
+      "get": {
+        "selects": 32,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 32,
+        "checkouts": 4,
+        "checkout_elapsed_ms": 0.052,
+        "external_provider_calls": 0,
+        "pool_wait_ms": 0,
+        "queue_wait_ms": null,
+        "elapsed_ms": 35.855
+      }
+    },
+    {
+      "version": "before",
+      "candidate_count": 100,
+      "backend": "sqlite",
+      "fresh_execute": {
+        "selects": 2256,
+        "writes": 835,
+        "transactions": 229,
+        "execute_calls": 3320,
+        "checkouts": 638,
+        "checkout_elapsed_ms": 93.09,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": 8.608,
+        "elapsed_ms": 1408.091
+      },
+      "cached_execute": {
+        "selects": 3,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 3,
+        "checkouts": 1,
+        "checkout_elapsed_ms": 0.094,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": null,
+        "elapsed_ms": 3.383
+      },
+      "get": {
+        "selects": 1132,
+        "writes": 405,
+        "transactions": 102,
+        "execute_calls": 1639,
+        "checkouts": 309,
+        "checkout_elapsed_ms": 33.976,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": null,
+        "elapsed_ms": 547.078
+      }
+    },
+    {
+      "version": "after",
+      "candidate_count": 100,
+      "backend": "sqlite",
+      "fresh_execute": {
+        "selects": 157,
+        "writes": 27,
+        "transactions": 25,
+        "execute_calls": 209,
+        "checkouts": 28,
+        "checkout_elapsed_ms": 4.956,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": 9.025,
+        "elapsed_ms": 524.615
+      },
+      "cached_execute": {
+        "selects": 3,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 3,
+        "checkouts": 1,
+        "checkout_elapsed_ms": 0.142,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": null,
+        "elapsed_ms": 4.942
+      },
+      "get": {
+        "selects": 32,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 32,
+        "checkouts": 4,
+        "checkout_elapsed_ms": 0.698,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": null,
+        "elapsed_ms": 107.301
+      }
+    },
+    {
+      "version": "before",
+      "candidate_count": 12,
+      "backend": "sqlite",
+      "fresh_execute": {
+        "selects": 408,
+        "writes": 131,
+        "transactions": 53,
+        "execute_calls": 592,
+        "checkouts": 110,
+        "checkout_elapsed_ms": 12.969,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": 11.068,
+        "elapsed_ms": 213.63
+      },
+      "cached_execute": {
+        "selects": 3,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 3,
+        "checkouts": 1,
+        "checkout_elapsed_ms": 0.099,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": null,
+        "elapsed_ms": 1.386
+      },
+      "get": {
+        "selects": 164,
+        "writes": 53,
+        "transactions": 14,
+        "execute_calls": 231,
+        "checkouts": 45,
+        "checkout_elapsed_ms": 5.546,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": null,
+        "elapsed_ms": 78.286
+      }
+    },
+    {
+      "version": "after",
+      "candidate_count": 12,
+      "backend": "sqlite",
+      "fresh_execute": {
+        "selects": 157,
+        "writes": 27,
+        "transactions": 25,
+        "execute_calls": 209,
+        "checkouts": 28,
+        "checkout_elapsed_ms": 5.796,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": 6.017,
+        "elapsed_ms": 148.002
+      },
+      "cached_execute": {
+        "selects": 3,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 3,
+        "checkouts": 1,
+        "checkout_elapsed_ms": 0.1,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": null,
+        "elapsed_ms": 2.46
+      },
+      "get": {
+        "selects": 32,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 32,
+        "checkouts": 4,
+        "checkout_elapsed_ms": 0.707,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": null,
+        "elapsed_ms": 27.323
+      }
+    },
+    {
+      "version": "before",
+      "candidate_count": 50,
+      "backend": "sqlite",
+      "fresh_execute": {
+        "selects": 1206,
+        "writes": 435,
+        "transactions": 129,
+        "execute_calls": 1770,
+        "checkouts": 338,
+        "checkout_elapsed_ms": 40.509,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": 10.737,
+        "elapsed_ms": 698.304
+      },
+      "cached_execute": {
+        "selects": 3,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 3,
+        "checkouts": 1,
+        "checkout_elapsed_ms": 0.087,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": null,
+        "elapsed_ms": 2.413
+      },
+      "get": {
+        "selects": 582,
+        "writes": 205,
+        "transactions": 52,
+        "execute_calls": 839,
+        "checkouts": 159,
+        "checkout_elapsed_ms": 14.785,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": null,
+        "elapsed_ms": 252.283
+      }
+    },
+    {
+      "version": "after",
+      "candidate_count": 50,
+      "backend": "sqlite",
+      "fresh_execute": {
+        "selects": 157,
+        "writes": 27,
+        "transactions": 25,
+        "execute_calls": 209,
+        "checkouts": 28,
+        "checkout_elapsed_ms": 3.943,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": 11.496,
+        "elapsed_ms": 280.759
+      },
+      "cached_execute": {
+        "selects": 3,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 3,
+        "checkouts": 1,
+        "checkout_elapsed_ms": 0.164,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": null,
+        "elapsed_ms": 4.697
+      },
+      "get": {
+        "selects": 32,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 32,
+        "checkouts": 4,
+        "checkout_elapsed_ms": 0.641,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": null,
+        "elapsed_ms": 56.409
+      }
+    },
+    {
+      "version": "before",
+      "candidate_count": 6,
+      "backend": "sqlite",
+      "fresh_execute": {
+        "selects": 282,
+        "writes": 83,
+        "transactions": 41,
+        "execute_calls": 406,
+        "checkouts": 74,
+        "checkout_elapsed_ms": 8.351,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": 11.694,
+        "elapsed_ms": 138.212
+      },
+      "cached_execute": {
+        "selects": 3,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 3,
+        "checkouts": 1,
+        "checkout_elapsed_ms": 0.09,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": null,
+        "elapsed_ms": 1.321
+      },
+      "get": {
+        "selects": 98,
+        "writes": 29,
+        "transactions": 8,
+        "execute_calls": 135,
+        "checkouts": 27,
+        "checkout_elapsed_ms": 2.696,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": null,
+        "elapsed_ms": 43.185
+      }
+    },
+    {
+      "version": "after",
+      "candidate_count": 6,
+      "backend": "sqlite",
+      "fresh_execute": {
+        "selects": 157,
+        "writes": 27,
+        "transactions": 25,
+        "execute_calls": 209,
+        "checkouts": 28,
+        "checkout_elapsed_ms": 3.28,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": 10.501,
+        "elapsed_ms": 84.607
+      },
+      "cached_execute": {
+        "selects": 3,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 3,
+        "checkouts": 1,
+        "checkout_elapsed_ms": 0.104,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": null,
+        "elapsed_ms": 2.393
+      },
+      "get": {
+        "selects": 32,
+        "writes": 0,
+        "transactions": 0,
+        "execute_calls": 32,
+        "checkouts": 4,
+        "checkout_elapsed_ms": 0.543,
+        "external_provider_calls": 0,
+        "pool_wait_ms": null,
+        "queue_wait_ms": null,
+        "elapsed_ms": 12.334
+      }
+    }
+  ]
+}

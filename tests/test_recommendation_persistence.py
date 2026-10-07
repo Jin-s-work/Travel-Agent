@@ -40,7 +40,7 @@ def test_withdrawal_during_scoring_cannot_activate_stale_facts(discovery,monkeyp
     assert run['result'] is None and run['data_status']=='stale'
     with discovery.app.state.db.connect() as con:
         row=con.execute('SELECT candidates_json,result_json FROM recommendation_runs WHERE id=?',(run['run_id'],)).fetchone()
-        assert tuple(row)==(None,None)
+        assert row['candidates_json'] is not None and row['result_json'] is None
 
 
 def test_parallel_identical_intent_produces_one_run(discovery):

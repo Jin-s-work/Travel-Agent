@@ -390,7 +390,7 @@ class GenerationManager:
             con.execute("UPDATE trip_index_generations SET state='retired',retired_at=? WHERE trip_id=? AND state IN ('staged','ready','active','failed')", (utcnow(), trip_id))
         return self.cleanup(trip_id)
 
-    def cleanup(self, trip_id=None):
+    def cleanup(self, trip_id=None, *, guard=None):
         """Claim reclaimable rows, delete outside SQL, then record completion.
 
         A generation in staged/ready state remains a resumable writer checkpoint.
@@ -398,6 +398,7 @@ class GenerationManager:
         """
         with self.db.connect() as con:
             con.execute('BEGIN IMMEDIATE')
+            if guard: guard(con=con)
             # Terminal jobs will never resume a staged/ready checkpoint. Keep
             # unfinished jobs' artifacts even after an arbitrary wall timeout.
             con.execute("UPDATE trip_index_generations SET state='failed' WHERE state IN ('staged','ready') "
@@ -425,6 +426,7 @@ class GenerationManager:
                 con.execute('UPDATE trip_index_generations SET state=? WHERE id=?', ('deleting', row['id']))
         deleted = []
         for row in rows:
+            if guard: guard()
             try:
                 self.client.delete_collection(name=row['collection_name'])
             except Exception as exc:
@@ -434,6 +436,8 @@ class GenerationManager:
                     # A storage/network failure is not evidence of deletion.
                     continue
             with self.db.connect() as con:
+                con.execute('BEGIN IMMEDIATE')
+                if guard: guard(con=con)
                 con.execute('UPDATE trip_index_generations SET state=?,retired_at=? WHERE id=? AND state=?', ('deleted', utcnow(), row['id'], 'deleting'))
             deleted.append(row['id'])
         return deleted

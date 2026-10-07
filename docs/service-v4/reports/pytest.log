@@ -1,0 +1,292 @@
+........................................................................ [  6%]
+...................sssssssssss.......................................... [ 13%]
+................................................FFFFFFF................. [ 20%]
+........................................................................ [ 27%]
+........................................................................ [ 34%]
+........................................................................ [ 40%]
+........................................................................ [ 47%]
+........................................sss............................. [ 54%]
+........................................................................ [ 61%]
+........................................................................ [ 68%]
+........................................................................ [ 75%]
+........................................................................ [ 81%]
+........................................................................ [ 88%]
+...................................................s.................... [ 95%]
+..............................................                           [100%]
+=================================== FAILURES ===================================
+___ test_two_users_two_trips_enforce_every_private_id_before_external_calls ____
+
+service = namespace(app=<fastapi.applications.FastAPI object at 0x116192350>, settings=Settings(mail_analysis_mode='auto', publi...=<function service.<locals>.generate at 0x1160d0d60>, lifetime=<starlette.testclient.TestClient object at 0x11606fdf0>)
+
+    def test_two_users_two_trips_enforce_every_private_id_before_external_calls(service):
+        a, b = service.login("A"), service.login("B")
+        a1, a2 = _trip(a.client), _trip(a.client, "Barcelona")
+        b1, b2 = _trip(b.client), _trip(b.client, "Barcelona")
+        assert {t["id"] for t in a.client.get("/api/v2/trips").json()["items"]} == {a1["id"], a2["id"]}
+        assert {t["id"] for t in b.client.get("/api/v2/trips").json()["items"]} == {b1["id"], b2["id"]}
+>       receipt = _upload(a.client, a1["id"])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_foundation_api.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_foundation_api.py:101: in _upload
+    _job(client, receipt)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x11619af10>
+receipt = {'id': 'job_4f83fc7197f04a76bdde494638b6fc22', 'actor_id': '5609ae95-b882-474f-a04b-3c875559848f', 'scope_kind': 'personal_trip', 'scope_id': 'trip_f871118c31624267b7e8149b5bacdabf', ...}
+
+    def _job(client, receipt):
+        deadline = time.monotonic() + 10
+        while True:
+            response = client.get("/api/v2/jobs/" + receipt["job_id"])
+            assert response.status_code == 200, response.text
+            value = response.json()
+            if value["state"] in {"succeeded", "partial", "failed", "cancelled"}:
+                return value
+>           assert time.monotonic() < deadline, value
+E           AssertionError: {'id': 'job_4f83fc7197f04a76bdde494638b6fc22', 'actor_id': '5609ae95-b882-474f-a04b-3c875559848f', 'scope_kind': 'personal_trip', 'scope_id': 'trip_f871118c31624267b7e8149b5bacdabf', ...}
+E           assert 165895.558144625 < 165877.303534583
+E            +  where 165895.558144625 = <built-in function monotonic>()
+E            +    where <built-in function monotonic> = time.monotonic
+
+tests/test_foundation_api.py:113: AssertionError
+__ test_upload_same_filename_is_opaque_and_duplicate_detection_is_trip_local ___
+
+service = namespace(app=<fastapi.applications.FastAPI object at 0x11648b110>, settings=Settings(mail_analysis_mode='auto', publi...=<function service.<locals>.generate at 0x1161e9940>, lifetime=<starlette.testclient.TestClient object at 0x1160dbf00>)
+
+    def test_upload_same_filename_is_opaque_and_duplicate_detection_is_trip_local(service):
+        actor = service.login("A")
+        first, second = _trip(actor.client), _trip(actor.client, "Other")
+>       r1 = _upload(actor.client, first["id"], name="same.txt", key="one")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_foundation_api.py:167: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_foundation_api.py:101: in _upload
+    _job(client, receipt)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x116595260>
+receipt = {'id': 'job_8eba5aa15aab4a8fb4c65a5b327e3391', 'actor_id': '32e08fd1-b80d-4d31-bd6b-f82269eae5e4', 'scope_kind': 'personal_trip', 'scope_id': 'trip_cf9e18d6157545e0b992a4081b51e435', ...}
+
+    def _job(client, receipt):
+        deadline = time.monotonic() + 10
+        while True:
+            response = client.get("/api/v2/jobs/" + receipt["job_id"])
+            assert response.status_code == 200, response.text
+            value = response.json()
+            if value["state"] in {"succeeded", "partial", "failed", "cancelled"}:
+                return value
+>           assert time.monotonic() < deadline, value
+E           AssertionError: {'id': 'job_8eba5aa15aab4a8fb4c65a5b327e3391', 'actor_id': '32e08fd1-b80d-4d31-bd6b-f82269eae5e4', 'scope_kind': 'personal_trip', 'scope_id': 'trip_cf9e18d6157545e0b992a4081b51e435', ...}
+E           assert 165910.778127416 < 165910.773119916
+E            +  where 165910.778127416 = <built-in function monotonic>()
+E            +    where <built-in function monotonic> = time.monotonic
+
+tests/test_foundation_api.py:113: AssertionError
+____ test_mixed_upload_errors_and_idempotency_have_no_extra_provider_calls _____
+
+service = namespace(app=<fastapi.applications.FastAPI object at 0x116be1950>, settings=Settings(mail_analysis_mode='auto', publi...=<function service.<locals>.generate at 0x1161e8860>, lifetime=<starlette.testclient.TestClient object at 0x116594d10>)
+
+    def test_mixed_upload_errors_and_idempotency_have_no_extra_provider_calls(service):
+        actor = service.login("A")
+        trip = _trip(actor.client)
+        files = [("files", ("safe.txt", b"Synthetic reservation", "text/plain")),
+                 ("files", ("bad.exe", b"bad", "application/octet-stream")),
+                 ("files", ("../../escape.txt", b"Synthetic reservation", "text/plain")),
+                 ("files", ("bad.txt", b"<script>fetch('/private')</script>", "text/plain")),
+                 ("files", ("badmime.txt", b"Synthetic reservation", "image/png"))]
+        path = f"/api/v2/trips/{trip['id']}/documents"
+        response = actor.client.post(path, files=files, headers={"Idempotency-Key": "fixture-mixed"})
+        assert response.status_code == 202, response.text
+        receipt = response.json()
+        assert len(receipt["accepted"]) == 1 and len(receipt["rejected"]) == 4
+>       assert _job(actor.client, receipt)["state"] == "partial"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_foundation_api.py:198: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x116cad8c0>
+receipt = {'id': 'job_6c55254ae8624b699be0604f84c6694a', 'actor_id': 'adf16b46-4242-4a18-903d-6cfc0df782fd', 'scope_kind': 'personal_trip', 'scope_id': 'trip_6ade2c2cf64642ce8eafb6780256b4a3', ...}
+
+    def _job(client, receipt):
+        deadline = time.monotonic() + 10
+        while True:
+            response = client.get("/api/v2/jobs/" + receipt["job_id"])
+            assert response.status_code == 200, response.text
+            value = response.json()
+            if value["state"] in {"succeeded", "partial", "failed", "cancelled"}:
+                return value
+>           assert time.monotonic() < deadline, value
+E           AssertionError: {'id': 'job_6c55254ae8624b699be0604f84c6694a', 'actor_id': 'adf16b46-4242-4a18-903d-6cfc0df782fd', 'scope_kind': 'personal_trip', 'scope_id': 'trip_6ade2c2cf64642ce8eafb6780256b4a3', ...}
+E           assert 165925.906634458 < 165925.891475541
+E            +  where 165925.906634458 = <built-in function monotonic>()
+E            +    where <built-in function monotonic> = time.monotonic
+
+tests/test_foundation_api.py:113: AssertionError
+_ test_day_query_contains_eight_source_bookings_plus_manual_even_with_page_limit _
+
+service = namespace(app=<fastapi.applications.FastAPI object at 0x116d27250>, settings=Settings(mail_analysis_mode='auto', publi...=<function service.<locals>.generate at 0x116d0e2a0>, lifetime=<starlette.testclient.TestClient object at 0x116cad370>)
+
+    def test_day_query_contains_eight_source_bookings_plus_manual_even_with_page_limit(service):
+        actor = service.login("A")
+        trip = _trip(actor.client)
+        service.state.parsed = [_fact(i) for i in range(8)]
+>       _upload(actor.client, trip["id"])
+
+tests/test_foundation_api.py:220: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_foundation_api.py:101: in _upload
+    _job(client, receipt)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x115838270>
+receipt = {'id': 'job_a10157d96d354098a29895627ab10fe1', 'actor_id': '595fb7a0-b2a8-4701-9310-f08f038ad85d', 'scope_kind': 'personal_trip', 'scope_id': 'trip_f5bfd93d365f462286ef0386edd11af9', ...}
+
+    def _job(client, receipt):
+        deadline = time.monotonic() + 10
+        while True:
+            response = client.get("/api/v2/jobs/" + receipt["job_id"])
+            assert response.status_code == 200, response.text
+            value = response.json()
+            if value["state"] in {"succeeded", "partial", "failed", "cancelled"}:
+                return value
+>           assert time.monotonic() < deadline, value
+E           AssertionError: {'id': 'job_a10157d96d354098a29895627ab10fe1', 'actor_id': '595fb7a0-b2a8-4701-9310-f08f038ad85d', 'scope_kind': 'personal_trip', 'scope_id': 'trip_f5bfd93d365f462286ef0386edd11af9', ...}
+E           assert 165941.044595541 < 165941.024690666
+E            +  where 165941.044595541 = <built-in function monotonic>()
+E            +    where <built-in function monotonic> = time.monotonic
+
+tests/test_foundation_api.py:113: AssertionError
+_ test_reprocess_failure_preserves_corrected_booking_and_active_generation[parse] _
+
+service = namespace(app=<fastapi.applications.FastAPI object at 0x119bdc910>, settings=Settings(mail_analysis_mode='auto', publi...=<function service.<locals>.generate at 0x117303420>, lifetime=<starlette.testclient.TestClient object at 0x11606caf0>)
+failure = 'parse'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1177c7540>
+
+    @pytest.mark.parametrize("failure", ["parse", "embed", "vector"])
+    def test_reprocess_failure_preserves_corrected_booking_and_active_generation(service, failure, monkeypatch):
+        actor = service.login("A")
+        trip = _trip(actor.client)
+>       receipt = _upload(actor.client, trip["id"])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_foundation_api.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_foundation_api.py:101: in _upload
+    _job(client, receipt)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x1178da690>
+receipt = {'id': 'job_9918e40bdebf444cb4b6243188de2935', 'actor_id': '2409943d-1e6a-4f81-b335-15c3a7583526', 'scope_kind': 'personal_trip', 'scope_id': 'trip_3e023a450c0743e4a47067f13427707b', ...}
+
+    def _job(client, receipt):
+        deadline = time.monotonic() + 10
+        while True:
+            response = client.get("/api/v2/jobs/" + receipt["job_id"])
+            assert response.status_code == 200, response.text
+            value = response.json()
+            if value["state"] in {"succeeded", "partial", "failed", "cancelled"}:
+                return value
+>           assert time.monotonic() < deadline, value
+E           AssertionError: {'id': 'job_9918e40bdebf444cb4b6243188de2935', 'actor_id': '2409943d-1e6a-4f81-b335-15c3a7583526', 'scope_kind': 'personal_trip', 'scope_id': 'trip_3e023a450c0743e4a47067f13427707b', ...}
+E           assert 165956.203712125 < 165956.183853083
+E            +  where 165956.203712125 = <built-in function monotonic>()
+E            +    where <built-in function monotonic> = time.monotonic
+
+tests/test_foundation_api.py:113: AssertionError
+_ test_reprocess_failure_preserves_corrected_booking_and_active_generation[embed] _
+
+service = namespace(app=<fastapi.applications.FastAPI object at 0x11afc8690>, settings=Settings(mail_analysis_mode='auto', publi...=<function service.<locals>.generate at 0x119c06ac0>, lifetime=<starlette.testclient.TestClient object at 0x1178d9480>)
+failure = 'embed'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x119be4bb0>
+
+    @pytest.mark.parametrize("failure", ["parse", "embed", "vector"])
+    def test_reprocess_failure_preserves_corrected_booking_and_active_generation(service, failure, monkeypatch):
+        actor = service.login("A")
+        trip = _trip(actor.client)
+>       receipt = _upload(actor.client, trip["id"])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_foundation_api.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_foundation_api.py:101: in _upload
+    _job(client, receipt)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x119b9ecf0>
+receipt = {'id': 'job_fbaf118e39cf4eb9978904ad18a1d6af', 'actor_id': '7e43bbf3-fc10-40ef-80d9-3bba7756b1a0', 'scope_kind': 'personal_trip', 'scope_id': 'trip_c14601a684b6491997503b0151a9fea6', ...}
+
+    def _job(client, receipt):
+        deadline = time.monotonic() + 10
+        while True:
+            response = client.get("/api/v2/jobs/" + receipt["job_id"])
+            assert response.status_code == 200, response.text
+            value = response.json()
+            if value["state"] in {"succeeded", "partial", "failed", "cancelled"}:
+                return value
+>           assert time.monotonic() < deadline, value
+E           AssertionError: {'id': 'job_fbaf118e39cf4eb9978904ad18a1d6af', 'actor_id': '7e43bbf3-fc10-40ef-80d9-3bba7756b1a0', 'scope_kind': 'personal_trip', 'scope_id': 'trip_c14601a684b6491997503b0151a9fea6', ...}
+E           assert 165971.370092125 < 165971.363931875
+E            +  where 165971.370092125 = <built-in function monotonic>()
+E            +    where <built-in function monotonic> = time.monotonic
+
+tests/test_foundation_api.py:113: AssertionError
+_ test_reprocess_failure_preserves_corrected_booking_and_active_generation[vector] _
+
+service = namespace(app=<fastapi.applications.FastAPI object at 0x11afc9310>, settings=Settings(mail_analysis_mode='auto', publi...=<function service.<locals>.generate at 0x11b134680>, lifetime=<starlette.testclient.TestClient object at 0x119b9e690>)
+failure = 'vector'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x11b28f8c0>
+
+    @pytest.mark.parametrize("failure", ["parse", "embed", "vector"])
+    def test_reprocess_failure_preserves_corrected_booking_and_active_generation(service, failure, monkeypatch):
+        actor = service.login("A")
+        trip = _trip(actor.client)
+>       receipt = _upload(actor.client, trip["id"])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_foundation_api.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_foundation_api.py:101: in _upload
+    _job(client, receipt)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x11b186580>
+receipt = {'id': 'job_c4a136d0c3ce49a496959247e02b5c67', 'actor_id': 'a25ff1c1-3eca-4e80-8318-011ca3b46ed9', 'scope_kind': 'personal_trip', 'scope_id': 'trip_bc9002b327b24dfeab76936e90814b8c', ...}
+
+    def _job(client, receipt):
+        deadline = time.monotonic() + 10
+        while True:
+            response = client.get("/api/v2/jobs/" + receipt["job_id"])
+            assert response.status_code == 200, response.text
+            value = response.json()
+            if value["state"] in {"succeeded", "partial", "failed", "cancelled"}:
+                return value
+>           assert time.monotonic() < deadline, value
+E           AssertionError: {'id': 'job_c4a136d0c3ce49a496959247e02b5c67', 'actor_id': 'a25ff1c1-3eca-4e80-8318-011ca3b46ed9', 'scope_kind': 'personal_trip', 'scope_id': 'trip_bc9002b327b24dfeab76936e90814b8c', ...}
+E           assert 165986.746086041 < 165986.730762
+E            +  where 165986.746086041 = <built-in function monotonic>()
+E            +    where <built-in function monotonic> = time.monotonic
+
+tests/test_foundation_api.py:113: AssertionError
+=============================== warnings summary ===============================
+.venv/lib/python3.13/site-packages/fastapi/testclient.py:1
+  /Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag/.venv/lib/python3.13/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+.venv/lib/python3.13/site-packages/authlib/integrations/httpx_client/assertion_client.py:5
+  /Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag/.venv/lib/python3.13/site-packages/authlib/integrations/httpx_client/assertion_client.py:5: AuthlibDeprecationWarning: The httpx module is deprecated; please use httpx2 instead.
+    from ._compat import httpx2
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_foundation_api.py::test_two_users_two_trips_enforce_every_private_id_before_external_calls
+FAILED tests/test_foundation_api.py::test_upload_same_filename_is_opaque_and_duplicate_detection_is_trip_local
+FAILED tests/test_foundation_api.py::test_mixed_upload_errors_and_idempotency_have_no_extra_provider_calls
+FAILED tests/test_foundation_api.py::test_day_query_contains_eight_source_bookings_plus_manual_even_with_page_limit
+FAILED tests/test_foundation_api.py::test_reprocess_failure_preserves_corrected_booking_and_active_generation[parse]
+FAILED tests/test_foundation_api.py::test_reprocess_failure_preserves_corrected_booking_and_active_generation[embed]
+FAILED tests/test_foundation_api.py::test_reprocess_failure_preserves_corrected_booking_and_active_generation[vector]
+7 failed, 1032 passed, 15 skipped, 2 warnings in 502.74s (0:08:22)

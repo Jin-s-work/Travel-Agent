@@ -50,7 +50,7 @@ def capture_run(con,owner,trip,run,snapshot,candidates,result):
     kinds=snapshot['conditions']['recommendation_types'];limit=snapshot['limit']
     unsupported=result.get('unsupported_constraints',[])
     summary={'city':snapshot['conditions']['city'],'types':kinds,'ranker_version':result['config_version'],
-        'language_requested':snapshot['review_language_filter']['required'],
+        'language_requested':('local_discovery' in kinds) if snapshot.get('recommendation_model_version')=='general_v3' else snapshot['review_language_filter']['required'],
         'language_unsupported':any('REVIEW' in x or 'LANGUAGE' in x or 'OBSERVATION' in x for x in unsupported),
         'target_per_section':limit,'shortage':any(len(result['sections'][k]['items'])<limit for k in kinds),
         'candidate_count':len(candidates),'selected_count':sum(len(result['sections'][k]['items']) for k in kinds),

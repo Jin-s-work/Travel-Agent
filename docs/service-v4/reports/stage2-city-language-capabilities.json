@@ -1,0 +1,2909 @@
+{
+  "scope": "normal API synthetic fixture; no live collection; all product gates OFF",
+  "response": {
+    "items": [
+      {
+        "city": "tokyo",
+        "language_profile": {
+          "city": "tokyo",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [
+            "ja"
+          ],
+          "source": "https://www.gotokyo.org/book/wp-content/uploads/2026/03/AO2_2603_tg_low_JP.pdf",
+          "checked_at": "2026-10-07",
+          "status": "available",
+          "reason_codes": []
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "osaka",
+        "language_profile": {
+          "city": "osaka",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "kyoto",
+        "language_profile": {
+          "city": "kyoto",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "fukuoka",
+        "language_profile": {
+          "city": "fukuoka",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "sapporo",
+        "language_profile": {
+          "city": "sapporo",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "nagoya",
+        "language_profile": {
+          "city": "nagoya",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "naha",
+        "language_profile": {
+          "city": "naha",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "hiroshima",
+        "language_profile": {
+          "city": "hiroshima",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "seoul",
+        "language_profile": {
+          "city": "seoul",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "OVERLAPPING_LANGUAGE_SETS"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "OVERLAPPING_LANGUAGE_SETS",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "busan",
+        "language_profile": {
+          "city": "busan",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "OVERLAPPING_LANGUAGE_SETS"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "OVERLAPPING_LANGUAGE_SETS",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "jeju",
+        "language_profile": {
+          "city": "jeju",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "OVERLAPPING_LANGUAGE_SETS"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "OVERLAPPING_LANGUAGE_SETS",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "beijing",
+        "language_profile": {
+          "city": "beijing",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "shanghai",
+        "language_profile": {
+          "city": "shanghai",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "guangzhou",
+        "language_profile": {
+          "city": "guangzhou",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "chengdu",
+        "language_profile": {
+          "city": "chengdu",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "hong-kong",
+        "language_profile": {
+          "city": "hong-kong",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "macau",
+        "language_profile": {
+          "city": "macau",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "taipei",
+        "language_profile": {
+          "city": "taipei",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "kaohsiung",
+        "language_profile": {
+          "city": "kaohsiung",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "singapore",
+        "language_profile": {
+          "city": "singapore",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "bangkok",
+        "language_profile": {
+          "city": "bangkok",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "chiang-mai",
+        "language_profile": {
+          "city": "chiang-mai",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "phuket",
+        "language_profile": {
+          "city": "phuket",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "hanoi",
+        "language_profile": {
+          "city": "hanoi",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "ho-chi-minh-city",
+        "language_profile": {
+          "city": "ho-chi-minh-city",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "da-nang",
+        "language_profile": {
+          "city": "da-nang",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "kuala-lumpur",
+        "language_profile": {
+          "city": "kuala-lumpur",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "george-town",
+        "language_profile": {
+          "city": "george-town",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "jakarta",
+        "language_profile": {
+          "city": "jakarta",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "denpasar",
+        "language_profile": {
+          "city": "denpasar",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "manila",
+        "language_profile": {
+          "city": "manila",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "cebu-city",
+        "language_profile": {
+          "city": "cebu-city",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "new-delhi",
+        "language_profile": {
+          "city": "new-delhi",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "mumbai",
+        "language_profile": {
+          "city": "mumbai",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "jaipur",
+        "language_profile": {
+          "city": "jaipur",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "kathmandu",
+        "language_profile": {
+          "city": "kathmandu",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "dubai",
+        "language_profile": {
+          "city": "dubai",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "abu-dhabi",
+        "language_profile": {
+          "city": "abu-dhabi",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "doha",
+        "language_profile": {
+          "city": "doha",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "istanbul",
+        "language_profile": {
+          "city": "istanbul",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "madrid",
+        "language_profile": {
+          "city": "madrid",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "barcelona",
+        "language_profile": {
+          "city": "barcelona",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [
+            "es",
+            "ca"
+          ],
+          "source": "https://www.barcelona.cat/internationalwelcome/sites/default/files/10-tips_EN.pdf",
+          "checked_at": "2026-10-07",
+          "status": "available",
+          "reason_codes": []
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "seville",
+        "language_profile": {
+          "city": "seville",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "valencia",
+        "language_profile": {
+          "city": "valencia",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "lisbon",
+        "language_profile": {
+          "city": "lisbon",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "porto",
+        "language_profile": {
+          "city": "porto",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "paris",
+        "language_profile": {
+          "city": "paris",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "nice",
+        "language_profile": {
+          "city": "nice",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "lyon",
+        "language_profile": {
+          "city": "lyon",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "london",
+        "language_profile": {
+          "city": "london",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "edinburgh",
+        "language_profile": {
+          "city": "edinburgh",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "dublin",
+        "language_profile": {
+          "city": "dublin",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "rome",
+        "language_profile": {
+          "city": "rome",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "milan",
+        "language_profile": {
+          "city": "milan",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "florence",
+        "language_profile": {
+          "city": "florence",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "venice",
+        "language_profile": {
+          "city": "venice",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "naples",
+        "language_profile": {
+          "city": "naples",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "berlin",
+        "language_profile": {
+          "city": "berlin",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "munich",
+        "language_profile": {
+          "city": "munich",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "frankfurt",
+        "language_profile": {
+          "city": "frankfurt",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "amsterdam",
+        "language_profile": {
+          "city": "amsterdam",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "brussels",
+        "language_profile": {
+          "city": "brussels",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "zurich",
+        "language_profile": {
+          "city": "zurich",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "geneva",
+        "language_profile": {
+          "city": "geneva",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "vienna",
+        "language_profile": {
+          "city": "vienna",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "prague",
+        "language_profile": {
+          "city": "prague",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "budapest",
+        "language_profile": {
+          "city": "budapest",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "warsaw",
+        "language_profile": {
+          "city": "warsaw",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "krakow",
+        "language_profile": {
+          "city": "krakow",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "copenhagen",
+        "language_profile": {
+          "city": "copenhagen",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "stockholm",
+        "language_profile": {
+          "city": "stockholm",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "oslo",
+        "language_profile": {
+          "city": "oslo",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "helsinki",
+        "language_profile": {
+          "city": "helsinki",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "reykjavik",
+        "language_profile": {
+          "city": "reykjavik",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "athens",
+        "language_profile": {
+          "city": "athens",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "dubrovnik",
+        "language_profile": {
+          "city": "dubrovnik",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "new-york",
+        "language_profile": {
+          "city": "new-york",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "los-angeles",
+        "language_profile": {
+          "city": "los-angeles",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "san-francisco",
+        "language_profile": {
+          "city": "san-francisco",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "las-vegas",
+        "language_profile": {
+          "city": "las-vegas",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "seattle",
+        "language_profile": {
+          "city": "seattle",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "chicago",
+        "language_profile": {
+          "city": "chicago",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "boston",
+        "language_profile": {
+          "city": "boston",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "miami",
+        "language_profile": {
+          "city": "miami",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "honolulu",
+        "language_profile": {
+          "city": "honolulu",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "vancouver",
+        "language_profile": {
+          "city": "vancouver",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "toronto",
+        "language_profile": {
+          "city": "toronto",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "montreal",
+        "language_profile": {
+          "city": "montreal",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "mexico-city",
+        "language_profile": {
+          "city": "mexico-city",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "cancun",
+        "language_profile": {
+          "city": "cancun",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "lima",
+        "language_profile": {
+          "city": "lima",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "buenos-aires",
+        "language_profile": {
+          "city": "buenos-aires",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "rio-de-janeiro",
+        "language_profile": {
+          "city": "rio-de-janeiro",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "sydney",
+        "language_profile": {
+          "city": "sydney",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "melbourne",
+        "language_profile": {
+          "city": "melbourne",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "brisbane",
+        "language_profile": {
+          "city": "brisbane",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "auckland",
+        "language_profile": {
+          "city": "auckland",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "cairo",
+        "language_profile": {
+          "city": "cairo",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "cape-town",
+        "language_profile": {
+          "city": "cape-town",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      },
+      {
+        "city": "marrakesh",
+        "language_profile": {
+          "city": "marrakesh",
+          "input_supported": true,
+          "version": "city-languages-v1",
+          "local_languages": [],
+          "source": null,
+          "checked_at": null,
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED"
+          ]
+        },
+        "observed_local": {
+          "status": "unavailable",
+          "reason_codes": [
+            "CITY_LANGUAGE_PROFILE_UNREVIEWED",
+            "REVIEW_PRODUCTION_DISABLED",
+            "SYNTHETIC_PROVIDER",
+            "PROVIDER_CONTRACT_UNVERIFIED",
+            "CLASSIFICATION_QUALITY_UNVERIFIED",
+            "NO_REVIEW_OBSERVATION"
+          ],
+          "valid_aggregate_count": 0
+        },
+        "quality_policy_version": "review-language-quality-v2",
+        "synthetic": true
+      }
+    ],
+    "profile_version": "city-languages-v1",
+    "population_inference_allowed": false,
+    "residency_inference_allowed": false
+  }
+}

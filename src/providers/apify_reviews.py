@@ -19,6 +19,7 @@ from .reviews import CollectionRequest, ProviderCapabilities, ProviderPage, Revi
 class ApifyReviewCollectionProvider(ReviewCollectionProvider):
     name = 'apify'
     adapter_version = 'apify-compass-v1'
+    source_pagination_observable = False  # Dataset offsets expose no Google source-page receipts.
     actor = 'compass~google-maps-reviews-scraper'
     API = 'https://api.apify.com/v2'
     FIELDS = 'reviewId,text,textTranslated,originalLanguage,translatedLanguage,publishedAtDate,scrapedAt,stars,reviewOrigin,placeId'
@@ -207,7 +208,8 @@ class ApifyReviewCollectionProvider(ReviewCollectionProvider):
             total=None
         exhausted=total is not None and offset+len(payload)>=total
         next_cursor=None if exhausted else f'offset:{offset+len(payload)}'
-        limitations=['SOURCE_PAGINATION_NOT_VISIBLE','NEWEST_TIME_BASIS_UNVERIFIED']
+        limitations=['SOURCE_PAGINATION_NOT_VISIBLE']
+        if self.capabilities.sort_basis=='unknown':limitations.append('NEWEST_TIME_BASIS_UNVERIFIED')
         if not self.contract_verified:
             limitations.append('ORIGINAL_FIELDS_UNVERIFIED')
         if total is None:

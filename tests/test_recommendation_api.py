@@ -65,7 +65,9 @@ def test_saved_snapshot_reloads_with_no_external_cost_even_when_budget_halted(di
     receipt=submit(discovery,trip)
     run=completed(discovery,trip,receipt)
     result=run['result']
-    assert set(result['sections'])=={'local_discovery','landmark'}
+    assert set(result['sections'])=={'local_discovery','landmark','reference'}
+    assert not result['sections']['local_discovery']['items']  # No synthetic language gate in this fixture.
+    assert result['sections']['landmark']['items']
     assert run['input_status']==run['data_status']=='current'
     assert run['conditions_snapshot']['party']['adults']==4
     assert result['external_discovery']['calls']==0
@@ -173,7 +175,7 @@ def test_changed_conditions_and_trip_versions_preserve_old_snapshot_as_stale(dis
 
 
 @pytest.mark.parametrize('change',['revoke','expire','disable'])
-def test_withdrawn_or_expired_sources_hide_saved_result_and_comparison(discovery,change):
+def test_withdrawn_or_expired_sources_withhold_affected_cards_and_preserve_snapshot(discovery,change):
     trip,stored=prepare(discovery)
     run=completed(discovery,trip,submit(discovery,trip))
     base=f"/api/v2/trips/{trip['id']}"
@@ -191,12 +193,16 @@ def test_withdrawn_or_expired_sources_hide_saved_result_and_comparison(discovery
         assert discovery.client.patch('/api/v2/admin/discovery-packs/'+stored['id'],json={
             'status':'disabled','evidence':'Synthetic evidence pack deactivated'}).status_code==200
     after=discovery.client.get(base+'/recommendations/'+run['run_id']).json()
-    assert after['result'] is None and after['data_status']=='stale' and 'SOURCE_DATA_CHANGED' in after['reason_codes']
+    assert after['result'] is not None and after['data_status']=='stale' and 'SOURCE_DATA_CHANGED' in after['reason_codes']
+    withheld=set(after['result']['withheld_place_ids'])
+    assert stored['places'][0]['place_id'] in withheld
+    assert not set(eligible_ids(after))&withheld
     compared=discovery.client.get(base+'/comparisons/'+comparison['comparison_id']).json()
-    assert compared['items']==[] and compared['data_status']=='stale'
+    assert not {p['place_id'] for p in compared['items']}&withheld and compared['data_status']=='stale'
+    if change!='disable':assert set(eligible_ids(run))-withheld<=set(eligible_ids(after))
     with discovery.app.state.db.connect() as con:
         row=con.execute('SELECT result_json,candidates_json FROM recommendation_runs WHERE id=?',(run['run_id'],)).fetchone()
-        assert row['result_json'] is None and row['candidates_json'] is None
+        assert row['result_json'] is not None and row['candidates_json'] is not None
 
 
 def test_cancellation_during_calculation_does_not_activate_late_result(discovery,monkeypatch):
@@ -248,3 +254,21 @@ def test_source_revoked_while_calculating_prevents_publication(discovery,monkeyp
     assert job['state']=='failed' and job['error_code']=='SOURCE_DATA_CHANGED',job
     response=discovery.client.get(f"/api/v2/trips/{trip['id']}/recommendations/{receipt.json()['run_id']}")
     assert response.json()['result'] is None
+
+
+def test_review_only_withdrawal_preserves_iconic_and_reference_results(discovery,monkeypatch):
+    trip,_=prepare(discovery)
+    run=completed(discovery,trip,submit(discovery,trip))
+    ids={p['place_id'] for p in run['result']['sections']['landmark']['items']}
+    original=discovery.app.state.reviews._evidence_on
+    def changed(con,place_ids):
+        rows=original(con,place_ids)
+        for row in rows.values():row['withdrawal_test_version']='review-only-change'
+        return rows
+    monkeypatch.setattr(discovery.app.state.reviews,'_evidence_on',changed)
+    output=discovery.client.get(f"/api/v2/trips/{trip['id']}/recommendations/{run['run_id']}").json()
+    assert output['data_status']=='stale'
+    assert {p['place_id'] for p in output['result']['sections']['landmark']['items']}==ids
+    assert output['result']['withheld_review_place_ids']
+    assert not output['result']['withheld_place_ids']
+    assert all(p['review_evidence']['counts'] is None for p in output['result']['sections']['landmark']['items'])

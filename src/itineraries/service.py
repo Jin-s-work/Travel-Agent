@@ -48,26 +48,30 @@ class Itineraries:
     def _data(self,con,actor,trip_id,snapshot,extra_ids=()):
         self._scope(con,actor,trip_id)
         ids={p['place_id'] for p in snapshot.get('selected',[])}|set(extra_ids)
-        rows=con.execute("SELECT c.*,p.name,p.address,p.city,p.identity_status FROM research_candidates c JOIN candidate_packs k ON k.id=c.pack_id JOIN place_identities p ON p.id=c.place_id WHERE p.deleted_at IS NULL AND c.status='approved' AND k.status='approved' AND p.identity_status='verified' AND p.city=? ORDER BY p.id,c.created_at",(snapshot['city'],)).fetchall()
-        excluded={r[0] for r in con.execute('SELECT place_id FROM discovery_exclusions WHERE trip_id=?',(trip_id,))}
+        values=self.discovery._catalog_on(con,trip_id,snapshot['city'],include_photos=False,place_ids=ids)
         candidates={}
-        for row in rows:
-            if row['place_id'] not in ids:continue
-            value=self.discovery._candidate(con,row)
-            value['excluded']=value['place_id'] in excluded
-            # These are server-approved structured coordinates, never client
-            # supplied provider IDs or parsed reservation location guesses.
-            value['coordinate_permitted']=bool(value['latitude'] is not None and value['longitude'] is not None and any(s.get('status')=='active' and s.get('display_permitted') and s.get('read_confirmed') for s in value['sources']))
+        for value in values:
+            # Display, identity and visit certainty remain independent. A public
+            # provider identifier is not an approved/editorial recommendation.
+            value['coordinate_permitted']=bool(value.get('latitude') is not None and value.get('longitude') is not None and any(source.get('status')=='active' and source.get('display_permitted') and source.get('read_confirmed') for source in value.get('sources',[])))
+            match=re.fullmatch(r'osm_(node|way|relation)_([1-9][0-9]*)',value['place_id'])
+            if match and value.get('source_kind')=='public_map' and value.get('provider')=='openstreetmap' and value['coordinate_permitted']:
+                url=f'https://www.openstreetmap.org/{match[1]}/{match[2]}'
+                if value.get('canonical_url')==url and any(source.get('url')==url and source.get('status')=='active' and source.get('display_permitted') and source.get('read_confirmed') for source in value.get('sources',[])):
+                    value['identity_basis']='provider_location'
             candidates[value['place_id']]=value
         bookings=[]
         from src.foundation.booking_times import booking_time_conflicts
         booking_overrides={}
         for override in con.execute('SELECT o.booking_id,o.field_path FROM booking_overrides o JOIN bookings b ON b.id=o.booking_id WHERE b.trip_id=? AND b.deleted_at IS NULL AND o.active=1',(trip_id,)):
             booking_overrides.setdefault(override['booking_id'],set()).add(override['field_path'])
+        events_by_booking={}
+        for event in con.execute('SELECT e.* FROM booking_events e JOIN bookings b ON b.id=e.booking_id WHERE b.trip_id=? AND b.deleted_at IS NULL ORDER BY e.id',(trip_id,)):
+            events_by_booking.setdefault(event['booking_id'],[]).append(dict(event))
         for row in con.execute('SELECT * FROM bookings WHERE trip_id=? AND deleted_at IS NULL ORDER BY id',(trip_id,)):
             value=json.loads(row['effective_json'])
             time_conflicts=booking_time_conflicts(json.loads(row['extracted_json']),value,booking_overrides.get(row['id'],set()))
-            events=[dict(r) for r in con.execute('SELECT * FROM booking_events WHERE booking_id=? ORDER BY id',(row['id'],))]
+            events=events_by_booking.get(row['id'],[])
             bookings.append({'booking_id':row['id'],'id':row['id'],'version':row['version'],
                 'kind':value.get('kind'),'status':value.get('status'),'name':value.get('provider') or value.get('kind') or '예약',
                 'date':value.get('date'),'date_end':value.get('date_end'),'events':events,'time_conflicts':time_conflicts})
@@ -135,8 +139,8 @@ class Itineraries:
             if leg.get('expires_at') and datetime.fromisoformat(leg['expires_at'].replace('Z','+00:00'))<=clock():
                 error('SOURCE_DATA_CHANGED','이동 근거가 만료되었습니다. 새 미리보기를 확인해 주세요.')
 
-    def submit(self,actor,trip_id,body,key):
-        body=Generation.model_validate(body).model_dump(mode='json');fingerprint=digest(body)
+    def submit(self,actor,trip_id,body,key,*,preview_only=False):
+        body=Generation.model_validate(body).model_dump(mode='json');fingerprint=digest({'mode':'preview' if preview_only else 'generate','input':body})
         existing=self.jobs.lookup(actor.id,actor.session_id,'personal_trip',trip_id,'itinerary_generate',key,fingerprint)
         if existing:
             with self.db.connect() as con:row=con.execute('SELECT id FROM itineraries WHERE job_id=?',(existing['id'],)).fetchone()
@@ -191,6 +195,8 @@ class Itineraries:
             stamp=utcnow()
             con.execute('INSERT INTO itineraries(id,trip_id,owner_id,job_id,trip_version,conditions_version,request_version,snapshot_json,input_data_json,input_manifest,created_by,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)',
                 (ident,trip_id,actor.id,job['id'],current['version'],body['conditions_version'],body['itinerary_request_version'],dump(snapshot),dump(data),digest(data),actor.id,stamp,stamp))
+            if preview_only:
+                con.execute('INSERT INTO itinerary_generation_drafts(itinerary_id,preview_id,created_at) VALUES(?,?,?)',(ident,new_id('generation_preview'),stamp))
         return self._receipt(ident,job)
 
     @staticmethod
@@ -202,6 +208,10 @@ class Itineraries:
         with self.db.connect() as con:row=dict(self._get(con,actor,trip_id,ident))
         ctx.guard()
         if row['active_revision_id']:return {'itinerary_id':ident,'revision_id':row['active_revision_id']}
+        with self.db.connect() as con:
+            draft=con.execute('SELECT * FROM itinerary_generation_drafts WHERE itinerary_id=?',(ident,)).fetchone()
+        if draft and draft['result_json']:
+            return {'itinerary_id':ident,'preview_id':draft['preview_id'],'validation_status':json.loads(draft['result_json'])['validation_status']}
         snapshot=json.loads(row['snapshot_json']);data=json.loads(row['input_data_json'])
         with self.db.connect() as con:self._data_guard(con,actor,trip_id,snapshot,data,row['input_manifest'])
         ctx.progress('fixed_booking_validation',done=0,total=len(data['bookings']))
@@ -215,10 +225,63 @@ class Itineraries:
             if (cv['version'] if cv else 0)!=row['conditions_version']:error('VERSION_CONFLICT','생성 중 방문 조건이 변경되었습니다. 현재 조건으로 다시 만들어 주세요.')
             self._data_guard(con,actor,trip_id,snapshot,data,row['input_manifest']);self._leg_guard(result)
             if current['active_revision_id']:return {'itinerary_id':ident,'revision_id':current['active_revision_id']}
-            rid=self._revision(con,current,actor,'generation',[],result,data,version=1)
+            if draft:
+                expires=(clock()+timedelta(minutes=10)).isoformat()
+                changed=con.execute('UPDATE itinerary_generation_drafts SET result_json=?,expires_at=? WHERE itinerary_id=? AND result_json IS NULL',(dump(result),expires,ident))
+                if changed.rowcount!=1:error('VERSION_CONFLICT','미리보기 상태가 변경되었습니다.')
+                rid=None
+            else:
+                rid=self._revision(con,current,actor,'generation',[],result,data,version=1)
         ctx.progress('itinerary_saved',done=len(result.get('items',[])),total=len(result.get('items',[])))
         state='partial' if result.get('unplaced') or result.get('conflicts') else 'succeeded'
-        return {'state':state,'result':{'itinerary_id':ident,'revision_id':rid,'validation_status':result['validation_status']}}
+        return {'state':state,'result':{'itinerary_id':ident,'revision_id':rid,'preview_id':draft['preview_id'] if draft else None,'validation_status':result['validation_status']}}
+
+    def generation_preview(self,actor,trip_id,ident):
+        with self.db.connect() as con:
+            row=self._get(con,actor,trip_id,ident)
+            draft=con.execute('SELECT * FROM itinerary_generation_drafts WHERE itinerary_id=?',(ident,)).fetchone()
+            if not draft:error('NOT_FOUND','일정 미리보기를 찾을 수 없습니다.',404)
+            result=json.loads(draft['result_json']) if draft['result_json'] else None
+            snapshot=json.loads(row['snapshot_json'])
+            data=self._data(con,actor,trip_id,snapshot)
+            trip=self._scope(con,actor,trip_id)
+            cv=con.execute('SELECT version FROM discovery_conditions WHERE trip_id=?',(trip_id,)).fetchone()
+            stale=(digest(data)!=row['input_manifest'] or trip['version']!=row['trip_version'] or (cv[0] if cv else 0)!=row['conditions_version'])
+            expired=bool(draft['expires_at'] and draft['expires_at']<=utcnow())
+            if result:
+                stale=stale or any(leg.get('expires_at') and leg['expires_at']<=utcnow() for leg in result.get('legs',[]))
+                if stale:result=self._safe_view(result,data)
+            return {'itinerary_id':ident,'preview_id':draft['preview_id'],'base_version':0,
+                'result':result,'snapshot':snapshot,'expires_at':draft['expires_at'],
+                'state':'pending' if result is None else 'expired' if expired else 'stale' if stale else 'ready',
+                'can_apply':bool(result and not stale and not expired and not draft['applied_revision_id'] and self._can_apply(result,snapshot)),
+                'applied_revision_id':draft['applied_revision_id'],'reservation_action':'none'}
+
+    def apply_generation(self,actor,trip_id,ident,body):
+        from .constraints import validate
+        with self.db.connect() as con:
+            con.execute('BEGIN IMMEDIATE')
+            row=self._get(con,actor,trip_id,ident)
+            draft=con.execute('SELECT * FROM itinerary_generation_drafts WHERE itinerary_id=? AND preview_id=?',(ident,body['preview_id'])).fetchone()
+            if not draft:error('NOT_FOUND','일정 미리보기를 찾을 수 없습니다.',404)
+            if draft['applied_revision_id']:
+                if row['active_revision_id']==draft['applied_revision_id']:return self._get_after_commit(actor,trip_id,ident,con)
+                error('VERSION_CONFLICT','적용 이후 일정이 변경되었습니다.')
+            self._version(row,body['expected_version'])
+            if not draft['result_json']:error('ITINERARY_NOT_READY','미리보기 계산이 끝난 뒤 적용해 주세요.')
+            if draft['expires_at']<=utcnow():error('PREVIEW_EXPIRED','미리보기가 만료되었습니다. 현재 조건으로 다시 확인해 주세요.')
+            trip=self._scope(con,actor,trip_id)
+            cv=con.execute('SELECT version FROM discovery_conditions WHERE trip_id=?',(trip_id,)).fetchone()
+            if trip['version']!=row['trip_version'] or (cv[0] if cv else 0)!=row['conditions_version']:
+                error('VERSION_CONFLICT','여행·예약 또는 방문 조건이 변경되었습니다. 새 미리보기를 확인해 주세요.')
+            snapshot=json.loads(row['snapshot_json']);old=json.loads(row['input_data_json'])
+            data=self._data_guard(con,actor,trip_id,snapshot,old,row['input_manifest'])
+            result=json.loads(draft['result_json']);self._leg_guard(result)
+            result.update(validate(result['items'],data['candidates'],snapshot,result['legs'],clock(),bookings=data['bookings']))
+            if not self._can_apply(result,snapshot):error('EDIT_CONFLICT','충돌이나 미확인을 먼저 확인해 주세요. 아직 일정은 적용되지 않았습니다.',details={'conflicts':result.get('conflicts',[]),'unresolved_conditions':result.get('unresolved_conditions',[])})
+            rid=self._revision(con,row,actor,'generation',[],result,data,version=1)
+            con.execute('UPDATE itinerary_generation_drafts SET applied_revision_id=? WHERE itinerary_id=?',(rid,ident))
+        return self.get(actor,trip_id,ident)
 
     def _revision(self,con,row,actor,kind,commands,result,data,version=None,undo_stack=None):
         version=version or row['version']+1;ident=new_id('revision');stamp=utcnow()
@@ -240,14 +303,24 @@ class Itineraries:
     def list(self,actor,trip_id,limit=20,cursor=0):
         with self.db.connect() as con:
             self._scope(con,actor,trip_id)
-            rows=con.execute('SELECT id,version,job_id,validation_status,active_revision_id,created_at,updated_at FROM itineraries WHERE trip_id=? ORDER BY created_at DESC,id DESC LIMIT ? OFFSET ?',(trip_id,limit+1,cursor)).fetchall()
+            rows=con.execute('SELECT id,version,job_id,validation_status,active_revision_id,created_at,updated_at FROM itineraries WHERE trip_id=? AND NOT EXISTS(SELECT 1 FROM itinerary_generation_drafts d WHERE d.itinerary_id=itineraries.id AND d.applied_revision_id IS NULL) ORDER BY created_at DESC,id DESC LIMIT ? OFFSET ?',(trip_id,limit+1,cursor)).fetchall()
         return {'items':[dict(r)|{'itinerary_id':r['id'],'state':self.jobs.get(r['job_id'],actor.id,actor.session_id)['state']} for r in rows[:limit]],'next_cursor':str(cursor+limit) if len(rows)>limit else None}
 
     @staticmethod
     def _safe_view(result,data):
         """Revoke stale source payloads without deleting the user's arrangement."""
-        value=deepcopy(result);valid={p['place_id']:p for p in data['candidates']}
+        value=deepcopy(result)
+        valid={p['place_id']:p for p in data['candidates'] if any(
+            source.get('status')=='active' and source.get('read_confirmed') and source.get('display_permitted')
+            for source in p.get('sources',[]))}
         bookings={b['booking_id']:b for b in data['bookings']}
+        unavailable_items={item['item_id'] for item in value.get('items',[]) if
+            (item.get('place_id') and item['place_id'] not in valid) or
+            (item.get('booking_id') and item['booking_id'] not in bookings)}
+        # Planned rests inherit the preceding place's coordinates. Revoke that
+        # copy too, while keeping the user's rest duration and arrangement.
+        unavailable_items.update(item['item_id'] for item in value.get('items',[])
+            if item.get('parent_item_id') in unavailable_items)
         for item in value.get('items',[]):
             item.pop('facts',None);item.pop('sources',None);item['source_refs']=[]
             if item.get('place_id') and item['place_id'] not in valid:
@@ -259,8 +332,15 @@ class Itineraries:
                 item['source_status']='changed' if booking else 'deleted'
                 if not booking:
                     for name in ('local_start','local_end','start_instant','end_instant','location','name'):item[name]=None
+            if item['item_id'] in unavailable_items and item.get('parent_item_id'):
+                item.pop('location',None)
         for leg in value.get('legs',[]):
             leg.update(basis='unknown',duration_minutes=None,distance_m=None,distance_meters=None,source_refs=[],verification_status='stale')
+            for side in ('from','to'):
+                if leg.get(side+'_item_id') in unavailable_items:
+                    endpoint=leg.get(side+'_endpoint') or {}
+                    leg[side+'_endpoint']={**{key:endpoint[key] for key in ('id','place_id','city','timezone') if key in endpoint},
+                        'coordinate_permitted':False,'unavailable':True}
         value['validation_status']='provisional' if not value.get('conflicts') else 'conflicted'
         value.setdefault('unresolved_conditions',[]).append({'code':'SOURCE_DATA_CHANGED','reason':'예약 또는 근거가 바뀌었습니다. 현재 예약과 새 미리보기를 확인해 주세요.'})
         return value

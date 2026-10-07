@@ -146,10 +146,11 @@ def test_pg_receipt_replay_survives_filesystem_loss(cloud):
         assert result=={'ok':1}
 
 
-def test_cloud_encrypted_backup_deletion_checkpoint_restore_and_import(cloud,tmp_path):
+@pytest.mark.parametrize('source_schema',[12,None],ids=['schema12','current'])
+def test_cloud_encrypted_backup_deletion_checkpoint_restore_and_import(cloud,tmp_path,source_schema):
     from src.storage.transfer import cloud_snapshot,import_sqlite,inspect_source
     from src.operations.backup import write_checkpoint,restore_archive
-    from src.foundation.db import Database
+    from src.foundation.db import Database,SCHEMA_VERSION
     from src.storage.objects import SupabaseObjects
     from src.foundation.repository import Repository,DomainError
     key=os.urandom(32);archive=tmp_path/'snapshot.enc';checkpoint=tmp_path/'latest.enc'
@@ -163,11 +164,19 @@ def test_cloud_encrypted_backup_deletion_checkpoint_restore_and_import(cloud,tmp
     result=restore_archive(archive,checkpoint,restored,key)
     assert result['state']=='restored_closed_for_validation'
     local=Database(restored/'database.sqlite3')
+    if source_schema==12:
+        # Recreate the immediately preceding production schema, not merely its
+        # version marker. Import must migrate a private clone and preserve source.
+        with local.connect() as con:
+            for table in ('review_run_dependencies','place_review_requests','place_external_links','review_provider_contracts','workspace_drafts','itinerary_generation_drafts','maintenance_status','storage_deletion_receipts'):
+                con.execute('DROP TABLE '+table)
+            con.execute('PRAGMA user_version=12')
     assert len(Repository(local).list_bookings(owner,keep['id']))==8
     with pytest.raises(DomainError):Repository(local).get_trip(owner,doomed['id'])
     before={p:p.read_bytes() for p in (restored/'documents').rglob('*') if p.is_file()}
     report,_=inspect_source(local.path,restored/'documents')
     assert report['owned_documents']==1
+    assert report['source_schema']==(source_schema or SCHEMA_VERSION)
     target_schema='travel_test_'+uuid4().hex
     target=PostgresDatabase(DSN,tmp_path/'import-cache',schema=target_schema)
     obj=__import__('src.storage.objects',fromlist=['SupabaseObjects']).SupabaseObjects(cloud.settings,target,transport=httpx.MockTransport(cloud.storage))
@@ -242,6 +251,42 @@ def test_upload_finishing_after_deletion_cannot_register_original(cloud):
             assert con.execute('SELECT count(*) FROM cloud_objects').fetchone()[0]==1
             con.execute("UPDATE cloud_objects SET created_at=now()-interval '2 days'")
         objects.reconcile();assert cloud.storage.objects=={}
+
+
+def test_import_upload_after_completed_cleanup_stays_closed(cloud,tmp_path):
+    from datetime import datetime,timedelta,timezone
+    import hashlib
+    from src.foundation.db import Database
+    from src.foundation.repository import Repository,DomainError,utcnow
+    from src.storage.transfer import import_sqlite
+    source=Database(tmp_path/'source.sqlite3');repo=Repository(source)
+    with source.connect() as con:
+        con.execute('INSERT INTO users(id,email,auth_provider,auth_subject,created_at,updated_at) VALUES(?,?,?,?,?,?)',
+                    ('source-owner','source@example.test','fixture','source',utcnow(),utcnow()))
+    trip=repo.create_trip('source-owner',{'title':'Synthetic import','start_date':'2026-11-01','end_date':'2026-11-04'})
+    docs=tmp_path/'source-documents';docs.mkdir();path=docs/'original.txt';path.write_bytes(b'synthetic original')
+    repo.create_document('source-owner',trip['id'],path.name,str(path),hashlib.sha256(path.read_bytes()).hexdigest())
+    app=cloud.create();objects=app.state.documents.objects;original=objects.request
+    def late(method,request_path,**kwargs):
+        if method=='POST':
+            now=datetime.now(timezone.utc)
+            with app.state.db.connect() as con:
+                con.execute('UPDATE cloud_import_objects SET created_at=?',((now-timedelta(days=2)).isoformat(),))
+            objects.reconcile(now=now)
+            objects.reconcile(now=now+timedelta(days=1,seconds=1))
+        return original(method,request_path,**kwargs)
+    objects.request=late
+    try:
+        with pytest.raises(DomainError) as error:import_sqlite(source.path,docs,app.state.db,objects,apply=True)
+        assert error.value.code=='STORAGE_UPLOAD_EXPIRED'
+        with app.state.db.connect() as con:
+            assert con.execute('SELECT count(*) FROM users').fetchone()[0]==0
+            assert con.execute('SELECT count(*) FROM source_documents').fetchone()[0]==0
+            assert con.execute('SELECT mode FROM operations_controls').fetchone()[0]=='maintenance'
+            row=con.execute('SELECT * FROM storage_deletion_receipts').fetchone()
+            assert row['completed_at'] is None and row['confirmations']==1
+        assert cloud.storage.objects=={} and path.read_bytes()==b'synthetic original'
+    finally:objects.close();source.close()
 
 
 def test_postgres_sigkill_recovers_receipt_and_checkpoint(cloud,tmp_path):

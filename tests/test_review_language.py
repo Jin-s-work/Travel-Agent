@@ -94,7 +94,7 @@ def test_unknown_korean_is_false_negative_and_languages_have_denominators():
 
 
 def test_general_text_even_perfect_never_enables_review_gate():
-    rows=[{'expected':language,'predicted':language} for language in ('ja','ko','es','ca','en') for _ in range(30)]
+    rows=[{'expected':language,'predicted':language} for language in ('ja','ko','es','ca','en') for _ in range(50)]
     result=evaluate_predictions(rows,local_languages=('es','ca'),domain='FLORES-200 general text')
     assert result['numerical_target_passed']
     assert not result['production_strict_gate_supported']

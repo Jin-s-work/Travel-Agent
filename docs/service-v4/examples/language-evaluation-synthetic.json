@@ -1,0 +1,83 @@
+{
+  "city": "tokyo",
+  "synthetic": true,
+  "domain": "general_corpus",
+  "category": "restaurant",
+  "provider_build": null,
+  "development": [],
+  "heldout": [
+    {
+      "text": "料理がとても美味しく、店員さんも親切に案内してくれました。",
+      "expected": "ja",
+      "place_id": "synthetic-only-ja-0",
+      "original_checked": false
+    },
+    {
+      "text": "静かな店内でゆっくり食事を楽しむことができました。",
+      "expected": "ja",
+      "place_id": "synthetic-only-ja-1",
+      "original_checked": false
+    },
+    {
+      "text": "昼食に注文した定食は量も十分で満足しました。",
+      "expected": "ja",
+      "place_id": "synthetic-only-ja-2",
+      "original_checked": false
+    },
+    {
+      "text": "予約した時間に到着して、待たずに席へ案内されました。",
+      "expected": "ja",
+      "place_id": "synthetic-only-ja-3",
+      "original_checked": false
+    },
+    {
+      "text": "음식이 맛있었고 직원도 친절하게 메뉴를 설명해 주었습니다.",
+      "expected": "ko",
+      "place_id": "synthetic-only-ko-0",
+      "original_checked": false
+    },
+    {
+      "text": "조용한 실내에서 식사를 편하게 즐길 수 있었습니다.",
+      "expected": "ko",
+      "place_id": "synthetic-only-ko-1",
+      "original_checked": false
+    },
+    {
+      "text": "점심에 주문한 음식은 양도 충분해서 만족스러웠습니다.",
+      "expected": "ko",
+      "place_id": "synthetic-only-ko-2",
+      "original_checked": false
+    },
+    {
+      "text": "예약한 시간에 도착해서 기다리지 않고 자리에 앉았습니다.",
+      "expected": "ko",
+      "place_id": "synthetic-only-ko-3",
+      "original_checked": false
+    },
+    {
+      "text": "La comida estaba deliciosa y el personal nos explicó el menú con paciencia.",
+      "expected": "es",
+      "place_id": "synthetic-only-es-0",
+      "original_checked": false
+    },
+    {
+      "text": "Pudimos disfrutar de una cena tranquila en el interior del restaurante.",
+      "expected": "es",
+      "place_id": "synthetic-only-es-1",
+      "original_checked": false
+    },
+    {
+      "text": "El plato que pedimos para almorzar tenía una cantidad suficiente.",
+      "expected": "es",
+      "place_id": "synthetic-only-es-2",
+      "original_checked": false
+    },
+    {
+      "text": "Llegamos a la hora de la reserva y nos sentamos sin esperar.",
+      "expected": "es",
+      "place_id": "synthetic-only-es-3",
+      "original_checked": false
+    }
+  ],
+  "note": "Entirely authored synthetic sentences, never actual restaurant reviews or observed language counts."
+}

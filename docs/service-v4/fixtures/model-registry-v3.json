@@ -1,0 +1,59 @@
+{
+  "version": "general_v3",
+  "learning_status": "insufficient_evidence",
+  "models": {
+    "local_observed_general_v3": {
+      "section": "local_discovery",
+      "ordering_kind": "rule",
+      "order": [
+        "local_lower:desc",
+        "korean_upper:asc",
+        "language_unknown:asc",
+        "canonical_place_id:asc"
+      ],
+      "required_features": [
+        "local_lower",
+        "korean_upper",
+        "language_unknown"
+      ],
+      "personalized": false
+    },
+    "iconic_general_v3": {
+      "section": "landmark",
+      "ordering_kind": "evidence_groups",
+      "order": [
+        "evidence_group",
+        "platform_cohort",
+        "rating_count:desc",
+        "rating:desc",
+        "canonical_place_id:asc"
+      ],
+      "required_features": [
+        "iconic_evidence"
+      ],
+      "personalized": false
+    },
+    "reference_general_v3": {
+      "section": "reference",
+      "ordering_kind": "rule",
+      "order": [
+        "nearby_profile_only:straight_distance:asc",
+        "canonical_place_id:asc"
+      ],
+      "required_features": [
+        "permitted_place_identity"
+      ],
+      "personalized": false
+    }
+  },
+  "features": {
+    "local_lower": "L/T; observed original-language window, not residency",
+    "korean_upper": "(K+U)/T; unknown-language bounds, not a confidence interval",
+    "language_unknown": "U/T; extraction-unknown records are separate",
+    "rating": "permitted platform rating within the same scale",
+    "rating_count": "platform total ratings, never a language denominator",
+    "iconic_evidence": "official_landmark/platform_popular/editorial_recognition",
+    "straight_distance": "Haversine distance from explicit origin; not walking duration",
+    "preference_match": "explicit requested tags only; absent input is unspecified"
+  }
+}

@@ -22,6 +22,7 @@ from src.reliability.dispatcher import JobContext
 from src.reliability.jobs import Jobs
 from src.reliability.providers import ProviderGateway
 from src.research.service import ReviewService, RIGHTS
+from tests.job_diagnostics import claim_required
 
 
 class SyntheticDetector:
@@ -133,8 +134,7 @@ class KillingContext(JobContext):
 
 
 def run_one(env, owner='recovery-worker'):
-    job = env.jobs.claim(owner)
-    assert job is not None
+    job = claim_required(env.jobs,owner)
     context = KillingContext(env, job, owner)
     result = env.review.execute(job, context)
     if env.fault == 'aggregate_activation':

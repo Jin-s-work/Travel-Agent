@@ -16,7 +16,7 @@ from uuid import uuid4
 import psycopg
 from psycopg import sql
 from src.foundation.db import Database, SCHEMA_VERSION
-from src.foundation.repository import utcnow
+from src.foundation.repository import DomainError, utcnow
 from src.operations.backup import create_archive, restore_archive, write_checkpoint, key_bytes, _sanitize_deleted
 from src.storage.objects import SupabaseObjects
 
@@ -38,7 +38,7 @@ def inspect_source(source, documents_root):
         con.row_factory=sqlite3.Row
         if con.execute('PRAGMA integrity_check').fetchone()[0]!='ok' or con.execute('PRAGMA foreign_key_check').fetchall():raise ValueError('Source integrity failed')
         version=con.execute('PRAGMA user_version').fetchone()[0]
-        if version not in (7,8,9,SCHEMA_VERSION):raise ValueError(f'Unsupported source schema; make a validated version 7, 8, 9 or {SCHEMA_VERSION} snapshot first')
+        if version not in (7,8,9,12,13,SCHEMA_VERSION):raise ValueError(f'Unsupported source schema; make a validated version 7, 8, 9, 12, 13 or {SCHEMA_VERSION} snapshot first')
         for row in con.execute('SELECT d.* FROM source_documents d JOIN trips t ON t.id=d.trip_id WHERE d.deleted_at IS NULL AND t.deleted_at IS NULL'):
             path=Path(row['opaque_path'])
             if not path.is_absolute() or not path.resolve().is_relative_to(root) or any(p.is_symlink() for p in [path,*path.parents]) or not path.is_file():raise ValueError('Missing or unsafe owned original')
@@ -74,12 +74,25 @@ def import_sqlite(source,documents_root,db,objects,*,apply=False):
                 con.execute('INSERT INTO cloud_import_objects(key,sha256,byte_size) VALUES(?,?,?)',(key,file['hash'],file['size']))
             objects.request('POST',objects.url(key),content=file['path'].read_bytes(),headers={'Content-Type':'application/octet-stream','x-upsert':'false'})
             uploads.append((key,file))
+            try:
+                with db.connect() as con:
+                    con.execute('BEGIN IMMEDIATE')
+                    objects.check_registration(con,key)
+            except DomainError:
+                objects.reject_late_upload(key,kind='import')
+                raise
             with local.connect() as con:con.execute('UPDATE source_documents SET opaque_path=? WHERE id=?',('supabase:'+key,file['id']))
         with local.connect() as source_con, db.connect() as target:
             target.execute('BEGIN IMMEDIATE')
             if target.execute('SELECT count(*) FROM users').fetchone()[0]:raise ValueError('Target changed during import')
+            # The same writer transaction excludes reconciliation between this
+            # final fence and publishing source_document/cloud_object references.
+            for key,_ in uploads:objects.check_registration(target,key)
             for table in ('review_controls','operations_identity','operations_controls'):target.execute('DELETE FROM '+table)
             for table in tables(source_con):
+                # These describe the target's own leases and object keys. Never
+                # overwrite its tombstones with metadata from the local source.
+                if table in {'maintenance_status','storage_deletion_receipts'}:continue
                 columns=[r[1] for r in source_con.execute('PRAGMA table_info('+table+')')]
                 statement='INSERT INTO '+table+'('+','.join(columns)+') VALUES('+','.join('?' for _ in columns)+')'
                 for row in source_con.execute('SELECT * FROM '+table):target.execute(statement,tuple(row))

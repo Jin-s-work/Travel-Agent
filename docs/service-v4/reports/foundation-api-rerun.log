@@ -1,0 +1,33 @@
+.......................................                                  [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.13/site-packages/fastapi/testclient.py:1
+  /Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag/.venv/lib/python3.13/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/test_foundation_api.py::test_two_users_two_trips_enforce_every_private_id_before_external_calls
+  /Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag/.venv/lib/python3.13/site-packages/authlib/integrations/httpx_client/assertion_client.py:5: AuthlibDeprecationWarning: The httpx module is deprecated; please use httpx2 instead.
+    from ._compat import httpx2
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 20 durations =============================
+1.14s call     tests/test_foundation_api.py::test_two_users_two_trips_enforce_every_private_id_before_external_calls
+0.63s call     tests/test_foundation_api.py::test_two_parallel_http_answers_keep_corrected_facts_and_source_ids_separate
+0.60s call     tests/test_foundation_api.py::test_upload_same_filename_is_opaque_and_duplicate_detection_is_trip_local
+0.55s call     tests/test_foundation_api.py::test_document_delete_reindexes_healthy_remaining_vectors_without_external_calls
+0.50s call     tests/test_foundation_api.py::test_reextract_preserves_override_exposes_conflict_and_booking_delete_is_independent
+0.48s call     tests/test_foundation_api.py::test_real_chroma_uses_only_active_document_generation_and_current_sql
+0.48s call     tests/test_foundation_api.py::test_day_query_contains_eight_source_bookings_plus_manual_even_with_page_limit
+0.41s call     tests/test_foundation_api.py::test_reindex_after_embedding_model_change_builds_new_model_instead_of_copying_old
+0.41s setup    tests/test_foundation_api.py::test_two_users_two_trips_enforce_every_private_id_before_external_calls
+0.38s call     tests/test_foundation_api.py::test_reprocess_failure_preserves_corrected_booking_and_active_generation[vector]
+0.30s call     tests/test_foundation_api.py::test_reprocess_failure_preserves_corrected_booking_and_active_generation[embed]
+0.28s call     tests/test_foundation_api.py::test_session_revoke_during_processing_preserves_old_activation
+0.28s call     tests/test_foundation_api.py::test_restart_keeps_trip_booking_correction_and_session
+0.27s call     tests/test_foundation_api.py::test_changed_facts_during_answer_do_not_release_stale_answer[correct]
+0.25s call     tests/test_foundation_api.py::test_reprocess_failure_preserves_corrected_booking_and_active_generation[parse]
+0.24s call     tests/test_foundation_api.py::test_changed_facts_during_answer_do_not_release_stale_answer[delete_trip]
+0.24s call     tests/test_foundation_api.py::test_changed_facts_during_answer_do_not_release_stale_answer[delete_booking]
+0.23s call     tests/test_foundation_api.py::test_anaphoric_followup_uses_latest_unique_booking_and_current_corrected_facts
+0.22s call     tests/test_foundation_api.py::test_date_qualified_policy_question_reads_sql_date_before_semantic_topk[2026-11-06 \ud22c\uc5b4 \ud658\ubd88 \uaddc\uc815 \uc54c\ub824\uc918]
+0.22s call     tests/test_foundation_api.py::test_save_failure_becomes_terminal_receipt_and_can_be_retried
+39 passed, 2 warnings in 13.00s

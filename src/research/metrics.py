@@ -22,6 +22,8 @@ def _result(decision: str, reasons: list[str], display_mode: str, metrics: dict 
     return {
         "decision": decision,
         "strict_pass": decision == "pass",
+        "quality_pass": decision in {"pass", "fail"},
+        "quality_reason_codes": [] if decision in {"pass", "fail"} else list(dict.fromkeys(reasons)),
         "reason_codes": list(dict.fromkeys(reasons)),
         "display_mode": display_mode,
         "metrics": metrics,

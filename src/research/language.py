@@ -148,6 +148,7 @@ def evaluate_predictions(rows, *, local_languages=('ja',), domain='unverified', 
     """
     rows=list(rows)
     local=set(local_languages)
+    if not local or 'ko' in local:raise ValueError('OVERLAPPING_OR_EMPTY_LANGUAGE_SETS')
     matrix=Counter((row['expected'],row.get('predicted') or 'unknown') for row in rows)
     labels=sorted({row['expected'] for row in rows}|{row.get('predicted') for row in rows if row.get('predicted')})
     per_language={}
@@ -162,7 +163,8 @@ def evaluate_predictions(rows, *, local_languages=('ja',), domain='unverified', 
     lfp=sum(row['expected'] not in local and row.get('predicted') in local for row in rows)
     korean=per_language.get('ko',{'tp':0,'fp':0,'fn':0,'support':0,'unknown':0,'precision':None,'recall':None})
     local_precision=ltp/(ltp+lfp) if ltp+lfp else None
-    support_sufficient=len(rows)>=100 and korean['support']>0 and ltp+lfp>0
+    local_truth=sum(row['expected'] in local for row in rows)
+    support_sufficient=len(rows)>=100 and korean['support']>=50 and local_truth>=50 and ltp+lfp>=50
     numerical_pass=bool(support_sufficient and local_precision>=.95 and korean['recall']>=.95)
     review_valid=domain=='independently_labeled_restaurant_reviews' and split=='heldout'
     return {'count':len(rows),'unknown_count':sum(not row.get('predicted') for row in rows),
@@ -170,7 +172,7 @@ def evaluate_predictions(rows, *, local_languages=('ja',), domain='unverified', 
         'local_languages':sorted(local),'local_precision':local_precision,'local_tp':ltp,'local_fp':lfp,
         'korean_precision':korean['precision'],'korean_recall':korean['recall'],
         'korean_tp':korean['tp'],'korean_fp':korean['fp'],'korean_fn':korean['fn'],
-        'korean_support':korean['support'],'support_sufficient':support_sufficient,
+        'korean_support':korean['support'],'local_truth':local_truth,'local_prediction_support':ltp+lfp,'quality_policy_version':'review-language-quality-v2','support_sufficient':support_sufficient,
         'per_language':per_language,'confusion_matrix':{a:{b:n for (x,b),n in sorted(matrix.items()) if x==a} for a in labels},
         'domain':domain,'split':split,'numerical_target_passed':numerical_pass,
         'production_strict_gate_supported':numerical_pass and review_valid,

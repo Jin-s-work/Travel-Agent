@@ -495,7 +495,7 @@ class Operations:
             with self.repo.db.connect() as con:
                 docs=con.execute('SELECT opaque_path FROM source_documents WHERE trip_id=? AND deleted_at IS NOT NULL',(job['trip_id'],)).fetchall()
             for doc in docs:
-                if doc['opaque_path'].startswith('supabase:'): self.documents.objects.remove(doc['opaque_path'][9:])
+                if doc['opaque_path'].startswith('supabase:'): self.documents.objects.remove(doc['opaque_path'][9:],guard=ctx.guard)
         with self.repo.db.connect() as con:
             con.execute('BEGIN IMMEDIATE'); self.jobs.guard(job['id'],job['fencing_token'],con=con)
             for doc in con.execute('SELECT id,opaque_path FROM source_documents WHERE trip_id=? AND deleted_at IS NOT NULL',(job['trip_id'],)).fetchall():
@@ -515,7 +515,7 @@ class Operations:
             with self.repo.db.connect() as con:
                 keys=con.execute("SELECT key FROM cloud_objects WHERE trip_id=? AND state!='deleted'",(trip,)).fetchall()
             for row in keys:
-                ctx.guard(); self.documents.objects.remove(row['key'])
+                ctx.guard(); self.documents.objects.remove(row['key'],guard=ctx.guard)
         # Cleanup is serialized after writers; late external returns cannot
         # regain their SQL fence or artifact write authorization.
         with self.repo.db.connect() as con:

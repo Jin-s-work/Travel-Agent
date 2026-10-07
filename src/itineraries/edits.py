@@ -3,7 +3,7 @@ from copy import deepcopy
 from datetime import timedelta
 from zoneinfo import ZoneInfo
 
-from .constraints import issue, validate
+from .constraints import issue, validate, identity_eligible
 from .intervals import local_iso, resolve_local, utc
 from .scheduler import _place_item, booking_items, rebuild_legs
 
@@ -35,7 +35,7 @@ def revalidate(current, snapshot, bookings, candidates, route_lookup, now):
         if not item.get('place_id'):
             continue
         candidate = catalog.get(item['place_id'])
-        permitted = candidate and candidate.get('pack_status') == 'approved' and candidate.get('identity_status') == 'verified' and any(
+        permitted = identity_eligible(candidate) and any(
             source.get('status') == 'active' and source.get('read_confirmed') and source.get('display_permitted') for source in candidate.get('sources', []))
         item['source_refs'] = []
         if not permitted:

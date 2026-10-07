@@ -353,7 +353,10 @@ def route_candidates(snapshot,candidates,now,limit):
     for candidate in candidates:
         kinds=set(candidate.get('recommendation_types',[]))&set(snapshot['conditions']['recommendation_types'])
         if not kinds:continue
-        output=_candidate(snapshot,candidate,sorted(kinds)[0],_stamp(now),config)
+        if snapshot.get('recommendation_model_version')=='general_v3':
+            from .general import candidate as evaluate_general
+            output=evaluate_general(snapshot,candidate,'reference',_stamp(now),config)
+        else:output=_candidate(snapshot,candidate,sorted(kinds)[0],_stamp(now),config)
         if any(check['state']=='failed' for check in output['visit_fit']['checks']):continue
         distance=straight_line_distance(snapshot['conditions'].get('origin') or {},candidate)
         if distance is not None:eligible.append((distance,candidate['place_id'],candidate))
@@ -648,6 +651,9 @@ def recommend(snapshot: Mapping[str, Any], candidates: list[dict], now=None, con
     limit = snapshot.get("limit", 6)
     if type(limit) is not int or not 1 <= limit <= 20:
         raise ValueError("Recommendation limit must be 1 to 20")
+    if snapshot.get('recommendation_model_version') == 'general_v3':
+        from .general import recommend as general_recommend
+        return general_recommend(snapshot, candidates, current, config)
     sections = {kind: {key: [] for key in ("items", "needs_confirmation", "insufficient_data", "excluded")} for kind in ("local_discovery", "landmark")}
     # Duplicate internal IDs are the same branch. Do not merge chain branches.
     unique = {}

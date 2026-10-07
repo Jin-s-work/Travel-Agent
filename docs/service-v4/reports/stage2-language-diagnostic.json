@@ -1,0 +1,104 @@
+{
+  "count": 12,
+  "unknown_count": 1,
+  "unknown_ratio": 0.08333333333333333,
+  "local_languages": [
+    "ja"
+  ],
+  "local_precision": 1.0,
+  "local_tp": 4,
+  "local_fp": 0,
+  "korean_precision": 1.0,
+  "korean_recall": 1.0,
+  "korean_tp": 4,
+  "korean_fp": 0,
+  "korean_fn": 0,
+  "korean_support": 4,
+  "local_truth": 4,
+  "local_prediction_support": 4,
+  "quality_policy_version": "review-language-quality-v2",
+  "support_sufficient": false,
+  "per_language": {
+    "es": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 1,
+      "support": 4,
+      "unknown": 1,
+      "precision": 1.0,
+      "recall": 0.75
+    },
+    "ja": {
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "support": 4,
+      "unknown": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "ko": {
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "support": 4,
+      "unknown": 0,
+      "precision": 1.0,
+      "recall": 1.0
+    }
+  },
+  "confusion_matrix": {
+    "es": {
+      "es": 3,
+      "unknown": 1
+    },
+    "ja": {
+      "ja": 4
+    },
+    "ko": {
+      "ko": 4
+    }
+  },
+  "domain": "general_corpus",
+  "split": "heldout",
+  "numerical_target_passed": false,
+  "production_strict_gate_supported": false,
+  "classification_quality": "CLASSIFICATION_QUALITY_UNVERIFIED",
+  "city": "tokyo",
+  "language_profile_version": "city-languages-v1",
+  "original_checks": 0,
+  "original_translation_errors": 0,
+  "duplicate_text_count": 0,
+  "shared_place_count": 0,
+  "heldout_disjoint": true,
+  "place_labels_complete": true,
+  "synthetic": true,
+  "model": {
+    "available": true,
+    "package_version": "2.2.0",
+    "detector_version": "lingua-2.2.0/review-language-rules-v1",
+    "license": "Apache-2.0",
+    "model_sha256": "51fbd102097b5ec99ef3d7d98c27d6b03adf75132e7901059a457caa1e7b7e07",
+    "model_bytes": 307235408,
+    "hash_scope": "installed native binary with bundled models",
+    "language_scope": "all 75 Lingua languages",
+    "network_required": false,
+    "confidence_semantics": "relative model score; not calibrated correctness or residence probability",
+    "rules": {
+      "min_letters": 8,
+      "min_latin_words": 4,
+      "min_confidence": 0.7,
+      "min_margin": 0.2,
+      "max_characters": 20000
+    }
+  },
+  "detector_version": "lingua-2.2.0/review-language-rules-v1",
+  "processing_milliseconds": 356.62,
+  "memory_peak_native_units": 133644288,
+  "memory_units": "bytes on macOS; KiB on Linux",
+  "provider_build": null,
+  "category": "restaurant",
+  "source_population_inference": false,
+  "review_distribution_merged": false,
+  "input_sha256": "19b21f71f9c61f8b82dc184b6f8ba355f300d18ddd94411c91edacc667cf2470"
+}

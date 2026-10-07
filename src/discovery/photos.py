@@ -28,6 +28,7 @@ LICENSE_URLS = {
 }
 PHOTO_KIND_ORDER = {'food': 0, 'interior': 1, 'exterior': 2, 'other': 3}
 MAX_PHOTOS = 3
+MAX_MANIFEST_BYTES = 1024 * 1024
 IMAGE_PATH = re.compile(r'^/wikipedia/commons/(?:thumb/)?[a-f0-9]/[a-f0-9]{2}/[^/]+(?:/[0-9]+px-[^/]+)?\.(?:jpe?g|png|webp)$', re.I)
 
 
@@ -98,12 +99,11 @@ def _photo(photo, clock):
 
 
 @lru_cache(maxsize=4)
-def _read_manifest(path, mtime_ns, size):
-    if size > 1024 * 1024:
-        return None
+def _read_manifest(content):
+    """Cache parsing of at most four already bounded byte snapshots."""
     try:
-        value = json.loads(Path(path).read_text(encoding='utf-8'))
-    except (OSError, UnicodeError, ValueError):
+        value = json.loads(content.decode('utf-8'))
+    except (UnicodeError, ValueError, RecursionError):
         return None
     if (not isinstance(value, dict) or not _plain(value.get('version'), 100)
             or not isinstance(value.get('places'), list) or len(value['places']) > 1000):
@@ -112,12 +112,17 @@ def _read_manifest(path, mtime_ns, size):
 
 
 def load_manifest():
-    """Re-read on deployment/local file replacement; absence disables photos only."""
+    """Read current permissions even when replacement preserves file metadata."""
     try:
-        stat = MANIFEST_PATH.stat()
-        return _read_manifest(str(MANIFEST_PATH), stat.st_mtime_ns, stat.st_size)
+        # Metadata can collide or be stale on mounted filesystems. Open/read on
+        # every access so replacement and access revocation cannot hit old rights.
+        with MANIFEST_PATH.open('rb') as source:
+            content = source.read(MAX_MANIFEST_BYTES + 1)
     except OSError:
         return None
+    if len(content) > MAX_MANIFEST_BYTES:
+        return None
+    return _read_manifest(content)
 
 
 def unavailable(reason):
@@ -171,21 +176,26 @@ def select_photos(manifest, identity, *, approved, clock=None):
             'available_count': len(result), 'reason_codes': reasons or ([] if result else ['PHOTO_NOT_REVIEWED'])}}
 
 
-def for_place(con, place_id, *, manifest=None, clock=None):
-    """Gate every read using current public identity, pack and source approvals."""
-    # OSM candidates never authorize photo reuse. Skip even the first SQL read.
-    if isinstance(place_id, str) and re.fullmatch(r'osm_(?:node|way|relation)_[1-9][0-9]*', place_id):
-        return unavailable('PHOTO_NOT_REVIEWED')
-    row = con.execute('SELECT * FROM place_identities WHERE id=? AND deleted_at IS NULL', (place_id,)).fetchone()
-    if not row:
-        return unavailable('PLACE_NOT_APPROVED')
-    identity = dict(row)
-    approved = identity['identity_status'] == 'verified' and identity['provider'] == 'manual_official' and bool(con.execute(
-        "SELECT 1 FROM research_candidates c JOIN candidate_packs k ON k.id=c.pack_id "
+def for_places(con, place_ids, *, manifest=None, clock=None):
+    """Current photo permission in two reads for a bounded set of identities."""
+    ids=sorted(set(place_ids)); result={ident:unavailable('PHOTO_NOT_REVIEWED') for ident in ids}
+    ids=[ident for ident in ids if not isinstance(ident,str) or not re.fullmatch(r'osm_(?:node|way|relation)_[1-9][0-9]*',ident)]
+    if not ids:return result
+    marks=','.join('?' for _ in ids)
+    rows={r['id']:dict(r) for r in con.execute(f'SELECT * FROM place_identities WHERE id IN ({marks}) AND deleted_at IS NULL',ids)}
+    approved={r['place_id'] for r in con.execute(
+        "SELECT DISTINCT c.place_id FROM research_candidates c JOIN candidate_packs k ON k.id=c.pack_id "
         "JOIN evidence_sources s ON s.place_id=c.place_id "
-        "WHERE c.place_id=? AND c.status='approved' AND k.status='approved' AND k.synthetic=0 "
+        f"WHERE c.place_id IN ({marks}) AND c.status='approved' AND k.status='approved' AND k.synthetic=0 "
         "AND s.status='active' AND s.read_confirmed=1 AND s.display_permitted=1 AND s.policy_version=k.version "
         "AND NOT EXISTS(SELECT 1 FROM discovery_tombstones t WHERE t.kind='pack' AND t.target_id=k.id) "
-        "AND NOT EXISTS(SELECT 1 FROM discovery_tombstones t WHERE t.kind='source' AND t.target_id=s.id) LIMIT 1",
-        (place_id,)).fetchone())
-    return select_photos(load_manifest() if manifest is None else manifest, identity, approved=approved, clock=clock)
+        "AND NOT EXISTS(SELECT 1 FROM discovery_tombstones t WHERE t.kind='source' AND t.target_id=s.id)",ids)}
+    metadata=load_manifest() if manifest is None else manifest
+    for ident in ids:
+        identity=rows.get(ident)
+        result[ident]=select_photos(metadata,identity,approved=ident in approved and identity['identity_status']=='verified' and identity['provider']=='manual_official',clock=clock) if identity else unavailable('PLACE_NOT_APPROVED')
+    return result
+
+
+def for_place(con, place_id, *, manifest=None, clock=None):
+    return for_places(con,[place_id],manifest=manifest,clock=clock)[place_id]

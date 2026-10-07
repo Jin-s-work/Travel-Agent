@@ -92,7 +92,7 @@ test('structured conflict codes are rendered as user explanations instead of raw
 });
 test('refresh restores an existing itinerary by GET without creating another job',async()=>{
   const methods=[],state={session:{authenticated:true},trip:{id:'t1'},epoch:1,tab:'trip',itineraries:{serial:0,runs:[],selected:new Map(),displayed:null}};
-  const context=load(['itineraryId','loadItineraries'],{state,itineraryPollTimer:null,clearTimeout,tripPath:()=>'/trips/t1',allPages:async()=>[{id:'i1',state:'succeeded'}],api:async(path,options)=>{methods.push(options?.method||'GET');return {id:'i1',version:1,active_revision_id:'rev1',state:'succeeded',data_status:'current',snapshot:{selected:[{place_id:'p1',duration_minutes:90,duration_origin:'user'}]},items:[]};},renderItinerary(){},itineraryCandidatePool:()=>new Map([['p1',{name:'저장한 장소'}]])});
+  const context=load(['itineraryId','loadItineraries'],{window:{},state,itineraryPollTimer:null,clearTimeout,tripPath:()=>'/trips/t1',allPages:async()=>[{id:'i1',state:'succeeded'}],api:async(path,options)=>{methods.push(options?.method||'GET');return {id:'i1',version:1,active_revision_id:'rev1',state:'succeeded',data_status:'current',snapshot:{selected:[{place_id:'p1',duration_minutes:90,duration_origin:'user'}]},items:[]};},renderItinerary(){},itineraryCandidatePool:()=>new Map([['p1',{name:'저장한 장소'}]])});
   await context.loadItineraries();assert.deepEqual(methods,['GET']);assert.equal(state.itineraries.displayed.id,'i1');assert.equal(state.itineraries.selected.get('p1').duration_minutes,90);assert.equal(state.itineraries.selected.get('p1').duration_origin,'user');
 });
 

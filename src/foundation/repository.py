@@ -237,6 +237,8 @@ class Repository:
             self._trip(con, user_id, trip_id)
             now = utcnow()
             self._tombstone(con, 'trip', trip_id, trip_id)
+            con.execute('DELETE FROM workspace_drafts WHERE trip_id=?',(trip_id,))
+            con.execute('DELETE FROM itinerary_generation_drafts WHERE itinerary_id IN (SELECT id FROM itineraries WHERE trip_id=?)',(trip_id,))
             con.execute('UPDATE trips SET deleted_at=?,updated_at=?,version=version+1 WHERE id=?', (now, now, trip_id))
             con.execute('UPDATE source_documents SET deleted_at=?,updated_at=? WHERE trip_id=? AND deleted_at IS NULL', (now, now, trip_id))
             con.execute('UPDATE bookings SET deleted_at=?,updated_at=?,version=version+1 WHERE trip_id=? AND deleted_at IS NULL', (now, now, trip_id))

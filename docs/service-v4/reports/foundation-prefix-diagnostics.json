@@ -1,0 +1,1102 @@
+[
+  {
+    "nodeid": "tests/test_accommodations_api.py::test_save_and_get_make_no_external_calls_and_disabled_resolve_is_honest",
+    "outcome": "passed",
+    "seconds": 0.0896
+  },
+  {
+    "nodeid": "tests/test_accommodations_api.py::test_two_users_two_trips_reject_cross_references",
+    "outcome": "passed",
+    "seconds": 0.1354
+  },
+  {
+    "nodeid": "tests/test_accommodations_api.py::test_candidates_are_never_auto_selected_and_selection_is_versioned",
+    "outcome": "passed",
+    "seconds": 0.134
+  },
+  {
+    "nodeid": "tests/test_accommodations_api.py::test_legacy_label_migration_is_idempotent_and_deleted_not_resurrected",
+    "outcome": "passed",
+    "seconds": 0.0487
+  },
+  {
+    "nodeid": "tests/test_accommodations_api.py::test_booking_suggestion_keeps_original_override_and_synthetic_never_live_queries",
+    "outcome": "passed",
+    "seconds": 0.0911
+  },
+  {
+    "nodeid": "tests/test_accommodations_api.py::test_changes_invalidate_origin_snapshot_without_moving_stay_dates",
+    "outcome": "passed",
+    "seconds": 0.1448
+  },
+  {
+    "nodeid": "tests/test_accommodations_api.py::test_input_validation_and_private_url_no_fetch",
+    "outcome": "passed",
+    "seconds": 0.0726
+  },
+  {
+    "nodeid": "tests/test_accommodations_api.py::test_deleted_stay_erases_private_provider_receipt_and_cannot_replay",
+    "outcome": "passed",
+    "seconds": 0.1152
+  },
+  {
+    "nodeid": "tests/test_accommodations_api.py::test_schema11_to12_migration_and_readonly_inventory_preserve_stops",
+    "outcome": "passed",
+    "seconds": 0.0115
+  },
+  {
+    "nodeid": "tests/test_accommodations_api.py::test_response_loss_is_unknown_and_does_not_call_again",
+    "outcome": "passed",
+    "seconds": 0.0952
+  },
+  {
+    "nodeid": "tests/test_accommodations_api.py::test_checkpoint_resume_and_activated_receipt_do_not_repeat_provider",
+    "outcome": "passed",
+    "seconds": 0.0792
+  },
+  {
+    "nodeid": "tests/test_accommodations_api.py::test_delete_while_provider_inflight_cannot_restore_location",
+    "outcome": "passed",
+    "seconds": 0.0675
+  },
+  {
+    "nodeid": "tests/test_accommodations_api.py::test_expired_worker_fence_cannot_activate_candidates",
+    "outcome": "passed",
+    "seconds": 0.0771
+  },
+  {
+    "nodeid": "tests/test_accommodations_api.py::test_restore_newer_stay_tombstone_erases_older_backup_label",
+    "outcome": "passed",
+    "seconds": 0.1066
+  },
+  {
+    "nodeid": "tests/test_accommodations_api.py::test_pending_resolution_binds_additional_idempotency_key",
+    "outcome": "passed",
+    "seconds": 0.0582
+  },
+  {
+    "nodeid": "tests/test_accommodations_origin.py::test_no_stay_and_unresolved_saved_label_are_distinct",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_accommodations_origin.py::test_zero_coordinate_is_valid_but_no_coordinate_invention",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_accommodations_origin.py::test_checkout_not_all_day_and_explicit_choice",
+    "outcome": "passed",
+    "seconds": 0.0002
+  },
+  {
+    "nodeid": "tests/test_accommodations_origin.py::test_switch_day_checks_time_or_requests_choice",
+    "outcome": "passed",
+    "seconds": 0.0002
+  },
+  {
+    "nodeid": "tests/test_accommodations_origin.py::test_overlap_gap_explicit_version_and_deletion",
+    "outcome": "passed",
+    "seconds": 0.0002
+  },
+  {
+    "nodeid": "tests/test_accommodations_origin.py::test_unknown_dates_and_dates_outside_trip_not_moved",
+    "outcome": "passed",
+    "seconds": 0.0002
+  },
+  {
+    "nodeid": "tests/test_accommodations_origin.py::test_city_timezones_are_preserved[tokyo-Asia/Tokyo]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_accommodations_origin.py::test_city_timezones_are_preserved[madrid-Europe/Madrid]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_accommodations_origin.py::test_city_timezones_are_preserved[new-york-America/New_York]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_accommodations_origin.py::test_city_timezones_are_preserved[sydney-Australia/Sydney]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_accommodations_origin.py::test_dst_ambiguous_visit_is_unknown",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_accommodations_origin.py::test_legacy_manual_coordinate_provenance_with_no_stop",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_accommodations_origin.py::test_versions_are_stable_and_change_on_context_change",
+    "outcome": "passed",
+    "seconds": 0.0002
+  },
+  {
+    "nodeid": "tests/test_accommodations_origin.py::test_expired_coordinates_and_none_do_not_fallback",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_health",
+    "outcome": "passed",
+    "seconds": 0.0038
+  },
+  {
+    "nodeid": "tests/test_api.py::test_upload_limit_leaves_room_for_real_emails",
+    "outcome": "passed",
+    "seconds": 0.0003
+  },
+  {
+    "nodeid": "tests/test_api.py::test_fast_path_routing[\\uccb4\\ud06c\\uc544\\uc6c3 \\uc2dc\\uac04 \\uc5b8\\uc81c\\uc57c?-True]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_fast_path_routing[\\ud22c\\uc5b4 \\ud658\\ubd88 \\uaddc\\uc815 \\uc54c\\ub824\\uc918-True]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_fast_path_routing[\\uadc0\\uad6d \\ud56d\\uacf5\\ud3b8 \\uc608\\uc57d\\ubc88\\ud638\\ub294?-True]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_fast_path_routing[\\ub458\\uc9f8 \\ub0a0 \\uc77c\\uc815 \\ubb50\\uc57c?-False]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_fast_path_routing[3\\uc77c\\ucc28 \\ud22c\\uc5b4 \\uba87 \\uc2dc\\uc57c?-False]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_fast_path_routing[\\ub3c4\\ucfc4 \\uc9c0\\uae08 \\ub0a0\\uc528 \\uc5b4\\ub54c?-False]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_fast_path_routing[\\ud638\\ud154 \\uadfc\\ucc98 \\ub9db\\uc9d1 \\ucd94\\ucc9c\\ud574\\uc918-False]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_fast_path_routing[\\uc548\\ub155 \\ubc18\\uac00\\uc6cc-False]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_referential_questions_go_to_agent[\\uadf8\\uac70 \\ud658\\ubd88 \\ub418\\ub098?]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_referential_questions_go_to_agent[\\uadf8 \\ud638\\ud154 \\uccb4\\ud06c\\uc544\\uc6c3 \\uba87 \\uc2dc\\uc57c?]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_referential_questions_go_to_agent[\\uc544\\uae4c \\ub9d0\\ud55c \\uc608\\uc57d \\ucde8\\uc18c\\ud558\\uba74 \\uc5bc\\ub9c8\\uc57c?]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_referential_questions_go_to_agent[\\uac70\\uae30 \\uba87 \\uc2dc\\uae4c\\uc9c0 \\uac00\\uc57c \\ud574?]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_referential_questions_go_to_agent[\\ubc29\\uae08 \\uadf8 \\ud22c\\uc5b4 \\uc9d1\\ud569 \\uc7a5\\uc18c \\uc5b4\\ub514\\uc57c?]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_strip_tool_mentions[search_bookings \\uacb0\\uacfc: \\uc608\\uc57d \\ub0b4\\uc5ed\\uc5d0\\uc11c \\ud655\\uc778\\ud560 \\uc218 \\uc5c6\\uc2b5\\ub2c8\\ub2e4.-\\uc608\\uc57d \\ub0b4\\uc5ed\\uc5d0\\uc11c \\ud655\\uc778\\ud560 \\uc218 \\uc5c6\\uc2b5\\ub2c8\\ub2e4.]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_strip_tool_mentions[[bookings_on_date] 2026-10-13 \\uc608\\uc57d 2\\uac74-2026-10-13 \\uc608\\uc57d 2\\uac74]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_strip_tool_mentions[web_search \\uacb0\\uacfc: search_bookings \\uacb0\\uacfc: \\uc5c6\\uc2b5\\ub2c8\\ub2e4.-\\uc5c6\\uc2b5\\ub2c8\\ub2e4.]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_strip_tool_mentions[resolve_trip_day: \\ub458\\uc9f8 \\ub0a0\\uc740 2026-10-13\\uc785\\ub2c8\\ub2e4.-\\ub458\\uc9f8 \\ub0a0\\uc740 2026-10-13\\uc785\\ub2c8\\ub2e4.]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_strip_tool_mentions[\\uccb4\\ud06c\\uc544\\uc6c3\\uc740 11:00\\uc785\\ub2c8\\ub2e4.\\n\\ucd9c\\ucc98: Hotel (\\uc608\\uc57d\\ubc88\\ud638 1)-\\uccb4\\ud06c\\uc544\\uc6c3\\uc740 11:00\\uc785\\ub2c8\\ub2e4.\\n\\ucd9c\\ucc98: Hotel (\\uc608\\uc57d\\ubc88\\ud638 1)]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_strip_tool_mentions[\\uc2dc\\uac01: 15:00 ~ 11:00-\\uc2dc\\uac01: 15:00 ~ 11:00]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_trim_after_refusal_drops_appended_advice",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_trim_after_refusal_keeps_web_search_results",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_trim_after_refusal_leaves_normal_answers",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_web_index_is_served",
+    "outcome": "passed",
+    "seconds": 0.0441
+  },
+  {
+    "nodeid": "tests/test_api.py::test_service_worker_served_from_root",
+    "outcome": "passed",
+    "seconds": 0.0024
+  },
+  {
+    "nodeid": "tests/test_api.py::test_manifest_served",
+    "outcome": "passed",
+    "seconds": 0.0021
+  },
+  {
+    "nodeid": "tests/test_api.py::test_policy_lines_extracts_refund_block",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_policy_lines_without_policy",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_to_booking_splits_time_range",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_to_booking_handles_single_time",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_retired_global_apis_require_authentication[GET-/api/bookings]",
+    "outcome": "passed",
+    "seconds": 0.0037
+  },
+  {
+    "nodeid": "tests/test_api.py::test_retired_global_apis_require_authentication[POST-/api/ask]",
+    "outcome": "passed",
+    "seconds": 0.0037
+  },
+  {
+    "nodeid": "tests/test_api.py::test_retired_global_apis_require_authentication[POST-/api/ask/stream]",
+    "outcome": "passed",
+    "seconds": 0.0033
+  },
+  {
+    "nodeid": "tests/test_api.py::test_retired_global_apis_require_authentication[POST-/api/index]",
+    "outcome": "passed",
+    "seconds": 0.0035
+  },
+  {
+    "nodeid": "tests/test_api.py::test_retired_global_apis_require_authentication[GET-/api/index/status]",
+    "outcome": "passed",
+    "seconds": 0.003
+  },
+  {
+    "nodeid": "tests/test_api.py::test_retired_global_apis_require_authentication[DELETE-/api/index]",
+    "outcome": "passed",
+    "seconds": 0.0034
+  },
+  {
+    "nodeid": "tests/test_api.py::test_retired_global_apis_require_authentication[POST-/api/trip-start]",
+    "outcome": "passed",
+    "seconds": 0.0035
+  },
+  {
+    "nodeid": "tests/test_api.py::test_retired_global_apis_require_authentication[GET-/api/download/x]",
+    "outcome": "passed",
+    "seconds": 0.0038
+  },
+  {
+    "nodeid": "tests/test_api.py::test_no_shared_demo_seed_or_private_http_state",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_strict_question_contract[payload0]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_strict_question_contract[payload1]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_strict_question_contract[payload2]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_strict_question_contract[payload3]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_api.py::test_strict_question_contract[payload4]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_booking_time_conflicts.py::test_summary_time_correction_is_answered_and_blocks_itinerary_until_aligned",
+    "outcome": "passed",
+    "seconds": 0.1532
+  },
+  {
+    "nodeid": "tests/test_booking_time_conflicts.py::test_only_event_correction_is_not_answered_as_old_summary",
+    "outcome": "passed",
+    "seconds": 0.1446
+  },
+  {
+    "nodeid": "tests/test_booking_time_conflicts.py::test_changed_summary_date_remains_discoverable_with_conflict",
+    "outcome": "passed",
+    "seconds": 0.1741
+  },
+  {
+    "nodeid": "tests/test_booking_time_conflicts.py::test_roundtrip_end_correction_identifies_only_return_arrival",
+    "outcome": "passed",
+    "seconds": 0.0002
+  },
+  {
+    "nodeid": "tests/test_catalog_presentation.py::test_empty_catalog_is_not_reported_as_failed_user_conditions",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_catalog_presentation.py::test_missing_category_differs_from_known_condition_failure",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_catalog_presentation.py::test_unknown_candidates_remain_visible_without_becoming_qualified",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_catalog_presentation.py::test_different_sections_and_unknowns_do_not_double_count_same_branch",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_catalog_registration.py::test_registration_requires_review_then_is_idempotent_without_new_versions",
+    "outcome": "passed",
+    "seconds": 0.0531
+  },
+  {
+    "nodeid": "tests/test_catalog_registration.py::test_revoked_source_and_disabled_pack_cannot_be_reactivated",
+    "outcome": "passed",
+    "seconds": 0.0276
+  },
+  {
+    "nodeid": "tests/test_catalog_registration.py::test_import_tool_rejects_fake_duplicate_and_expired_input",
+    "outcome": "passed",
+    "seconds": 0.0037
+  },
+  {
+    "nodeid": "tests/test_catalog_registration.py::test_non_admin_existing_session_cannot_import",
+    "outcome": "passed",
+    "seconds": 0.016
+  },
+  {
+    "nodeid": "tests/test_catalog_registration.py::test_official_minimal_facts_produce_honest_confirmation_cards_without_paid_calls[tokyo-Asia/Tokyo]",
+    "outcome": "passed",
+    "seconds": 0.2133
+  },
+  {
+    "nodeid": "tests/test_catalog_registration.py::test_official_minimal_facts_produce_honest_confirmation_cards_without_paid_calls[barcelona-Europe/Madrid]",
+    "outcome": "passed",
+    "seconds": 0.2251
+  },
+  {
+    "nodeid": "tests/test_catalog_registration.py::test_official_minimal_facts_produce_honest_confirmation_cards_without_paid_calls[madrid-Europe/Madrid]",
+    "outcome": "passed",
+    "seconds": 0.2182
+  },
+  {
+    "nodeid": "tests/test_cloud_configuration.py::test_cloud_gate_requires_tls_session_pooler_and_zero_cost",
+    "outcome": "passed",
+    "seconds": 0.0047
+  },
+  {
+    "nodeid": "tests/test_cloud_configuration.py::test_mismatched_cloud_settings_never_create_local_database",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_destinations.py::test_registry_has_100_unambiguous_identities_and_iana_timezones",
+    "outcome": "passed",
+    "seconds": 0.0114
+  },
+  {
+    "nodeid": "tests/test_destinations.py::test_all_cities_accept_own_timezone_and_currency_without_converting_money",
+    "outcome": "passed",
+    "seconds": 0.0058
+  },
+  {
+    "nodeid": "tests/test_destinations.py::test_every_city_roundtrips_through_owned_trip_and_conditions",
+    "outcome": "passed",
+    "seconds": 3.3202
+  },
+  {
+    "nodeid": "tests/test_destinations.py::test_mail_examples_are_valid_synthetic_messages_and_zip_matches",
+    "outcome": "passed",
+    "seconds": 0.0185
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_unsafe_link_rejected[file:///etc/passwd]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_unsafe_link_rejected[gopher://example.org]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_unsafe_link_rejected[http://127.0.0.1/]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_unsafe_link_rejected[http://[::1]/]",
+    "outcome": "passed",
+    "seconds": 0.0002
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_unsafe_link_rejected[http://169.254.169.254/latest/meta-data]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_unsafe_link_rejected[http://10.0.0.1/]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_unsafe_link_rejected[https://user:password@example.org/]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_unsafe_link_rejected[http://localhost/]",
+    "outcome": "passed",
+    "seconds": 0.0002
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_unsafe_link_rejected[http://server.internal/]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_unsafe_link_rejected[http://[::ffff:127.0.0.1]/]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_unsafe_link_rejected[https://example.org:8443/]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_unsafe_link_rejected[https://example.org/\\r\\nx]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_reader_returns_inert_bytes_and_sends_no_credentials",
+    "outcome": "passed",
+    "seconds": 0.0002
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_any_private_dns_answer_blocks_entire_connection",
+    "outcome": "passed",
+    "seconds": 0.0002
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_connected_peer_cannot_change_to_private_or_other_public_ip",
+    "outcome": "passed",
+    "seconds": 0.0002
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_redirect_revalidates_dns_and_never_sends_to_private_target",
+    "outcome": "passed",
+    "seconds": 0.0002
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_response_limits_and_formats[response0-RESPONSE_TOO_LARGE]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_response_limits_and_formats[response1-RESPONSE_TOO_LARGE]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_response_limits_and_formats[response2-UNSUPPORTED_MIME]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_response_limits_and_formats[response3-UNSUPPORTED_MIME]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_response_limits_and_formats[response4-HTTP_UNAVAILABLE]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_response_limits_and_formats[response5-UNSUPPORTED_URL]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_redirect_loop_and_deadline",
+    "outcome": "passed",
+    "seconds": 0.0002
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_real_connector_pins_ip_and_keeps_tls_hostname",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_connectivity_fallback_uses_only_validated_dns_before_http",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_http_refusal_never_fails_over_to_another_ip[403]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_http_refusal_never_fails_over_to_another_ip[429]",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_http_refusal_never_fails_over_to_another_ip[504]",
+    "outcome": "passed",
+    "seconds": 0.0003
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_tls_validation_failure_is_not_bypassed_or_retried",
+    "outcome": "passed",
+    "seconds": 0.0002
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_retry_after_accepts_dates_and_rejects_untrusted_text",
+    "outcome": "passed",
+    "seconds": 0.0002
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_ipv4_remains_reachable_when_dns_lists_two_ipv6_answers_first",
+    "outcome": "passed",
+    "seconds": 0.0002
+  },
+  {
+    "nodeid": "tests/test_discovery_fetch.py::test_connect_failure_keeps_only_numeric_diagnostic_not_exception_text",
+    "outcome": "passed",
+    "seconds": 0.0001
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_conditions_reuse_trip_snapshot_version_and_preserve_on_conflict",
+    "outcome": "passed",
+    "seconds": 0.0932
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_unsupported_city_is_not_implicitly_rewritten_to_tokyo",
+    "outcome": "passed",
+    "seconds": 0.0314
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_bookmark_storage_resolution_reload_and_duplicate_preserves_note",
+    "outcome": "passed",
+    "seconds": 0.2726
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_ambiguous_same_chain_requires_selection_and_partial_match_not_auto_resolved",
+    "outcome": "passed",
+    "seconds": 0.259
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_unknown_url_preserves_note_and_spoofed_place_id_not_resolved",
+    "outcome": "passed",
+    "seconds": 0.2309
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_exclusions_are_private_per_trip_and_do_not_mutate_catalog",
+    "outcome": "passed",
+    "seconds": 0.2486
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_unreviewed_sources_cannot_be_published_and_source_revocation_hides_values",
+    "outcome": "passed",
+    "seconds": 0.2462
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_stale_facts_hide_value_and_conflicting_party_limits_both_retained",
+    "outcome": "passed",
+    "seconds": 0.1027
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_pack_disable_preserves_personal_bookmark_and_admin_scope",
+    "outcome": "passed",
+    "seconds": 0.2856
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_typed_facts_reject_invented_capacity_availability_and_money[price-value0]",
+    "outcome": "passed",
+    "seconds": 0.0191
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_typed_facts_reject_invented_capacity_availability_and_money[price-value1]",
+    "outcome": "passed",
+    "seconds": 0.0188
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_typed_facts_reject_invented_capacity_availability_and_money[max_party-20 seats]",
+    "outcome": "passed",
+    "seconds": 0.0181
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_typed_facts_reject_invented_capacity_availability_and_money[live_availability-value3]",
+    "outcome": "passed",
+    "seconds": 0.0189
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_typed_facts_reject_invented_capacity_availability_and_money[reservation_url-http://127.0.0.1/private]",
+    "outcome": "passed",
+    "seconds": 0.0165
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_typed_facts_reject_invented_capacity_availability_and_money[opening_hours-value5]",
+    "outcome": "passed",
+    "seconds": 0.0196
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_malformed_fact_structures_return_422_instead_of_internal_error[reservation_required-not sure]",
+    "outcome": "passed",
+    "seconds": 0.017
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_malformed_fact_structures_return_422_instead_of_internal_error[price-value1]",
+    "outcome": "passed",
+    "seconds": 0.0192
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_malformed_fact_structures_return_422_instead_of_internal_error[price-value2]",
+    "outcome": "passed",
+    "seconds": 0.0186
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_malformed_fact_structures_return_422_instead_of_internal_error[opening_hours-value3]",
+    "outcome": "passed",
+    "seconds": 0.0212
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_malformed_fact_structures_return_422_instead_of_internal_error[opening_hours-value4]",
+    "outcome": "passed",
+    "seconds": 0.0164
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_malformed_fact_structures_return_422_instead_of_internal_error[live_availability-value5]",
+    "outcome": "passed",
+    "seconds": 0.0188
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_malformed_fact_structures_return_422_instead_of_internal_error[live_availability-value6]",
+    "outcome": "passed",
+    "seconds": 0.0185
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_malformed_fact_structures_return_422_instead_of_internal_error[local_evidence-value7]",
+    "outcome": "passed",
+    "seconds": 0.021
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_malformed_fact_structures_return_422_instead_of_internal_error[iconic_evidence-value8]",
+    "outcome": "passed",
+    "seconds": 0.0206
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_malformed_fact_structures_return_422_instead_of_internal_error[local_evidence-value9]",
+    "outcome": "passed",
+    "seconds": 0.0159
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_malformed_fact_structures_return_422_instead_of_internal_error[rating-value10]",
+    "outcome": "passed",
+    "seconds": 0.0182
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_malformed_fact_structures_return_422_instead_of_internal_error[dietary-value11]",
+    "outcome": "passed",
+    "seconds": 0.0211
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_base_location_reused_without_invented_coordinates_and_city_choice_saved",
+    "outcome": "passed",
+    "seconds": 0.0631
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_source_recheck_allows_new_facts_only_after_recorded_read",
+    "outcome": "passed",
+    "seconds": 0.2131
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_whitespace_bookmark_rejected_without_creating_record",
+    "outcome": "passed",
+    "seconds": 0.0289
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_madrid_has_explicit_capability_and_preserves_private_bookmarks",
+    "outcome": "passed",
+    "seconds": 0.1674
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_stay_ranges_include_return_visits_and_error_points_to_date",
+    "outcome": "passed",
+    "seconds": 0.0624
+  },
+  {
+    "nodeid": "tests/test_discovery_foundation.py::test_saved_context_is_revalidated_after_city_stay_changes",
+    "outcome": "passed",
+    "seconds": 0.0679
+  },
+  {
+    "nodeid": "tests/test_discovery_intents.py::test_first_request_inherits_and_persists_without_condition_save[tokyo]",
+    "outcome": "passed",
+    "seconds": 0.1273
+  },
+  {
+    "nodeid": "tests/test_discovery_intents.py::test_first_request_inherits_and_persists_without_condition_save[barcelona]",
+    "outcome": "passed",
+    "seconds": 0.1355
+  },
+  {
+    "nodeid": "tests/test_discovery_intents.py::test_first_request_inherits_and_persists_without_condition_save[madrid]",
+    "outcome": "passed",
+    "seconds": 0.1396
+  },
+  {
+    "nodeid": "tests/test_discovery_intents.py::test_first_request_inherits_and_persists_without_condition_save[paris]",
+    "outcome": "passed",
+    "seconds": 0.2558
+  },
+  {
+    "nodeid": "tests/test_discovery_intents.py::test_party_and_dates_inherit_while_explicit_override_survives",
+    "outcome": "passed",
+    "seconds": 0.1541
+  },
+  {
+    "nodeid": "tests/test_discovery_intents.py::test_same_key_different_input_and_concurrent_versions",
+    "outcome": "passed",
+    "seconds": 0.1073
+  },
+  {
+    "nodeid": "tests/test_discovery_intents.py::test_mid_transaction_failure_rolls_back_conditions_and_job",
+    "outcome": "passed",
+    "seconds": 0.0524
+  },
+  {
+    "nodeid": "tests/test_discovery_intents.py::test_two_users_two_trips_cross_scope_and_delete",
+    "outcome": "passed",
+    "seconds": 0.1562
+  },
+  {
+    "nodeid": "tests/test_discovery_intents.py::test_non_contiguous_stop_identity_and_gap",
+    "outcome": "passed",
+    "seconds": 0.0493
+  },
+  {
+    "nodeid": "tests/test_discovery_intents.py::test_origin_coordinates_do_not_reactivate_after_date_change",
+    "outcome": "passed",
+    "seconds": 0.0553
+  },
+  {
+    "nodeid": "tests/test_discovery_intents.py::test_invalid_dates_rejected_without_job[0000-01-01]",
+    "outcome": "passed",
+    "seconds": 0.026
+  },
+  {
+    "nodeid": "tests/test_discovery_intents.py::test_invalid_dates_rejected_without_job[123456-01-01]",
+    "outcome": "passed",
+    "seconds": 0.0254
+  },
+  {
+    "nodeid": "tests/test_discovery_intents.py::test_invalid_dates_rejected_without_job[2026-02-29]",
+    "outcome": "passed",
+    "seconds": 0.0323
+  },
+  {
+    "nodeid": "tests/test_discovery_intents.py::test_invalid_dates_rejected_without_job[2026-13-10]",
+    "outcome": "passed",
+    "seconds": 0.1333
+  },
+  {
+    "nodeid": "tests/test_discovery_intents.py::test_invalid_override_and_null_are_not_silently_removed",
+    "outcome": "passed",
+    "seconds": 0.0551
+  },
+  {
+    "nodeid": "tests/test_discovery_intents.py::test_legacy_conditions_remain_explicit_and_old_snapshot_is_immutable",
+    "outcome": "passed",
+    "seconds": 0.1821
+  },
+  {
+    "nodeid": "tests/test_discovery_intents.py::test_existing_condition_version_zero_can_start_itinerary",
+    "outcome": "passed",
+    "seconds": 0.1091
+  },
+  {
+    "nodeid": "tests/test_discovery_intents.py::test_schema10_upgrade_and_readonly_inventory_preserve_data",
+    "outcome": "passed",
+    "seconds": 0.0534
+  },
+  {
+    "nodeid": "tests/test_discovery_intents.py::test_process_killed_inside_sql_transaction_does_not_publish",
+    "outcome": "passed",
+    "seconds": 0.1053
+  },
+  {
+    "nodeid": "tests/test_discovery_intents.py::test_two_different_intents_cannot_both_save_same_version",
+    "outcome": "passed",
+    "seconds": 0.0434
+  },
+  {
+    "nodeid": "tests/test_discovery_intents.py::test_reorder_keeps_ids_and_removed_selected_stop_needs_confirmation",
+    "outcome": "passed",
+    "seconds": 0.0848
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_two_users_two_trips_enforce_every_private_id_before_external_calls",
+    "outcome": "passed",
+    "seconds": 1.2646
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_upload_same_filename_is_opaque_and_duplicate_detection_is_trip_local",
+    "outcome": "passed",
+    "seconds": 0.5417
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_mixed_upload_errors_and_idempotency_have_no_extra_provider_calls",
+    "outcome": "passed",
+    "seconds": 0.2388
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_day_query_contains_eight_source_bookings_plus_manual_even_with_page_limit",
+    "outcome": "passed",
+    "seconds": 0.277
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_reprocess_failure_preserves_corrected_booking_and_active_generation[parse]",
+    "outcome": "passed",
+    "seconds": 0.3162
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_reprocess_failure_preserves_corrected_booking_and_active_generation[embed]",
+    "outcome": "passed",
+    "seconds": 0.3391
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_reprocess_failure_preserves_corrected_booking_and_active_generation[vector]",
+    "outcome": "passed",
+    "seconds": 0.3382
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_reextract_preserves_override_exposes_conflict_and_booking_delete_is_independent",
+    "outcome": "passed",
+    "seconds": 0.7789
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_origin_csrf_and_history_fail_before_external_work",
+    "outcome": "passed",
+    "seconds": 0.0988
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_revoked_session_during_answer_cannot_release_private_answer",
+    "outcome": "passed",
+    "seconds": 0.2551
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_changed_facts_during_answer_do_not_release_stale_answer[correct]",
+    "outcome": "passed",
+    "seconds": 0.2574
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_changed_facts_during_answer_do_not_release_stale_answer[delete_booking]",
+    "outcome": "passed",
+    "seconds": 0.2554
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_changed_facts_during_answer_do_not_release_stale_answer[delete_trip]",
+    "outcome": "passed",
+    "seconds": 0.2633
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_two_parallel_http_answers_keep_corrected_facts_and_source_ids_separate",
+    "outcome": "passed",
+    "seconds": 0.4931
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_invitation_requires_verified_target_and_can_expire_or_be_revoked",
+    "outcome": "passed",
+    "seconds": 0.0164
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_same_invitation_simultaneous_use_can_create_only_one_account",
+    "outcome": "passed",
+    "seconds": 0.0098
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_anaphoric_followup_uses_latest_unique_booking_and_current_corrected_facts",
+    "outcome": "passed",
+    "seconds": 0.2939
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_unresolved_or_ambiguous_followup_asks_without_vector_or_generator[history0]",
+    "outcome": "passed",
+    "seconds": 0.2444
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_unresolved_or_ambiguous_followup_asks_without_vector_or_generator[history1]",
+    "outcome": "passed",
+    "seconds": 0.273
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_unresolved_or_ambiguous_followup_asks_without_vector_or_generator[history2]",
+    "outcome": "passed",
+    "seconds": 0.2418
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_followup_same_provider_disambiguates_by_history_date_using_sql",
+    "outcome": "passed",
+    "seconds": 0.3532
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_date_qualified_policy_question_reads_sql_date_before_semantic_topk[2026-11-06 \\ud22c\\uc5b4 \\ud658\\ubd88 \\uaddc\\uc815 \\uc54c\\ub824\\uc918]",
+    "outcome": "passed",
+    "seconds": 0.5692
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_date_qualified_policy_question_reads_sql_date_before_semantic_topk[11\\uc6d4 6\\uc77c \\uc608\\uc57d \\ucde8\\uc18c \\uc218\\uc218\\ub8cc\\ub294?]",
+    "outcome": "passed",
+    "seconds": 0.2649
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_date_qualified_policy_question_reads_sql_date_before_semantic_topk[\\uccab\\ub0a0 \\uc608\\uc57d \\ud658\\ubd88 \\uc815\\ucc45]",
+    "outcome": "passed",
+    "seconds": 0.4124
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_date_qualified_policy_question_reads_sql_date_before_semantic_topk[2026\\ub144 11\\uc6d4 6\\uc77c \\uc608\\uc57d \\ud658\\ubd88 \\uc815\\ucc45]",
+    "outcome": "passed",
+    "seconds": 0.2981
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_date_qualified_missing_provider_does_not_substitute_other_booking",
+    "outcome": "passed",
+    "seconds": 0.2566
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_date_pronoun_policy_uses_history_date_without_turning_into_schedule_list",
+    "outcome": "passed",
+    "seconds": 0.2481
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_daily_roundtrip_answer_only_shows_requested_day_leg_preserving_detail",
+    "outcome": "passed",
+    "seconds": 0.229
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_cancelled_booking_and_date_only_event_are_explicit_in_daily_answer",
+    "outcome": "passed",
+    "seconds": 0.0637
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_restart_keeps_trip_booking_correction_and_session",
+    "outcome": "passed",
+    "seconds": 0.2929
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_unconfigured_production_private_routes_fail_closed",
+    "outcome": "passed",
+    "seconds": 0.0971
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_invalid_extraction_never_calls_embedding",
+    "outcome": "passed",
+    "seconds": 0.1331
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_save_failure_becomes_terminal_receipt_and_can_be_retried",
+    "outcome": "passed",
+    "seconds": 0.2566
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_ambiguous_extraction_is_review_not_success",
+    "outcome": "passed",
+    "seconds": 0.2025
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_expired_session_denies_reads_and_scrubs_identity",
+    "outcome": "passed",
+    "seconds": 0.0407
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_real_chroma_uses_only_active_document_generation_and_current_sql",
+    "outcome": "passed",
+    "seconds": 0.4419
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_session_revoke_during_processing_preserves_old_activation",
+    "outcome": "passed",
+    "seconds": 0.2223
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_document_delete_reindexes_healthy_remaining_vectors_without_external_calls",
+    "outcome": "passed",
+    "seconds": 0.3668
+  },
+  {
+    "nodeid": "tests/test_foundation_api.py::test_reindex_after_embedding_model_change_builds_new_model_instead_of_copying_old",
+    "outcome": "passed",
+    "seconds": 0.4116
+  }
+]

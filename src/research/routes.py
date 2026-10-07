@@ -45,6 +45,19 @@ class Collection(Input):
     max_elapsed_seconds:int=Field(default=300,ge=1,le=900)
     max_total_charge_usd:str=Field(default='0',pattern=r'^(?:[0-2](?:\.\d{1,6})?|3(?:\.0{1,6})?)$')
 class Quality(Input):
+    provider:Literal['apify','fake']|None=None
+    provider_build:str|None=None
+    adapter_version:str|None=None
+    category:Literal['restaurant','cafe']|None=None
+    policy_version:str|None=None
+    quality_policy_version:str|None=None
+    language_profile_version:str|None=None
+    duplicate_text_count:int|None=Field(default=None,ge=0)
+    shared_place_count:int|None=Field(default=None,ge=0)
+    memory_peak_bytes:int|None=Field(default=None,ge=0)
+    processing_milliseconds:int|None=Field(default=None,ge=0)
+    model_license:str|None=None
+    model_sha256:str|None=None
     city:Literal['tokyo','barcelona']
     detector_version:str=Field(min_length=1,max_length=200)
     domain:Literal['restaurant_reviews','general_corpus']
@@ -105,3 +118,89 @@ def cleanup(ident:str,request:Request,actor=Depends(require_actor)):
         from src.foundation.repository import DomainError
         raise DomainError('COLLECTION_STILL_RUNNING','수집 취소 또는 보관 기한 이후에 원격 삭제를 실행해 주세요.',409)
     return service.cleanup_remote(ident)
+
+class ExternalPreview(Input):
+    canonical_place_id:str=Field(min_length=1,max_length=100)
+    provider:Literal['apify','fake']
+    external_place_id:str=Field(min_length=5,max_length=256,pattern=r'^[A-Za-z0-9_:\-]+$')
+    name:str=Field(min_length=1,max_length=200)
+    address:str=Field(min_length=4,max_length=400)
+    source_url:str=Field(max_length=2000)
+    latitude:float|None=Field(default=None,ge=-90,le=90)
+    longitude:float|None=Field(default=None,ge=-180,le=180)
+    source_id:str=Field(min_length=1,max_length=100)
+    evidence:str=Field(min_length=20,max_length=2000)
+    expected_identity_version:int=Field(ge=1)
+    expires_at:str
+class ExternalDecision(Input):
+    expected_identity_version:int=Field(ge=1)
+    decision:Literal['approved','rejected']='approved'
+    confirm_name:bool=False
+    confirm_address:bool=False
+    confirm_coordinates:bool=False
+    confirm_branch:bool=False
+class ProviderContract(Input):
+    provider:Literal['apify','fake']
+    build:str=Field(min_length=1,max_length=100)
+    adapter_version:str=Field(min_length=1,max_length=100)
+    status:Literal['pending','approved']='pending'
+    checked_at:str
+    expires_at:str
+    report_sha256:str=Field(pattern=r'^[a-f0-9]{64}$')
+    documentation_urls:list[str]=Field(min_length=1,max_length=10)
+    schema_verified:bool=False
+    original_separation_verified:bool=False
+    original_language_verified:bool=False
+    language_meaning:str=Field(min_length=10,max_length=2000)
+    sort_basis:Literal['published_at','edited_at','unknown']='unknown'
+    source_pagination_visible:bool=False
+    continuity_verified:bool=False
+    internal_limits_verified:bool=False
+    pagination_scope:str=Field(min_length=10,max_length=2000)
+    rights_policy_id:str=Field(min_length=1,max_length=100)
+    sample_count:int=Field(ge=0,le=100000)
+    failure_types:list[str]=Field(default_factory=list,max_length=30)
+    reviewer_note:str=Field(min_length=20,max_length=2000)
+    synthetic:bool=False
+    pricing_checked_at:str
+    billing_unit:str=Field(min_length=3,max_length=200)
+    execution_cap_usd:str=Field(pattern=r'^(?:[0-2](?:\.\d{1,6})?|3(?:\.0{1,6})?)$')
+    additional_cost_scope:str=Field(min_length=10,max_length=2000)
+
+@router.get('/admin/review-external-links')
+def external_links(request:Request,canonical_place_id:str|None=None,actor=Depends(require_actor)):
+    return admin_service(request,actor).external_links(actor,canonical_place_id)
+@router.post('/admin/review-external-links/preview',status_code=201)
+def preview_link(body:ExternalPreview,request:Request,actor=Depends(require_actor)):
+    return admin_service(request,actor).preview_link(actor,body.model_dump())
+@router.post('/admin/review-external-links/{ident}/approve')
+def approve_link(ident:str,body:ExternalDecision,request:Request,actor=Depends(require_actor)):
+    return admin_service(request,actor).decide_link(actor,ident,body.model_dump())
+@router.post('/admin/review-external-links/{ident}/revoke')
+def revoke_link(ident:str,request:Request,actor=Depends(require_actor)):
+    return admin_service(request,actor).revoke_link(actor,ident)
+@router.get('/admin/review-provider-contracts')
+def contracts(request:Request,actor=Depends(require_actor)):
+    return admin_service(request,actor).provider_contracts(actor)
+@router.post('/admin/review-provider-contracts',status_code=201)
+def contract(body:ProviderContract,request:Request,actor=Depends(require_actor)):
+    return admin_service(request,actor).add_contract(actor,body.model_dump())
+@router.post('/admin/review-provider-contracts/{ident}/revoke')
+def revoke_contract(ident:str,request:Request,actor=Depends(require_actor)):
+    return admin_service(request,actor).revoke_contract(actor,ident)
+@router.get('/review-capabilities')
+def capabilities(request:Request,actor=Depends(require_actor)):
+    return request.app.state.reviews.capabilities()
+@router.post('/trips/{trip_id}/places/{place_id}/review-request',status_code=202)
+def review_request(trip_id:str,place_id:str,request:Request,actor=Depends(require_actor)):
+    return request.app.state.reviews.request_review(actor,trip_id,place_id,visibility=request.app.state.discovery._visible_place)
+@router.get('/admin/place-review-requests')
+def review_requests(request:Request,actor=Depends(require_actor)):
+    return admin_service(request,actor).review_requests(actor)
+
+@router.get('/admin/review-quality-evaluations')
+def qualities(request:Request,actor=Depends(require_actor)):
+    return admin_service(request,actor).quality_evaluations(actor)
+@router.post('/admin/review-collection-preview')
+def collection_preview(body:Collection,request:Request,actor=Depends(require_actor)):
+    return admin_service(request,actor).collection_preview(actor,body.model_dump())

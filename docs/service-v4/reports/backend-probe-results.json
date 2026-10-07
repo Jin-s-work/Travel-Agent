@@ -1,0 +1,68 @@
+[
+  {
+    "label": "catalog_6",
+    "checkouts": 24,
+    "statements": 120,
+    "SELECT": 70,
+    "BEGIN": 8,
+    "INSERT": 6,
+    "COMMIT": 8,
+    "UPDATE": 28
+  },
+  {
+    "label": "catalog_12",
+    "checkouts": 42,
+    "statements": 216,
+    "SELECT": 124,
+    "BEGIN": 14,
+    "INSERT": 12,
+    "COMMIT": 14,
+    "UPDATE": 52
+  },
+  {
+    "label": "job_execute_12",
+    "checkouts": 110,
+    "statements": 667,
+    "BEGIN": 53,
+    "SELECT": 408,
+    "COMMIT": 53,
+    "UPDATE": 119,
+    "INSERT": 34
+  },
+  {
+    "label": "saved_run_get_12",
+    "checkouts": 45,
+    "statements": 244,
+    "SELECT": 152,
+    "BEGIN": 14,
+    "INSERT": 12,
+    "COMMIT": 14,
+    "UPDATE": 52
+  },
+  {
+    "label": "unrelated_policy_invalidates_saved_run",
+    "before": "current",
+    "before_result": true,
+    "after": "stale",
+    "after_result": false,
+    "reason_codes": [
+      "SOURCE_DATA_CHANGED"
+    ]
+  },
+  {
+    "label": "follower_promoted_without_maintenance",
+    "acquisition_calls": 12,
+    "dispatcher_alive": true,
+    "review_maintenance_tasks": 0
+  },
+  {
+    "label": "orphan_sweep_does_not_advance_101_objects_sqlite_compatible_query",
+    "delete_calls": 200,
+    "unique_keys_deleted": 100,
+    "orphan_rows_remaining": 1
+  },
+  {
+    "label": "paid_provider_calls",
+    "calls": 0
+  }
+]

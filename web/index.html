@@ -11,13 +11,16 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="고잉">
 <link rel="preload" href="/fonts/PretendardVariable-v1.3.9.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/foundation.css?v=ff6f5bbc4e16">
+<link rel="stylesheet" href="/css/foundation.css?v=a126fd2ba73a">
 <link rel="stylesheet" href="/css/design-system.css?v=727c090b8664">
 <script src="/js/offline-store.js?v=f2e23f13122c" defer></script>
-<script src="/js/product.js?v=a8fe8457aace" defer></script>
+<script src="/js/product.js?v=0c4bb5414da3" defer></script>
 <script src="/js/travel-tools.js?v=babbf4751245" defer></script>
-<script src="/js/accommodations.js?v=06ed455836c2" defer></script>
-<script src="/js/foundation.js?v=14c198c0bd93" defer></script>
+<script src="/js/accommodations.js?v=05844caeb0b8" defer></script>
+<script src="/js/workspace.js?v=6ae42c65719a" defer></script>
+<script src="/js/discovery-experience.js?v=298a513027d3" defer></script>
+<script src="/js/review-lab.js?v=7222f7d6695e" defer></script>
+<script src="/js/foundation.js?v=24be4c062c63" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">본문으로 이동</a>
@@ -118,6 +121,8 @@
         <div id="discoveryMessage" class="form-note" role="status" hidden></div>
         <section id="recommendationWorkspace" class="recommendation-workspace" aria-labelledby="recommendationTitle">
           <div class="section-heading"><h2 id="recommendationTitle">이번 여행에서 가볼 곳</h2><button id="applyRecommendations" type="button" class="primary">장소 찾아보기</button></div>
+          <div id="discoveryModes" class="discovery-modes"></div>
+          <div class="discovery-support-row"><section id="discoveryCapability" class="discovery-capability" aria-live="polite"></section><button id="showReferencePlaces" type="button" class="text-button reference-entry" aria-pressed="false">주변 장소 참고하기 ↗</button></div>
           <section class="recommendation-filter-bar discovery-conditions" aria-labelledby="discoveryConditionsTitle">
             <div class="filter-summary-copy"><h3 id="discoveryConditionsTitle">나에게 맞는 조건</h3><p id="discoveryConditionBrief" class="hint"></p><p id="recommendationFilterSummary" class="hint">관점별 최대 6곳</p><div id="discoveryConditions"></div></div>
             <button id="editDiscoveryConditions" type="button" class="secondary filter-trigger" aria-haspopup="dialog">조건 변경</button>
@@ -173,8 +178,9 @@
         <div class="section-heading"><h2>이 여행의 장소</h2><button id="linkReviewPlace" type="button" class="text-button">공유받은 장소 추가</button></div>
         <div id="reviewEvidence" aria-live="polite"></div>
         <section id="reviewAdmin" class="review-admin" aria-labelledby="reviewAdminTitle" hidden>
-          <div class="section-heading"><h2 id="reviewAdminTitle">관리자 · 리뷰 조사</h2><div class="actions"><button id="createReviewPlace" type="button" class="secondary">지점 등록</button><button id="createReviewPolicy" type="button" class="secondary">이용 범위 기록</button></div></div>
+          <div class="section-heading"><h2 id="reviewAdminTitle">관리자 · 리뷰 조사</h2><div class="actions"><button id="createReviewPlace" type="button" class="secondary">별도 조사 지점 등록</button><button id="createReviewPolicy" type="button" class="secondary">이용 범위 기록</button></div></div>
           <div id="reviewControls" class="panel"></div>
+          <section id="reviewLab" class="review-lab" aria-label="리뷰 근거 출시 검증"></section>
           <div class="section-heading"><h3>등록한 지점</h3></div><div id="reviewPlaces"></div>
           <details class="panel review-details"><summary>이용 범위와 보관 기한</summary><div id="reviewPolicies"></div></details>
           <div class="section-heading"><h3>수집 작업</h3></div><div id="reviewRuns" aria-live="polite"></div>

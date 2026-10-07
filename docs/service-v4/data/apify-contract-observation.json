@@ -1,0 +1,40 @@
+{
+  "checked_date": "2026-10-07",
+  "actor": "compass/google-maps-reviews-scraper",
+  "metadata_url": "https://api.apify.com/v2/acts/compass~google-maps-reviews-scraper",
+  "observed_build": "0.0.528",
+  "build_id": "Thi4eHCCVpONALGyk",
+  "adapter_version": "apify-compass-v1",
+  "report_sha256": "fb803acfdbb4d695e564700eb97260566ceeb836163fc25168adc52555e8488a",
+  "status": "pending",
+  "runtime_approved": false,
+  "sort_basis": "unknown",
+  "continuity_verified": false,
+  "original_fields_sample_verified": false,
+  "collection": "not_run",
+  "quality": "not_run",
+  "usage_permission": "not_approved",
+  "account_balance": "not_checked",
+  "pricing_reference": {
+    "url": "https://apify.com/compass/google-maps-reviews-scraper/pricing",
+    "plan": "Free",
+    "currency": "USD",
+    "per_1000_records": "0.60",
+    "per_actor_start": "0.00005"
+  },
+  "pilot_request": {
+    "days": 180,
+    "stage_a": {
+      "places": 6,
+      "max_records_per_place": 100
+    },
+    "stage_b": {
+      "places": 10,
+      "max_records_per_place": 200
+    },
+    "pages": 20,
+    "attempts_per_page": 2,
+    "max_total_charge_usd": null,
+    "approval_required": true
+  }
+}

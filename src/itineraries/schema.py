@@ -29,6 +29,10 @@ CREATE INDEX itinerary_previews_expiry ON itinerary_previews(expires_at);
 
 
 def scrub_trip(con,trip_id):
+    # Restore/checkpoint sanitization also reaches this path, without going
+    # through the live Repository.delete_trip request.
+    con.execute('DELETE FROM workspace_drafts WHERE trip_id=?',(trip_id,))
+    con.execute('DELETE FROM itinerary_generation_drafts WHERE itinerary_id IN (SELECT id FROM itineraries WHERE trip_id=?)',(trip_id,))
     con.execute('DELETE FROM itinerary_previews WHERE trip_id=?',(trip_id,))
     con.execute("UPDATE itinerary_revisions SET command_json='[]',result_json='{}',input_data_json='{}' WHERE itinerary_id IN (SELECT id FROM itineraries WHERE trip_id=?)",(trip_id,))
     con.execute("UPDATE itineraries SET snapshot_json='{}',input_data_json=NULL,input_manifest=NULL,undo_stack_json='[]',validation_status='deleted' WHERE trip_id=?",(trip_id,))

@@ -725,3 +725,65 @@ button.primary,button.secondary { font-weight:500; }
 :root[data-text-size="large"] .mail-intro .dropzone { padding:20px 12px; }
 :root[data-text-size="large"] .mail-intro .dropzone input { font-size:var(--type-caption); }
 @media(forced-colors:active) { .mail-intro .dropzone,.mail-intro .dropzone input::file-selector-button { border-color:ButtonText; } }
+
+/* Small continuation cues use the existing type, color and card system. */
+.workspace-draft-status { display:flex; flex-wrap:wrap; align-items:center; gap:4px 12px; margin:0 0 12px; }
+.workspace-draft-status[hidden] { display:none; }
+.workspace-draft-status .hint { margin:0; }
+.home-next-actions { display:grid; gap:8px; }
+.home-next-actions .home-next-booking { margin:0; min-width:0; }
+.home-next-booking>span:first-child { display:grid; gap:4px; min-width:0; }
+.home-next-booking strong,.home-next-booking .hint { overflow-wrap:anywhere; }
+.booking-correction-preview { min-width:0; margin:16px 0; scroll-margin-block:20px; }
+.booking-correction-preview:empty { display:none; }
+.booking-correction-preview .source-card { overflow-wrap:anywhere; }
+.field>.discovery-check-group { margin:0; padding:0; border:0; }
+.field>.discovery-check-group .check { min-height:44px; }
+.itinerary-preview .actions { flex-wrap:wrap; }
+.itinerary-preview button { white-space:normal; }
+@media(max-width:600px) {
+  .quick-context { flex-wrap:wrap; }
+  .home-next-booking { align-items:flex-start; gap:12px; }
+  .home-next-booking>span:last-child { flex:none; }
+  .booking-correction-preview .source-card { padding:12px; }
+  .itinerary-preview .actions button { width:100%; }
+}
+:root[data-text-size="large"] .home-next-booking { align-items:flex-start; flex-direction:column; }
+:root[data-text-size="large"] .itinerary-preview .actions { flex-direction:column; align-items:stretch; }
+
+/* Evidence-led discovery: purpose before filters, and no mixed promise. */
+.discovery-modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:18px 0 12px}
+.discovery-mode{display:flex;min-height:88px;flex-direction:column;align-items:flex-start;text-align:left;gap:6px;padding:17px 18px;border:1px solid var(--border-default);border-radius:var(--radius-card);background:var(--fill-surface);color:var(--text-primary);transition:background-color 160ms ease-out,border-color 160ms ease-out,transform 140ms ease-out}
+.discovery-mode strong{font-size:calc(17px * var(--text-scale,1));line-height:1.45;word-break:keep-all;overflow-wrap:anywhere}
+.discovery-mode .hint{margin:0;line-height:1.5}
+.discovery-mode[aria-selected="true"]{background:var(--fill-brand-weak);border-color:var(--text-brand);box-shadow:inset 0 0 0 1px var(--text-brand)}
+.discovery-mode:active,.category-chip:active{transform:scale(.985)}
+.discovery-support-row{display:flex;align-items:flex-start;gap:16px;justify-content:space-between;margin:0 0 22px}
+.discovery-capability{min-width:0;flex:1;padding:3px 0;color:var(--text-secondary)}
+.discovery-capability strong{font-size:var(--type-label);color:var(--text-primary)}
+.discovery-capability p{margin:6px 0 0;line-height:1.6}
+.reference-entry{flex-shrink:0;white-space:normal;min-height:44px;text-align:left}
+.discovery-category-chips{display:flex;flex-wrap:wrap;gap:8px}
+.category-chip{min-height:44px;padding:9px 16px;border:1px solid var(--border-default);border-radius:var(--radius-pill);background:var(--fill-surface);color:var(--text-secondary);transition:background-color 140ms ease-out,transform 140ms ease-out}
+.category-chip[aria-pressed="true"]{background:var(--text-primary);color:var(--fill-surface);border-color:var(--text-primary)}
+.stage2-section{padding-top:6px}.stage2-section>h2{font-size:var(--type-title);margin:0 0 8px}
+.ordering-note{font-size:var(--type-caption);line-height:1.6;color:var(--text-tertiary);margin:0 0 18px}
+.recommendation-evidence-group{margin:0 0 22px}.recommendation-evidence-group>h3{margin:18px 0 7px;font-size:var(--type-body)}
+.iconic-group-label{grid-column:1/-1;margin:8px 0 0;color:var(--text-secondary);font-size:var(--type-label);font-weight:600}
+.review-card-evidence{padding:13px 0;border-top:1px solid var(--border-subtle);font-size:var(--type-label);line-height:1.65}
+.review-card-evidence p{margin:4px 0}.review-card-evidence .review-scope{font-size:var(--type-caption)}
+.evidence-label{font-size:var(--type-label);font-weight:600;color:var(--text-brand);margin:6px 0}
+.language-evidence p{line-height:1.7;overflow-wrap:anywhere}.language-evidence .hint{font-variant-numeric:tabular-nums}
+.review-lab{margin:20px 0}.review-lab-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.review-lab-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0}
+.review-lab-step{padding:14px;border:1px solid var(--border-default);border-radius:var(--radius-field);text-align:left;background:var(--fill-surface);color:var(--text-primary);min-width:0}
+.review-lab-step span{display:block;color:var(--text-tertiary);font-size:var(--type-caption);margin-top:5px}
+.review-lab-list{display:grid;gap:12px}.review-lab-list .panel{margin:0;overflow-wrap:anywhere}
+.review-verification-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0}
+.review-verification-grid>div{padding:14px;background:var(--fill-secondary);border-radius:var(--radius-field);min-width:0;overflow-wrap:anywhere}
+.review-lab-status{font-size:var(--type-caption);line-height:1.65;overflow-wrap:anywhere}
+.review-lab-callout{padding:16px;background:var(--fill-secondary);border-radius:var(--radius-field);line-height:1.65;margin:14px 0}
+@media(max-width:600px){.discovery-support-row{flex-direction:column;gap:4px}.discovery-mode{padding:13px 12px;min-height:95px}.discovery-mode .hint{font-size:var(--type-caption)}.review-lab-steps{grid-template-columns:1fr}.review-verification-grid{grid-template-columns:1fr}}
+@media(max-width:360px){.discovery-modes{gap:8px}.discovery-mode strong{font-size:calc(15px * var(--text-scale,1))}.category-chip{padding:9px 12px}}
+:root[data-text-size="large"] .discovery-modes,:root[data-text-size="large"] .review-lab-steps{grid-template-columns:1fr}
+@media(prefers-reduced-motion:reduce){.discovery-mode,.category-chip{transition:none}.discovery-mode:active,.category-chip:active{transform:none}}

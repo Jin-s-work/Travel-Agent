@@ -1,0 +1,49 @@
+{
+  "environment": "temporary Linux Docker test container; synthetic data only",
+  "note": "Post-failure readonly snapshot, not a capture of the instant claim returned None. Dispatcher heartbeat earlier than job creation is the observed anomaly. Production clock/lease checks were not relaxed.",
+  "rows": [
+    {
+      "now": "2026-10-07T06:00:07.040803+00:00",
+      "jobs": [
+        {
+          "state": "queued",
+          "error_code": null,
+          "available_at": "2026-10-07T05:55:24.071410+00:00",
+          "deadline_at": "2026-10-07T06:01:24.071413+00:00",
+          "created_at": "2026-10-07T05:55:24.071410+00:00",
+          "updated_at": "2026-10-07T05:55:24.071410+00:00",
+          "lease_expires_at": null,
+          "lease_owner": null
+        }
+      ],
+      "dispatcher": [
+        {
+          "name": "main",
+          "owner": "killed-review-worker",
+          "lease_expires_at": "2026-10-07T05:56:52.495842+00:00",
+          "heartbeat_at": "2026-10-07T05:55:22.495831+00:00"
+        }
+      ],
+      "controls": [
+        {
+          "mode": "normal",
+          "external_enabled": 1
+        }
+      ],
+      "sessions": [
+        {
+          "expires_at": "2026-10-08T05:55:24.056177+00:00",
+          "epoch": 0
+        }
+      ],
+      "users": [
+        {
+          "status": "active",
+          "role": "admin",
+          "session_epoch": 0
+        }
+      ],
+      "fixture": "test_sigkill_receipt_and_check3"
+    }
+  ]
+}

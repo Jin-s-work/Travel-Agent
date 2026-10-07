@@ -97,7 +97,16 @@ def test_official_minimal_facts_produce_honest_confirmation_cards_without_paid_c
     run=discovery.client.get(base+'/recommendations/'+receipt.json()['run_id']).json()
     summary=run['result']['summary']
     assert summary['catalog_count']==summary['displayable_count']==3
-    assert summary['qualified_count']==0 and summary['state']=='needs_confirmation'
+    # V3 keeps identity-only listings in the auxiliary reference section.
+    # The legacy Madrid pack alone includes one sourced iconic-evidence fact.
+    expected_iconic=1 if city=='madrid' else 0
+    assert summary['qualified_count']==0
+    assert summary['state']==('needs_confirmation' if expected_iconic else 'reference_only')
+    assert summary['confirmation_count']==expected_iconic
+    assert summary['reference_count']==3-expected_iconic
+    assert not run['result']['sections']['local_discovery']['needs_confirmation']
+    assert len(run['result']['sections']['landmark']['needs_confirmation'])==expected_iconic
+    assert len(run['result']['sections']['reference']['needs_confirmation'])==3
     for section in run['result']['sections'].values():
         assert section['items']==[]
         for item in section['needs_confirmation']:

@@ -37,12 +37,13 @@ def test_real_schema11_upgrade_keeps_owners_stops_booking_override_and_original_
         con.execute('INSERT INTO booking_overrides(id,booking_id,field_path,value_json,editor_id,revision,created_at) VALUES(?,?,?,?,?,?,?)',(override,booking,'provider',json.dumps('Synthetic user correction'),users[0],4,stamp))
         con.execute('INSERT INTO discovery_conditions VALUES(?,?,?,?,?,?,?)',(trips[0],users[0],3,7,dump({'id':trips[0],'version':7}),dump({'origin':{'label':'Old explicit point','latitude':0,'longitude':0},'party':{'adults':2}}),stamp))
         # Simulate precisely the deployed schema boundary, preserving all old rows.
+        for table in ('review_run_dependencies','place_review_requests','place_external_links','review_provider_contracts','workspace_drafts','itinerary_generation_drafts','maintenance_status','storage_deletion_receipts'):con.execute('DROP TABLE '+table)
         con.execute('DROP TABLE accommodation_resolutions');con.execute('DROP TABLE trip_accommodations')
         con.execute('UPDATE schema_version SET version=11')
         before=contents(con)
     schema=db.schema;db.close()
     upgraded=Database(path)
-    assert upgraded.schema==schema and upgraded.schema_version()==12
+    assert upgraded.schema==schema and upgraded.schema_version()==14
     with upgraded.connect() as con:
         assert contents(con)==before
         rows=[dict(row) for row in con.execute('SELECT * FROM trip_accommodations ORDER BY legacy_stop_id')]

@@ -11,6 +11,7 @@ from .auth import Actor, require_actor, digest
 from .repository import DomainError
 from .models import TripCreate, TripPatch, BookingCreate, BookingPatch
 from .search import SearchContext, answer
+from . import workspaces
 
 router = APIRouter(prefix='/api/v2')
 
@@ -142,6 +143,19 @@ def delete_trip(trip_id:str,request:Request,actor:Actor=Depends(require_actor)):
 @router.get('/trips/{trip_id}/bookings')
 def bookings(trip_id:str,request:Request,actor:Actor=Depends(require_actor),date_from:str|None=None,date_to:str|None=None,kind:str|None=None,status:str|None=None,cursor:str|None=None,limit:int=Query(50,ge=1,le=100)):
     return page(request.app.state.repo.list_bookings(actor.id,trip_id,date_from,date_to,kind,status),cursor,limit)
+
+@router.get('/trips/{trip_id}/workspace-draft')
+def workspace_draft(trip_id:str,request:Request,actor:Actor=Depends(require_actor)):
+    return workspaces.read(request,actor,trip_id)
+
+@router.put('/trips/{trip_id}/workspace-draft')
+def save_workspace_draft(trip_id:str,body:workspaces.Draft,request:Request,actor:Actor=Depends(require_actor)):
+    return workspaces.save(request,actor,trip_id,body)
+
+@router.delete('/trips/{trip_id}/workspace-draft',status_code=204)
+def clear_workspace_draft(trip_id:str,request:Request,actor:Actor=Depends(require_actor)):
+    workspaces.clear(request,actor,trip_id)
+    return Response(status_code=204)
 
 @router.post('/trips/{trip_id}/bookings',status_code=201)
 def create_booking(trip_id:str,body:BookingCreate,request:Request,actor:Actor=Depends(require_actor)):

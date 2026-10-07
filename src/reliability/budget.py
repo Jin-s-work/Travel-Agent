@@ -272,11 +272,12 @@ class Budget:
                 self._ledger(con,call_id,'estimate_exceeded',actual-row['estimated_cost_micros'],None,stamp)
             return dict(con.execute('SELECT * FROM usage_reservations WHERE call_id=?',(call_id,)).fetchone())
 
-    def release_unsent(self, call_id, *, reason_code='NOT_SENT', explicitly_unsent=False):
+    def release_unsent(self, call_id, *, reason_code='NOT_SENT', explicitly_unsent=False, guard=None):
         """A generic error is never evidence of no charge. Explicit transport proof only."""
         stamp = self._now().isoformat()
         with self.db.connect() as con:
             con.execute('BEGIN IMMEDIATE')
+            if guard: guard(con=con)
             row = con.execute('SELECT * FROM usage_reservations WHERE call_id=?',(call_id,)).fetchone()
             if not row or row['state'] == 'released':
                 return

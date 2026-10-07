@@ -1,0 +1,207 @@
+........................................................................ [  6%]
+...................sssssssssssss........................................ [ 13%]
+........................................................................ [ 19%]
+........................................................................ [ 26%]
+........................................................................ [ 32%]
+........................................................................ [ 39%]
+........................................................................ [ 45%]
+...................................F..EEEEE..............sss............ [ 52%]
+........................................................................ [ 59%]
+.................................................................FF..... [ 65%]
+.........F.............................................................. [ 72%]
+........................................................................ [ 78%]
+........................................................................ [ 85%]
+......................................F................................. [ 91%]
+.....................s.................................................. [ 98%]
+................                                                         [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_reservations_on_date_includes_everything_that_day[2026-10-12-expected0] _
+tests/test_pipeline.py:380: in seeded_store
+    indexer.index_emails(directory=directory, store=store, parse_cache=load_seed())
+src/indexer.py:62: in index_emails
+    parsed = parse_reservation(email["raw_text"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/parser.py:140: in parse_reservation
+    response = _chat_create(
+src/parser.py:118: in _chat_create
+    return client.chat.completions.create(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/openai/_utils/_utils.py:298: in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py:1296: in create
+    return self._post(
+/usr/local/lib/python3.13/site-packages/openai/_base_client.py:1360: in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/openai/_base_client.py:1133: in request
+    raise self._make_status_error_from_response(err.response) from None
+E   openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Incorrect API key provided: test-pla****lder. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}
+---------------------------- Captured stderr setup -----------------------------
+  파싱 중: ._01_korean_air_outbound.txt
+_ ERROR at setup of test_reservations_on_date_includes_everything_that_day[2026-10-13-expected1] _
+tests/test_pipeline.py:380: in seeded_store
+    indexer.index_emails(directory=directory, store=store, parse_cache=load_seed())
+src/indexer.py:62: in index_emails
+    parsed = parse_reservation(email["raw_text"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/parser.py:140: in parse_reservation
+    response = _chat_create(
+src/parser.py:118: in _chat_create
+    return client.chat.completions.create(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/openai/_utils/_utils.py:298: in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py:1296: in create
+    return self._post(
+/usr/local/lib/python3.13/site-packages/openai/_base_client.py:1360: in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/openai/_base_client.py:1133: in request
+    raise self._make_status_error_from_response(err.response) from None
+E   openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Incorrect API key provided: test-pla****lder. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}
+_ ERROR at setup of test_reservations_on_date_includes_everything_that_day[2026-10-14-expected2] _
+tests/test_pipeline.py:380: in seeded_store
+    indexer.index_emails(directory=directory, store=store, parse_cache=load_seed())
+src/indexer.py:62: in index_emails
+    parsed = parse_reservation(email["raw_text"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/parser.py:140: in parse_reservation
+    response = _chat_create(
+src/parser.py:118: in _chat_create
+    return client.chat.completions.create(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/openai/_utils/_utils.py:298: in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py:1296: in create
+    return self._post(
+/usr/local/lib/python3.13/site-packages/openai/_base_client.py:1360: in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/openai/_base_client.py:1133: in request
+    raise self._make_status_error_from_response(err.response) from None
+E   openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Incorrect API key provided: test-pla****lder. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}
+____ ERROR at setup of test_reservations_on_date_catches_overlapping_stays _____
+tests/test_pipeline.py:380: in seeded_store
+    indexer.index_emails(directory=directory, store=store, parse_cache=load_seed())
+src/indexer.py:62: in index_emails
+    parsed = parse_reservation(email["raw_text"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/parser.py:140: in parse_reservation
+    response = _chat_create(
+src/parser.py:118: in _chat_create
+    return client.chat.completions.create(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/openai/_utils/_utils.py:298: in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py:1296: in create
+    return self._post(
+/usr/local/lib/python3.13/site-packages/openai/_base_client.py:1360: in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/openai/_base_client.py:1133: in request
+    raise self._make_status_error_from_response(err.response) from None
+E   openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Incorrect API key provided: test-pla****lder. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}
+_ ERROR at setup of test_reservations_on_date_returns_nothing_outside_the_trip _
+tests/test_pipeline.py:380: in seeded_store
+    indexer.index_emails(directory=directory, store=store, parse_cache=load_seed())
+src/indexer.py:62: in index_emails
+    parsed = parse_reservation(email["raw_text"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/parser.py:140: in parse_reservation
+    response = _chat_create(
+src/parser.py:118: in _chat_create
+    return client.chat.completions.create(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/openai/_utils/_utils.py:298: in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py:1296: in create
+    return self._post(
+/usr/local/lib/python3.13/site-packages/openai/_base_client.py:1360: in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.13/site-packages/openai/_base_client.py:1133: in request
+    raise self._make_status_error_from_response(err.response) from None
+E   openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Incorrect API key provided: test-pla****lder. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}
+=================================== FAILURES ===================================
+_______________ test_index_emails_uses_seed_without_calling_llm ________________
+tests/test_pipeline.py:322: in test_index_emails_uses_seed_without_calling_llm
+    summary = indexer.index_emails(
+src/indexer.py:62: in index_emails
+    parsed = parse_reservation(email["raw_text"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_pipeline.py:315: in explode
+    raise AssertionError("시드가 있는데 LLM 파싱이 호출됐습니다")
+E   AssertionError: 시드가 있는데 LLM 파싱이 호출됐습니다
+----------------------------- Captured stderr call -----------------------------
+  파싱 중: ._06_hakone_rentcar.eml
+_____ test_real_process_sigkill_before_or_after_sql_pointer_commit[ready] ______
+tests/test_reliability_generations.py:377: in test_real_process_sigkill_before_or_after_sql_pointer_commit
+    assert marker.exists(), process.communicate(timeout=1) if process.poll() is not None else 'worker did not reach crash boundary'
+E   AssertionError: (b'', b'Traceback (most recent call last):
+E       File "/tmp/pytest-of-user/pytest-2/test_real_process_sigkill_befo0/crash...liability_generations.py", line 11, in <module>
+E         import pytest
+E     ModuleNotFoundError: No module named \'pytest\'
+E     ')
+E   assert False
+E    +  where False = exists()
+E    +    where exists = PosixPath('/tmp/pytest-of-user/pytest-2/test_real_process_sigkill_befo0/boundary.json').exists
+_____ test_real_process_sigkill_before_or_after_sql_pointer_commit[active] _____
+tests/test_reliability_generations.py:377: in test_real_process_sigkill_before_or_after_sql_pointer_commit
+    assert marker.exists(), process.communicate(timeout=1) if process.poll() is not None else 'worker did not reach crash boundary'
+E   AssertionError: (b'', b'Traceback (most recent call last):
+E       File "/tmp/pytest-of-user/pytest-2/test_real_process_sigkill_befo1/crash...liability_generations.py", line 11, in <module>
+E         import pytest
+E     ModuleNotFoundError: No module named \'pytest\'
+E     ')
+E   assert False
+E    +  where False = exists()
+E    +    where exists = PosixPath('/tmp/pytest-of-user/pytest-2/test_real_process_sigkill_befo1/boundary.json').exists
+______ test_one_retry_child_per_parent_even_for_concurrent_different_keys ______
+tests/test_reliability_jobs.py:266: in test_one_retry_child_per_parent_even_for_concurrent_different_keys
+    jobs.finish(child['id'], child['fencing_token'])
+                ^^^^^^^^^^^
+E   TypeError: 'NoneType' object is not subscriptable
+_ test_sigkill_receipt_and_checkpoint_replay_never_repeats_remote_call[page_checkpoint] _
+tests/test_review_recovery.py:177: in test_sigkill_receipt_and_checkpoint_replay_never_repeats_remote_call
+    kill_child(tmp_path, point)
+tests/test_review_recovery.py:153: in kill_child
+    assert result.returncode == -signal.SIGKILL, result.stderr
+E   AssertionError: Traceback (most recent call last):
+E       File "<string>", line 3, in <module>
+E         run_one(construct(sys.argv[1],sys.argv[2]), "killed-review-worker")
+E         ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       File "/tmp/stage1-work/tests/test_review_recovery.py", line 137, in run_one
+E         assert job is not None
+E                ^^^^^^^^^^^^^^^
+E     AssertionError
+E     
+E   assert 1 == -<Signals.SIGKILL: 9>
+E    +  where 1 = CompletedProcess(args=['/usr/local/bin/python', '-c', 'import sys\nfrom tests.test_review_recovery import construct,ru...t_review_recovery.py", line 137, in run_one\n    assert job is not None\n           ^^^^^^^^^^^^^^^\nAssertionError\n').returncode
+E    +  and   <Signals.SIGKILL: 9> = signal.SIGKILL
+=============================== warnings summary ===============================
+../../usr/local/lib/python3.13/site-packages/fastapi/testclient.py:1
+  /usr/local/lib/python3.13/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../../usr/local/lib/python3.13/site-packages/authlib/integrations/httpx_client/assertion_client.py:5
+  /usr/local/lib/python3.13/site-packages/authlib/integrations/httpx_client/assertion_client.py:5: AuthlibDeprecationWarning: The httpx module is deprecated; please use httpx2 instead.
+    from ._compat import httpx2
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_pipeline.py::test_index_emails_uses_seed_without_calling_llm
+FAILED tests/test_reliability_generations.py::test_real_process_sigkill_before_or_after_sql_pointer_commit[ready]
+FAILED tests/test_reliability_generations.py::test_real_process_sigkill_before_or_after_sql_pointer_commit[active]
+FAILED tests/test_reliability_jobs.py::test_one_retry_child_per_parent_even_for_concurrent_different_keys
+FAILED tests/test_review_recovery.py::test_sigkill_receipt_and_checkpoint_replay_never_repeats_remote_call[page_checkpoint]
+ERROR tests/test_pipeline.py::test_reservations_on_date_includes_everything_that_day[2026-10-12-expected0]
+ERROR tests/test_pipeline.py::test_reservations_on_date_includes_everything_that_day[2026-10-13-expected1]
+ERROR tests/test_pipeline.py::test_reservations_on_date_includes_everything_that_day[2026-10-14-expected2]
+ERROR tests/test_pipeline.py::test_reservations_on_date_catches_overlapping_stays
+ERROR tests/test_pipeline.py::test_reservations_on_date_returns_nothing_outside_the_trip
+5 failed, 1069 passed, 17 skipped, 2 warnings, 5 errors in 177.44s (0:02:57)

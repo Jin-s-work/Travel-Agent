@@ -104,6 +104,10 @@ class Apply(Input):
     expected_version:int=Field(ge=1)
     preview_id:str=Field(min_length=1,max_length=100)
 
+class GenerationApply(Input):
+    expected_version:Literal[0]
+    preview_id:str=Field(min_length=1,max_length=100)
+
 
 class Undo(Input):
     expected_version:int=Field(ge=1)

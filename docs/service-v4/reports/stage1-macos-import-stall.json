@@ -1,0 +1,2504 @@
+{
+  "status": "interrupted_due_to_dependency_file_read_stall",
+  "environment": "macOS Python 3.13.5; source dependencies on Desktop; separate /private/tmp pycache prefix; pytest plugin autoload disabled",
+  "full_suite_completed": false,
+  "counts": null,
+  "recorded_timeout_reports": 18,
+  "diagnostic_limit": "Only failures emitted before interruption are included. Do not infer full pass/fail totals. Synthetic jobs only; no payload, SQL parameters or real user data.",
+  "errors": [
+    {
+      "timeout_seconds": 10,
+      "job": {
+        "state": "running",
+        "stage": "building_index",
+        "attempt": 1,
+        "max_attempts": 3,
+        "error_code": null,
+        "retryable": false,
+        "created_at": "2026-10-07T05:41:13.412174+00:00",
+        "updated_at": "2026-10-07T05:41:13.490736+00:00",
+        "started_at": "2026-10-07T05:41:13.424900+00:00",
+        "deadline_at": "2026-10-07T05:56:13.412181+00:00",
+        "lease_expires_at": null
+      },
+      "unique_worker_stacks": [
+        [
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1026
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "__init__.py",
+            "function": "<module>",
+            "line": 141
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1022
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_code",
+            "line": 1159
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_data",
+            "line": 1218
+          }
+        ]
+      ]
+    },
+    {
+      "timeout_seconds": 10,
+      "job": {
+        "state": "running",
+        "stage": "building_index",
+        "attempt": 1,
+        "max_attempts": 3,
+        "error_code": null,
+        "retryable": false,
+        "created_at": "2026-10-07T05:41:28.667583+00:00",
+        "updated_at": "2026-10-07T05:41:28.727504+00:00",
+        "started_at": "2026-10-07T05:41:28.672645+00:00",
+        "deadline_at": "2026-10-07T05:56:28.667587+00:00",
+        "lease_expires_at": null
+      },
+      "unique_worker_stacks": [
+        [
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1026
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "__init__.py",
+            "function": "<module>",
+            "line": 18
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_handle_fromlist",
+            "line": 1415
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1022
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_code",
+            "line": 1159
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_data",
+            "line": 1218
+          }
+        ],
+        [
+          {
+            "file": "threading.py",
+            "function": "_bootstrap",
+            "line": 1014
+          },
+          {
+            "file": "threading.py",
+            "function": "_bootstrap_inner",
+            "line": 1043
+          },
+          {
+            "file": "threading.py",
+            "function": "run",
+            "line": 994
+          },
+          {
+            "file": "thread.py",
+            "function": "_worker",
+            "line": 93
+          },
+          {
+            "file": "thread.py",
+            "function": "run",
+            "line": 59
+          },
+          {
+            "file": "api.py",
+            "function": "dispatch",
+            "line": 186
+          },
+          {
+            "file": "handlers.py",
+            "function": "__call__",
+            "line": 177
+          },
+          {
+            "file": "handlers.py",
+            "function": "process_documents",
+            "line": 279
+          },
+          {
+            "file": "generations.py",
+            "function": "build",
+            "line": 292
+          },
+          {
+            "file": "generations.py",
+            "function": "client",
+            "line": 83
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_lock_unlock_module",
+            "line": 471
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "acquire",
+            "line": 365
+          }
+        ]
+      ]
+    },
+    {
+      "timeout_seconds": 10,
+      "job": {
+        "state": "running",
+        "stage": "building_index",
+        "attempt": 1,
+        "max_attempts": 3,
+        "error_code": null,
+        "retryable": false,
+        "created_at": "2026-10-07T05:41:43.800173+00:00",
+        "updated_at": "2026-10-07T05:41:43.873786+00:00",
+        "started_at": "2026-10-07T05:41:43.807646+00:00",
+        "deadline_at": "2026-10-07T05:56:43.800177+00:00",
+        "lease_expires_at": null
+      },
+      "unique_worker_stacks": [
+        [
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1026
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "__init__.py",
+            "function": "<module>",
+            "line": 217
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1022
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_code",
+            "line": 1159
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_data",
+            "line": 1218
+          }
+        ],
+        [
+          {
+            "file": "threading.py",
+            "function": "_bootstrap",
+            "line": 1014
+          },
+          {
+            "file": "threading.py",
+            "function": "_bootstrap_inner",
+            "line": 1043
+          },
+          {
+            "file": "threading.py",
+            "function": "run",
+            "line": 994
+          },
+          {
+            "file": "thread.py",
+            "function": "_worker",
+            "line": 93
+          },
+          {
+            "file": "thread.py",
+            "function": "run",
+            "line": 59
+          },
+          {
+            "file": "api.py",
+            "function": "dispatch",
+            "line": 186
+          },
+          {
+            "file": "handlers.py",
+            "function": "__call__",
+            "line": 177
+          },
+          {
+            "file": "handlers.py",
+            "function": "process_documents",
+            "line": 279
+          },
+          {
+            "file": "generations.py",
+            "function": "build",
+            "line": 292
+          },
+          {
+            "file": "generations.py",
+            "function": "client",
+            "line": 83
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_lock_unlock_module",
+            "line": 471
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "acquire",
+            "line": 365
+          }
+        ]
+      ]
+    },
+    {
+      "timeout_seconds": 10,
+      "job": {
+        "state": "running",
+        "stage": "building_index",
+        "attempt": 1,
+        "max_attempts": 3,
+        "error_code": null,
+        "retryable": false,
+        "created_at": "2026-10-07T05:41:59.150364+00:00",
+        "updated_at": "2026-10-07T05:41:59.213959+00:00",
+        "started_at": "2026-10-07T05:41:59.160712+00:00",
+        "deadline_at": "2026-10-07T05:56:59.150368+00:00",
+        "lease_expires_at": null
+      },
+      "unique_worker_stacks": [
+        [
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1026
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "__init__.py",
+            "function": "<module>",
+            "line": 217
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1022
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_code",
+            "line": 1159
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_data",
+            "line": 1218
+          }
+        ],
+        [
+          {
+            "file": "threading.py",
+            "function": "_bootstrap",
+            "line": 1014
+          },
+          {
+            "file": "threading.py",
+            "function": "_bootstrap_inner",
+            "line": 1043
+          },
+          {
+            "file": "threading.py",
+            "function": "run",
+            "line": 994
+          },
+          {
+            "file": "thread.py",
+            "function": "_worker",
+            "line": 93
+          },
+          {
+            "file": "thread.py",
+            "function": "run",
+            "line": 59
+          },
+          {
+            "file": "api.py",
+            "function": "dispatch",
+            "line": 186
+          },
+          {
+            "file": "handlers.py",
+            "function": "__call__",
+            "line": 177
+          },
+          {
+            "file": "handlers.py",
+            "function": "process_documents",
+            "line": 279
+          },
+          {
+            "file": "generations.py",
+            "function": "build",
+            "line": 292
+          },
+          {
+            "file": "generations.py",
+            "function": "client",
+            "line": 83
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_lock_unlock_module",
+            "line": 471
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "acquire",
+            "line": 365
+          }
+        ]
+      ]
+    },
+    {
+      "timeout_seconds": 10,
+      "job": {
+        "state": "running",
+        "stage": "building_index",
+        "attempt": 1,
+        "max_attempts": 3,
+        "error_code": null,
+        "retryable": false,
+        "created_at": "2026-10-07T05:42:14.344022+00:00",
+        "updated_at": "2026-10-07T05:42:14.435874+00:00",
+        "started_at": "2026-10-07T05:42:14.353659+00:00",
+        "deadline_at": "2026-10-07T05:57:14.344031+00:00",
+        "lease_expires_at": null
+      },
+      "unique_worker_stacks": [
+        [
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1026
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "__init__.py",
+            "function": "<module>",
+            "line": 217
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1022
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_code",
+            "line": 1159
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_data",
+            "line": 1218
+          }
+        ],
+        [
+          {
+            "file": "threading.py",
+            "function": "_bootstrap",
+            "line": 1014
+          },
+          {
+            "file": "threading.py",
+            "function": "_bootstrap_inner",
+            "line": 1043
+          },
+          {
+            "file": "threading.py",
+            "function": "run",
+            "line": 994
+          },
+          {
+            "file": "thread.py",
+            "function": "_worker",
+            "line": 93
+          },
+          {
+            "file": "thread.py",
+            "function": "run",
+            "line": 59
+          },
+          {
+            "file": "api.py",
+            "function": "dispatch",
+            "line": 186
+          },
+          {
+            "file": "handlers.py",
+            "function": "__call__",
+            "line": 177
+          },
+          {
+            "file": "handlers.py",
+            "function": "process_documents",
+            "line": 279
+          },
+          {
+            "file": "generations.py",
+            "function": "build",
+            "line": 292
+          },
+          {
+            "file": "generations.py",
+            "function": "client",
+            "line": 83
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_lock_unlock_module",
+            "line": 471
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "acquire",
+            "line": 365
+          }
+        ]
+      ]
+    },
+    {
+      "timeout_seconds": 10,
+      "job": {
+        "state": "running",
+        "stage": "building_index",
+        "attempt": 1,
+        "max_attempts": 3,
+        "error_code": null,
+        "retryable": false,
+        "created_at": "2026-10-07T05:42:29.503568+00:00",
+        "updated_at": "2026-10-07T05:42:29.591245+00:00",
+        "started_at": "2026-10-07T05:42:29.510331+00:00",
+        "deadline_at": "2026-10-07T05:57:29.503573+00:00",
+        "lease_expires_at": null
+      },
+      "unique_worker_stacks": [
+        [
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1026
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "__init__.py",
+            "function": "<module>",
+            "line": 217
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1022
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_code",
+            "line": 1159
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_data",
+            "line": 1218
+          }
+        ],
+        [
+          {
+            "file": "threading.py",
+            "function": "_bootstrap",
+            "line": 1014
+          },
+          {
+            "file": "threading.py",
+            "function": "_bootstrap_inner",
+            "line": 1043
+          },
+          {
+            "file": "threading.py",
+            "function": "run",
+            "line": 994
+          },
+          {
+            "file": "thread.py",
+            "function": "_worker",
+            "line": 93
+          },
+          {
+            "file": "thread.py",
+            "function": "run",
+            "line": 59
+          },
+          {
+            "file": "api.py",
+            "function": "dispatch",
+            "line": 186
+          },
+          {
+            "file": "handlers.py",
+            "function": "__call__",
+            "line": 177
+          },
+          {
+            "file": "handlers.py",
+            "function": "process_documents",
+            "line": 279
+          },
+          {
+            "file": "generations.py",
+            "function": "build",
+            "line": 292
+          },
+          {
+            "file": "generations.py",
+            "function": "client",
+            "line": 83
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_lock_unlock_module",
+            "line": 471
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "acquire",
+            "line": 365
+          }
+        ]
+      ]
+    },
+    {
+      "timeout_seconds": 10,
+      "job": {
+        "state": "running",
+        "stage": "building_index",
+        "attempt": 1,
+        "max_attempts": 3,
+        "error_code": null,
+        "retryable": false,
+        "created_at": "2026-10-07T05:42:44.672417+00:00",
+        "updated_at": "2026-10-07T05:42:44.744588+00:00",
+        "started_at": "2026-10-07T05:42:44.677525+00:00",
+        "deadline_at": "2026-10-07T05:57:44.672420+00:00",
+        "lease_expires_at": null
+      },
+      "unique_worker_stacks": [
+        [
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1026
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "schema_utils.py",
+            "function": "<module>",
+            "line": 4
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1022
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_code",
+            "line": 1159
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_data",
+            "line": 1218
+          }
+        ],
+        [
+          {
+            "file": "threading.py",
+            "function": "_bootstrap",
+            "line": 1014
+          },
+          {
+            "file": "threading.py",
+            "function": "_bootstrap_inner",
+            "line": 1043
+          },
+          {
+            "file": "threading.py",
+            "function": "run",
+            "line": 994
+          },
+          {
+            "file": "thread.py",
+            "function": "_worker",
+            "line": 93
+          },
+          {
+            "file": "thread.py",
+            "function": "run",
+            "line": 59
+          },
+          {
+            "file": "api.py",
+            "function": "dispatch",
+            "line": 186
+          },
+          {
+            "file": "handlers.py",
+            "function": "__call__",
+            "line": 177
+          },
+          {
+            "file": "handlers.py",
+            "function": "process_documents",
+            "line": 279
+          },
+          {
+            "file": "generations.py",
+            "function": "build",
+            "line": 292
+          },
+          {
+            "file": "generations.py",
+            "function": "client",
+            "line": 83
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_lock_unlock_module",
+            "line": 471
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "acquire",
+            "line": 365
+          }
+        ]
+      ]
+    },
+    {
+      "timeout_seconds": 10,
+      "job": {
+        "state": "running",
+        "stage": "building_index",
+        "attempt": 1,
+        "max_attempts": 3,
+        "error_code": null,
+        "retryable": false,
+        "created_at": "2026-10-07T05:42:59.829114+00:00",
+        "updated_at": "2026-10-07T05:42:59.898753+00:00",
+        "started_at": "2026-10-07T05:42:59.835542+00:00",
+        "deadline_at": "2026-10-07T05:57:59.829117+00:00",
+        "lease_expires_at": null
+      },
+      "unique_worker_stacks": [
+        [
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1026
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "schema_utils.py",
+            "function": "<module>",
+            "line": 4
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1022
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_code",
+            "line": 1159
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_data",
+            "line": 1218
+          }
+        ],
+        [
+          {
+            "file": "threading.py",
+            "function": "_bootstrap",
+            "line": 1014
+          },
+          {
+            "file": "threading.py",
+            "function": "_bootstrap_inner",
+            "line": 1043
+          },
+          {
+            "file": "threading.py",
+            "function": "run",
+            "line": 994
+          },
+          {
+            "file": "thread.py",
+            "function": "_worker",
+            "line": 93
+          },
+          {
+            "file": "thread.py",
+            "function": "run",
+            "line": 59
+          },
+          {
+            "file": "api.py",
+            "function": "dispatch",
+            "line": 186
+          },
+          {
+            "file": "handlers.py",
+            "function": "__call__",
+            "line": 177
+          },
+          {
+            "file": "handlers.py",
+            "function": "process_documents",
+            "line": 279
+          },
+          {
+            "file": "generations.py",
+            "function": "build",
+            "line": 292
+          },
+          {
+            "file": "generations.py",
+            "function": "client",
+            "line": 83
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_lock_unlock_module",
+            "line": 471
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "acquire",
+            "line": 365
+          }
+        ]
+      ]
+    },
+    {
+      "timeout_seconds": 10,
+      "job": {
+        "state": "running",
+        "stage": "building_index",
+        "attempt": 1,
+        "max_attempts": 3,
+        "error_code": null,
+        "retryable": false,
+        "created_at": "2026-10-07T05:43:15.110919+00:00",
+        "updated_at": "2026-10-07T05:43:15.198702+00:00",
+        "started_at": "2026-10-07T05:43:15.126152+00:00",
+        "deadline_at": "2026-10-07T05:58:15.110928+00:00",
+        "lease_expires_at": null
+      },
+      "unique_worker_stacks": [
+        [
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1026
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "schema_utils.py",
+            "function": "<module>",
+            "line": 4
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1022
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_code",
+            "line": 1159
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_data",
+            "line": 1218
+          }
+        ],
+        [
+          {
+            "file": "threading.py",
+            "function": "_bootstrap",
+            "line": 1014
+          },
+          {
+            "file": "threading.py",
+            "function": "_bootstrap_inner",
+            "line": 1043
+          },
+          {
+            "file": "threading.py",
+            "function": "run",
+            "line": 994
+          },
+          {
+            "file": "thread.py",
+            "function": "_worker",
+            "line": 93
+          },
+          {
+            "file": "thread.py",
+            "function": "run",
+            "line": 59
+          },
+          {
+            "file": "api.py",
+            "function": "dispatch",
+            "line": 186
+          },
+          {
+            "file": "handlers.py",
+            "function": "__call__",
+            "line": 177
+          },
+          {
+            "file": "handlers.py",
+            "function": "process_documents",
+            "line": 279
+          },
+          {
+            "file": "generations.py",
+            "function": "build",
+            "line": 292
+          },
+          {
+            "file": "generations.py",
+            "function": "client",
+            "line": 83
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_lock_unlock_module",
+            "line": 471
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "acquire",
+            "line": 365
+          }
+        ]
+      ]
+    },
+    {
+      "timeout_seconds": 10,
+      "job": {
+        "state": "running",
+        "stage": "building_index",
+        "attempt": 1,
+        "max_attempts": 3,
+        "error_code": null,
+        "retryable": false,
+        "created_at": "2026-10-07T05:43:30.260291+00:00",
+        "updated_at": "2026-10-07T05:43:30.331655+00:00",
+        "started_at": "2026-10-07T05:43:30.266179+00:00",
+        "deadline_at": "2026-10-07T05:58:30.260294+00:00",
+        "lease_expires_at": null
+      },
+      "unique_worker_stacks": [
+        [
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1026
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "__init__.py",
+            "function": "<module>",
+            "line": 14
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1022
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_code",
+            "line": 1159
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_data",
+            "line": 1218
+          }
+        ],
+        [
+          {
+            "file": "threading.py",
+            "function": "_bootstrap",
+            "line": 1014
+          },
+          {
+            "file": "threading.py",
+            "function": "_bootstrap_inner",
+            "line": 1043
+          },
+          {
+            "file": "threading.py",
+            "function": "run",
+            "line": 994
+          },
+          {
+            "file": "thread.py",
+            "function": "_worker",
+            "line": 93
+          },
+          {
+            "file": "thread.py",
+            "function": "run",
+            "line": 59
+          },
+          {
+            "file": "api.py",
+            "function": "dispatch",
+            "line": 186
+          },
+          {
+            "file": "handlers.py",
+            "function": "__call__",
+            "line": 177
+          },
+          {
+            "file": "handlers.py",
+            "function": "process_documents",
+            "line": 279
+          },
+          {
+            "file": "generations.py",
+            "function": "build",
+            "line": 292
+          },
+          {
+            "file": "generations.py",
+            "function": "client",
+            "line": 83
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_lock_unlock_module",
+            "line": 471
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "acquire",
+            "line": 365
+          }
+        ]
+      ]
+    },
+    {
+      "timeout_seconds": 10,
+      "job": {
+        "state": "running",
+        "stage": "building_index",
+        "attempt": 1,
+        "max_attempts": 3,
+        "error_code": null,
+        "retryable": false,
+        "created_at": "2026-10-07T05:43:45.428963+00:00",
+        "updated_at": "2026-10-07T05:43:45.501741+00:00",
+        "started_at": "2026-10-07T05:43:45.435409+00:00",
+        "deadline_at": "2026-10-07T05:58:45.428969+00:00",
+        "lease_expires_at": null
+      },
+      "unique_worker_stacks": [
+        [
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1026
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "__init__.py",
+            "function": "<module>",
+            "line": 14
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1022
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_code",
+            "line": 1159
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_data",
+            "line": 1218
+          }
+        ],
+        [
+          {
+            "file": "threading.py",
+            "function": "_bootstrap",
+            "line": 1014
+          },
+          {
+            "file": "threading.py",
+            "function": "_bootstrap_inner",
+            "line": 1043
+          },
+          {
+            "file": "threading.py",
+            "function": "run",
+            "line": 994
+          },
+          {
+            "file": "thread.py",
+            "function": "_worker",
+            "line": 93
+          },
+          {
+            "file": "thread.py",
+            "function": "run",
+            "line": 59
+          },
+          {
+            "file": "api.py",
+            "function": "dispatch",
+            "line": 186
+          },
+          {
+            "file": "handlers.py",
+            "function": "__call__",
+            "line": 177
+          },
+          {
+            "file": "handlers.py",
+            "function": "process_documents",
+            "line": 279
+          },
+          {
+            "file": "generations.py",
+            "function": "build",
+            "line": 292
+          },
+          {
+            "file": "generations.py",
+            "function": "client",
+            "line": 83
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_lock_unlock_module",
+            "line": 471
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "acquire",
+            "line": 365
+          }
+        ]
+      ]
+    },
+    {
+      "timeout_seconds": 10,
+      "job": {
+        "state": "running",
+        "stage": "building_index",
+        "attempt": 1,
+        "max_attempts": 3,
+        "error_code": null,
+        "retryable": false,
+        "created_at": "2026-10-07T05:44:00.592563+00:00",
+        "updated_at": "2026-10-07T05:44:00.666535+00:00",
+        "started_at": "2026-10-07T05:44:00.601363+00:00",
+        "deadline_at": "2026-10-07T05:59:00.592566+00:00",
+        "lease_expires_at": null
+      },
+      "unique_worker_stacks": [
+        [
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1026
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "__init__.py",
+            "function": "<module>",
+            "line": 14
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1022
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_code",
+            "line": 1159
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_data",
+            "line": 1218
+          }
+        ],
+        [
+          {
+            "file": "threading.py",
+            "function": "_bootstrap",
+            "line": 1014
+          },
+          {
+            "file": "threading.py",
+            "function": "_bootstrap_inner",
+            "line": 1043
+          },
+          {
+            "file": "threading.py",
+            "function": "run",
+            "line": 994
+          },
+          {
+            "file": "thread.py",
+            "function": "_worker",
+            "line": 93
+          },
+          {
+            "file": "thread.py",
+            "function": "run",
+            "line": 59
+          },
+          {
+            "file": "api.py",
+            "function": "dispatch",
+            "line": 186
+          },
+          {
+            "file": "handlers.py",
+            "function": "__call__",
+            "line": 177
+          },
+          {
+            "file": "handlers.py",
+            "function": "process_documents",
+            "line": 279
+          },
+          {
+            "file": "generations.py",
+            "function": "build",
+            "line": 292
+          },
+          {
+            "file": "generations.py",
+            "function": "client",
+            "line": 83
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_lock_unlock_module",
+            "line": 471
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "acquire",
+            "line": 365
+          }
+        ]
+      ]
+    },
+    {
+      "timeout_seconds": 10,
+      "job": {
+        "state": "running",
+        "stage": "building_index",
+        "attempt": 1,
+        "max_attempts": 3,
+        "error_code": null,
+        "retryable": false,
+        "created_at": "2026-10-07T05:44:15.796209+00:00",
+        "updated_at": "2026-10-07T05:44:15.893136+00:00",
+        "started_at": "2026-10-07T05:44:15.802392+00:00",
+        "deadline_at": "2026-10-07T05:59:15.796217+00:00",
+        "lease_expires_at": null
+      },
+      "unique_worker_stacks": [
+        [
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "validators.py",
+            "function": "<module>",
+            "line": 19
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1026
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "__init__.py",
+            "function": "<module>",
+            "line": 11
+          },
+          {
+            "file": "_core.py",
+            "function": "__rmatmul__",
+            "line": 389
+          },
+          {
+            "file": "_core.py",
+            "function": "_schemas",
+            "line": 37
+          },
+          {
+            "file": "_local.py",
+            "function": "read_text",
+            "line": 546
+          },
+          {
+            "file": "_abc.py",
+            "function": "read_text",
+            "line": 633
+          }
+        ],
+        [
+          {
+            "file": "threading.py",
+            "function": "_bootstrap",
+            "line": 1014
+          },
+          {
+            "file": "threading.py",
+            "function": "_bootstrap_inner",
+            "line": 1043
+          },
+          {
+            "file": "threading.py",
+            "function": "run",
+            "line": 994
+          },
+          {
+            "file": "thread.py",
+            "function": "_worker",
+            "line": 93
+          },
+          {
+            "file": "thread.py",
+            "function": "run",
+            "line": 59
+          },
+          {
+            "file": "api.py",
+            "function": "dispatch",
+            "line": 186
+          },
+          {
+            "file": "handlers.py",
+            "function": "__call__",
+            "line": 177
+          },
+          {
+            "file": "handlers.py",
+            "function": "process_documents",
+            "line": 279
+          },
+          {
+            "file": "generations.py",
+            "function": "build",
+            "line": 292
+          },
+          {
+            "file": "generations.py",
+            "function": "client",
+            "line": 83
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_lock_unlock_module",
+            "line": 471
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "acquire",
+            "line": 365
+          }
+        ]
+      ]
+    },
+    {
+      "timeout_seconds": 10,
+      "job": {
+        "state": "running",
+        "stage": "building_index",
+        "attempt": 1,
+        "max_attempts": 3,
+        "error_code": null,
+        "retryable": false,
+        "created_at": "2026-10-07T05:44:29.137152+00:00",
+        "updated_at": "2026-10-07T05:44:29.208618+00:00",
+        "started_at": "2026-10-07T05:44:29.148988+00:00",
+        "deadline_at": "2026-10-07T05:59:29.137156+00:00",
+        "lease_expires_at": null
+      },
+      "unique_worker_stacks": [
+        [
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "validators.py",
+            "function": "<module>",
+            "line": 19
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1026
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "__init__.py",
+            "function": "<module>",
+            "line": 11
+          },
+          {
+            "file": "_core.py",
+            "function": "__rmatmul__",
+            "line": 389
+          },
+          {
+            "file": "_core.py",
+            "function": "_schemas",
+            "line": 37
+          },
+          {
+            "file": "_local.py",
+            "function": "read_text",
+            "line": 546
+          },
+          {
+            "file": "_abc.py",
+            "function": "read_text",
+            "line": 633
+          }
+        ],
+        [
+          {
+            "file": "threading.py",
+            "function": "_bootstrap",
+            "line": 1014
+          },
+          {
+            "file": "threading.py",
+            "function": "_bootstrap_inner",
+            "line": 1043
+          },
+          {
+            "file": "threading.py",
+            "function": "run",
+            "line": 994
+          },
+          {
+            "file": "thread.py",
+            "function": "_worker",
+            "line": 93
+          },
+          {
+            "file": "thread.py",
+            "function": "run",
+            "line": 59
+          },
+          {
+            "file": "api.py",
+            "function": "dispatch",
+            "line": 186
+          },
+          {
+            "file": "handlers.py",
+            "function": "__call__",
+            "line": 177
+          },
+          {
+            "file": "handlers.py",
+            "function": "process_documents",
+            "line": 279
+          },
+          {
+            "file": "generations.py",
+            "function": "build",
+            "line": 292
+          },
+          {
+            "file": "generations.py",
+            "function": "client",
+            "line": 83
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_lock_unlock_module",
+            "line": 471
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "acquire",
+            "line": 365
+          }
+        ]
+      ]
+    },
+    {
+      "timeout_seconds": 10,
+      "job": {
+        "state": "running",
+        "stage": "building_index",
+        "attempt": 1,
+        "max_attempts": 3,
+        "error_code": null,
+        "retryable": false,
+        "created_at": "2026-10-07T05:44:44.281841+00:00",
+        "updated_at": "2026-10-07T05:44:44.351946+00:00",
+        "started_at": "2026-10-07T05:44:44.288677+00:00",
+        "deadline_at": "2026-10-07T05:59:44.281847+00:00",
+        "lease_expires_at": null
+      },
+      "unique_worker_stacks": [
+        [
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "validators.py",
+            "function": "<module>",
+            "line": 19
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1026
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "__init__.py",
+            "function": "<module>",
+            "line": 11
+          },
+          {
+            "file": "_core.py",
+            "function": "__rmatmul__",
+            "line": 389
+          },
+          {
+            "file": "_core.py",
+            "function": "_schemas",
+            "line": 37
+          },
+          {
+            "file": "_local.py",
+            "function": "read_text",
+            "line": 546
+          },
+          {
+            "file": "_abc.py",
+            "function": "read_text",
+            "line": 633
+          }
+        ],
+        [
+          {
+            "file": "threading.py",
+            "function": "_bootstrap",
+            "line": 1014
+          },
+          {
+            "file": "threading.py",
+            "function": "_bootstrap_inner",
+            "line": 1043
+          },
+          {
+            "file": "threading.py",
+            "function": "run",
+            "line": 994
+          },
+          {
+            "file": "thread.py",
+            "function": "_worker",
+            "line": 93
+          },
+          {
+            "file": "thread.py",
+            "function": "run",
+            "line": 59
+          },
+          {
+            "file": "api.py",
+            "function": "dispatch",
+            "line": 186
+          },
+          {
+            "file": "handlers.py",
+            "function": "__call__",
+            "line": 177
+          },
+          {
+            "file": "handlers.py",
+            "function": "process_documents",
+            "line": 279
+          },
+          {
+            "file": "generations.py",
+            "function": "build",
+            "line": 292
+          },
+          {
+            "file": "generations.py",
+            "function": "client",
+            "line": 83
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_lock_unlock_module",
+            "line": 471
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "acquire",
+            "line": 365
+          }
+        ]
+      ]
+    },
+    {
+      "timeout_seconds": 10,
+      "job": {
+        "state": "running",
+        "stage": "building_index",
+        "attempt": 1,
+        "max_attempts": 3,
+        "error_code": null,
+        "retryable": false,
+        "created_at": "2026-10-07T05:44:59.425040+00:00",
+        "updated_at": "2026-10-07T05:44:59.502653+00:00",
+        "started_at": "2026-10-07T05:44:59.435811+00:00",
+        "deadline_at": "2026-10-07T05:59:59.425044+00:00",
+        "lease_expires_at": null
+      },
+      "unique_worker_stacks": [
+        [
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "validators.py",
+            "function": "<module>",
+            "line": 19
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1026
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "__init__.py",
+            "function": "<module>",
+            "line": 11
+          },
+          {
+            "file": "_core.py",
+            "function": "__rmatmul__",
+            "line": 389
+          },
+          {
+            "file": "_core.py",
+            "function": "_schemas",
+            "line": 37
+          },
+          {
+            "file": "_local.py",
+            "function": "read_text",
+            "line": 546
+          },
+          {
+            "file": "_abc.py",
+            "function": "read_text",
+            "line": 633
+          }
+        ],
+        [
+          {
+            "file": "threading.py",
+            "function": "_bootstrap",
+            "line": 1014
+          },
+          {
+            "file": "threading.py",
+            "function": "_bootstrap_inner",
+            "line": 1043
+          },
+          {
+            "file": "threading.py",
+            "function": "run",
+            "line": 994
+          },
+          {
+            "file": "thread.py",
+            "function": "_worker",
+            "line": 93
+          },
+          {
+            "file": "thread.py",
+            "function": "run",
+            "line": 59
+          },
+          {
+            "file": "api.py",
+            "function": "dispatch",
+            "line": 186
+          },
+          {
+            "file": "handlers.py",
+            "function": "__call__",
+            "line": 177
+          },
+          {
+            "file": "handlers.py",
+            "function": "process_documents",
+            "line": 279
+          },
+          {
+            "file": "generations.py",
+            "function": "build",
+            "line": 292
+          },
+          {
+            "file": "generations.py",
+            "function": "client",
+            "line": 83
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_lock_unlock_module",
+            "line": 471
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "acquire",
+            "line": 365
+          }
+        ]
+      ]
+    },
+    {
+      "timeout_seconds": 10,
+      "job": {
+        "state": "running",
+        "stage": "building_index",
+        "attempt": 1,
+        "max_attempts": 3,
+        "error_code": null,
+        "retryable": false,
+        "created_at": "2026-10-07T05:45:14.595166+00:00",
+        "updated_at": "2026-10-07T05:45:14.673030+00:00",
+        "started_at": "2026-10-07T05:45:14.604574+00:00",
+        "deadline_at": "2026-10-07T06:00:14.595169+00:00",
+        "lease_expires_at": null
+      },
+      "unique_worker_stacks": [
+        [
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1026
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "validators.py",
+            "function": "<module>",
+            "line": 24
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_handle_fromlist",
+            "line": 1415
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1022
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_code",
+            "line": 1159
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_data",
+            "line": 1218
+          }
+        ],
+        [
+          {
+            "file": "threading.py",
+            "function": "_bootstrap",
+            "line": 1014
+          },
+          {
+            "file": "threading.py",
+            "function": "_bootstrap_inner",
+            "line": 1043
+          },
+          {
+            "file": "threading.py",
+            "function": "run",
+            "line": 994
+          },
+          {
+            "file": "thread.py",
+            "function": "_worker",
+            "line": 93
+          },
+          {
+            "file": "thread.py",
+            "function": "run",
+            "line": 59
+          },
+          {
+            "file": "api.py",
+            "function": "dispatch",
+            "line": 186
+          },
+          {
+            "file": "handlers.py",
+            "function": "__call__",
+            "line": 177
+          },
+          {
+            "file": "handlers.py",
+            "function": "process_documents",
+            "line": 279
+          },
+          {
+            "file": "generations.py",
+            "function": "build",
+            "line": 292
+          },
+          {
+            "file": "generations.py",
+            "function": "client",
+            "line": 83
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_lock_unlock_module",
+            "line": 471
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "acquire",
+            "line": 365
+          }
+        ]
+      ]
+    },
+    {
+      "timeout_seconds": 10,
+      "job": {
+        "state": "running",
+        "stage": "building_index",
+        "attempt": 1,
+        "max_attempts": 3,
+        "error_code": null,
+        "retryable": false,
+        "created_at": "2026-10-07T05:45:29.739149+00:00",
+        "updated_at": "2026-10-07T05:45:29.823800+00:00",
+        "started_at": "2026-10-07T05:45:29.751010+00:00",
+        "deadline_at": "2026-10-07T06:00:29.739155+00:00",
+        "lease_expires_at": null
+      },
+      "unique_worker_stacks": [
+        [
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1026
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "validators.py",
+            "function": "<module>",
+            "line": 24
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_handle_fromlist",
+            "line": 1415
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_call_with_frames_removed",
+            "line": 488
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load",
+            "line": 1360
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_find_and_load_unlocked",
+            "line": 1331
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_load_unlocked",
+            "line": 935
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "exec_module",
+            "line": 1022
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_code",
+            "line": 1159
+          },
+          {
+            "file": "<frozen importlib._bootstrap_external>",
+            "function": "get_data",
+            "line": 1218
+          }
+        ],
+        [
+          {
+            "file": "threading.py",
+            "function": "_bootstrap",
+            "line": 1014
+          },
+          {
+            "file": "threading.py",
+            "function": "_bootstrap_inner",
+            "line": 1043
+          },
+          {
+            "file": "threading.py",
+            "function": "run",
+            "line": 994
+          },
+          {
+            "file": "thread.py",
+            "function": "_worker",
+            "line": 93
+          },
+          {
+            "file": "thread.py",
+            "function": "run",
+            "line": 59
+          },
+          {
+            "file": "api.py",
+            "function": "dispatch",
+            "line": 186
+          },
+          {
+            "file": "handlers.py",
+            "function": "__call__",
+            "line": 177
+          },
+          {
+            "file": "handlers.py",
+            "function": "process_documents",
+            "line": 279
+          },
+          {
+            "file": "generations.py",
+            "function": "build",
+            "line": 292
+          },
+          {
+            "file": "generations.py",
+            "function": "client",
+            "line": 83
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "_lock_unlock_module",
+            "line": 471
+          },
+          {
+            "file": "<frozen importlib._bootstrap>",
+            "function": "acquire",
+            "line": 365
+          }
+        ]
+      ]
+    }
+  ]
+}

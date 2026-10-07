@@ -366,82 +366,114 @@ class DiscoveryService:
         permitted=source['status']=='active' and source['read_confirmed'] and source['display_permitted']
         if not permitted and not admin:return {'id':source['id'],'status':'unavailable','reason_codes':['SOURCE_POLICY_UNAVAILABLE']}
         return {k:source[k] for k in ('id','source_key','url','source_type','source_group','checked_at','published_at','read_confirmed','display_permitted','status','policy_version','version','evidence_note')}
-    def _facts(self,con,place_id,admin=False):
-        values=[];sources={r['id']:r for r in con.execute('SELECT * FROM evidence_sources WHERE place_id=?',(place_id,))}
-        for row in con.execute('SELECT * FROM place_facts WHERE place_id=? ORDER BY checked_at DESC,id',(place_id,)):
-            source=sources.get(row['source_id']);reasons=[]
-            expired=row['expires_at']<=now()
+    def _facts_many(self,con,place_ids,admin=False):
+        """Two bounded reads; source/fact combinations never multiply in a join."""
+        ids=sorted(set(place_ids)); output={ident:([],[]) for ident in ids}
+        if not ids:return output
+        marks=','.join('?' for _ in ids)
+        sources={}
+        for row in con.execute(f"SELECT s.*,EXISTS(SELECT 1 FROM discovery_tombstones t WHERE t.kind='source' AND t.target_id=s.id) AS withdrawn FROM evidence_sources s WHERE s.place_id IN ({marks}) ORDER BY s.source_key,s.id",ids):
+            source=dict(row)
+            if source['withdrawn']:source.update(status='revoked',display_permitted=0)
+            sources[source['id']]=source;output[source['place_id']][1].append(self._source_dto(source,admin))
+        clock=now()
+        for row in con.execute(f'SELECT * FROM place_facts WHERE place_id IN ({marks}) ORDER BY checked_at DESC,id',ids):
+            source=sources.get(row['source_id']); reasons=[];expired=row['expires_at']<=clock
             if not source or source['status']!='active' or not source['read_confirmed'] or not source['display_permitted']:reasons.append('SOURCE_POLICY_UNAVAILABLE')
             elif source['policy_version']!=row['policy_version']:reasons.append('SOURCE_POLICY_CHANGED')
             if expired:reasons.append('FACT_STALE')
-            allowed=not reasons
             fact={k:row[k] for k in ('id','field','status','source_id','checked_at','valid_for_date','valid_from','valid_until','expires_at','policy_version')}
-            fact.update(place_id=place_id,value=json.loads(row['value_json']) if admin or allowed else None,
-                freshness='expired' if expired else 'fresh',usable=allowed,reason_codes=reasons)
-            values.append(fact)
-        return values,[self._source_dto(s,admin) for s in sources.values()]
-    def _candidate(self,con,row,admin=False):
-        facts,sources=self._facts(con,row['place_id'],admin)
-        pack=con.execute('SELECT * FROM candidate_packs WHERE id=?',(row['pack_id'],)).fetchone()
-        return {'place_id':row['place_id'],'name':row['name'],'native_name':row['native_name'],'display_name':row['name'],
-            'address':row['address'],'city':row['city'],'category':row['category'],'categories':[row['category']],
-            'recommendation_types':json.loads(row['recommendation_types_json']),'tags':json.loads(row['tags_json']),
-            'chain_id':row['chain_id'],'neighborhood':row['neighborhood'],'latitude':row['latitude'],'longitude':row['longitude'],
-            'identity_status':row['identity_status'],'pack_status':pack['status'],'synthetic':bool(pack['synthetic']),
-            'canonical_url':row['canonical_url'],'facts':facts,'sources':sources}
-    def _public_catalog(self,con,city,excluded,*,categories=None):
-        from .public_places import POLICY, TTL, ATTRIBUTION, DISPLAY_CANDIDATES
-        cutoff=(datetime.now(timezone.utc)-TTL).isoformat()
-        rows=con.execute("SELECT c.*,p.name,p.address,p.city,p.identity_status FROM research_candidates c JOIN candidate_packs k ON k.id=c.pack_id JOIN place_identities p ON p.id=c.place_id WHERE p.provider='openstreetmap' AND p.deleted_at IS NULL AND p.identity_status='needs_confirmation' AND c.status='public_data' AND k.status='public_data' AND k.updated_at>? AND (CAST(? AS TEXT) IS NULL OR p.city=?) ORDER BY c.sort_order,p.id",(cutoff,city,city)).fetchall()
-        if not rows:return []
-        ids={r['place_id'] for r in rows}
-        sources={r['place_id']:self._source_dto(r) for r in con.execute("SELECT s.* FROM evidence_sources s JOIN place_identities p ON p.id=s.place_id WHERE p.provider='openstreetmap' AND s.policy_version=? AND s.status='active' AND s.read_confirmed=1 AND s.display_permitted=1 AND (CAST(? AS TEXT) IS NULL OR p.city=?)",(POLICY,city,city)) if r['place_id'] in ids}
-        # Apply the request and source gates before filling the display slots.
-        # Otherwise excluded restaurants can hide a usable cafe later in the cache.
-        categories=set(categories) if categories is not None else None
-        counts={};selected=[]
-        for row in rows:
-            if row['place_id'] in excluded or row['place_id'] not in sources:continue
-            if categories is not None and row['category'] not in categories:continue
-            count=counts.get(row['city'],0)
-            if count>=DISPLAY_CANDIDATES:continue
-            counts[row['city']]=count+1;selected.append(row)
-        rows=selected
-        ids={r['place_id'] for r in rows}
-        facts={}
-        for r in con.execute("SELECT f.* FROM place_facts f JOIN place_identities p ON p.id=f.place_id WHERE p.provider='openstreetmap' AND f.policy_version=? AND (CAST(? AS TEXT) IS NULL OR p.city=?)",(POLICY,city,city)):
-            if r['place_id'] not in ids:continue
-            value={k:r[k] for k in ('id','field','status','source_id','checked_at','valid_for_date','valid_from','valid_until','expires_at','policy_version')}
-            fresh=r['expires_at']>now();source=sources.get(r['place_id'])
-            allowed=bool(fresh and source and source['id']==r['source_id'])
-            value.update(place_id=r['place_id'],value=json.loads(r['value_json']) if allowed else None,freshness='fresh' if fresh else 'expired',usable=allowed,reason_codes=[] if allowed else ['FACT_STALE'])
-            facts.setdefault(r['place_id'],[]).append(value)
-        result=[]
-        for r in rows:
-            source=sources.get(r['place_id'])
-            if not source:continue
-            result.append({'place_id':r['place_id'],'name':r['name'],'native_name':r['native_name'],'display_name':r['name'],'address':r['address'],'city':r['city'],'category':r['category'],'categories':[r['category']],'recommendation_types':['local_discovery'],'tags':json.loads(r['tags_json']),'chain_id':None,'neighborhood':r['neighborhood'],'latitude':r['latitude'],'longitude':r['longitude'],'identity_status':'needs_confirmation','pack_status':'public_data','synthetic':False,'canonical_url':r['canonical_url'],'facts':facts.get(r['place_id'],[]),'sources':[source],'provider':'openstreetmap','source_kind':'public_map','attribution':ATTRIBUTION,'excluded':r['place_id'] in excluded})
-        return result
+            fact.update(place_id=row['place_id'],value=json.loads(row['value_json']) if admin or not reasons else None,
+                freshness='expired' if expired else 'fresh',usable=not reasons,reason_codes=reasons)
+            output[row['place_id']][0].append(fact)
+        return output
 
-    def catalog(self,actor,trip_id,city=None,include_unapproved=False,*,include_photos=True,categories=None):
-        self.repo.get_trip(actor.id,trip_id)
+    def _facts(self,con,place_id,admin=False):
+        return self._facts_many(con,[place_id],admin)[place_id]
+
+    def _candidates(self,con,rows,admin=False):
+        rows=list(rows)
+        if not rows:return []
+        facts=self._facts_many(con,[r['place_id'] for r in rows],admin)
+        ids=sorted({r['pack_id'] for r in rows});marks=','.join('?' for _ in ids)
+        packs={r['id']:r for r in con.execute(f'SELECT * FROM candidate_packs WHERE id IN ({marks})',ids)}
+        output=[]
+        for row in rows:
+            pack=packs[row['pack_id']];values,sources=facts[row['place_id']]
+            value={'place_id':row['place_id'],'name':row['name'],'native_name':row['native_name'],'display_name':row['name'],
+                'address':row['address'],'city':row['city'],'category':row['category'],'categories':[row['category']],
+                'recommendation_types':json.loads(row['recommendation_types_json']),'tags':json.loads(row['tags_json']),
+                'chain_id':row['chain_id'],'neighborhood':row['neighborhood'],'latitude':row['latitude'],'longitude':row['longitude'],
+                'identity_status':row['identity_status'],'pack_status':pack['status'],'synthetic':bool(pack['synthetic']),
+                'canonical_url':row['canonical_url'],'facts':values,'sources':sources,
+                'dependencies':{'pack_id':pack['id'],'pack_version':pack['version'],'identity_version':row['identity_version'] if 'identity_version' in row.keys() else None}}
+            if pack['status']=='public_data':
+                from .public_places import ATTRIBUTION
+                value.update(provider='openstreetmap',source_kind='public_map',attribution=ATTRIBUTION)
+            output.append(value)
+        return output
+
+    def _candidate(self,con,row,admin=False):
+        return self._candidates(con,[row],admin)[0]
+
+    def _catalog_rows(self,con,city,*,categories=None,place_ids=None,public=False,include_unapproved=False,available_only=False,origin=None):
+        from .public_places import TTL,POLICY
+        clauses=['p.deleted_at IS NULL'];args=[]
+        if public:
+            clauses += ["p.provider='openstreetmap'","p.identity_status='needs_confirmation'","c.status='public_data'","k.status='public_data'",'k.updated_at>?']
+            args.append((datetime.now(timezone.utc)-TTL).isoformat())
+        elif not include_unapproved:
+            clauses += ["c.status='approved'","k.status='approved'","p.identity_status='verified'"]
+        if not include_unapproved:clauses.append("NOT EXISTS(SELECT 1 FROM discovery_tombstones t WHERE t.kind='pack' AND t.target_id=k.id)")
+        if city:clauses.append('p.city=?');args.append(city)
+        for column,values in [('c.category',categories),('p.id',place_ids)]:
+            if values is not None:
+                values=sorted(set(values))
+                if not values:return []
+                clauses.append(column+' IN ('+','.join('?' for _ in values)+')');args.extend(values)
+        if public or available_only:
+            clauses.append("EXISTS(SELECT 1 FROM place_facts f JOIN evidence_sources s ON s.id=f.source_id WHERE f.place_id=p.id AND f.expires_at>? AND s.status='active' AND s.read_confirmed=1 AND s.display_permitted=1 AND s.policy_version=f.policy_version AND NOT EXISTS(SELECT 1 FROM discovery_tombstones t WHERE t.kind='source' AND t.target_id=s.id))")
+            args.append(now())
+        if not include_unapproved and not self.allow_synthetic:clauses.append('k.synthetic=0')
+        order='p.id,c.id'
+        if origin and origin.get('latitude') is not None and origin.get('longitude') is not None:
+            # Cheap deterministic spatial ordering before the bounded in-memory hard-condition pass.
+            import math
+            scale=math.cos(math.radians(origin['latitude']))**2
+            order='CASE WHEN c.latitude IS NULL OR c.longitude IS NULL THEN 1 ELSE 0 END,((c.latitude-?)*(c.latitude-?)+?*(c.longitude-?)*(c.longitude-?)),p.id,c.id'
+            args.extend([origin['latitude'],origin['latitude'],scale,origin['longitude'],origin['longitude']])
+        # A request evaluates at most 1000 stored rows; provider collection remains capped at 60.
+        return con.execute("SELECT c.*,p.name,p.address,p.city,p.identity_status,p.version AS identity_version FROM research_candidates c JOIN candidate_packs k ON k.id=c.pack_id JOIN place_identities p ON p.id=c.place_id WHERE "+' AND '.join(clauses)+' ORDER BY '+order+' LIMIT 1000',args).fetchall()
+
+    def _public_catalog(self,con,city,excluded,*,categories=None,place_ids=None,origin=None,limit=None):
+        rows=self._catalog_rows(con,city,categories=categories,place_ids=place_ids,origin=origin,public=True)
+        values=self._candidates(con,rows);items={}
+        for value in values:
+            if value['place_id'] not in excluded:
+                value['excluded']=False;items.setdefault(value['place_id'],value)
+        result=list(items.values())
+        return result if limit is None else result[:limit]
+
+    def _catalog_on(self,con,trip_id,city=None,*,include_unapproved=False,include_photos=True,categories=None,place_ids=None,origin=None,available_only=False):
+        rows=self._catalog_rows(con,city,categories=categories,place_ids=place_ids,origin=origin,include_unapproved=include_unapproved,available_only=available_only)
+        excluded={r['place_id'] for r in con.execute('SELECT place_id FROM discovery_exclusions WHERE trip_id=?',(trip_id,))}
+        items={}
+        for value in self._candidates(con,rows,include_unapproved):
+            value['excluded']=value['place_id'] in excluded
+            items.setdefault(value['place_id'],value)
+        for value in self._public_catalog(con,city,excluded,categories=categories,place_ids=place_ids,origin=origin):items.setdefault(value['place_id'],value)
+        values=sorted(items.values(),key=lambda p:p['place_id'])
+        if include_photos:
+            from .photos import for_places
+            images=for_places(con,[p['place_id'] for p in values])
+            for value in values:value.update(images[value['place_id']])
+        return values
+
+    def catalog(self,actor,trip_id,city=None,include_unapproved=False,*,include_photos=True,categories=None,place_ids=None,origin=None):
         with self.db.connect() as con:
+            self.repo._trip(con,actor.id,trip_id)
             if include_unapproved:self._admin(con,actor)
-            rows=con.execute("SELECT c.*,p.name,p.address,p.city,p.identity_status FROM research_candidates c JOIN candidate_packs k ON k.id=c.pack_id JOIN place_identities p ON p.id=c.place_id WHERE p.deleted_at IS NULL AND (?=1 OR c.status='approved' AND k.status='approved' AND p.identity_status='verified') AND (CAST(? AS TEXT) IS NULL OR p.city=?) ORDER BY p.id",(int(include_unapproved),city,city)).fetchall()
-            excluded={r[0] for r in con.execute('SELECT place_id FROM discovery_exclusions WHERE trip_id=?',(trip_id,))}
-            items={}
-            for row in rows:
-                value=self._candidate(con,row,include_unapproved);value['excluded']=row['place_id'] in excluded;items[row['place_id']]=value
-                if value['synthetic'] and not self.allow_synthetic:items.pop(row['place_id'],None)
-                elif include_photos:
-                    from .photos import for_place
-                    value.update(for_place(con,row['place_id']))
-            for value in self._public_catalog(con,city,excluded,categories=categories):
-                items[value['place_id']]=value
-                if include_photos:
-                    from .photos import for_place
-                    value.update(for_place(con,value['place_id']))
-            return sorted(items.values(),key=lambda p:p['place_id'])
+            return self._catalog_on(con,trip_id,city,include_unapproved=include_unapproved,include_photos=include_photos,categories=categories,place_ids=place_ids,origin=origin)
     def detail(self,actor,trip_id,place_id):
         self.repo.get_trip(actor.id,trip_id)
         with self.db.connect() as con:

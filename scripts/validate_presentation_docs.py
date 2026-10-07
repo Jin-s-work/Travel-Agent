@@ -26,8 +26,8 @@ def headings(text):
     return {re.sub(r'[^\w\- ]', '', line.lower()).replace(' ', '-')
             for line in re.findall(r'^#{1,6} (.+)$', text, re.M)}
 
-def validate():
-    docs = [ROOT/'README.md'] + [PRESENTATION/name for name in ('README.md','SCRIPT.md','CREDITS.md','REVIEW.md')]
+def validate(presentation=PRESENTATION, prefix='going-class-presentation'):
+    docs = [ROOT/'README.md'] + [presentation/name for name in ('README.md','SCRIPT.md','CREDITS.md','REVIEW.md')]
     errors, count = [], 0
     for doc in docs:
         body = doc.read_text()
@@ -44,11 +44,11 @@ def validate():
             elif parsed.fragment and target.suffix=='.md':
                 if unquote(parsed.fragment) not in headings(target.read_text()):
                     errors.append(f'{doc.relative_to(ROOT)}: missing heading {value}')
-    data=json.loads((PRESENTATION/'slides-content.json').read_text())
+    data=json.loads((presentation/'slides-content.json').read_text())
     assert len(data)==10, 'Expected the existing ten-slide deck'
     assert sum(x['seconds'] for x in data)==510, 'Timing allocation changed'
-    script=normalized((PRESENTATION/'SCRIPT.md').read_text())
-    with zipfile.ZipFile(PRESENTATION/'going-class-presentation.pptx') as z:
+    script=normalized((presentation/'SCRIPT.md').read_text())
+    with zipfile.ZipFile(presentation/f'{prefix}.pptx') as z:
         assert z.testzip() is None
         slides=[n for n in z.namelist() if re.fullmatch(r'ppt/slides/slide\d+\.xml',n)]
         notes=[n for n in z.namelist() if re.fullmatch(r'ppt/notesSlides/notesSlide\d+\.xml',n)]
@@ -63,11 +63,11 @@ def validate():
             text=normalized(''.join(ET.fromstring(z.read(f'ppt/slides/slide{i}.xml')).itertext()))
             assert normalized(d['title']) in text, f'Slide {i}: title differs'
             assert normalized(d['subtitle']) in text, f'Slide {i}: subtitle differs'
-    with zipfile.ZipFile(PRESENTATION/'going-class-presentation.key') as z:
+    with zipfile.ZipFile(presentation/f'{prefix}.key') as z:
         assert z.testzip() is None
         assert any(n.startswith('Index/') for n in z.namelist())
     assert not errors, '\n'.join(errors)
-    files = docs + [PRESENTATION/n for n in ('going-class-presentation.pptx','going-class-presentation.key','slides-content.json','preview.webp')]
+    files = docs + [presentation/n for n in (f'{prefix}.pptx',f'{prefix}.key','slides-content.json','preview.webp')]
     return {'scope':'Document/package consistency only; not product tests or live quality',
             'passed':True,'local_links_checked':count,'slides':10,'pptx_notes_matching_script':10,
             'target_duration_seconds':510,'actual_spoken_duration_measured':False,
@@ -77,9 +77,11 @@ def validate():
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--write-manifest',action='store_true')
+    parser.add_argument('--v4',action='store_true',help='Validate new evidence-led presentation, preserving previous files')
     args=parser.parse_args()
-    result=validate()
+    presentation=PRESENTATION/'v4' if args.v4 else PRESENTATION
+    result=validate(presentation, 'going-v4-class-presentation' if args.v4 else 'going-class-presentation')
     text=json.dumps(result,ensure_ascii=False,indent=2)+'\n'
     if args.write_manifest:
-        (PRESENTATION/'validation.json').write_text(text)
+        (presentation/'validation.json').write_text(text)
     print(text,end='')

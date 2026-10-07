@@ -197,9 +197,9 @@ def test_latest_opt_out_checkpoint_wins_and_event_id_collision(discovery):
 
 def test_report_filters_preserve_unmeasured_denominators(discovery):
     prepared(discovery)
-    measured=discovery.client.get('/api/v2/admin/product-report?synthetic=true&recommendation_type=local_discovery&language_required=false').json()
+    measured=discovery.client.get('/api/v2/admin/product-report?synthetic=true&recommendation_type=local_discovery&language_required=true').json()
     assert measured['cohort']['completed_runs']==1
-    zero=discovery.client.get('/api/v2/admin/product-report?synthetic=true&language_required=true').json()
+    zero=discovery.client.get('/api/v2/admin/product-report?synthetic=true&language_required=false').json()
     assert zero['cohort']['completed_runs']==0 and zero['metrics']['candidate_shortage']['ratio'] is None
     assert discovery.client.get('/api/v2/admin/product-report?start=2026-10-10&end=2026-10-01').status_code==422
 
@@ -222,6 +222,7 @@ def test_schema9_upgrade_preserves_trips_and_excludes_legacy_events(discovery):
     pack,trip,path,run=prepared(discovery)
     db=discovery.app.state.db
     with db.connect() as con:
+        for table in ('review_run_dependencies','place_review_requests','place_external_links','review_provider_contracts','workspace_drafts','itinerary_generation_drafts','maintenance_status','storage_deletion_receipts'):con.execute('DROP TABLE '+table)
         for table in ('accommodation_resolutions','trip_accommodations','discovery_intents','discovery_contexts','feedback_changes','fact_report_actions','visit_feedback','fact_reports','expense_overrides','product_run_metrics','product_preferences'):con.execute('DROP TABLE '+table)
         con.execute('DROP INDEX product_event_period')
         for column in ('schema_version','detail_json','client_at','exclusion_reason'):con.execute('ALTER TABLE discovery_events DROP COLUMN '+column)

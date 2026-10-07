@@ -203,7 +203,7 @@ def test_recommendation_matrix_bounded_metered_and_receipt_survives_read(discove
     assert run['snapshot']['route_stats']['provider_calls']==1
     assert len(run['snapshot']['route_evidence'])==1
     one=list(run['snapshot']['route_evidence'])[0]
-    row=all_items(run['result'])[one]
+    row=all_items(run['result'],'reference')[one]
     assert row['movement']['duration_minutes']==12
     assert row['movement']['straight_line_m'] is not None
     assert 'VERIFIED_WALKING_ROUTE' in row['score_components']['movement']['reason_codes']
@@ -228,7 +228,7 @@ def test_zero_budget_real_adapter_entry_never_called_and_unknown_keeps_distance(
     run=finish(discovery,trip,submit(discovery.client,trip,body(trip,overrides=overrides)))
     assert provider.calls==0 and run['snapshot']['route_stats']['provider_calls']==0
     assert not run['result']['sections']['local_discovery']['items']
-    assert any(row['movement']['straight_line_m'] is not None for row in all_items(run['result']).values())
+    assert any(row['movement']['straight_line_m'] is not None for row in all_items(run['result'],'reference').values())
     with discovery.app.state.db.connect() as con:
         assert con.execute('SELECT count(*) FROM usage_reservations').fetchone()[0]==0
 
@@ -261,13 +261,13 @@ def test_expired_route_dto_hides_time_preserves_sql_frozen_evidence(discovery):
     value=conditions();response=submit(discovery.client,trip,body(trip,overrides=value));run=finish(discovery,trip,response)
     with discovery.app.state.db.connect() as con:
         row=con.execute('SELECT snapshot_json,result_json FROM recommendation_runs WHERE id=?',(run['run_id'],)).fetchone()
-        stored=json.loads(row['result_json']);one=stored['sections']['local_discovery']['items'][0]
+        stored=json.loads(row['result_json']);one=stored['sections']['reference']['items'][0]
         one['movement']['route']={'status':'ok','mode':'walking','distance_m':1000,'duration_seconds':720,'expires_at':'2020-01-01T00:00:00+00:00','checked_at':'2019-12-31T23:00:00+00:00'}
         one['movement'].update(duration_minutes=12,kind='provider',distance_m=1000)
         frozen=json.dumps(stored);con.execute('UPDATE recommendation_runs SET result_json=? WHERE id=?',(frozen,run['run_id']))
     actual=discovery.client.get(f"/api/v2/trips/{trip['id']}/recommendations/{run['run_id']}").json()
     assert actual['route_status']=='stale'
-    rendered=all_items(actual['result'])[one['place_id']]['movement']
+    rendered=all_items(actual['result'],'reference')[one['place_id']]['movement']
     assert rendered['duration_minutes'] is None and rendered['route']['duration_seconds'] is None
     assert rendered['straight_line_m'] is not None
     with discovery.app.state.db.connect() as con:

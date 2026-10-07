@@ -1,0 +1,14 @@
+........................................................................ [ 36%]
+........................................................................ [ 72%]
+........................................................                 [100%]
+=============================== warnings summary ===============================
+../../../../../private/tmp/going-stage1-native313/lib/python3.13/site-packages/fastapi/testclient.py:1
+  /private/tmp/going-stage1-native313/lib/python3.13/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/test_stage2_review_contracts.py::test_normal_canonical_link_collect_card_and_itinerary_flow
+  /private/tmp/going-stage1-native313/lib/python3.13/site-packages/authlib/integrations/httpx_client/assertion_client.py:5: AuthlibDeprecationWarning: The httpx module is deprecated; please use httpx2 instead.
+    from ._compat import httpx2
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+200 passed, 2 warnings in 18.14s

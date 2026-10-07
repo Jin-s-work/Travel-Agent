@@ -49,14 +49,14 @@ def center(city):
     return CENTERS['cities'].get(city)
 
 
-def query(city):
+def query(city,*,categories=None):
     c = center(city)
     if not c:
         raise DomainError('CITY_UNSUPPORTED', '등록된 도시를 선택해 주세요.', 422)
     # No user text, private location, date or address leaves the server.
     return urlencode({'lat': c['latitude'], 'lon': c['longitude'],
                       'radius': c['radius_m']/1000, 'limit': MAX_CANDIDATES,
-                      'osm_tag': ['amenity:restaurant', 'amenity:cafe']}, doseq=True)
+                      'osm_tag': ['amenity:'+category for category in (['restaurant','cafe'] if categories is None else sorted(set(categories)&{'restaurant','cafe'}))]}, doseq=True)
 
 
 
@@ -158,8 +158,8 @@ def normalize_photon(payload, city):
     return normalize({'elements': elements}, city)
 
 
-def fetch(city):
-    page = fetch_public(ENDPOINT + '?' + query(city), max_bytes=MAX_BYTES,
+def fetch(city,*,categories=None):
+    page = fetch_public(ENDPOINT + '?' + query(city,categories=categories), max_bytes=MAX_BYTES,
                         timeout_seconds=15, max_redirects=0)
     if page.mime != 'application/json':
         raise FetchRejected('UNSUPPORTED_MIME')
@@ -186,7 +186,7 @@ class PublicDiscovery:
     def _status(self, city, state, **changes):
         c = center(city)
         return {'state': state, 'provider': PROVIDER, 'calls': 0, 'cost': {'currency': 'USD', 'micros': 0},
-                'cache_hit': False, 'endpoint': ENDPOINT, 'query_service': 'Photon', 'query_version': QUERY_VERSION, 'scope': 'city_center', 'radius_m': c['radius_m'] if c else None,
+                'cache_hit': False, 'endpoint': ENDPOINT, 'query_service': 'Photon', 'query_version': QUERY_VERSION, 'scope': 'city_center', 'origin_scope_supported':False, 'scope_reason':'CITY_CENTER_ONLY', 'radius_m': c['radius_m'] if c else None,
                 'center': c, 'center_attribution':{'text':'GeoNames','url':'https://www.geonames.org/','license':'CC BY 4.0','license_url':CENTERS['license_url']}, 'attribution': ATTRIBUTION, 'policy_version': POLICY,
                 'notice': '도심 3km 주변 공개지도 장소예요. 지점·영업·가격·리뷰는 방문 전에 확인해 주세요.', **changes}
 
@@ -201,14 +201,18 @@ class PublicDiscovery:
         delay = units.get('retry_after_seconds', 900)
         return stamp(row['updated_at']) + timedelta(seconds=delay)
 
-    def ensure(self, actor, trip_id, city, ctx):
+    def ensure(self, actor, trip_id, city, ctx, *, origin=None,categories=None,radius_m=None):
         """Called only by an authenticated recommendation job, never by GET."""
         if not center(city):
             return self._status(city, 'unavailable', reason='CITY_UNSUPPORTED')
         ctx.guard()
+        import inspect
+        try:inspect.signature(self.fetcher).bind(city,categories=[]);category_support=True
+        except (TypeError,ValueError):category_support=False
+        selected=sorted(set(categories or ['restaurant','cafe'])&{'restaurant','cafe'}) if category_support else None
         now = self.clock().astimezone(timezone.utc)
-        request_hash = hashlib.sha256((POLICY + ':' + QUERY_VERSION + ':' + ENDPOINT + ':' + query(city)).encode()).hexdigest()
-        pack_id = 'osm_pack_' + city
+        request_hash = hashlib.sha256((POLICY + ':' + QUERY_VERSION + ':' + ENDPOINT + ':' + query(city,categories=selected)).encode()).hexdigest()
+        pack_id = 'osm_pack_' + city + ('_'+request_hash[:20] if selected is not None and set(selected)!={'restaurant','cafe'} else '')
         context = CallContext(actor.id, trip_id, trip_id, job_id=ctx.job['id'])
         try:
             from src.operations.controls import external_guard
@@ -249,12 +253,12 @@ class PublicDiscovery:
                     (call_id, actor.id, trip_id, context.job_id, 'personal_trip', trip_id, PROVIDER, 'public_city_restaurants', 'public_discovery', 1, 'job:' + context.job_id + ':' + city, request_hash, 'sent', 'USD', units, 0, POLICY, date, encode({'calls':0,'response_bytes':0}), day, now.strftime('%Y-%m'), date, date))
                 Budget._ledger(con, call_id, 'reserved', 0, {'calls':1,'response_bytes':MAX_BYTES}, date, reason='EXPLICIT_FREE_PUBLIC_DATA')
             try:
-                ctx.guard(); items, received = self.fetcher(city); ctx.guard()
+                ctx.guard(); items, received = self.fetcher(city,categories=selected) if category_support else self.fetcher(city); ctx.guard()
                 if type(received) is not int or not 0 <= received <= MAX_BYTES or len(items) > MAX_CANDIDATES:
                     raise DomainError('PUBLIC_DISCOVERY_OVERSIZED', '공개지도 응답이 허용 크기를 넘었어요.', 503)
                 with self.db.connect() as con:
                     con.execute('BEGIN IMMEDIATE'); ctx.guard(con=con); Budget._scope(con, context)
-                    self._store(con, actor, city, items, now)
+                    self._store(con, actor, city, items, now,pack_id=pack_id)
                     self._settle(con, call_id, received, now)
                 return self._status(city, 'ready' if items else 'empty', calls=1, candidate_count=len(items), display_limit=DISPLAY_CANDIDATES, fetched_at=date, expires_at=(now+TTL).isoformat())
             except Exception as exc:
@@ -286,12 +290,13 @@ class PublicDiscovery:
         con.execute("UPDATE usage_reservations SET state='settled',actual_units_json=?,actual_cost_micros=0,error_code=?,updated_at=? WHERE call_id=?", (encode(units), code, now.isoformat(), call_id))
         Budget._ledger(con, call_id, 'settled', 0, units, now.isoformat(), reason=code or 'EXPLICIT_FREE_PUBLIC_DATA')
 
-    def _store(self, con, actor, city, items, now):
-        pack_id, date = 'osm_pack_' + city, now.isoformat()
+    def _store(self, con, actor, city, items, now,*,pack_id=None):
+        pack_id, date = pack_id or 'osm_pack_' + city, now.isoformat()
+        version=POLICY if pack_id=='osm_pack_'+city else POLICY+':'+pack_id
         if con.execute("SELECT 1 FROM discovery_tombstones WHERE kind='pack' AND target_id=?", (pack_id,)).fetchone():
             raise DomainError('PUBLIC_DISCOVERY_WITHDRAWN', '이 도시의 공개지도 자료 제공이 중지되었어요.', 503)
         con.execute('INSERT INTO candidate_packs VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET status=excluded.status,updated_at=excluded.updated_at',
-                    (pack_id, POLICY, city, 0, 'public_data', actor.id, date, date))
+                    (pack_id, version, city, 0, 'public_data', actor.id, date, date))
         # Retain removed identities for existing bookmarks, but remove them from current discovery.
         con.execute("UPDATE research_candidates SET status='expired' WHERE pack_id=?", (pack_id,))
         old_places={r['id']:r for r in con.execute("SELECT id,city,identity_status,deleted_at FROM place_identities WHERE provider='openstreetmap'")}

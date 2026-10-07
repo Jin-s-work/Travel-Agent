@@ -14,7 +14,7 @@ from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
-ASSETS = ('js/accommodations.js', 'js/foundation.js', 'js/travel-tools.js', 'js/product.js', 'js/offline-store.js', 'css/foundation.css', 'css/design-system.css', 'icon.svg')
+ASSETS = ('js/discovery-experience.js', 'js/review-lab.js', 'js/workspace.js', 'js/accommodations.js', 'js/foundation.js', 'js/travel-tools.js', 'js/product.js', 'js/offline-store.js', 'css/foundation.css', 'css/design-system.css', 'icon.svg')
 
 
 def updated_index():

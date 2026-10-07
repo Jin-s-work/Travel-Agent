@@ -8,7 +8,7 @@ import sqlite3
 import fcntl
 
 
-SCHEMA_VERSION = 12
+SCHEMA_VERSION = 14
 SCHEMA = """
 CREATE TABLE users (
  id TEXT PRIMARY KEY, email TEXT NOT NULL, auth_provider TEXT NOT NULL,
@@ -196,6 +196,14 @@ COMMIT;''')
                 except BaseException:
                     connection.rollback()
                     raise
+                version = 12
+            if version == 12:
+                from src.foundation.journey_schema import SCHEMA as journey_schema
+                connection.executescript('BEGIN IMMEDIATE;\n' + journey_schema + '\nPRAGMA user_version=13;\nCOMMIT;')
+                version = 13
+            if version == 13:
+                from src.research.stage2_schema import SCHEMA as stage2_schema
+                connection.executescript('BEGIN IMMEDIATE;\n' + stage2_schema + '\nPRAGMA user_version=14;\nCOMMIT;')
 
     @contextmanager
     def connect(self):
