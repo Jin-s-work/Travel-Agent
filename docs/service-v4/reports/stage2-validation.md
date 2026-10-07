@@ -78,3 +78,9 @@ PYTHON_DOTENV_DISABLED=1 .venv/bin/python -m pytest tests/test_cloud_storage.py 
 3. 현재 계정·단가·이용 범위를 확인한 승인 한도에서 리뷰 A→검토→B를 진행한다. 원천 연속성을 확인할 수 있는 adapter/protocol이 없으면 strict OFF를 유지한다.
 4. 실제 도시별 heldout 품질을 통과한 후에만 제품 gate를 검토한다. 필요 설정, dry-run, 복구는 [리뷰 계약 보고서](stage2-review-contracts.md)에 있다.
 5. 소수 사용자의 두 탐색 선택·저장·일정 채택·방문 경험을 건수와 이유로 측정한다.
+
+## GitHub 및 정리
+
+구현·README·새 발표 자료 commit `98d2d31`을 `main`과 `codex/private-beta-launch`에 atomic push했다. 운영 배포 명령과 새 공급자 지출은 실행하지 않았다. `render.yaml`은 autoDeployTrigger off이며 실제 운영 환경 반영 여부를 이번 코드 업로드의 성공으로 간주하지 않는다. 임시 PostgreSQL 검증 컨테이너와 그 시험 볼륨만 정리했다. 기존 사용자 Keynote 수정은 커밋에서 제외했다.
+
+새 발표 PPTX와 Keynote는10장·8분30초 목표이며 Keynote에서 모든 장과 메모를 직접 확인했다. 패키지·차트 workbook·폰트·배치 검사와 로컬 문서 링크64개를 통과했다. 실제 낭독·Windows PowerPoint는 미검증이다. [발표 검증](../../presentation/v4/REVIEW.md).
