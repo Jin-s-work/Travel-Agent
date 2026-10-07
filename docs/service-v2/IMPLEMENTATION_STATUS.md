@@ -523,3 +523,8 @@ DB 비밀번호 확인/필요 시 소유자의 직접 재설정과 Google 웹 �
 무료→AI 전환에서 기존 원문의 검색 벡터 누락으로 활성화가 막히던 문제를 수정했다. 안전한 전체 세대 검증·SQL 예약 보존은 유지하고 완료된 추출/임베딩을 재시도에서 재사용한다. 전체 Python1026 pass/15 skip; 최종 운영 결과는 v3 검증 기록 참조.
 
 최종 **d7a9fbf / dep-db2qt1d9fdbs738uqlb0** 실제Live. 기존키로 OpenAI합성8예약 분석·근거8건 확인,재시작후15예약유지·원문6개 검색세대활성. Python1026/Node122 pass,Python15 skip. 초기복구219초·실물모바일미검증 등 제한은 v3 보고서 참조. README 수정 없음.
+
+
+## 2026-10-07 후속 — 고잉·여백·공개지도 검색
+
+사용자 지정 이름 **고잉**, 단순 G아이콘, 컴팩트 홈/모바일 패딩과 상태 문구를 적용했다. 운영 Overpass 연결 거절을 확인한 뒤 무료 Photon 조회로 전환했다. `3b019b8` / `dep-db2reuks728c73acnk9g` Live, 실제 런던50개 지점 수신/음식점12카드 표시/상세/새로고침 확인. 공개 후보를 검수된 추천이나 확정 영업으로 표시하지 않는다. Python1039 passed/15 skipped,Node124 passed. [상세 결과·한계](../service-v3/reports/going-design-search-validation.md). README 및 기존 OpenAI 메일 모델·예산 유지.
