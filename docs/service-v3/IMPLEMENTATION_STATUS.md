@@ -195,3 +195,8 @@ Pretendard Variable v1.3.9를 자체 호스팅하고 굵기/자간/여백/버튼
 사용자 지정 이름 고잉과 G 아이콘으로 교체. 모바일 중복 하단 패딩·큰 홈 카드·숙소 없는 거리 입력·중복 검색 오류를 정리했다. DNS 연결 복구, HTTP 거절/연결 오류 분리, 공급자 공통 Retry-After·정확한 재시도 시각을 구현했다. 로컬 회귀와 운영 검증은 [실행 보고서](reports/going-design-search-validation.md)에 구분해 기록한다. README 미변경, OpenAI 예산과 개인정보 계약 유지.
 
 최종 `3b019b8` / `dep-db2reuks728c73acnk9g` Live(2026-10-07 12:07:38 KST 시작,1m04s). Render에서 기존 Overpass TCP접속이 errno111로 거절되어 공식 Photon 조회로 전환했다. 운영 런던50개 지점 저장→음식점12카드/상세/새로고침 복원 확인. 검수된 추천·리뷰 비율과는 구분한다. Python1039 pass/15 skip,Node124 pass. 변경 범위·실제52.89초 처리시간·라이브 미검증 항목은 위 보고서 참조. README 미변경.
+
+
+### 고잉 아이콘 후속 변경
+
+사용자 피드백에 따라 G를 여행가방 SVG로 교체했다. 기존 색·서비스명은 유지하고 헤더/로그인/파비콘 및 PWA 자산 캐시를 갱신했다. 실제 크기 확인과 관련 JS20개·asset check 통과. 운영 반영 여부는 [검증 보고서](reports/going-design-search-validation.md)의 후속 기록을 따른다. README 미변경.
