@@ -49,7 +49,7 @@
 | PostgreSQL | 시간 충돌·무료 메일·외부 호출 없는 재색인 | 임시 PostgreSQL 58 passed, 15.79s. 시험 전용 컨테이너 정리 |
 | 브라우저 | Chrome 실제 메일 업로드→예약 확인·교정→재분석→질문→새로고침, 필터 편집·취소 | 실제 무료 parser로 3메일/10예약. 날짜 질문 8방문+숙박=9근거. 미지원 메일 실패/원문/직접입력 안내, 기존10예약 보존 |
 | 반응형/접근성 | Chrome 390px·960px, 200% 글자·다크, 키보드/초점, font-family/font ready | 390px scrollWidth=390, 200% 모달 clientWidth=scrollWidth=318. Pretendard 로드 확인. 실제 iOS/Android/Safari 미검증 |
-| 배포 | 실행 revision·Render deploy ID·HTTPS·readiness·자산 대조 | pending |
+| 배포 | 실행 revision·Render deploy ID·HTTPS·readiness·자산 대조 | `64ee184` / `dep-db2pu9om7kps73bsa17g`, 10:23:51 KST 시작, 1m06s 후 Deploy succeeded. HTTPS/live/ready 200, 개인 API 401, 자산 8개 해시 일치 |
 
 ### 실행 명령과 경계
 
@@ -82,6 +82,10 @@ ZIP 무결성·내부 경로/README 일치 검사는 완료했다. 실제 사용
 - 운영 DB 읽기 전용 확인: 문서6 `needs_review`, 활성 `local-mail-v1` 세대6, schema12, usage 예약/정산0행. 모든 개인 테이블 RLS true, browser `anon`/`authenticated`의 travel schema USAGE false. 유료 AI·임베딩 호출과 플랜 변경 없음.
 - HTTPS live/ready 200, 익명 trips/cities/mail-capabilities API 401. 운영 기존 세션으로 확인했으며 이번 수정에서 Google OAuth 신규 로그인 왕복은 반복하지 않았다.
 - 운영 복구 중 이전 오류 문구가 성공 뒤 남는 화면 문제를 찾아 재시도별 결과 초기화를 보완했다. 같은 job의 부분 결과는 보존하고 새 시도/최종 결과에서만 오래된 안내·건수를 지운다. 영어 restaurant로 저장된 식당도 음식점 필터/상세/편집에 표시하며 저장값을 임의로 교정하지 않는다. 후속 최종 배포와 자산 해시 결과는 위 배포 표를 따른다.
+
+최종 UI 보완 배포 뒤에도 운영 문서6/활성 무료 세대6/예약15가 유지됐고 최근 메일 job6개 모두 `succeeded`, attempt1, error null이었다. 실제 운영의 파일별 실행 시간은 약22.6~28.4초였으며 순차 작업6개는 첫 시작부터 마지막 완료까지 약159초였다. 이는 해당 테스트팩 실행의 관측값이며 메일 복잡도·무료 인스턴스 기동 대기에 따라 달라진다.
+
+Chrome/macOS에서 최종 자산 `foundation.js?v=515b0d15ba0e`, Pretendard 실제 로드/계산 font-family, 음식점 필터 **2/14건**과 한글 종류, 전체14건 복귀를 확인했다. 브라우저 console error 관측0. 검증 JSON은 [운영 확인 결과](mail-recovery-live-verification.json)에 저장한다. 새로운 파일 업로드/교정·재분석/질문 전체 흐름은 앞서 기록한 로컬 합성 시험이며, 운영에서는 기존 6개 메일의 복구와 보존을 검증했다.
 
 ## 운영 경계와 복구
 

@@ -177,3 +177,5 @@ Pretendard Variable v1.3.9를 자체 호스팅하고 굵기/자간/여백/버튼
 최종 Python 1020 passed/15 skipped/2 warnings, Node119 passed, 임시 PostgreSQL58 passed. Chrome 실제 업로드/교정/재분석/날짜질문/새로고침/실패안내, 390px/960px/큰글자200%/다크/키보드 필터를 검증했다. 합성 로그인과 운영 로그인은 구분한다. DB schema 변경·비밀·플랜·유료 API 활성화 없음.
 
 상세: [메일·디자인 검증 보고서](reports/mail-recovery-pretendard-validation.md). 운영 배포 결과는 이 보고서의 배포 표를 따른다.
+
+최종 무료 운영 반영: `64ee184`, Render `dep-db2pu9om7kps73bsa17g`(2026-10-07 10:23:51 KST 시작·1m06s 후 Deploy succeeded). 기존 실패 메일6개→14예약 복구, 운영 재시작 후 총15예약 유지, 유료 usage0. 최종 UI119/Python1020/PostgreSQL58 통과, Python15skip. HTTPS·익명 개인API 차단·8개 자산해시·Pretendard/음식점 필터를 실제 확인했다. 상세 결과는 메일·디자인 검증 보고서와 연결된 운영 JSON에 기록한다.
