@@ -1,0 +1,126 @@
+{
+  "schema": 12,
+  "counts": {
+    "users": 1,
+    "trips": 2,
+    "trip_stops": 2,
+    "source_documents": 6,
+    "bookings": 1,
+    "recommendation_runs": 12,
+    "itineraries": 0,
+    "deletion_tombstones": 2,
+    "trip_accommodations": 3,
+    "accommodation_resolutions": 0,
+    "candidate_packs": 3,
+    "research_candidates": 9,
+    "evidence_sources": 10
+  },
+  "catalog_by_city": {
+    "barcelona": 3,
+    "madrid": 3,
+    "tokyo": 3
+  },
+  "stays_by_state": {
+    "unresolved": 1,
+    "unavailable": 2
+  },
+  "stay_no_invented_identity": 1,
+  "rls": {
+    "accommodation_resolutions": true,
+    "trip_accommodations": true
+  },
+  "all_private_tables_rls": true,
+  "browser_schema_usage": {
+    "anon": false,
+    "authenticated": false
+  },
+  "latest_job": {
+    "operation": "recommendations",
+    "state": "succeeded",
+    "attempt": 1,
+    "stage": "succeeded",
+    "started_at": "2026-10-06T16:38:24.314613+00:00",
+    "finished_at": "2026-10-06T16:39:19.233548+00:00",
+    "error_code": null
+  },
+  "usage_by_provider": [],
+  "http": {
+    "/health/live": {
+      "status": 200,
+      "body": {
+        "ok": true
+      }
+    },
+    "/health/ready": {
+      "status": 200,
+      "body": {
+        "ready": true,
+        "checks": {
+          "schema": true,
+          "storage": true,
+          "dispatcher": true,
+          "identity": true,
+          "restore": true
+        }
+      }
+    },
+    "/api/v2/trips": {
+      "status": 401,
+      "body": null
+    },
+    "/api/v2/cities": {
+      "status": 401,
+      "body": null
+    },
+    "/": {
+      "status": 200,
+      "accommodations_script": true,
+      "brand_yeojeong": true
+    }
+  },
+  "asset_hash_matches": {
+    "js/accommodations.js": true,
+    "js/foundation.js": true,
+    "css/foundation.css": true,
+    "css/design-system.css": true,
+    "sw.js": true,
+    "manifest.webmanifest": true,
+    "icon.svg": true,
+    "fonts/SUIT-Variable-v2.0.5.woff2": true
+  },
+  "runtime_commit": "9c97e86df4329c6033d1dce3357c061bbdb9c8ca",
+  "deploy_id": "dep-db2i79mgekts73cfodrg",
+  "deploy_started_at": "2026-10-07T01:36:55+09:00",
+  "render_duration": "1m02s",
+  "render_status": "Deploy succeeded|Live",
+  "counts_before_deployment": {
+    "users": 1,
+    "trips": 2,
+    "trip_stops": 2,
+    "source_documents": 6,
+    "bookings": 1,
+    "recommendation_runs": 10,
+    "itineraries": 0,
+    "deletion_tombstones": 2,
+    "trip_accommodations": 3,
+    "accommodation_resolutions": 0,
+    "candidate_packs": 3,
+    "research_candidates": 9,
+    "evidence_sources": 10
+  },
+  "count_changes": {
+    "recommendation_runs": 2
+  },
+  "browser": {
+    "platform": "Chrome/macOS",
+    "new_oauth_roundtrip": false,
+    "automatic_result_display": true,
+    "result_loading_submit_disabled": true,
+    "restaurant_cards": 3,
+    "qualified_recommendations": 0,
+    "console_errors": 0,
+    "gallery_buttons_and_keyboard": true,
+    "reload_preserved_results": true,
+    "physical_mobile_tested": false
+  }
+}

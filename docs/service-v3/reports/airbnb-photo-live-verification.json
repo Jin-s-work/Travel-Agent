@@ -1,0 +1,87 @@
+{
+  "schema": 12,
+  "counts": {
+    "users": 1,
+    "trips": 2,
+    "trip_stops": 2,
+    "source_documents": 6,
+    "bookings": 1,
+    "recommendation_runs": 9,
+    "itineraries": 0,
+    "deletion_tombstones": 2,
+    "trip_accommodations": 3,
+    "accommodation_resolutions": 0,
+    "candidate_packs": 3,
+    "research_candidates": 9,
+    "evidence_sources": 10
+  },
+  "catalog_by_city": {
+    "barcelona": 3,
+    "madrid": 3,
+    "tokyo": 3
+  },
+  "stays_by_state": {
+    "unresolved": 1,
+    "unavailable": 2
+  },
+  "stay_no_invented_identity": 1,
+  "rls": {
+    "accommodation_resolutions": true,
+    "trip_accommodations": true
+  },
+  "all_private_tables_rls": true,
+  "browser_schema_usage": {
+    "anon": false,
+    "authenticated": false
+  },
+  "http": {
+    "/health/live": {
+      "status": 200,
+      "body": {
+        "ok": true
+      }
+    },
+    "/health/ready": {
+      "status": 200,
+      "body": {
+        "ready": true,
+        "checks": {
+          "schema": true,
+          "storage": true,
+          "dispatcher": true,
+          "identity": true,
+          "restore": true
+        }
+      }
+    },
+    "/api/v2/trips": {
+      "status": 401,
+      "body": null
+    },
+    "/api/v2/cities": {
+      "status": 401,
+      "body": null
+    },
+    "/": {
+      "status": 200,
+      "accommodations_script": true
+    }
+  },
+  "asset_hash_matches": {
+    "js/accommodations.js": true,
+    "js/foundation.js": true,
+    "css/foundation.css": true,
+    "css/design-system.css": true,
+    "sw.js": true
+  },
+  "runtime_commit": "801922dfcce6db0513f1023a689931a971cc2f25",
+  "deploy_id": "dep-db2h59p42hec73aol2og",
+  "live_at_kst": "2026-10-07T00:26:13+09:00",
+  "count_changes": {
+    "recommendation_runs": {
+      "before": 8,
+      "after": 9
+    }
+  },
+  "count_change_reason": "One authenticated live recommendation verification; no new trip, document, booking or accommodation."
+}

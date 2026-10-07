@@ -1,0 +1,36 @@
+{
+  "version": "zero-spend-2026-10-06-v1",
+  "confirmed_at": "2026-10-06T00:00:00+09:00",
+  "timezone": "UTC",
+  "halted": true,
+  "prices": {
+    "openai/gpt-5-mini": {
+      "currency": "USD",
+      "rates_per_million": {
+        "input_tokens": "0.25",
+        "output_tokens": "2.00"
+      },
+      "max_units": {
+        "input_tokens": 100000,
+        "output_tokens": 4096
+      }
+    },
+    "openai/text-embedding-3-small": {
+      "currency": "USD",
+      "rates_per_million": {
+        "input_tokens": "0.02"
+      },
+      "max_units": {
+        "input_tokens": 100000
+      }
+    }
+  },
+  "limits": {
+    "USD": {
+      "user_daily": 0,
+      "user_monthly": 0,
+      "global_daily": 0,
+      "global_monthly": 0
+    }
+  }
+}

@@ -1,0 +1,794 @@
+{
+  "snapshot": {
+    "conditions": {
+      "city": "tokyo",
+      "visit": {
+        "date": "2026-11-06",
+        "local_time": "12:00",
+        "timezone": "Asia/Tokyo"
+      },
+      "party": {
+        "adults": 4,
+        "children": []
+      },
+      "categories": [
+        "restaurant"
+      ],
+      "recommendation_types": [
+        "local_discovery",
+        "landmark"
+      ],
+      "origin": {
+        "label": "합성 출발점",
+        "latitude": 35.68,
+        "longitude": 139.77
+      },
+      "budget": {
+        "currency": "JPY",
+        "amount_max": "3000",
+        "basis": "per_person",
+        "period": "meal"
+      },
+      "density": "balanced",
+      "required": {
+        "dietary": [],
+        "accessibility": []
+      },
+      "preferred": {
+        "tags": [
+          "noodles"
+        ],
+        "dietary": []
+      },
+      "prefer_nearby": true
+    },
+    "limit": 6,
+    "rating_filter": {
+      "enabled": true,
+      "min_rating": 4.2,
+      "min_count": 200,
+      "apply_to": [
+        "local_discovery"
+      ]
+    },
+    "movement_version": "v2",
+    "evaluation_at": "2026-10-05T12:00:00+00:00",
+    "origin_context": {
+      "origin_version": "origin-fixture-1",
+      "origin": {
+        "label": "Synthetic hotel",
+        "accommodation_id": "stay_fixture",
+        "version": 1
+      }
+    },
+    "route_evidence": {
+      "place_tokyo_1": {
+        "origin_index": 0,
+        "destination_index": 0,
+        "origin_identity": {
+          "id": "stay_fixture",
+          "version": "origin-fixture-1"
+        },
+        "destination_identity": {
+          "id": "place_tokyo_1",
+          "version": "cf106de2b1a4acfcf66a10e4"
+        },
+        "mode": "walking",
+        "status": "ok",
+        "provider": "synthetic_location",
+        "adapter_version": "synthetic_routes_v1",
+        "distance_m": 1900,
+        "duration_seconds": 1500,
+        "checked_at": "2026-10-05T11:58:00+00:00",
+        "expires_at": "2026-10-05T14:00:00+00:00",
+        "usage_permission": {
+          "display": true,
+          "durable_storage": true
+        },
+        "accessibility_status": "unknown"
+      },
+      "place_tokyo_2": {
+        "origin_index": 0,
+        "destination_index": 0,
+        "origin_identity": {
+          "id": "stay_fixture",
+          "version": "origin-fixture-1"
+        },
+        "destination_identity": {
+          "id": "place_tokyo_2",
+          "version": "069a94395e2a5f6eac1f5d1a"
+        },
+        "mode": "walking",
+        "status": "ok",
+        "provider": "synthetic_location",
+        "adapter_version": "synthetic_routes_v1",
+        "distance_m": 1900,
+        "duration_seconds": 300,
+        "checked_at": "2026-10-05T11:58:00+00:00",
+        "expires_at": "2026-10-05T14:00:00+00:00",
+        "usage_permission": {
+          "display": true,
+          "durable_storage": true
+        },
+        "accessibility_status": "unknown"
+      }
+    },
+    "route_stats": {
+      "provider_calls": 0,
+      "matrix_elements": 2,
+      "source": "explicit_synthetic_fixture",
+      "actual_provider_cost": null
+    },
+    "synthetic_fixture_notice": "Entire snapshot, places and routes are synthetic. No live maps call, paid usage or user outcomes."
+  },
+  "candidates": [
+    {
+      "external_id": "synthetic-tokyo-1",
+      "name": "합성 東京 1 · 非常に長い名前の地域食堂と文化散歩",
+      "native_name": "합성 東京 1 · 非常に長い名前の地域食堂と文化散歩",
+      "address": "SYNTHETIC ONLY 1 tokyo",
+      "category": "restaurant",
+      "canonical_url": "https://example.org/tokyo/1",
+      "chain_id": "synthetic_chain",
+      "neighborhood": "synthetic_neighborhood",
+      "tags": [
+        "culture",
+        "noodles"
+      ],
+      "recommendation_types": [
+        "local_discovery",
+        "landmark"
+      ],
+      "latitude": 35.681,
+      "longitude": 139.77100000000002,
+      "sources": [
+        {
+          "key": "official",
+          "url": "https://example.org/tokyo/1/official",
+          "source_type": "synthetic",
+          "source_group": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "read_confirmed": true,
+          "display_permitted": true,
+          "evidence_note": "Synthetic test evidence only; not an actual recommendation.",
+          "id": "source_1_official",
+          "status": "active",
+          "policy_version": "synthetic-discovery-v1-tokyo"
+        },
+        {
+          "key": "regional_a",
+          "url": "https://example.org/tokyo/1/regional_a",
+          "source_type": "synthetic",
+          "source_group": "regional_a",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "read_confirmed": true,
+          "display_permitted": true,
+          "evidence_note": "Synthetic test evidence only; not an actual recommendation.",
+          "id": "source_1_regional_a",
+          "status": "active",
+          "policy_version": "synthetic-discovery-v1-tokyo"
+        },
+        {
+          "key": "regional_b",
+          "url": "https://example.org/tokyo/1/regional_b",
+          "source_type": "synthetic",
+          "source_group": "regional_b",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "read_confirmed": true,
+          "display_permitted": true,
+          "evidence_note": "Synthetic test evidence only; not an actual recommendation.",
+          "id": "source_1_regional_b",
+          "status": "active",
+          "policy_version": "synthetic-discovery-v1-tokyo"
+        }
+      ],
+      "facts": [
+        {
+          "field": "local_evidence",
+          "value": {
+            "source_groups": [
+              "regional_a",
+              "regional_b"
+            ],
+            "direct_confirmation": false
+          },
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_1_0",
+          "source_id": "source_1_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "iconic_evidence",
+          "value": {
+            "source_groups": [
+              "regional_a",
+              "regional_b"
+            ],
+            "level": "city"
+          },
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_1_1",
+          "source_id": "source_1_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "opening_hours",
+          "value": {
+            "timezone": "Asia/Tokyo",
+            "weekly": {
+              "0": [
+                [
+                  "10:00",
+                  "22:00"
+                ]
+              ],
+              "1": [
+                [
+                  "10:00",
+                  "22:00"
+                ]
+              ],
+              "2": [
+                [
+                  "10:00",
+                  "22:00"
+                ]
+              ],
+              "3": [
+                [
+                  "10:00",
+                  "22:00"
+                ]
+              ],
+              "4": [
+                [
+                  "10:00",
+                  "22:00"
+                ]
+              ],
+              "5": [
+                [
+                  "10:00",
+                  "22:00"
+                ]
+              ],
+              "6": [
+                [
+                  "10:00",
+                  "22:00"
+                ]
+              ]
+            }
+          },
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "valid_for_date": "2026-11-06",
+          "id": "fact_1_2",
+          "source_id": "source_1_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "max_party",
+          "value": 6,
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_1_3",
+          "source_id": "source_1_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "min_party",
+          "value": 1,
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_1_4",
+          "source_id": "source_1_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "children_rule",
+          "value": {
+            "allowed": true,
+            "minimum_age": 0
+          },
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_1_5",
+          "source_id": "source_1_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "closed",
+          "value": false,
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_1_6",
+          "source_id": "source_1_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "price",
+          "value": {
+            "currency": "JPY",
+            "amount_min": "1000",
+            "amount_max": "2000",
+            "basis": "per_person",
+            "period": "meal",
+            "tax": "included",
+            "deposit": null
+          },
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_1_7",
+          "source_id": "source_1_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "reservation_methods",
+          "value": [
+            "official_website"
+          ],
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_1_8",
+          "source_id": "source_1_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "reservation_url",
+          "value": "https://example.org/tokyo/1/booking",
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_1_9",
+          "source_id": "source_1_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "facility_capacity",
+          "value": 25,
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_1_10",
+          "source_id": "source_1_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "dietary",
+          "value": {
+            "vegetarian": true,
+            "nut_free": false
+          },
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_1_11",
+          "source_id": "source_1_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "accessibility",
+          "value": {
+            "step_free": true
+          },
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_1_12",
+          "source_id": "source_1_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "rating",
+          "value": {
+            "platform": "synthetic",
+            "scale": 5,
+            "rating": 4.5,
+            "total_rating_count": 300,
+            "comparison_cohort": "tokyo_test",
+            "usage_permitted": true
+          },
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_1_13",
+          "source_id": "source_1_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        }
+      ],
+      "place_id": "place_tokyo_1",
+      "city": "tokyo",
+      "identity_status": "verified",
+      "pack_status": "approved",
+      "synthetic": true
+    },
+    {
+      "external_id": "synthetic-tokyo-2",
+      "name": "합성 東京 2 · 非常に長い名前の地域食堂と文化散歩",
+      "native_name": "합성 東京 2 · 非常に長い名前の地域食堂と文化散歩",
+      "address": "SYNTHETIC ONLY 2 tokyo",
+      "category": "restaurant",
+      "canonical_url": "https://example.org/tokyo/2",
+      "chain_id": "synthetic_chain",
+      "neighborhood": "synthetic_neighborhood",
+      "tags": [
+        "culture",
+        "noodles"
+      ],
+      "recommendation_types": [
+        "local_discovery",
+        "landmark"
+      ],
+      "latitude": 35.682,
+      "longitude": 139.77200000000002,
+      "sources": [
+        {
+          "key": "official",
+          "url": "https://example.org/tokyo/2/official",
+          "source_type": "synthetic",
+          "source_group": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "read_confirmed": true,
+          "display_permitted": true,
+          "evidence_note": "Synthetic test evidence only; not an actual recommendation.",
+          "id": "source_2_official",
+          "status": "active",
+          "policy_version": "synthetic-discovery-v1-tokyo"
+        },
+        {
+          "key": "regional_a",
+          "url": "https://example.org/tokyo/2/regional_a",
+          "source_type": "synthetic",
+          "source_group": "regional_a",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "read_confirmed": true,
+          "display_permitted": true,
+          "evidence_note": "Synthetic test evidence only; not an actual recommendation.",
+          "id": "source_2_regional_a",
+          "status": "active",
+          "policy_version": "synthetic-discovery-v1-tokyo"
+        },
+        {
+          "key": "regional_b",
+          "url": "https://example.org/tokyo/2/regional_b",
+          "source_type": "synthetic",
+          "source_group": "regional_b",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "read_confirmed": true,
+          "display_permitted": true,
+          "evidence_note": "Synthetic test evidence only; not an actual recommendation.",
+          "id": "source_2_regional_b",
+          "status": "active",
+          "policy_version": "synthetic-discovery-v1-tokyo"
+        }
+      ],
+      "facts": [
+        {
+          "field": "local_evidence",
+          "value": {
+            "source_groups": [
+              "regional_a",
+              "regional_b"
+            ],
+            "direct_confirmation": false
+          },
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_2_0",
+          "source_id": "source_2_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "iconic_evidence",
+          "value": {
+            "source_groups": [
+              "regional_a",
+              "regional_b"
+            ],
+            "level": "city"
+          },
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_2_1",
+          "source_id": "source_2_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "opening_hours",
+          "value": {
+            "timezone": "Asia/Tokyo",
+            "weekly": {
+              "0": [
+                [
+                  "10:00",
+                  "22:00"
+                ]
+              ],
+              "1": [
+                [
+                  "10:00",
+                  "22:00"
+                ]
+              ],
+              "2": [
+                [
+                  "10:00",
+                  "22:00"
+                ]
+              ],
+              "3": [
+                [
+                  "10:00",
+                  "22:00"
+                ]
+              ],
+              "4": [
+                [
+                  "10:00",
+                  "22:00"
+                ]
+              ],
+              "5": [
+                [
+                  "10:00",
+                  "22:00"
+                ]
+              ],
+              "6": [
+                [
+                  "10:00",
+                  "22:00"
+                ]
+              ]
+            }
+          },
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "valid_for_date": "2026-11-06",
+          "id": "fact_2_2",
+          "source_id": "source_2_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "max_party",
+          "value": 6,
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_2_3",
+          "source_id": "source_2_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "min_party",
+          "value": 1,
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_2_4",
+          "source_id": "source_2_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "children_rule",
+          "value": {
+            "allowed": true,
+            "minimum_age": 0
+          },
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_2_5",
+          "source_id": "source_2_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "closed",
+          "value": false,
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_2_6",
+          "source_id": "source_2_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "price",
+          "value": {
+            "currency": "JPY",
+            "amount_min": "1000",
+            "amount_max": "2000",
+            "basis": "per_person",
+            "period": "meal",
+            "tax": "included",
+            "deposit": null
+          },
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_2_7",
+          "source_id": "source_2_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "reservation_methods",
+          "value": [
+            "official_website"
+          ],
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_2_8",
+          "source_id": "source_2_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "reservation_url",
+          "value": "https://example.org/tokyo/2/booking",
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_2_9",
+          "source_id": "source_2_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "facility_capacity",
+          "value": 25,
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_2_10",
+          "source_id": "source_2_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "dietary",
+          "value": {
+            "vegetarian": true,
+            "nut_free": false
+          },
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_2_11",
+          "source_id": "source_2_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "accessibility",
+          "value": {
+            "step_free": true
+          },
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_2_12",
+          "source_id": "source_2_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        },
+        {
+          "field": "rating",
+          "value": {
+            "platform": "synthetic",
+            "scale": 5,
+            "rating": 4.5,
+            "total_rating_count": 300,
+            "comparison_cohort": "tokyo_test",
+            "usage_permitted": true
+          },
+          "status": "verified",
+          "source_key": "official",
+          "checked_at": "2026-10-04T12:00:00+00:00",
+          "expires_at": "2027-01-03T12:00:00+00:00",
+          "id": "fact_2_13",
+          "source_id": "source_2_official",
+          "policy_version": "synthetic-discovery-v1-tokyo",
+          "freshness": "fresh",
+          "usable": true
+        }
+      ],
+      "place_id": "place_tokyo_2",
+      "city": "tokyo",
+      "identity_status": "verified",
+      "pack_status": "approved",
+      "synthetic": true
+    }
+  ]
+}

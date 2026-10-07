@@ -1,14 +1,14 @@
 {
-  "name": "Travel Inbox",
-  "short_name": "Travel Inbox",
-  "description": "여행 예약 확인 메일을 일정으로 정리하고 근거와 함께 답합니다",
+  "name": "여정",
+  "short_name": "여정",
+  "description": "가고 싶은 곳, 예약, 일정을 한곳에 모으는 나의 여행",
   "lang": "ko",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#EDEEF1",
-  "theme_color": "#C2701A",
+  "background_color": "#FAF9F6",
+  "theme_color": "#25485A",
   "icons": [
     {
       "src": "/icon.svg",

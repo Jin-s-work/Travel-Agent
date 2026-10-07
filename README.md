@@ -1,3 +1,13 @@
+> **현재 배포 방향: 기존 Render Free + Supabase Free.** [전환·설정·복구 안내](docs/operations/RENDER_SUPABASE.md). PostgreSQL·비공개 Storage·pgvector에 자료를 보존하도록 코드를 전환했습니다. 기존 Render 주소는 유지하며 Supabase는 `hii`를 사용합니다. 실제 새 버전 배포·OAuth 연결은 준비 상태와 구분합니다. 유료 AI/리뷰는 OFF입니다.
+
+> **2026-10-06 운영 준비:** 비루트·단일 worker·영구 디스크 검사, live/ready health, 외부 호출 중지, 암호화 백업·삭제 checkpoint 복원을 추가했습니다. [운영 절차](docs/operations/RUNBOOK.md) · [실제 검증](docs/operations/VALIDATION.md) · [현재 비용](docs/operations/COSTS.md) · [도시 준비 상태](docs/operations/CITY_READINESS.md). **외부 HTTPS 배포는 미실행**이며 도쿄·바르셀로나 실제 추천과 엄격 리뷰는 검수 대기입니다. 로컬 합성 데이터 검증을 출시 완료로 보지 않습니다.
+
+> **2026-10-05 장소 추천·일정 편집:** 여행 조건, 장소 보관함, 근거를 구분한 추천·비교와 예약을 보존하는 일정 생성·미리보기·적용·되돌리기를 추가했습니다. [탐색 안내](docs/service-v2/DISCOVERY_RUNBOOK.md) · [일정 안내](docs/service-v2/ITINERARY_RUNBOOK.md) · [구현/검증 상태](docs/service-v2/IMPLEMENTATION_STATUS.md). 실제 경로 제공자·리뷰 운영 활성화와 배포는 별도입니다.
+
+> 2단계 작업 복구·비용 관리: [실행/복구 안내](docs/service-v2/RELIABILITY_RUNBOOK.md) · [검증 상태](docs/service-v2/IMPLEMENTATION_STATUS.md). 가격·예산을 설정하기 전 외부 호출은 닫히며 저장된 예약 조회는 유지됩니다.
+
+> **2026-10-01 비공개 서비스 01단계 구현:** 초대 OIDC 로그인, 사용자별 여행·예약 관리, 복수 예약 메일 추출·교정, SQL 날짜 질문을 추가했습니다. 실행·초대·이관·복구는 [실행 안내](docs/service-v2/FOUNDATION_RUNBOOK.md), 실제 검증 및 미검증 범위는 [구현 상태](docs/service-v2/IMPLEMENTATION_STATUS.md)를 보세요. 아래 과거 데모·평가 설명은 개발 이력입니다. 원격 서비스는 이번 작업에서 배포하지 않았습니다. 인증 미설정 시 개인 API는 닫힙니다.
+
 <div align="center">
 
 <img src="docs/banner.svg" alt="Travel Inbox RAG" width="100%">
@@ -12,7 +22,7 @@
 <img src="https://img.shields.io/badge/OpenAI-gpt--5--mini-7C3AED?style=flat-square&logo=openai&logoColor=white" alt="OpenAI">
 </p>
 
-**[데모 열기 ↗](https://travel-inbox-rag.onrender.com)** &nbsp;·&nbsp;
+**[비공개 베타 준비 상태](docs/operations/VALIDATION.md)** &nbsp;·&nbsp;
 [작동 원리](#작동-원리) &nbsp;·&nbsp;
 [해결 내용](#해결-내용) &nbsp;·&nbsp;
 [평가 결과](#평가-결과)
@@ -54,7 +64,7 @@
 | 환각 차단 | 근거를 찾지 못하면 LLM을 호출하지 않고 거절합니다 |
 | 메타데이터 필터 | 예약 종류와 날짜 범위로 검색 범위를 제한합니다 |
 | 하루치 조회 | 날짜가 정해진 질문은 유사도 대신 범위 필터로 전부 가져옵니다 |
-| 자동 복구 | 배포 환경이 재시작해도 기동 시 데모 예약을 다시 채웁니다 |
+| 저장과 복구 | Supabase의 SQL·원문·검색을 유지하고 작업을 복구합니다. 로컬 모드는 영구 디스크를 사용합니다. 운영 데모 seed는 OFF입니다 |
 | 대화 이어가기 | "그거 환불돼?"는 앞 대화에서 대상을 찾아 검색합니다 |
 | 분리 평가 | 검색 품질과 생성 품질을 독립적으로 측정합니다 |
 
@@ -423,7 +433,7 @@ Structured Outputs는 스키마를 강제하지만 값의 정확성까지 보장
 python3.13 -m venv .venv && source .venv/bin/activate
 make install
 
-cp .env.example .env   # OPENAI_API_KEY 입력, TAVILY_API_KEY는 선택
+cp .env.example .env   # 기존 .env가 있으면 덮어쓰지 마세요. OIDC·초대 설정은 실행 안내 참고
 ```
 
 ### 실행
@@ -440,7 +450,7 @@ cp .env.example .env   # OPENAI_API_KEY 입력, TAVILY_API_KEY는 선택
 메일 탭에서 예약 확인 메일을 올리면 일정 탭에 카드가 날짜순으로 정리됩니다. 질문 탭에서
 물어보면 근거와 함께 답합니다. 홈 화면에 추가하면 앱처럼 실행됩니다.
 
-터미널에서도 같은 파이프라인을 그대로 씁니다.
+다음 터미널 CLI는 과거 공용 로컬 인덱스용입니다. 새 웹앱의 사용자별 SQLite 여행과 자동 공유하지 않습니다.
 
 ```console
 $ make ask Q="체크아웃 시간 언제야?"
@@ -454,7 +464,7 @@ $ make ask Q="체크아웃 시간 언제야?"
 ### API
 
 `api.py` 한 프로세스가 JSON과 정적 파일을 함께 서빙합니다. 같은 출처라 CORS 설정이
-없습니다. 스키마는 실행 후 `/api/docs`에서 볼 수 있습니다.
+없습니다. 현재 개인 API는 `/api/v2/trips/{trip_id}/...`를 사용합니다. 인증 후 `/api/v2/openapi.json`에서 스키마를 확인할 수 있습니다. 아래 구 API는 과거 계약이며, 현재는 미인증 401 / 인증 후 410으로 닫혔습니다.
 
 | 메서드 | 경로 | 설명 |
 | :--- | :--- | :--- |
@@ -550,10 +560,11 @@ git check-ignore -v .env    # 규칙이 출력되면 정상입니다
 > 키가 한 번이라도 커밋되면 파일을 삭제해도 히스토리에 남습니다. 즉시 폐기하고 재발급해야
 > 합니다.
 
-배포 전 점검 항목은 [deploy/CHECKLIST.md](deploy/CHECKLIST.md)에, 배포 절차는
-[deploy/RENDER.md](deploy/RENDER.md)에 정리했습니다.
+현재 비공개 서비스 배포는 [운영 절차](docs/operations/RUNBOOK.md)와 [검증 기록](docs/operations/VALIDATION.md)을 따릅니다. `deploy/`는 초기 공용 데모 이력이며 현재 인증·저장 계약의 배포 지침으로 사용하지 않습니다.
 
-## 한계
+## 초기 데모 평가의 한계
+
+아래는 초기 데모 이력입니다. 사용자 격리·영구 저장은 이후01~06단계에서 변경했으며 현재 제한은 [운영 검증](docs/operations/VALIDATION.md)을 따릅니다.
 
 - **평가셋 규모**: 질문 23개, 메일 7건 규모이며 질문과 정답을 직접 라벨링해 편향 가능성이
   있습니다.
@@ -567,7 +578,7 @@ git check-ignore -v .env    # 규칙이 출력되면 정상입니다
 - **남은 추출 흔들림**: `type`과 `time`은 규칙으로 고정했지만 `provider` 표기는 실행마다
   갈립니다(`대한항공` / `Korean Air`). 둘 다 실제 항공사를 가리키므로 검색에는 영향이
   없고, 화면 표기만 달라집니다.
-- **동시 사용**: 인덱스가 전역이라 다중 사용자 환경에서 데이터가 섞입니다.
+- **초기 동시 사용 한계**: 전역 인덱스를 사용했습니다. 현재 개인 API는 사용자·여행별 SQL 소유권과 활성 검색 세대를 검사합니다.
 - **지시대명사**: "그거 환불돼?"는 앞 대화에 대상이 분명할 때만 풀립니다. 애매하면
   추측하지 않고 되묻습니다.
 - **배포 환경**: Render 무료 티어는 디스크가 영구 저장이 아니고 메모리가 512MB입니다.

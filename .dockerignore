@@ -1,11 +1,7 @@
-# 키. 이미지 레이어에 한 번 들어가면 지워도 남는다.
+# Never copy private mail, tokens, local databases or development fixtures.
 .env
-.env.local
-
-# 실제 메일과 인덱스 (개인정보)
+.env.*
 data/
-
-# 빌드에 불필요
 .git/
 .venv/
 __pycache__/
@@ -13,11 +9,14 @@ __pycache__/
 .pytest_cache/
 reports/
 docs/
-deploy/
+deploy/*
+!deploy/render-supabase/
+deploy/render-supabase/*
+!deploy/render-supabase/pricing-zero.json
+!deploy/render-supabase/pricing-openai.json
+!deploy/render-supabase/prod-ca-2021.crt
 tests/
+seed/
 .DS_Store
 
-# 시드가 참조하는 데모 메일은 이미지에 있어야 한다. 없으면 기동 시
-# 인덱스 자동 복구가 조용히 건너뛰어진다.
-!tests/sample_emails/
-!tests/demo_emails/
+node_modules/

@@ -1,0 +1,60 @@
+{
+  "schema": 12,
+  "counts": {
+    "users": 1,
+    "trips": 2,
+    "trip_stops": 2,
+    "source_documents": 0,
+    "bookings": 1,
+    "recommendation_runs": 0,
+    "itineraries": 0,
+    "deletion_tombstones": 0,
+    "trip_accommodations": 1,
+    "accommodation_resolutions": 0,
+    "candidate_packs": 0,
+    "research_candidates": 0,
+    "evidence_sources": 0
+  },
+  "stays_by_state": {
+    "unresolved": 1
+  },
+  "stay_no_invented_identity": 1,
+  "rls": {
+    "accommodation_resolutions": true,
+    "trip_accommodations": true
+  },
+  "http": {
+    "/health/live": {
+      "status": 200,
+      "body": {
+        "ok": true
+      }
+    },
+    "/health/ready": {
+      "status": 200,
+      "body": {
+        "ready": true,
+        "checks": {
+          "schema": true,
+          "storage": true,
+          "dispatcher": true,
+          "identity": true,
+          "restore": true
+        }
+      }
+    },
+    "/api/v2/trips": {
+      "status": 401,
+      "body": null
+    },
+    "/api/v2/cities": {
+      "status": 401,
+      "body": null
+    },
+    "/": {
+      "status": 200,
+      "accommodations_script": true
+    }
+  },
+  "asset_hash_match": true
+}

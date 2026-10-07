@@ -1,0 +1,154 @@
+{
+  "version": "mail-examples-v1",
+  "synthetic": true,
+  "not_an_extractor_result": true,
+  "cases": [
+    {
+      "file": "01-tokyo-roundtrip.eml",
+      "subject": "Tokyo round-trip flight",
+      "expected_semantics": {
+        "booking_count": 2,
+        "events_per_booking": 2,
+        "dates": [
+          "2026-11-06",
+          "2026-11-09"
+        ],
+        "timezones": [
+          "Asia/Seoul",
+          "Asia/Tokyo"
+        ],
+        "rule": "왕복 각각 유지. 한 구간 삭제로 다른 구간 삭제 금지."
+      },
+      "synthetic": true
+    },
+    {
+      "file": "02-tokyo-hotel.eml",
+      "subject": "東京 テスト宿泊",
+      "expected_semantics": {
+        "booking_count": 1,
+        "nights": 3,
+        "checkin": "2026-11-06T15:00",
+        "checkout": "2026-11-09T11:00",
+        "currency": "JPY",
+        "amount": "60000",
+        "coordinates": null,
+        "rule": "숙박 전체 기간을 종일 바쁜 일정으로 만들지 않음."
+      },
+      "synthetic": true
+    },
+    {
+      "file": "03-tokyo-dinner.eml",
+      "subject": "夕食のテスト予約",
+      "expected_semantics": {
+        "booking_count": 1,
+        "date": "2026-11-07",
+        "time": "19:30",
+        "adults": 2,
+        "children": [
+          {
+            "age": null
+          }
+        ],
+        "price": null,
+        "deposit": "3000",
+        "rule": "보증금을 총 식사 가격으로 확정하거나 중복 합산하지 않음."
+      },
+      "synthetic": true
+    },
+    {
+      "file": "04-madrid-hotel.eml",
+      "subject": "Reserva de hotel de prueba en Madrid",
+      "expected_semantics": {
+        "booking_count": 1,
+        "city": "Madrid",
+        "timezone": "Europe/Madrid",
+        "currency": "EUR",
+        "amount": "480",
+        "rule": "같은 시간대인 바르셀로나로 치환하지 않음."
+      },
+      "synthetic": true
+    },
+    {
+      "file": "05-madrid-multiple.eml",
+      "subject": "Dos reservas independientes",
+      "expected_semantics": {
+        "booking_count": 2,
+        "dates": [
+          "2026-11-13",
+          "2026-11-14"
+        ],
+        "rule": "개별 교정·삭제가 다른 예약에 영향 없음. 식당 인당, 박물관 그룹 금액 구분."
+      },
+      "synthetic": true
+    },
+    {
+      "file": "06-date-only-unknown-party.eml",
+      "subject": "Missing time and party",
+      "expected_semantics": {
+        "booking_count": 1,
+        "date": "2026-11-15",
+        "time": null,
+        "party": null,
+        "price": null,
+        "rule": "00:00, 1명, 무료로 채우지 않음."
+      },
+      "synthetic": true
+    },
+    {
+      "file": "same-name-a/reservation.eml",
+      "subject": "Same filename Tokyo",
+      "expected_semantics": {
+        "booking_count": 1,
+        "rule": "same-name-b와 다른 내용. 파일명을 기본키로 사용하지 않음."
+      },
+      "synthetic": true
+    },
+    {
+      "file": "same-name-b/reservation.eml",
+      "subject": "Same filename Madrid",
+      "expected_semantics": {
+        "booking_count": 1,
+        "rule": "same-name-a와 동시에 보존. 같은 파일 재업로드는 같은 여행에서 중복 판정."
+      },
+      "synthetic": true
+    },
+    {
+      "file": "07-eight-bookings-one-day.eml",
+      "subject": "Eight independent Tokyo reservations",
+      "expected_semantics": {
+        "booking_count": 8,
+        "date": "2026-11-07",
+        "rule": "새 빈 여행에서 이 메일만 분석 후 수동 예약 18:00 한 건 추가. 당일 전체 질문은 정확히 9건."
+      },
+      "synthetic": true
+    },
+    {
+      "file": "08-madrid-time-change.eml",
+      "subject": "Cambio de hora de TEST-MEAL-005",
+      "expected_semantics": {
+        "rule": "변경 요청을 확정으로 바꾸지 않음. 기존 사용자 교정 13:45를 자동 덮어쓰지 않고 비교/확인."
+      },
+      "synthetic": true
+    },
+    {
+      "file": "09-html-only.eml",
+      "subject": "HTML-only synthetic booking",
+      "expected_semantics": {
+        "booking_count": 1,
+        "rule": "HTML은 텍스트로 읽고 링크는 실행·fetch하지 않음."
+      },
+      "synthetic": true
+    },
+    {
+      "file": "10-dst-ambiguous-madrid.eml",
+      "subject": "Hora ambigua por cambio horario",
+      "expected_semantics": {
+        "date": "2026-10-25",
+        "local_time": "02:30",
+        "utc_instant": null,
+        "rule": "DST 중복 시각: 임의 offset 확정 금지, 확인 필요."
+      },
+      "synthetic": true
+    }
+  ]
+}

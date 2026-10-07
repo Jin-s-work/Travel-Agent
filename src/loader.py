@@ -33,7 +33,13 @@ def read_email_file(path: str | Path) -> str:
     path = Path(path)
     if path.suffix.lower() == ".eml":
         return _read_eml(path)
-    return path.read_text(encoding="utf-8", errors="replace")
+    return read_email_bytes(path.read_bytes(), path.name)
+
+
+def read_email_bytes(data: bytes, filename: str) -> str:
+    if Path(filename).suffix.lower() != '.eml':
+        return data.decode('utf-8-sig',errors='replace').replace('\r\n', '\n').replace('\r', '\n')
+    return _message_text(email.message_from_bytes(data,policy=policy.default))
 
 
 def _read_eml(path: Path) -> str:
@@ -44,21 +50,37 @@ def _read_eml(path: Path) -> str:
     with path.open("rb") as fp:
         message = email.message_from_binary_file(fp, policy=policy.default)
 
+    return _message_text(message)
+
+
+def _message_text(message):
+
     header_lines = [
         f"{name}: {message[name]}"
         for name in ("From", "To", "Subject", "Date")
         if message[name]
     ]
 
-    body_part = message.get_body(preferencelist=("plain", "html"))
-    if body_part is None:
-        body = ""
-    else:
-        body = body_part.get_content()
+    body = ""
+    # Some senders include an empty plain alternative alongside the useful HTML
+    # body. Try HTML only when the plain body is empty, never an attachment.
+    for preference in (("plain",), ("html",)):
+        body_part = message.get_body(preferencelist=preference)
+        if body_part is None or body_part.get_content_disposition() == 'attachment':
+            continue
+        try:
+            candidate = body_part.get_content()
+        except (LookupError, UnicodeError):
+            candidate = (body_part.get_payload(decode=True) or b'').decode('utf-8', errors='replace')
+        if not isinstance(candidate, str):
+            continue
         if body_part.get_content_type() == "text/html":
-            body = _strip_html(body)
+            candidate = _strip_html(candidate)
+        if candidate.strip():
+            body = candidate
+            break
 
-    return "\n".join(header_lines + ["", body]).strip()
+    return "\n".join(header_lines + ["", body]).replace("\r\n", "\n").replace("\r", "\n").strip()
 
 
 def _strip_html(html: str) -> str:

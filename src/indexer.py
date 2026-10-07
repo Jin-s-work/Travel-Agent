@@ -65,9 +65,6 @@ def index_emails(
         metadata = build_metadata(parsed, filename, content_hash)
         chunks = _chunk(build_search_text(parsed))
 
-        # 내용이 바뀐 경우 이전 청크가 남지 않도록 먼저 지운다.
-        store.delete_by_source(filename)
-
         for chunk_index, chunk in enumerate(chunks):
             ids.append(f"{filename}::{chunk_index}")
             documents.append(chunk)
@@ -76,7 +73,15 @@ def index_emails(
 
     if documents:
         embeddings = embed_texts(documents)
-        store.add(ids, documents, embeddings, metadatas)
+        # No live data is removed until EVERY file has parsed and the complete
+        # embedding batch succeeded. VectorStore stages distinct new IDs and
+        # restores old records on an in-process replacement failure.
+        if hasattr(store, "replace_sources"):
+            store.replace_sources(indexed, ids, documents, embeddings, metadatas)
+        elif any(filename in already for filename in indexed):
+            raise RuntimeError("기존 자료를 안전하게 교체할 수 없는 저장소입니다.")
+        else:
+            store.add(ids, documents, embeddings, metadatas)
 
     return {
         "indexed": indexed,
@@ -88,7 +93,7 @@ def index_emails(
 
 def build_search_text(parsed: dict) -> str:
     """구조화 정보 + 원문 발췌를 검색용 자연어 문장으로 합친다."""
-    reservation_type = parsed.get("type") or "예약"
+    reservation_type = parsed.get("kind") or parsed.get("type") or "예약"
     provider = parsed.get("provider") or "제공처 미상"
 
     lines = [f"[{reservation_type}] {provider} 예약 확인."]
@@ -97,11 +102,24 @@ def build_search_text(parsed: dict) -> str:
         lines.append(f"예약번호(확인번호)는 {parsed['confirmation_number']}.")
     if parsed.get("date"):
         lines.append(f"이용 날짜는 {parsed['date']}.")
+    if parsed.get("date_end"):
+        lines.append(f"종료 날짜는 {parsed['date_end']}.")
     if parsed.get("time"):
         label = TIME_LABELS.get(reservation_type, "이용 시각")
         lines.append(f"{label}은 {parsed['time']}.")
     if parsed.get("location"):
         lines.append(f"장소는 {parsed['location']}.")
+    if parsed.get("time_end"):
+        lines.append(f"종료 시각은 {parsed['time_end']}.")
+    for event in parsed.get("events") or []:
+        lines.append(
+            f"일정 구간 {event.get('event_type') or '미상'}: "
+            f"{event.get('start_local') or '날짜/시각 미상'} "
+            f"({event.get('start_timezone') or '시간대 미확인'}) ~ "
+            f"{event.get('end_local') or '날짜/시각 미상'} "
+            f"({event.get('end_timezone') or '시간대 미확인'}), "
+            f"장소 {event.get('location') or '미상'}."
+        )
     if parsed.get("refund_policy"):
         lines.append(f"환불 및 취소 규정: {parsed['refund_policy']}")
     if parsed.get("raw_snippet"):
@@ -117,9 +135,11 @@ def build_metadata(parsed: dict, filename: str, content_hash: str = "") -> dict:
     받지 않고 int/float만 받으므로, 범위 필터용 YYYYMMDD 정수 키를 함께 넣는다.
     """
     start, end = _split_date_range(parsed.get("date"))
+    if parsed.get("date_end"):
+        _, end = _split_date_range(parsed["date_end"])
 
     return {
-        "type": parsed.get("type"),
+        "type": parsed.get("kind") or parsed.get("type"),
         "provider": parsed.get("provider"),
         "date": start,
         "location": parsed.get("location"),
@@ -132,6 +152,7 @@ def build_metadata(parsed: dict, filename: str, content_hash: str = "") -> dict:
         "date_start_int": _to_int(start),
         "date_end_int": _to_int(end),
         "content_hash": content_hash,
+        **{key: parsed[key] for key in ("booking_id", "document_id", "trip_id") if parsed.get(key)},
     }
 
 

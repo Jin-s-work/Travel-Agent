@@ -1,0 +1,29 @@
+From: Travel Demo <reservations@example.invalid>
+To: demo-traveler@example.invalid
+Subject: [TEST ONLY] Eight independent Tokyo reservations
+Date: Tue, 06 Oct 2026 09:00:00 +0900
+Message-ID: <07-eight-bookings-one-day.eml@example.invalid>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+SYNTHETIC TEST DATA / =EC=8B=A4=EC=A0=9C =EC=98=88=EC=95=BD=EC=9D=B4 =EC=95=
+=84=EB=8B=99=EB=8B=88=EB=8B=A4. =EC=99=B8=EB=B6=80 =EC=98=88=EC=95=BD=C2=B7=
+=EA=B2=B0=EC=A0=9C =ED=9A=A8=EB=A0=A5 =EC=97=86=EC=9D=8C.
+
+1. Fictional Tokyo Demo Stop 1; 2026-11-07 08:00=E2=80=9308:20 Asia/Tokyo; 2 =
+adults; TEST-EIGHT-01.
+2. Fictional Tokyo Demo Stop 2; 2026-11-07 09:00=E2=80=9309:20 Asia/Tokyo; 2 =
+adults; TEST-EIGHT-02.
+3. Fictional Tokyo Demo Stop 3; 2026-11-07 10:00=E2=80=9310:20 Asia/Tokyo; 2 =
+adults; TEST-EIGHT-03.
+4. Fictional Tokyo Demo Stop 4; 2026-11-07 11:00=E2=80=9311:20 Asia/Tokyo; 2 =
+adults; TEST-EIGHT-04.
+5. Fictional Tokyo Demo Stop 5; 2026-11-07 12:00=E2=80=9312:20 Asia/Tokyo; 2 =
+adults; TEST-EIGHT-05.
+6. Fictional Tokyo Demo Stop 6; 2026-11-07 13:00=E2=80=9313:20 Asia/Tokyo; 2 =
+adults; TEST-EIGHT-06.
+7. Fictional Tokyo Demo Stop 7; 2026-11-07 14:00=E2=80=9314:20 Asia/Tokyo; 2 =
+adults; TEST-EIGHT-07.
+8. Fictional Tokyo Demo Stop 8; 2026-11-07 15:00=E2=80=9315:20 Asia/Tokyo; 2 =
+adults; TEST-EIGHT-08.

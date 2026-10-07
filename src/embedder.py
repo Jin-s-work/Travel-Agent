@@ -16,7 +16,7 @@ def _client():
         raise RuntimeError(
             "OPENAI_API_KEY가 설정되지 않았습니다. .env.example을 참고해 .env를 만드세요."
         )
-    return OpenAI(api_key=OPENAI_API_KEY)
+    return OpenAI(api_key=OPENAI_API_KEY, max_retries=0, timeout=45.0)
 
 
 def embed_texts(
@@ -36,7 +36,13 @@ def embed_texts(
 
     for batch_index, start in enumerate(range(0, len(texts), batch_size), start=1):
         batch = texts[start : start + batch_size]
-        response = _client().embeddings.create(model=model, input=batch)
+        from src.reliability.providers import has_metering, embeddings_create
+        client = _client()
+        if has_metering():
+            response = embeddings_create(client, model=model, input=batch)
+        else:
+            # Legacy CLI only; service execution always binds metered_context.
+            response = client.embeddings.create(model=model, input=batch)
         # API가 순서를 보장하지만, index로 다시 정렬해 확실히 맞춘다.
         vectors.extend(item.embedding for item in sorted(response.data, key=lambda d: d.index))
 

@@ -1,0 +1,165 @@
+{
+  "document_states": {
+    "needs_review": 6
+  },
+  "document_generations": {
+    "local-mail-v1": 6
+  },
+  "schema": 12,
+  "counts": {
+    "users": 1,
+    "trips": 2,
+    "trip_stops": 2,
+    "source_documents": 6,
+    "bookings": 15,
+    "recommendation_runs": 12,
+    "itineraries": 0,
+    "deletion_tombstones": 2,
+    "trip_accommodations": 3,
+    "accommodation_resolutions": 0,
+    "candidate_packs": 3,
+    "research_candidates": 9,
+    "evidence_sources": 10
+  },
+  "catalog_by_city": {
+    "barcelona": 3,
+    "madrid": 3,
+    "tokyo": 3
+  },
+  "stays_by_state": {
+    "unresolved": 1,
+    "unavailable": 2
+  },
+  "stay_no_invented_identity": 1,
+  "rls": {
+    "accommodation_resolutions": true,
+    "trip_accommodations": true
+  },
+  "all_private_tables_rls": true,
+  "browser_schema_usage": {
+    "anon": false,
+    "authenticated": false
+  },
+  "latest_job": {
+    "operation": "documents",
+    "state": "succeeded",
+    "attempt": 1,
+    "stage": "succeeded",
+    "started_at": "2026-10-07T01:17:24.426014+00:00",
+    "finished_at": "2026-10-07T01:17:47.267992+00:00",
+    "error_code": null
+  },
+  "latest_document_jobs": [
+    {
+      "operation": "documents",
+      "state": "succeeded",
+      "attempt": 1,
+      "stage": "succeeded",
+      "started_at": "2026-10-07T01:17:24.426014+00:00",
+      "finished_at": "2026-10-07T01:17:47.267992+00:00",
+      "error_code": null
+    },
+    {
+      "operation": "documents",
+      "state": "succeeded",
+      "attempt": 1,
+      "stage": "succeeded",
+      "started_at": "2026-10-07T01:16:59.740419+00:00",
+      "finished_at": "2026-10-07T01:17:22.312841+00:00",
+      "error_code": null
+    },
+    {
+      "operation": "documents",
+      "state": "succeeded",
+      "attempt": 1,
+      "stage": "succeeded",
+      "started_at": "2026-10-07T01:16:29.431293+00:00",
+      "finished_at": "2026-10-07T01:16:57.801953+00:00",
+      "error_code": null
+    },
+    {
+      "operation": "documents",
+      "state": "succeeded",
+      "attempt": 1,
+      "stage": "succeeded",
+      "started_at": "2026-10-07T01:16:03.215387+00:00",
+      "finished_at": "2026-10-07T01:16:27.498981+00:00",
+      "error_code": null
+    },
+    {
+      "operation": "documents",
+      "state": "succeeded",
+      "attempt": 1,
+      "stage": "succeeded",
+      "started_at": "2026-10-07T01:15:36.932352+00:00",
+      "finished_at": "2026-10-07T01:16:01.269275+00:00",
+      "error_code": null
+    },
+    {
+      "operation": "documents",
+      "state": "succeeded",
+      "attempt": 1,
+      "stage": "succeeded",
+      "started_at": "2026-10-07T01:15:08.080678+00:00",
+      "finished_at": "2026-10-07T01:15:35.009787+00:00",
+      "error_code": null
+    }
+  ],
+  "usage_by_provider": [],
+  "http": {
+    "/health/live": {
+      "status": 200,
+      "body": {
+        "ok": true
+      }
+    },
+    "/health/ready": {
+      "status": 200,
+      "body": {
+        "ready": true,
+        "checks": {
+          "schema": true,
+          "storage": true,
+          "dispatcher": true,
+          "identity": true,
+          "restore": true
+        }
+      }
+    },
+    "/api/v2/trips": {
+      "status": 401,
+      "body": null
+    },
+    "/api/v2/cities": {
+      "status": 401,
+      "body": null
+    },
+    "/api/v2/mail-capabilities": {
+      "status": 401,
+      "body": null
+    },
+    "/": {
+      "status": 200,
+      "accommodations_script": true,
+      "brand_yeojeong": true
+    }
+  },
+  "asset_hash_matches": {
+    "js/accommodations.js": true,
+    "js/foundation.js": true,
+    "css/foundation.css": true,
+    "css/design-system.css": true,
+    "sw.js": true,
+    "manifest.webmanifest": true,
+    "icon.svg": true,
+    "fonts/PretendardVariable-v1.3.9.woff2": true
+  },
+  "release": {
+    "runtime_commit": "64ee184412d12d0dcd34800d2eb01f18075b5274",
+    "render_deploy_id": "dep-db2pu9om7kps73bsa17g",
+    "started_kst": "2026-10-07 10:23:51",
+    "dashboard_duration": "1m06s",
+    "status": "Deploy succeeded",
+    "url": "https://travel-inbox-rag.onrender.com"
+  }
+}

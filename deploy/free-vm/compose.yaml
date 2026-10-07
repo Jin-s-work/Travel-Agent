@@ -1,0 +1,66 @@
+# This file deploys onto an ALREADY provisioned persistent VM; it creates no cloud resources.
+name: travel-private
+services:
+  app:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    image: travel-agent:free-vm
+    restart: unless-stopped
+    init: true
+    user: "1000:1000"
+    env_file:
+      - path: ${TRAVEL_ENV_FILE:-.env}
+        required: true
+    environment:
+      APP_ENV: production
+      PYTHON_DOTENV_DISABLED: "1"
+      SEED_ON_EMPTY: "0"
+      WEB_CONCURRENCY: "1"
+      PORT: "7860"
+      PERSISTENT_STORAGE_ROOT: /var/data
+      DATABASE_PATH: /var/data/sql/service.sqlite3
+      DOCUMENTS_DIR: /var/data/documents
+      VECTORS_DIR: /var/data/vectors
+      EMAILS_DIR: /var/data/legacy-emails
+      CHROMA_DIR: /var/data/legacy-chroma
+      PRICING_CONFIG: /app/free-policy.json
+      # Explicit empty values override .env; no billed provider can be used by this profile.
+      OPENAI_API_KEY: ""
+      TAVILY_API_KEY: ""
+      APIFY_TOKEN: ""
+      APIFY_API_TOKEN: ""
+      GOOGLE_MAPS_API_KEY: ""
+      LANGSMITH_TRACING: "false"
+      ANONYMIZED_TELEMETRY: "false"
+      BACKUP_ENABLED: ${BACKUP_ENABLED:-0}
+    expose:
+      - "7860"
+    volumes:
+      - type: bind
+        source: ${HOST_DATA_DIR:?Set an existing persistent VM directory}
+        target: /var/data
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ./pricing-zero.json
+        target: /app/free-policy.json
+        read_only: true
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=134217728,mode=1777
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 768m
+    cpus: 1.0
+    pids_limit: 128
+    stop_grace_period: 30s
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:7860/health/ready', timeout=4).close()"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: json-file
+      options: {max-size: "5m", max-file: "2"}

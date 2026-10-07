@@ -1,0 +1,15 @@
+{
+  "scope": "local_docker_only",
+  "cloud_resources_created": 0,
+  "paid_provider_calls": 0,
+  "read_only_image": true,
+  "nonroot_uid": 1000,
+  "api_keys_forced_empty": true,
+  "zero_budget_rejected": true,
+  "restart_preserved": {
+    "trips": 1,
+    "bookings": 1,
+    "reservations": 0
+  },
+  "passed": true
+}

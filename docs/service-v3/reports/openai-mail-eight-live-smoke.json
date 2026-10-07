@@ -1,0 +1,31 @@
+{
+  "synthetic_only": true,
+  "models": [
+    "gpt-5-mini",
+    "text-embedding-3-small"
+  ],
+  "ok": true,
+  "case": "eight",
+  "extracted_records": 8,
+  "correct_date_time": true,
+  "embedding_dimensions": [
+    1536
+  ],
+  "elapsed_seconds": 30.81,
+  "usage": [
+    {
+      "provider": "openai",
+      "sku": "gpt-5-mini",
+      "state": "settled",
+      "estimated_cost_micros": 9465,
+      "actual_cost_micros": 6828
+    },
+    {
+      "provider": "openai",
+      "sku": "text-embedding-3-small",
+      "state": "settled",
+      "estimated_cost_micros": 2,
+      "actual_cost_micros": 1
+    }
+  ]
+}

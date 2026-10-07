@@ -1,15 +1,85 @@
-# Render 블루프린트. 대시보드에서 이 저장소를 연결하면 자동으로 읽힙니다.
-# 키는 여기 적지 않습니다. sync: false 는 "대시보드에서 직접 입력" 표시입니다.
-
+# Existing Render Web Service + existing Supabase Free project.
+# Review docs/operations/RENDER_SUPABASE.md before changing a live service.
+# No disk, paid worker, database provisioning, or automatic scaling.
 services:
   - type: web
     name: travel-inbox-rag
     runtime: docker
     plan: free
+    numInstances: 1
+    autoDeployTrigger: off
     dockerfilePath: ./Dockerfile
-    healthCheckPath: /api/health
+    healthCheckPath: /health/ready
     envVars:
+      - key: STORAGE_BACKEND
+        value: supabase
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+      - key: SUPABASE_STORAGE_BUCKET
+        value: travel-private
+      - key: APP_ENV
+        value: production
+      - key: PYTHON_DOTENV_DISABLED
+        value: "1"
+      - key: SEED_ON_EMPTY
+        value: "0"
+      - key: WEB_CONCURRENCY
+        value: "1"
+      - key: DATABASE_PATH
+        value: /tmp/travel-cache/sql/unused.sqlite3
+      - key: DOCUMENTS_DIR
+        value: /tmp/travel-cache/documents
+      - key: VECTORS_DIR
+        value: /tmp/travel-cache/vectors
+      - key: EMAILS_DIR
+        value: /tmp/travel-cache/legacy-emails
+      - key: CHROMA_DIR
+        value: /tmp/travel-cache/legacy-chroma
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: OIDC_CLIENT_ID
+        sync: false
+      - key: OIDC_CLIENT_SECRET
+        sync: false
+      - key: OIDC_SERVER_METADATA_URL
+        value: https://accounts.google.com/.well-known/openid-configuration
+      - key: SESSION_SECRET
+        sync: false
+      - key: ZERO_SPEND
+        value: "0"
+      - key: PRICING_CONFIG
+        value: /app/deploy/render-supabase/pricing-openai.json
       - key: OPENAI_API_KEY
         sync: false
+      - key: MAIL_ANALYSIS_MODE
+        value: ai
+      - key: EXTRACTION_MODEL
+        value: gpt-5-mini
+      - key: ANSWER_MODEL
+        value: gpt-5-mini
+      - key: AGENT_MODEL
+        value: gpt-5-mini
+      - key: EMBEDDING_MODEL
+        value: text-embedding-3-small
       - key: TAVILY_API_KEY
-        sync: false
+        value: ""
+      - key: APIFY_TOKEN
+        value: ""
+      - key: JOB_POLL_SECONDS
+        value: "3"
+      - key: JOB_LEASE_SECONDS
+        value: "90"
+      - key: JOB_HEARTBEAT_SECONDS
+        value: "20"
+      - key: JOB_MAX_ATTEMPTS
+        value: "3"
+      - key: JOB_DEADLINE_SECONDS
+        value: "900"
+      - key: JOB_SHUTDOWN_SECONDS
+        value: "5"
+      - key: BACKUP_ENABLED
+        value: "0"

@@ -1,0 +1,17 @@
+{
+    admin off
+    http_port 8080
+    https_port 8443
+}
+
+# No HTTP access log: callback query strings and private URLs stay out of logs.
+{$PUBLIC_HOST} {
+    encode zstd gzip
+    reverse_proxy app:7860 {
+        flush_interval -1
+    }
+    header {
+        Strict-Transport-Security "max-age=31536000"
+        -Server
+    }
+}

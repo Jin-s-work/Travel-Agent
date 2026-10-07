@@ -1,0 +1,27 @@
+{
+  "trips": {
+    "before_rows": 2,
+    "after_rows": 2,
+    "all_values_equal": true
+  },
+  "trip_stops": {
+    "before_rows": 2,
+    "after_rows": 2,
+    "all_values_equal": true
+  },
+  "bookings": {
+    "before_rows": 1,
+    "after_rows": 1,
+    "all_values_equal": true
+  },
+  "booking_overrides": {
+    "before_rows": 0,
+    "after_rows": 0,
+    "all_values_equal": true
+  },
+  "source_documents": {
+    "before_rows": 0,
+    "after_rows": 0,
+    "all_values_equal": true
+  }
+}

@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import threading
+import uuid
+from datetime import date
 from pathlib import Path
 
 from src.config import (
@@ -16,7 +18,8 @@ from src.config import (
 from src.embedder import embed_query
 
 
-# 프로세스 전체가 같은 VectorStore를 쓴다.
+# Legacy local CLI/seed store only. Authenticated APIs must use an explicit
+# owner/trip-scoped adapter and must never use this shared collection.
 #
 # 예전에는 API 계층·에이전트·rag가 각자 VectorStore를 만들었다. 두 가지가 문제였다.
 # 하나는 reset() 이후 다른 인스턴스가 삭제된 컬렉션 핸들을 그대로 들고 있어
@@ -52,6 +55,7 @@ class VectorStore:
         self.persist_dir = Path(persist_dir)
         self.persist_dir.mkdir(parents=True, exist_ok=True)
         self.collection_name = collection_name
+        self._lock = threading.RLock()
 
         self._client = chromadb.PersistentClient(
             path=str(self.persist_dir),
@@ -75,13 +79,14 @@ class VectorStore:
         일어나면(평가 스크립트, 인덱싱 CLI 등) 오래 떠 있는 서버는 옛 UUID를
         계속 들고 있어 이후 모든 요청이 NotFoundError로 죽는다. 실제로 겪었다.
         """
-        try:
-            return operation(self._collection)
-        except Exception as error:
-            if "does not exist" not in str(error):
-                raise
-            self._collection = self._open_collection()
-            return operation(self._collection)
+        with self._lock:
+            try:
+                return operation(self._collection)
+            except Exception as error:
+                if "does not exist" not in str(error):
+                    raise
+                self._collection = self._open_collection()
+                return operation(self._collection)
 
     def add(
         self,
@@ -103,6 +108,56 @@ class VectorStore:
             metadatas=[_clean_metadata(m) for m in metadatas],
         ))
         return len(ids)
+
+    def replace_sources(
+        self, sources: list[str], ids: list[str], documents: list[str],
+        embeddings: list[list[float]], metadatas: list[dict],
+    ) -> int:
+        """Replace a parsed batch only after embedding and staging succeeded.
+
+        Old IDs are never overwritten during staging, so an upsert failure keeps
+        the previous data. A deletion failure restores the saved old records.
+        The lock gives this instance's readers an all-before/all-after view. This
+        is NOT cross-process/crash-atomic; phase 2 uses durable generation pointers.
+        """
+        if not sources or not ids:
+            raise ValueError("교체할 원문과 새 청크가 필요합니다.")
+        if len(set(ids)) != len(ids) or not (len(ids) == len(documents) == len(embeddings) == len(metadatas)):
+            raise ValueError("교체할 청크 ID/자료 길이가 올바르지 않습니다.")
+        if {m.get("source_file") for m in metadatas} != set(sources):
+            raise ValueError("새 청크의 원문 범위가 교체 범위와 다릅니다.")
+
+        def replace(collection):
+            previous = collection.get(
+                where={"source_file": {"$in": list(set(sources))}},
+                include=["documents", "embeddings", "metadatas"],
+            )
+            staged_ids = [f"stage_{uuid.uuid4().hex}::{item}" for item in ids]
+            try:
+                collection.upsert(ids=staged_ids, documents=documents, embeddings=embeddings,
+                                  metadatas=[_clean_metadata(m) for m in metadatas])
+            except Exception:
+                # Old chunks were not touched, even if upsert accepted a prefix.
+                collection.delete(ids=staged_ids)
+                raise
+            try:
+                if previous["ids"]:
+                    collection.delete(ids=previous["ids"])
+            except Exception as original_error:
+                try:
+                    if previous["ids"]:
+                        old_embeddings = previous["embeddings"]
+                        if hasattr(old_embeddings, "tolist"):
+                            old_embeddings = old_embeddings.tolist()
+                        collection.upsert(ids=previous["ids"], documents=previous["documents"],
+                                          embeddings=old_embeddings, metadatas=previous["metadatas"])
+                    collection.delete(ids=staged_ids)
+                except Exception as rollback_error:
+                    raise RuntimeError("검색 교체 복원이 완료되지 않았습니다. 재색인 복구가 필요합니다.") from rollback_error
+                raise original_error
+            return len(ids)
+
+        return self._run(replace)
 
     def search(
         self,
@@ -195,7 +250,7 @@ class VectorStore:
 
         by_source: dict[str, dict] = {}
         for index, metadata in enumerate(records["metadatas"]):
-            source = metadata.get("source_file")
+            source = metadata.get("booking_id") or metadata.get("source_file")
             if source and source not in by_source:
                 by_source[source] = {**metadata, "document": records["documents"][index]}
 
@@ -213,7 +268,7 @@ class VectorStore:
 
         by_source: dict[str, dict] = {}
         for index, metadata in enumerate(records["metadatas"]):
-            source = metadata.get("source_file")
+            source = metadata.get("booking_id") or metadata.get("source_file")
             if source and source not in by_source:
                 by_source[source] = {**metadata, "document": records["documents"][index]}
 
@@ -234,8 +289,9 @@ class VectorStore:
 
     def reset(self) -> None:
         """컬렉션을 통째로 비운다."""
-        self._client.delete_collection(self.collection_name)
-        self._collection = self._open_collection()
+        with self._lock:
+            self._client.delete_collection(self.collection_name)
+            self._collection = self._open_collection()
 
 
 def _to_int(day: str | None) -> int | None:
@@ -243,7 +299,13 @@ def _to_int(day: str | None) -> int | None:
     if not day:
         return None
     digits = day.replace("-", "").strip()
-    return int(digits) if len(digits) == 8 and digits.isdigit() else None
+    if len(digits) != 8 or not digits.isdigit():
+        return None
+    try:
+        date(int(digits[:4]), int(digits[4:6]), int(digits[6:]))
+    except ValueError:
+        return None
+    return int(digits)
 
 
 def _apply_threshold(hits: list[dict], min_similarity: float | None) -> list[dict]:

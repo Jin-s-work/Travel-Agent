@@ -1,0 +1,801 @@
+{
+  "schema_version": "1.0",
+  "synthetic": true,
+  "created_on": "2026-10-01",
+  "description": "관측 리뷰 언어의 단위·통합 인수 테스트용 합성 입력. 실제 리뷰·수집·이용 허가·테스트 통과 기록이 아니다.",
+  "merge_strategy": "deep_merge_objects_replace_arrays",
+  "numeric_tolerance": 1e-12,
+  "strict_pass_scope": "언어 관측 엄격 조건만 검증한다. 실제 공급자 권리, 장소 평점·전체 평가 수·예약·동선의 종합 추천 통과가 아니다.",
+  "definitions": {
+    "observed_records": "중복 제거 후 관측한 고유 레코드 R",
+    "text_count": "본문 존재가 확인된 관측 T. 번역문만 있는 레코드도 언어 미판별로 포함",
+    "classified_count": "원문 언어 판별 C",
+    "unknown_count": "본문 존재는 확인했으나 원문 언어를 판별할 수 없는 U",
+    "extraction_unknown_count": "본문 존재 또는 원문 추출 상태를 확정할 수 없어 별도 보류한 레코드",
+    "bounds": "미판별만 고려한 결정적 범위이며 95% 신뢰구간 또는 분류 오류 보정이 아니다",
+    "population_inference_allowed": "본 fixture 전부 false. 합성 최신순/선택 자료로 전체를 추정하지 않는다"
+  },
+  "defaults": {
+    "collection_mode": "observed_window",
+    "source_type": "licensed_synthetic",
+    "sampling_design": "latest_contiguous_cohort",
+    "place_identity_confirmed": true,
+    "local_languages": [
+      "ja"
+    ],
+    "korean_language": "ko",
+    "total_rating_count": 1200,
+    "rights": {
+      "access_confirmed": true,
+      "compute_confirmed": true,
+      "display_confirmed": true,
+      "is_synthetic_assumption": true
+    },
+    "freshness": {
+      "state": "valid"
+    },
+    "quality": {
+      "language_evaluation": "passed",
+      "korean_recall_validation": "passed",
+      "local_precision_validation": "passed",
+      "is_synthetic_assumption": true
+    },
+    "window": {
+      "sort": "newest",
+      "ordering_semantics": "published_at",
+      "boundary_time_field": "published_at",
+      "continuity_status": "verified_supplier_window",
+      "stop_reason": "record_cap",
+      "locale_filter": null,
+      "keyword_filter": null,
+      "rating_filter": null,
+      "platform_full_coverage": false
+    },
+    "thresholds": {
+      "min_classified_texts": 100,
+      "max_unknown_share": 0.1,
+      "local_share_min": 0.6,
+      "korean_share_max": 0.1
+    },
+    "counts": {
+      "observed_records": 200,
+      "rating_only_count": 0,
+      "text_count": 200,
+      "classified_count": 190,
+      "unknown_count": 10,
+      "extraction_unknown_count": 0,
+      "local_count": 150,
+      "korean_count": 4
+    }
+  },
+  "cases": [
+    {
+      "id": "RL-01",
+      "title": "A: 정상 관측 구간, 보수적 범위 통과",
+      "input_overrides": {},
+      "expected": {
+        "decision": "pass",
+        "strict_pass": true,
+        "reason_codes_include": [],
+        "display_mode": "observed_statistics",
+        "metrics": {
+          "classified_local_share": 0.7894736842105263,
+          "classified_korean_share": 0.021052631578947368,
+          "unknown_share": 0.05,
+          "local_share_lower_bound": 0.75,
+          "local_share_upper_bound": 0.8,
+          "korean_share_lower_bound": 0.02,
+          "korean_share_upper_bound": 0.07
+        },
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-02",
+      "title": "정확히 현지어 60%와 한국어 10%인 경계값",
+      "input_overrides": {
+        "counts": {
+          "observed_records": 110,
+          "rating_only_count": 0,
+          "text_count": 110,
+          "classified_count": 100,
+          "unknown_count": 10,
+          "extraction_unknown_count": 0,
+          "local_count": 66,
+          "korean_count": 1
+        }
+      },
+      "expected": {
+        "decision": "pass",
+        "strict_pass": true,
+        "reason_codes_include": [],
+        "display_mode": "observed_statistics",
+        "metrics": {
+          "classified_local_share": 0.66,
+          "classified_korean_share": 0.01,
+          "unknown_share": 0.09090909090909091,
+          "local_share_lower_bound": 0.6,
+          "local_share_upper_bound": 0.6909090909090909,
+          "korean_share_lower_bound": 0.00909090909090909,
+          "korean_share_upper_bound": 0.1
+        },
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-03",
+      "title": "본문이 모두 분류된 정상 관측",
+      "input_overrides": {
+        "counts": {
+          "observed_records": 200,
+          "rating_only_count": 0,
+          "text_count": 200,
+          "classified_count": 200,
+          "unknown_count": 0,
+          "extraction_unknown_count": 0,
+          "local_count": 150,
+          "korean_count": 10
+        }
+      },
+      "expected": {
+        "decision": "pass",
+        "strict_pass": true,
+        "reason_codes_include": [],
+        "display_mode": "observed_statistics",
+        "metrics": {
+          "classified_local_share": 0.75,
+          "classified_korean_share": 0.05,
+          "unknown_share": 0.0,
+          "local_share_lower_bound": 0.75,
+          "local_share_upper_bound": 0.75,
+          "korean_share_lower_bound": 0.05,
+          "korean_share_upper_bound": 0.05
+        },
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-04",
+      "title": "D: 현지어 하한 55%로 조건 미달",
+      "input_overrides": {
+        "counts": {
+          "observed_records": 200,
+          "rating_only_count": 0,
+          "text_count": 200,
+          "classified_count": 195,
+          "unknown_count": 5,
+          "extraction_unknown_count": 0,
+          "local_count": 110,
+          "korean_count": 2
+        }
+      },
+      "expected": {
+        "decision": "fail",
+        "strict_pass": false,
+        "reason_codes_include": [
+          "LOCAL_SHARE_BELOW_MIN"
+        ],
+        "display_mode": "observed_statistics",
+        "metrics": {
+          "classified_local_share": 0.5641025641025641,
+          "classified_korean_share": 0.010256410256410256,
+          "unknown_share": 0.025,
+          "local_share_lower_bound": 0.55,
+          "local_share_upper_bound": 0.575,
+          "korean_share_lower_bound": 0.01,
+          "korean_share_upper_bound": 0.035
+        },
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-05",
+      "title": "E: 한국어 상한 11.5%로 조건 미달",
+      "input_overrides": {
+        "counts": {
+          "observed_records": 200,
+          "rating_only_count": 0,
+          "text_count": 200,
+          "classified_count": 195,
+          "unknown_count": 5,
+          "extraction_unknown_count": 0,
+          "local_count": 150,
+          "korean_count": 18
+        }
+      },
+      "expected": {
+        "decision": "fail",
+        "strict_pass": false,
+        "reason_codes_include": [
+          "KOREAN_SHARE_ABOVE_MAX"
+        ],
+        "display_mode": "observed_statistics",
+        "metrics": {
+          "classified_local_share": 0.7692307692307693,
+          "classified_korean_share": 0.09230769230769231,
+          "unknown_share": 0.025,
+          "local_share_lower_bound": 0.75,
+          "local_share_upper_bound": 0.775,
+          "korean_share_lower_bound": 0.09,
+          "korean_share_upper_bound": 0.115
+        },
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-06",
+      "title": "B: 한국어 관측 0건이지만 미판별 35%",
+      "input_overrides": {
+        "counts": {
+          "observed_records": 200,
+          "rating_only_count": 0,
+          "text_count": 200,
+          "classified_count": 130,
+          "unknown_count": 70,
+          "extraction_unknown_count": 0,
+          "local_count": 120,
+          "korean_count": 0
+        }
+      },
+      "expected": {
+        "decision": "unsupported",
+        "strict_pass": false,
+        "reason_codes_include": [
+          "TOO_MANY_UNKNOWN"
+        ],
+        "display_mode": "reference_only",
+        "metrics": {
+          "classified_local_share": 0.9230769230769231,
+          "classified_korean_share": 0.0,
+          "unknown_share": 0.35,
+          "local_share_lower_bound": 0.6,
+          "local_share_upper_bound": 0.95,
+          "korean_share_lower_bound": 0.0,
+          "korean_share_upper_bound": 0.35
+        },
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-07",
+      "title": "본문이 없는 별점만 200건",
+      "input_overrides": {
+        "counts": {
+          "observed_records": 200,
+          "rating_only_count": 200,
+          "text_count": 0,
+          "classified_count": 0,
+          "unknown_count": 0,
+          "extraction_unknown_count": 0,
+          "local_count": 0,
+          "korean_count": 0
+        }
+      },
+      "expected": {
+        "decision": "unsupported",
+        "strict_pass": false,
+        "reason_codes_include": [
+          "NO_TEXT_REVIEWS"
+        ],
+        "display_mode": "counts_only",
+        "metrics": {
+          "classified_local_share": null,
+          "classified_korean_share": null,
+          "unknown_share": null,
+          "local_share_lower_bound": null,
+          "local_share_upper_bound": null,
+          "korean_share_lower_bound": null,
+          "korean_share_upper_bound": null
+        },
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-08",
+      "title": "번역문만 있고 원문은 없는 150건",
+      "input_overrides": {
+        "text_evidence": "translated_only",
+        "counts": {
+          "observed_records": 150,
+          "rating_only_count": 0,
+          "text_count": 150,
+          "classified_count": 0,
+          "unknown_count": 150,
+          "extraction_unknown_count": 0,
+          "local_count": 0,
+          "korean_count": 0
+        }
+      },
+      "expected": {
+        "decision": "unsupported",
+        "strict_pass": false,
+        "reason_codes_include": [
+          "NO_CLASSIFIED_TEXTS",
+          "TOO_MANY_UNKNOWN"
+        ],
+        "display_mode": "counts_only",
+        "metrics": {
+          "classified_local_share": null,
+          "classified_korean_share": null,
+          "unknown_share": 1.0,
+          "local_share_lower_bound": 0.0,
+          "local_share_upper_bound": 1.0,
+          "korean_share_lower_bound": 0.0,
+          "korean_share_upper_bound": 1.0
+        },
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-09",
+      "title": "총평가 1,000건과 관련도순 원문 5건을 혼합하지 않음",
+      "input_overrides": {
+        "total_rating_count": 1000,
+        "source_type": "places_api_synthetic",
+        "window": {
+          "sort": "relevance",
+          "continuity_status": "selected_sample"
+        },
+        "counts": {
+          "observed_records": 5,
+          "rating_only_count": 0,
+          "text_count": 5,
+          "classified_count": 5,
+          "unknown_count": 0,
+          "extraction_unknown_count": 0,
+          "local_count": 5,
+          "korean_count": 0
+        }
+      },
+      "expected": {
+        "decision": "unsupported",
+        "strict_pass": false,
+        "reason_codes_include": [
+          "INSUFFICIENT_CLASSIFIED_TEXTS",
+          "INELIGIBLE_SELECTION"
+        ],
+        "display_mode": "counts_only",
+        "metrics": {
+          "classified_local_share": 1.0,
+          "classified_korean_share": 0.0,
+          "unknown_share": 0.0,
+          "local_share_lower_bound": 1.0,
+          "local_share_upper_bound": 1.0,
+          "korean_share_lower_bound": 0.0,
+          "korean_share_upper_bound": 0.0
+        },
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-10",
+      "title": "레코드는 200건이나 언어 판별 본문은 80건",
+      "input_overrides": {
+        "counts": {
+          "observed_records": 200,
+          "rating_only_count": 120,
+          "text_count": 80,
+          "classified_count": 80,
+          "unknown_count": 0,
+          "extraction_unknown_count": 0,
+          "local_count": 70,
+          "korean_count": 1
+        }
+      },
+      "expected": {
+        "decision": "unsupported",
+        "strict_pass": false,
+        "reason_codes_include": [
+          "INSUFFICIENT_CLASSIFIED_TEXTS"
+        ],
+        "display_mode": "reference_only",
+        "metrics": {
+          "classified_local_share": 0.875,
+          "classified_korean_share": 0.0125,
+          "unknown_share": 0.0,
+          "local_share_lower_bound": 0.875,
+          "local_share_upper_bound": 0.875,
+          "korean_share_lower_bound": 0.0125,
+          "korean_share_upper_bound": 0.0125
+        },
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-11",
+      "title": "원문 추출 실패 10건을 별점만 있는 기록으로 제외하지 않음",
+      "input_overrides": {
+        "counts": {
+          "observed_records": 200,
+          "rating_only_count": 10,
+          "text_count": 180,
+          "classified_count": 175,
+          "unknown_count": 5,
+          "extraction_unknown_count": 10,
+          "local_count": 140,
+          "korean_count": 4
+        }
+      },
+      "expected": {
+        "decision": "unsupported",
+        "strict_pass": false,
+        "reason_codes_include": [
+          "UNEXTRACTABLE_RECORDS"
+        ],
+        "display_mode": "reference_only",
+        "metrics": {
+          "classified_local_share": 0.8,
+          "classified_korean_share": 0.022857142857142857,
+          "unknown_share": 0.027777777777777776,
+          "local_share_lower_bound": 0.7777777777777778,
+          "local_share_upper_bound": 0.8055555555555556,
+          "korean_share_lower_bound": 0.022222222222222223,
+          "korean_share_upper_bound": 0.05
+        },
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-12",
+      "title": "수치가 좋아도 예산 한도로 중간 종료",
+      "input_overrides": {
+        "window": {
+          "stop_reason": "budget_cap",
+          "continuity_status": "partial"
+        }
+      },
+      "expected": {
+        "decision": "unsupported",
+        "strict_pass": false,
+        "reason_codes_include": [
+          "PARTIAL_COLLECTION"
+        ],
+        "display_mode": "reference_only",
+        "metrics": {
+          "classified_local_share": 0.7894736842105263,
+          "classified_korean_share": 0.021052631578947368,
+          "unknown_share": 0.05,
+          "local_share_lower_bound": 0.75,
+          "local_share_upper_bound": 0.8,
+          "korean_share_lower_bound": 0.02,
+          "korean_share_upper_bound": 0.07
+        },
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-13",
+      "title": "수치가 좋아도 관련도순은 엄격 관측 창 판정 제외",
+      "input_overrides": {
+        "window": {
+          "sort": "relevance",
+          "continuity_status": "selected_sample"
+        }
+      },
+      "expected": {
+        "decision": "unsupported",
+        "strict_pass": false,
+        "reason_codes_include": [
+          "INELIGIBLE_SELECTION"
+        ],
+        "display_mode": "reference_only",
+        "metrics": {
+          "classified_local_share": 0.7894736842105263,
+          "classified_korean_share": 0.021052631578947368,
+          "unknown_share": 0.05,
+          "local_share_lower_bound": 0.75,
+          "local_share_upper_bound": 0.8,
+          "korean_share_lower_bound": 0.02,
+          "korean_share_upper_bound": 0.07
+        },
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-14",
+      "title": "한국어 recall 평가 실패로 엄격 배지 차단",
+      "input_overrides": {
+        "quality": {
+          "language_evaluation": "failed",
+          "korean_recall_validation": "failed"
+        }
+      },
+      "expected": {
+        "decision": "unsupported",
+        "strict_pass": false,
+        "reason_codes_include": [
+          "CLASSIFICATION_QUALITY_UNVERIFIED"
+        ],
+        "display_mode": "reference_only",
+        "metrics": {
+          "classified_local_share": 0.7894736842105263,
+          "classified_korean_share": 0.021052631578947368,
+          "unknown_share": 0.05,
+          "local_share_lower_bound": 0.75,
+          "local_share_upper_bound": 0.8,
+          "korean_share_lower_bound": 0.02,
+          "korean_share_upper_bound": 0.07
+        },
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-15",
+      "title": "수정일 정렬과 게시일 종료 경계가 다른 경우",
+      "input_overrides": {
+        "window": {
+          "ordering_semantics": "edited_at",
+          "boundary_time_field": "published_at",
+          "stop_reason": "date_boundary"
+        }
+      },
+      "expected": {
+        "decision": "unsupported",
+        "strict_pass": false,
+        "reason_codes_include": [
+          "TIME_BASIS_MISMATCH"
+        ],
+        "display_mode": "reference_only",
+        "metrics": {
+          "classified_local_share": 0.7894736842105263,
+          "classified_korean_share": 0.021052631578947368,
+          "unknown_share": 0.05,
+          "local_share_lower_bound": 0.75,
+          "local_share_upper_bound": 0.8,
+          "korean_share_lower_bound": 0.02,
+          "korean_share_upper_bound": 0.07
+        },
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-16",
+      "title": "T=C+U를 위반한 입력",
+      "input_overrides": {
+        "counts": {
+          "observed_records": 200,
+          "rating_only_count": 0,
+          "text_count": 200,
+          "classified_count": 190,
+          "unknown_count": 20,
+          "extraction_unknown_count": 0,
+          "local_count": 150,
+          "korean_count": 4
+        }
+      },
+      "expected": {
+        "decision": "invalid_input",
+        "strict_pass": false,
+        "reason_codes_include": [
+          "COUNT_INVARIANT_VIOLATION"
+        ],
+        "display_mode": "none",
+        "metrics": null,
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-17",
+      "title": "현지어와 한국어가 겹치는 설정",
+      "input_overrides": {
+        "local_languages": [
+          "ja",
+          "ko"
+        ]
+      },
+      "expected": {
+        "decision": "invalid_input",
+        "strict_pass": false,
+        "reason_codes_include": [
+          "OVERLAPPING_LANGUAGE_SETS"
+        ],
+        "display_mode": "none",
+        "metrics": null,
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-18",
+      "title": "계산 또는 표시 권한이 확인되지 않음",
+      "input_overrides": {
+        "rights": {
+          "compute_confirmed": false,
+          "display_confirmed": false
+        }
+      },
+      "expected": {
+        "decision": "unsupported",
+        "strict_pass": false,
+        "reason_codes_include": [
+          "RIGHTS_UNVERIFIED"
+        ],
+        "display_mode": "none",
+        "metrics": null,
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-19",
+      "title": "유효기간이 지난 집계는 한국어 0%로 대체하지 않음",
+      "input_overrides": {
+        "freshness": {
+          "state": "expired"
+        }
+      },
+      "expected": {
+        "decision": "unsupported",
+        "strict_pass": false,
+        "reason_codes_include": [
+          "OBSERVATION_EXPIRED"
+        ],
+        "display_mode": "none",
+        "metrics": null,
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-20",
+      "title": "최신순 자료를 모집단 추정으로 전환하려는 요청",
+      "input_overrides": {
+        "collection_mode": "population_estimate",
+        "sampling_design": "latest_contiguous_cohort"
+      },
+      "expected": {
+        "decision": "unsupported",
+        "strict_pass": false,
+        "reason_codes_include": [
+          "POPULATION_DESIGN_UNSUPPORTED"
+        ],
+        "display_mode": "reference_only",
+        "metrics": {
+          "classified_local_share": 0.7894736842105263,
+          "classified_korean_share": 0.021052631578947368,
+          "unknown_share": 0.05,
+          "local_share_lower_bound": 0.75,
+          "local_share_upper_bound": 0.8,
+          "korean_share_lower_bound": 0.02,
+          "korean_share_upper_bound": 0.07
+        },
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-21",
+      "title": "음수 언어 수는 계산 전에 거절",
+      "input_overrides": {
+        "counts": {
+          "observed_records": 200,
+          "rating_only_count": 0,
+          "text_count": 200,
+          "classified_count": 190,
+          "unknown_count": 10,
+          "extraction_unknown_count": 0,
+          "local_count": 150,
+          "korean_count": -1
+        }
+      },
+      "expected": {
+        "decision": "invalid_input",
+        "strict_pass": false,
+        "reason_codes_include": [
+          "NEGATIVE_COUNT"
+        ],
+        "display_mode": "none",
+        "metrics": null,
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-22",
+      "title": "L+K가 분류 수 C를 초과하면 거절",
+      "input_overrides": {
+        "counts": {
+          "observed_records": 200,
+          "rating_only_count": 0,
+          "text_count": 200,
+          "classified_count": 190,
+          "unknown_count": 10,
+          "extraction_unknown_count": 0,
+          "local_count": 185,
+          "korean_count": 10
+        }
+      },
+      "expected": {
+        "decision": "invalid_input",
+        "strict_pass": false,
+        "reason_codes_include": [
+          "COUNT_INVARIANT_VIOLATION"
+        ],
+        "display_mode": "none",
+        "metrics": null,
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-23",
+      "title": "반올림하면 10%처럼 보이는 10.5%는 통과하지 않음",
+      "input_overrides": {
+        "counts": {
+          "observed_records": 200,
+          "rating_only_count": 0,
+          "text_count": 200,
+          "classified_count": 190,
+          "unknown_count": 10,
+          "extraction_unknown_count": 0,
+          "local_count": 150,
+          "korean_count": 11
+        }
+      },
+      "expected": {
+        "decision": "fail",
+        "strict_pass": false,
+        "reason_codes_include": [
+          "KOREAN_SHARE_ABOVE_MAX"
+        ],
+        "display_mode": "observed_statistics",
+        "metrics": {
+          "classified_local_share": 0.7894736842105263,
+          "classified_korean_share": 0.05789473684210526,
+          "unknown_share": 0.05,
+          "local_share_lower_bound": 0.75,
+          "local_share_upper_bound": 0.8,
+          "korean_share_lower_bound": 0.055,
+          "korean_share_upper_bound": 0.105
+        },
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    },
+    {
+      "id": "RL-24",
+      "title": "페이지 경계 반복으로 정렬 연속성을 검증하지 못함",
+      "input_overrides": {
+        "window": {
+          "stop_reason": "cursor_repeated",
+          "continuity_status": "partial"
+        }
+      },
+      "expected": {
+        "decision": "unsupported",
+        "strict_pass": false,
+        "reason_codes_include": [
+          "PARTIAL_COLLECTION"
+        ],
+        "display_mode": "reference_only",
+        "metrics": {
+          "classified_local_share": 0.7894736842105263,
+          "classified_korean_share": 0.021052631578947368,
+          "unknown_share": 0.05,
+          "local_share_lower_bound": 0.75,
+          "local_share_upper_bound": 0.8,
+          "korean_share_lower_bound": 0.02,
+          "korean_share_upper_bound": 0.07
+        },
+        "population_inference_allowed": false,
+        "residency_inference_allowed": false
+      }
+    }
+  ]
+}

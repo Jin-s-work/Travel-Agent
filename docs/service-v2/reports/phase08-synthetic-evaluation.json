@@ -1,0 +1,1804 @@
+{
+  "synthetic": true,
+  "behavioral_metrics": "not_measured",
+  "comparisons": [
+    {
+      "version": "frozen_ranker_evaluation_v1",
+      "input_hash": "33ddd34b2200e0ad70eb4ada365b11bad259b4651f76f97d0daf472ed3110754",
+      "clock": "2026-10-05T12:00:00+00:00",
+      "city": "tokyo",
+      "synthetic": true,
+      "baseline": {
+        "version": "ranker-hypotheses-v1",
+        "chain_limit": 2,
+        "neighborhood_limit": 3,
+        "category_limit": 4,
+        "distance_scale_m": 5000
+      },
+      "candidate": {
+        "version": "diversity-v2",
+        "chain_limit": 1,
+        "neighborhood_limit": 2,
+        "category_limit": 4,
+        "distance_scale_m": 5000
+      },
+      "comparison": [
+        {
+          "type": "local_discovery",
+          "top_overlap": 1,
+          "union_count": 2,
+          "rank_changes": [
+            {
+              "place_id": "place_tokyo_1",
+              "place_name": "합성 東京 1 · 非常に長い名前の地域食堂と文化散歩",
+              "before": 1,
+              "after": 1,
+              "before_components": {
+                "local_evidence": {
+                  "value": 1.0,
+                  "weight": 0.35,
+                  "source_ids": [
+                    "source_1_official",
+                    "source_1_regional_a",
+                    "source_1_regional_b"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.97134,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                }
+              },
+              "after_components": {
+                "local_evidence": {
+                  "value": 1.0,
+                  "weight": 0.35,
+                  "source_ids": [
+                    "source_1_official",
+                    "source_1_regional_a",
+                    "source_1_regional_b"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.97134,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                }
+              }
+            },
+            {
+              "place_id": "place_tokyo_2",
+              "place_name": "합성 東京 2 · 非常に長い名前の地域食堂と文化散歩",
+              "before": 2,
+              "after": null,
+              "before_components": {
+                "local_evidence": {
+                  "value": 1.0,
+                  "weight": 0.35,
+                  "source_ids": [
+                    "source_2_official",
+                    "source_2_regional_a",
+                    "source_2_regional_b"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9427,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                }
+              },
+              "after_components": {
+                "local_evidence": {
+                  "value": 1.0,
+                  "weight": 0.35,
+                  "source_ids": [
+                    "source_2_official",
+                    "source_2_regional_a",
+                    "source_2_regional_b"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9427,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                }
+              }
+            }
+          ],
+          "hard_violations": {
+            "before": 0,
+            "after": 0
+          },
+          "diversity": {
+            "before": {
+              "places": 2,
+              "categories": 1,
+              "neighborhoods": 1
+            },
+            "after": {
+              "places": 1,
+              "categories": 1,
+              "neighborhoods": 1
+            }
+          },
+          "missing_data": {
+            "before": 0,
+            "after": 0
+          }
+        },
+        {
+          "type": "landmark",
+          "top_overlap": 1,
+          "union_count": 2,
+          "rank_changes": [
+            {
+              "place_id": "place_tokyo_1",
+              "place_name": "합성 東京 1 · 非常に長い名前の地域食堂と文化散歩",
+              "before": 1,
+              "after": 1,
+              "before_components": {
+                "iconic_evidence": {
+                  "value": 0.6,
+                  "weight": 0.3,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.97134,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.15,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                }
+              },
+              "after_components": {
+                "iconic_evidence": {
+                  "value": 0.6,
+                  "weight": 0.3,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.97134,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.15,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                }
+              }
+            },
+            {
+              "place_id": "place_tokyo_2",
+              "place_name": "합성 東京 2 · 非常に長い名前の地域食堂と文化散歩",
+              "before": 2,
+              "after": null,
+              "before_components": {
+                "iconic_evidence": {
+                  "value": 0.6,
+                  "weight": 0.3,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9427,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.15,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                }
+              },
+              "after_components": {
+                "iconic_evidence": {
+                  "value": 0.6,
+                  "weight": 0.3,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9427,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.15,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                }
+              }
+            }
+          ],
+          "hard_violations": {
+            "before": 0,
+            "after": 0
+          },
+          "diversity": {
+            "before": {
+              "places": 2,
+              "categories": 1,
+              "neighborhoods": 1
+            },
+            "after": {
+              "places": 1,
+              "categories": 1,
+              "neighborhoods": 1
+            }
+          },
+          "missing_data": {
+            "before": 0,
+            "after": 0
+          }
+        }
+      ],
+      "language_gate_unchanged": true,
+      "automatic_winner": null,
+      "explanation_evaluation": {
+        "mode": "separate_contract_test",
+        "live_llm": "not_run"
+      },
+      "retrieval_calls": 0
+    },
+    {
+      "version": "frozen_ranker_evaluation_v1",
+      "input_hash": "ddbb2be97286e6979fd33d8a1c058d332e4a9cac2f154a0faa8e2381e1ed1862",
+      "clock": "2026-10-05T12:00:00+00:00",
+      "city": "tokyo",
+      "synthetic": true,
+      "baseline": {
+        "version": "ranker-hypotheses-v1",
+        "chain_limit": 2,
+        "neighborhood_limit": 3,
+        "category_limit": 4,
+        "distance_scale_m": 5000
+      },
+      "candidate": {
+        "version": "diversity-v2",
+        "chain_limit": 1,
+        "neighborhood_limit": 2,
+        "category_limit": 4,
+        "distance_scale_m": 5000
+      },
+      "comparison": [
+        {
+          "type": "local_discovery",
+          "top_overlap": 1,
+          "union_count": 2,
+          "rank_changes": [
+            {
+              "place_id": "place_tokyo_1",
+              "place_name": "합성 東京 1 · 非常に長い名前の地域食堂と文化散歩",
+              "before": 1,
+              "after": 1,
+              "before_components": {
+                "local_evidence": {
+                  "value": 1.0,
+                  "weight": 0.2,
+                  "source_ids": [
+                    "source_1_official",
+                    "source_1_regional_a",
+                    "source_1_regional_b"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.97134,
+                  "weight": 0.15,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "quality": {
+                  "value": 0.9,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "language": {
+                  "value": 0.8,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                }
+              },
+              "after_components": {
+                "local_evidence": {
+                  "value": 1.0,
+                  "weight": 0.2,
+                  "source_ids": [
+                    "source_1_official",
+                    "source_1_regional_a",
+                    "source_1_regional_b"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.97134,
+                  "weight": 0.15,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "quality": {
+                  "value": 0.9,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "language": {
+                  "value": 0.8,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                }
+              }
+            },
+            {
+              "place_id": "place_tokyo_2",
+              "place_name": "합성 東京 2 · 非常に長い名前の地域食堂と文化散歩",
+              "before": 2,
+              "after": null,
+              "before_components": {
+                "local_evidence": {
+                  "value": 1.0,
+                  "weight": 0.2,
+                  "source_ids": [
+                    "source_2_official",
+                    "source_2_regional_a",
+                    "source_2_regional_b"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9427,
+                  "weight": 0.15,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "quality": {
+                  "value": 0.9,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "language": {
+                  "value": 0.8,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                }
+              },
+              "after_components": {
+                "local_evidence": {
+                  "value": 1.0,
+                  "weight": 0.2,
+                  "source_ids": [
+                    "source_2_official",
+                    "source_2_regional_a",
+                    "source_2_regional_b"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9427,
+                  "weight": 0.15,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "quality": {
+                  "value": 0.9,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "language": {
+                  "value": 0.8,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                }
+              }
+            }
+          ],
+          "hard_violations": {
+            "before": 0,
+            "after": 0
+          },
+          "diversity": {
+            "before": {
+              "places": 2,
+              "categories": 1,
+              "neighborhoods": 1
+            },
+            "after": {
+              "places": 1,
+              "categories": 1,
+              "neighborhoods": 1
+            }
+          },
+          "missing_data": {
+            "before": 0,
+            "after": 0
+          }
+        },
+        {
+          "type": "landmark",
+          "top_overlap": 1,
+          "union_count": 2,
+          "rank_changes": [
+            {
+              "place_id": "place_tokyo_1",
+              "place_name": "합성 東京 1 · 非常に長い名前の地域食堂と文化散歩",
+              "before": 1,
+              "after": 1,
+              "before_components": {
+                "iconic_evidence": {
+                  "value": 0.6,
+                  "weight": 0.3,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.97134,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.15,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                }
+              },
+              "after_components": {
+                "iconic_evidence": {
+                  "value": 0.6,
+                  "weight": 0.3,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.97134,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.15,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                }
+              }
+            },
+            {
+              "place_id": "place_tokyo_2",
+              "place_name": "합성 東京 2 · 非常に長い名前の地域食堂と文化散歩",
+              "before": 2,
+              "after": null,
+              "before_components": {
+                "iconic_evidence": {
+                  "value": 0.6,
+                  "weight": 0.3,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9427,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.15,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                }
+              },
+              "after_components": {
+                "iconic_evidence": {
+                  "value": 0.6,
+                  "weight": 0.3,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9427,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.15,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                }
+              }
+            }
+          ],
+          "hard_violations": {
+            "before": 0,
+            "after": 0
+          },
+          "diversity": {
+            "before": {
+              "places": 2,
+              "categories": 1,
+              "neighborhoods": 1
+            },
+            "after": {
+              "places": 1,
+              "categories": 1,
+              "neighborhoods": 1
+            }
+          },
+          "missing_data": {
+            "before": 0,
+            "after": 0
+          }
+        }
+      ],
+      "language_gate_unchanged": true,
+      "automatic_winner": null,
+      "explanation_evaluation": {
+        "mode": "separate_contract_test",
+        "live_llm": "not_run"
+      },
+      "retrieval_calls": 0
+    },
+    {
+      "version": "frozen_ranker_evaluation_v1",
+      "input_hash": "3ba06f5d52c6f6bce4f8d13e442c130c09e88d3f148bf0631e76856668748f59",
+      "clock": "2026-10-05T12:00:00+00:00",
+      "city": "barcelona",
+      "synthetic": true,
+      "baseline": {
+        "version": "ranker-hypotheses-v1",
+        "chain_limit": 2,
+        "neighborhood_limit": 3,
+        "category_limit": 4,
+        "distance_scale_m": 5000
+      },
+      "candidate": {
+        "version": "diversity-v2",
+        "chain_limit": 1,
+        "neighborhood_limit": 2,
+        "category_limit": 4,
+        "distance_scale_m": 5000
+      },
+      "comparison": [
+        {
+          "type": "local_discovery",
+          "top_overlap": 1,
+          "union_count": 2,
+          "rank_changes": [
+            {
+              "place_id": "place_barcelona_1",
+              "place_name": "합성 Barcelona 1 · 非常に長い名前の地域食堂と文化散歩",
+              "before": 1,
+              "after": 1,
+              "before_components": {
+                "local_evidence": {
+                  "value": 1.0,
+                  "weight": 0.35,
+                  "source_ids": [
+                    "source_1_official",
+                    "source_1_regional_a",
+                    "source_1_regional_b"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9722,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                }
+              },
+              "after_components": {
+                "local_evidence": {
+                  "value": 1.0,
+                  "weight": 0.35,
+                  "source_ids": [
+                    "source_1_official",
+                    "source_1_regional_a",
+                    "source_1_regional_b"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9722,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                }
+              }
+            },
+            {
+              "place_id": "place_barcelona_2",
+              "place_name": "합성 Barcelona 2 · 非常に長い名前の地域食堂と文化散歩",
+              "before": 2,
+              "after": null,
+              "before_components": {
+                "local_evidence": {
+                  "value": 1.0,
+                  "weight": 0.35,
+                  "source_ids": [
+                    "source_2_official",
+                    "source_2_regional_a",
+                    "source_2_regional_b"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9444,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                }
+              },
+              "after_components": {
+                "local_evidence": {
+                  "value": 1.0,
+                  "weight": 0.35,
+                  "source_ids": [
+                    "source_2_official",
+                    "source_2_regional_a",
+                    "source_2_regional_b"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9444,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                }
+              }
+            }
+          ],
+          "hard_violations": {
+            "before": 0,
+            "after": 0
+          },
+          "diversity": {
+            "before": {
+              "places": 2,
+              "categories": 1,
+              "neighborhoods": 1
+            },
+            "after": {
+              "places": 1,
+              "categories": 1,
+              "neighborhoods": 1
+            }
+          },
+          "missing_data": {
+            "before": 0,
+            "after": 0
+          }
+        },
+        {
+          "type": "landmark",
+          "top_overlap": 1,
+          "union_count": 2,
+          "rank_changes": [
+            {
+              "place_id": "place_barcelona_1",
+              "place_name": "합성 Barcelona 1 · 非常に長い名前の地域食堂と文化散歩",
+              "before": 1,
+              "after": 1,
+              "before_components": {
+                "iconic_evidence": {
+                  "value": 0.6,
+                  "weight": 0.3,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9722,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.15,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                }
+              },
+              "after_components": {
+                "iconic_evidence": {
+                  "value": 0.6,
+                  "weight": 0.3,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9722,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.15,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                }
+              }
+            },
+            {
+              "place_id": "place_barcelona_2",
+              "place_name": "합성 Barcelona 2 · 非常に長い名前の地域食堂と文化散歩",
+              "before": 2,
+              "after": null,
+              "before_components": {
+                "iconic_evidence": {
+                  "value": 0.6,
+                  "weight": 0.3,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9444,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.15,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                }
+              },
+              "after_components": {
+                "iconic_evidence": {
+                  "value": 0.6,
+                  "weight": 0.3,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9444,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.15,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                }
+              }
+            }
+          ],
+          "hard_violations": {
+            "before": 0,
+            "after": 0
+          },
+          "diversity": {
+            "before": {
+              "places": 2,
+              "categories": 1,
+              "neighborhoods": 1
+            },
+            "after": {
+              "places": 1,
+              "categories": 1,
+              "neighborhoods": 1
+            }
+          },
+          "missing_data": {
+            "before": 0,
+            "after": 0
+          }
+        }
+      ],
+      "language_gate_unchanged": true,
+      "automatic_winner": null,
+      "explanation_evaluation": {
+        "mode": "separate_contract_test",
+        "live_llm": "not_run"
+      },
+      "retrieval_calls": 0
+    },
+    {
+      "version": "frozen_ranker_evaluation_v1",
+      "input_hash": "17ab98ca39c6c72b693cb046ea8702599a4ecbe776128a716b85743c4f07ac11",
+      "clock": "2026-10-05T12:00:00+00:00",
+      "city": "barcelona",
+      "synthetic": true,
+      "baseline": {
+        "version": "ranker-hypotheses-v1",
+        "chain_limit": 2,
+        "neighborhood_limit": 3,
+        "category_limit": 4,
+        "distance_scale_m": 5000
+      },
+      "candidate": {
+        "version": "diversity-v2",
+        "chain_limit": 1,
+        "neighborhood_limit": 2,
+        "category_limit": 4,
+        "distance_scale_m": 5000
+      },
+      "comparison": [
+        {
+          "type": "local_discovery",
+          "top_overlap": 1,
+          "union_count": 2,
+          "rank_changes": [
+            {
+              "place_id": "place_barcelona_1",
+              "place_name": "합성 Barcelona 1 · 非常に長い名前の地域食堂と文化散歩",
+              "before": 1,
+              "after": 1,
+              "before_components": {
+                "local_evidence": {
+                  "value": 1.0,
+                  "weight": 0.2,
+                  "source_ids": [
+                    "source_1_official",
+                    "source_1_regional_a",
+                    "source_1_regional_b"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9722,
+                  "weight": 0.15,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "quality": {
+                  "value": 0.9,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "language": {
+                  "value": 0.8,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                }
+              },
+              "after_components": {
+                "local_evidence": {
+                  "value": 1.0,
+                  "weight": 0.2,
+                  "source_ids": [
+                    "source_1_official",
+                    "source_1_regional_a",
+                    "source_1_regional_b"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9722,
+                  "weight": 0.15,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "quality": {
+                  "value": 0.9,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "language": {
+                  "value": 0.8,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                }
+              }
+            },
+            {
+              "place_id": "place_barcelona_2",
+              "place_name": "합성 Barcelona 2 · 非常に長い名前の地域食堂と文化散歩",
+              "before": 2,
+              "after": null,
+              "before_components": {
+                "local_evidence": {
+                  "value": 1.0,
+                  "weight": 0.2,
+                  "source_ids": [
+                    "source_2_official",
+                    "source_2_regional_a",
+                    "source_2_regional_b"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9444,
+                  "weight": 0.15,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "quality": {
+                  "value": 0.9,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "language": {
+                  "value": 0.8,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                }
+              },
+              "after_components": {
+                "local_evidence": {
+                  "value": 1.0,
+                  "weight": 0.2,
+                  "source_ids": [
+                    "source_2_official",
+                    "source_2_regional_a",
+                    "source_2_regional_b"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9444,
+                  "weight": 0.15,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "quality": {
+                  "value": 0.9,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "language": {
+                  "value": 0.8,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                }
+              }
+            }
+          ],
+          "hard_violations": {
+            "before": 0,
+            "after": 0
+          },
+          "diversity": {
+            "before": {
+              "places": 2,
+              "categories": 1,
+              "neighborhoods": 1
+            },
+            "after": {
+              "places": 1,
+              "categories": 1,
+              "neighborhoods": 1
+            }
+          },
+          "missing_data": {
+            "before": 0,
+            "after": 0
+          }
+        },
+        {
+          "type": "landmark",
+          "top_overlap": 1,
+          "union_count": 2,
+          "rank_changes": [
+            {
+              "place_id": "place_barcelona_1",
+              "place_name": "합성 Barcelona 1 · 非常に長い名前の地域食堂と文化散歩",
+              "before": 1,
+              "after": 1,
+              "before_components": {
+                "iconic_evidence": {
+                  "value": 0.6,
+                  "weight": 0.3,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9722,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.15,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                }
+              },
+              "after_components": {
+                "iconic_evidence": {
+                  "value": 0.6,
+                  "weight": 0.3,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9722,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.15,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_1_official"
+                  ],
+                  "reason_codes": []
+                }
+              }
+            },
+            {
+              "place_id": "place_barcelona_2",
+              "place_name": "합성 Barcelona 2 · 非常に長い名前の地域食堂と文化散歩",
+              "before": 2,
+              "after": null,
+              "before_components": {
+                "iconic_evidence": {
+                  "value": 0.6,
+                  "weight": 0.3,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9444,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.15,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                }
+              },
+              "after_components": {
+                "iconic_evidence": {
+                  "value": 0.6,
+                  "weight": 0.3,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.25,
+                  "source_ids": [],
+                  "reason_codes": []
+                },
+                "movement": {
+                  "value": 0.9444,
+                  "weight": 0.2,
+                  "source_ids": [],
+                  "reason_codes": [
+                    "DISTANCE_ESTIMATE"
+                  ]
+                },
+                "visit_fit": {
+                  "value": 1.0,
+                  "weight": 0.15,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                },
+                "price": {
+                  "value": 1.0,
+                  "weight": 0.1,
+                  "source_ids": [
+                    "source_2_official"
+                  ],
+                  "reason_codes": []
+                }
+              }
+            }
+          ],
+          "hard_violations": {
+            "before": 0,
+            "after": 0
+          },
+          "diversity": {
+            "before": {
+              "places": 2,
+              "categories": 1,
+              "neighborhoods": 1
+            },
+            "after": {
+              "places": 1,
+              "categories": 1,
+              "neighborhoods": 1
+            }
+          },
+          "missing_data": {
+            "before": 0,
+            "after": 0
+          }
+        }
+      ],
+      "language_gate_unchanged": true,
+      "automatic_winner": null,
+      "explanation_evaluation": {
+        "mode": "separate_contract_test",
+        "live_llm": "not_run"
+      },
+      "retrieval_calls": 0
+    }
+  ],
+  "explanation_contract": {
+    "safe_accepted": true,
+    "invented_candidate_rejected": true,
+    "live_llm": "not_run"
+  },
+  "paid_calls": 0
+}

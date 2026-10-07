@@ -1,0 +1,19 @@
+From: Travel Demo <reservations@example.invalid>
+To: demo-traveler@example.invalid
+Subject: [TEST ONLY] Missing time and party
+Date: Tue, 06 Oct 2026 09:00:00 +0900
+Message-ID: <06-date-only-unknown-party.eml@example.invalid>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+SYNTHETIC TEST DATA / =EC=8B=A4=EC=A0=9C =EC=98=88=EC=95=BD=EC=9D=B4 =EC=95=
+=84=EB=8B=99=EB=8B=88=EB=8B=A4. =EC=99=B8=EB=B6=80 =EC=98=88=EC=95=BD=C2=B7=
+=EA=B2=B0=EC=A0=9C =ED=9A=A8=EB=A0=A5 =EC=97=86=EC=9D=8C.
+
+Demo Madrid Gallery (fictional).
+Your visit date is 2026-11-15, Europe/Madrid. Exact entry time has not been a=
+ssigned.
+Number of visitors: pending. Price: not yet quoted. Reference TEST-UNKNOWN-00=
+6.
+This is a date-only visit record, not a midnight reservation.

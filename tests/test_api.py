@@ -18,50 +18,12 @@ def test_health():
     assert res.json() == {"ok": True}
 
 
-def test_bookings_shape():
-    res = client.get("/api/bookings")
-    assert res.status_code == 200
-
-    body = res.json()
-    assert {"items", "count", "trip_start", "trip_end"} <= body.keys()
-    assert body["count"] == len(body["items"])
-
-    for item in body["items"]:
-        # UI가 기대하는 키가 빠지면 화면이 조용히 비어버린다.
-        assert {"id", "kind", "provider", "date", "time", "source_file", "policy"} <= item.keys()
-        assert isinstance(item["policy"], list)
 
 
-def test_bookings_sorted_by_date():
-    items = client.get("/api/bookings").json()["items"]
-    dates = [i["date"] for i in items if i["date"]]
-    assert dates == sorted(dates), "일정은 날짜순이어야 한다"
 
 
-def test_index_rejects_unsupported_extension():
-    """지원하지 않는 형식만 올리면 인덱싱을 시작하지 않는다."""
-    res = client.post(
-        "/api/index",
-        files={"files": ("notes.pdf", b"%PDF-1.4", "application/pdf")},
-    )
-    assert res.status_code == 202
-    body = res.json()
-    assert body["uploaded"] == []
-    assert "notes.pdf" in body["rejected"]
-    # 저장할 파일이 없으므로 백그라운드 작업을 걸지 않는다.
-    assert body["state"] == "done"
 
 
-def test_index_rejects_oversized_file():
-    """업로드 본문을 통째로 메모리에 읽는다. 512MB 인스턴스에서는 상한이 필요하다."""
-    from src.config import MAX_UPLOAD_BYTES
-
-    huge = b"x" * (MAX_UPLOAD_BYTES + 1024)
-    res = client.post("/api/index", files={"files": ("huge.txt", huge, "text/plain")})
-    assert res.status_code == 202
-    body = res.json()
-    assert body["uploaded"] == []
-    assert "huge.txt" in body["rejected"]
 
 
 def test_upload_limit_leaves_room_for_real_emails():
@@ -79,44 +41,12 @@ def test_upload_limit_leaves_room_for_real_emails():
     assert MAX_UPLOAD_BYTES > largest * 100
 
 
-def test_index_status_shape():
-    res = client.get("/api/index/status")
-    assert res.status_code == 200
-    body = res.json()
-    assert body["state"] in {"idle", "running", "done", "error"}
-    # UI가 진행 표시에 쓰는 키가 빠지면 화면이 멈춘 것처럼 보인다.
-    assert {"total", "done", "indexed", "already_indexed", "error"} <= body.keys()
 
 
-def test_index_returns_202_not_200():
-    """인덱싱은 즉시 끝나지 않는다. 202로 '접수됨'을 알려야
-    프론트가 폴링으로 넘어간다."""
-    from api import app as fastapi_app
-
-    route = next(
-        r for r in fastapi_app.routes
-        if getattr(r, "path", "") == "/api/index" and "POST" in getattr(r, "methods", set())
-    )
-    assert route.status_code == 202
 
 
-def test_clear_index_reports_removed_files():
-    """비우기는 벡터뿐 아니라 업로드된 원본도 지운다.
-
-    파일이 남으면 다음 인덱싱에서 되살아나 '비웠는데 다시 나타나는' 문제가 된다.
-    """
-    res = client.request("DELETE", "/api/index", params={"keep_files": True})
-    assert res.status_code == 200
-    body = res.json()
-    assert "removed_files" in body
-    assert body["removed_files"] == [], "keep_files=True면 파일을 지우지 않는다"
 
 
-def test_clear_index_resets_job_state():
-    client.request("DELETE", "/api/index", params={"keep_files": True})
-    status = client.get("/api/index/status").json()
-    assert status["state"] == "idle"
-    assert status["indexed"] == []
 
 
 # ---------------------------------------------------------------- 빠른 경로
@@ -159,67 +89,12 @@ def test_referential_questions_go_to_agent(question):
     assert _can_answer_directly(question) is False
 
 
-def test_fast_path_survives_conversation_history():
-    """대화가 이어져도 스스로 뜻이 서는 질문은 빠른 경로를 타야 한다.
-
-    예전에는 history가 있으면 무조건 에이전트로 보내서 두 번째 질문부터
-    같은 질문도 LLM을 세 번 불렀다.
-    """
-    import inspect
-
-    import api
-
-    source = inspect.getsource(api._ask_events) + inspect.getsource(api.ask)
-    assert "not body.history and _can_answer_directly" not in source
 
 
-def test_index_status_reports_seeding():
-    """기동 직후 자동 복구 중에는 화면이 '예약 없음'이 아니라 '준비 중'이어야 한다."""
-    body = client.get("/api/index/status").json()
-    assert "seeding" in body
-    assert isinstance(body["seeding"], bool)
 
 
-def test_seeding_flag_is_on_while_running_and_off_after(monkeypatch):
-    """복구가 도는 동안에만 켜져 있어야 한다. 끝나고도 켜져 있으면 화면이 멈춘다."""
-    import threading
-
-    import api
-    import src.seed as seed_module
-
-    started, release = threading.Event(), threading.Event()
-
-    def slow_seed(store=None):
-        started.set()
-        release.wait(timeout=5)
-        return {"seeded": False, "reason": "테스트"}
-
-    monkeypatch.setattr(seed_module, "seed_if_empty", slow_seed)
-    monkeypatch.setattr(api, "store", lambda: None)
-
-    worker = threading.Thread(target=api._run_seeding)
-    worker.start()
-    assert started.wait(timeout=5)
-    assert client.get("/api/index/status").json()["seeding"] is True
-
-    release.set()
-    worker.join(timeout=5)
-    assert client.get("/api/index/status").json()["seeding"] is False
 
 
-def test_seeding_flag_clears_even_when_seeding_fails(monkeypatch):
-    """실패해도 플래그를 내려야 한다. 남으면 화면이 영영 '준비 중'이 된다."""
-    import api
-    import src.seed as seed_module
-
-    def boom(store=None):
-        raise RuntimeError("OPENAI_API_KEY가 없습니다")
-
-    monkeypatch.setattr(seed_module, "seed_if_empty", boom)
-    monkeypatch.setattr(api, "store", lambda: None)
-
-    api._run_seeding()
-    assert client.get("/api/index/status").json()["seeding"] is False
 
 
 @pytest.mark.parametrize(
@@ -273,20 +148,14 @@ def test_trim_after_refusal_leaves_normal_answers():
     assert _trim_after_refusal(answer, ["search_bookings"]) == answer
 
 
-def test_ask_rejects_empty_question():
-    res = client.post("/api/ask", json={"question": ""})
-    assert res.status_code == 422
 
 
-def test_ask_rejects_overlong_question():
-    res = client.post("/api/ask", json={"question": "가" * 1001})
-    assert res.status_code == 422
 
 
 def test_web_index_is_served():
     res = client.get("/")
     assert res.status_code == 200
-    assert "Travel Inbox" in res.text
+    assert "<title>여정 · 나의 여행</title>" in res.text
 
 
 def test_service_worker_served_from_root():
@@ -336,3 +205,24 @@ def test_to_booking_handles_single_time():
     out = _to_booking({"time": "07:40", "source_file": "05.txt", "document": ""})
     assert out["time"] == "07:40"
     assert out["time_end"] is None
+
+
+@pytest.mark.parametrize("method,path",[("GET","/api/bookings"),("POST","/api/ask"),("POST","/api/ask/stream"),("POST","/api/index"),("GET","/api/index/status"),("DELETE","/api/index"),("POST","/api/trip-start"),("GET","/api/download/x")])
+def test_retired_global_apis_require_authentication(method,path):
+    response=client.request(method,path)
+    assert response.status_code == 401
+    assert response.json()['error']['code']=='AUTH_REQUIRED'
+
+
+def test_no_shared_demo_seed_or_private_http_state():
+    import api
+    for name in ('_job','_agent','_run_seeding','store'):
+        assert not hasattr(api,name)
+
+
+@pytest.mark.parametrize('payload',[{'question':''},{'question':'가'*1001},{'question':'x','history':[{'role':'system','content':'x'}]},{'question':'x','history':[{'role':'tool','content':'x'}]},{'question':'x','history':[{'role':'user','content':'x'*4001}]}])
+def test_strict_question_contract(payload):
+    from api import AskRequest
+    from pydantic import ValidationError
+    with pytest.raises(ValidationError):
+        AskRequest.model_validate(payload)

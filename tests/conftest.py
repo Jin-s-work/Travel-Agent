@@ -14,6 +14,20 @@ from pathlib import Path
 _SANDBOX = Path(tempfile.mkdtemp(prefix="travel-inbox-tests-"))
 os.environ["CHROMA_DIR"] = str(_SANDBOX / "chroma")
 os.environ["EMAILS_DIR"] = str(_SANDBOX / "emails")
+os.environ["DATABASE_PATH"] = str(_SANDBOX / "service.sqlite3")
+os.environ["DOCUMENTS_DIR"] = str(_SANDBOX / "private-documents")
+os.environ["VECTORS_DIR"] = str(_SANDBOX / "private-vectors")
+os.environ["APP_ENV"] = "production"
+os.environ["STORAGE_BACKEND"] = "local"
+os.environ["DATABASE_URL"] = ""
+os.environ["SUPABASE_SECRET_KEY"] = ""
+os.environ["OIDC_CLIENT_ID"] = ""
+os.environ["OIDC_CLIENT_SECRET"] = ""
+os.environ["SESSION_SECRET"] = ""
+os.environ["OPENAI_API_KEY"] = "test-placeholder"
+os.environ["TAVILY_API_KEY"] = ""
+os.environ["SEED_ON_EMPTY"] = "0"
+os.environ["PUBLIC_DISCOVERY_ENABLED"] = "0"  # No live network from production-shaped test apps.
 
 import pytest  # noqa: E402  (환경변수 설정 뒤에 와야 한다)
 
