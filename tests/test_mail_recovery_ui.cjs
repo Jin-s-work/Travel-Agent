@@ -54,7 +54,17 @@ test('accepted documents stay busy before the first file result arrives',()=>{
 test('single failed file resumes its original job instead of paying for a new extraction',async()=>{
   const state={epoch:1,reprocessing:new Set(),jobs:new Map([['j',{job_id:'j',files:[{document_id:'d',state:'failed'}]}]])};let path,polled,fresh=0;
   const c=load(['retryUpload'],{state,canRetryJob:()=>true,documentProcessing:()=>false,renderDocuments(){},uid:()=> 'retry-id',
-    api:async p=>{path=p;return {job_id:'next'}},pollJob:async id=>{polled=id},reprocessDocument:()=>{fresh++}});
+    api:async p=>{path=p;return {job_id:'next'}},pollJob:async id=>{polled=id},updateUpload(){},renderUploads(){},reprocessDocument:()=>{fresh++}});
   await c.retryUpload({document_id:'d',filename:'test.eml',job_id:'j'});
   assert.equal(path,'/jobs/j/retry');assert.equal(polled,'next');assert.equal(fresh,0);assert.equal(state.reprocessing.size,0);
+});
+
+
+test('refresh and retry show accepted pending mail before per-file completion',()=>{
+  const state={uploads:[{document_id:'d',job_id:'old',state:'failed',error_code:'OLD'}],jobs:new Map([['old',{created_at:'1'}]]),recommendations:{active:null}};
+  const c=load(['updateUpload','mergeJob'],{state,terminal:j=>['succeeded','partial','failed','cancelled'].includes(j.state),renderJobs(){},renderUploads(){},renderDocuments(){}});
+  c.mergeJob({job_id:'new',created_at:'2',operation:'documents',state:'running',submission:{accepted:[{document_id:'d',filename:'test.eml'}]},files:[]});
+  assert.equal(state.uploads[0].state,'running');assert.equal(state.uploads[0].error_code,null);assert.equal(state.uploads[0].job_id,'new');
+  c.mergeJob({job_id:'new',created_at:'2',operation:'documents',state:'succeeded',files:[{document_id:'d',state:'succeeded',bookings_count:8}]});
+  assert.equal(state.uploads[0].state,'succeeded');assert.equal(state.uploads[0].bookings_count,8);
 });

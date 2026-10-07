@@ -588,7 +588,12 @@
   function canRetryJob(j){if([...state.jobs.values()].some(child=>child.submission?.resume_from===j.job_id))return false;if(j.operation==='reindex')return j.state==='failed'&&!budgetCodes.has(j.error_code);return ['partial','failed','cancelled'].includes(j.state)&&!budgetCodes.has(j.error_code)&&(j.files||[]).some(f=>f.state==='failed'&&!budgetCodes.has(f.error_code));}
   function nextAction(j){const code=j.error_code||(j.files||[]).find(f=>budgetCodes.has(f.error_code))?.error_code;if(code?.includes('BUDGET')||code==='GLOBAL_OPERATIONS_STOPPED')return '새로운 외부 호출이 중단되었습니다. 운영자가 단가·예산을 확인한 뒤 새 작업을 요청할 수 있습니다. 저장된 예약·일정은 계속 볼 수 있어요.';if(code?.includes('UNKNOWN')||code?.includes('RECONCILIATION'))return '공급자의 처리·과금 여부를 확인 중입니다. 중복 과금을 피하기 위해 자동 재시도하지 않습니다.';if(j.cancel_requested_at&&!terminal(j))return '취소를 요청했습니다. 이미 전송된 외부 요청은 끝날 수 있으며 비용이 발생할 수 있습니다.';if(j.state==='cancelled')return '작업이 중단되었습니다. 이미 저장된 결과는 유지됩니다.';if(j.state==='partial'){if(j.operation==='itinerary_generate')return '일정에서 미배치 장소와 확인이 필요한 조건을 살펴보세요. 고정 예약은 유지됩니다.';if(j.operation==='recommendation_generate')return '확인된 후보만 저장했습니다. 추천 화면에서 부족한 근거와 조건을 확인해 주세요.';return '저장된 결과와 확인이 필요한 항목을 확인해 주세요.';}return '';}
   function stopWatchers(){for(const w of state.watchers.values()){w.stream?.close();clearTimeout(w.timer);}state.watchers.clear();}
-  function mergeJob(j){state.jobs.set(j.job_id,j);(j.files||[]).forEach(f=>{const current=state.uploads.find(x=>x.document_id===f.document_id);const prior=current?.job_id&&state.jobs.get(current.job_id);if(!prior||prior.created_at<=j.created_at)updateUpload({...f,job_id:j.job_id},{authoritative:terminal(j)});});renderJobs();renderUploads();if(j.operation==='documents')renderDocuments();
+  function mergeJob(j){state.jobs.set(j.job_id,j);
+    const files=[...(j.files||[])];
+    if(j.operation==='documents'&&!terminal(j))for(const accepted of j.submission?.accepted||[]){
+      if(!files.some(file=>file.document_id===accepted.document_id))files.push({...accepted,state:j.state});
+    }
+    files.forEach(f=>{const current=state.uploads.find(x=>x.document_id===f.document_id);const prior=current?.job_id&&state.jobs.get(current.job_id);if(!prior||prior.created_at<=j.created_at)updateUpload({...f,job_id:j.job_id},{authoritative:terminal(j)});});renderJobs();renderUploads();if(j.operation==='documents')renderDocuments();
     const active=state.recommendations.active;
     if(active&&(active.job_id||active.job?.job_id)===j.job_id){
       const finished=terminal(j)&&!terminal(active);active.job=j;active.state=j.state;state.recommendations.connectionError=null;
@@ -631,10 +636,10 @@
     const failed=(job?.files||[]).filter(f=>f.state==='failed');
     if(job&&failed.length===1&&failed[0].document_id===file.document_id&&canRetryJob(job)){
       if(documentProcessing(file.document_id))return;
-      const epoch=state.epoch;state.reprocessing.add(file.document_id);renderDocuments();
+      const epoch=state.epoch;state.reprocessing.add(file.document_id);updateUpload({...file,state:'queued'});renderUploads();renderDocuments();
       try{const next=await api('/jobs/'+job.job_id+'/retry',{method:'POST',headers:{'Idempotency-Key':uid()}});
         if(epoch===state.epoch)await pollJob(next.job_id,epoch);
-      }catch(error){if(epoch===state.epoch)fail(error,$('#uploadError'));}
+      }catch(error){if(epoch===state.epoch){updateUpload({...file,state:'failed'});renderUploads();fail(error,$('#uploadError'));}}
       finally{if(epoch===state.epoch){state.reprocessing.delete(file.document_id);renderDocuments();}}
       return;
     }

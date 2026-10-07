@@ -61,3 +61,5 @@
 - 활성화 직전 강제 오류 → 원래 예약 유지 → retry에서 parse/embed 호출 증가 없이 성공. 복구 임베딩 실패 때도 기존 활성 세대·예약·교정 유지.
 - 최종 백엔드: `PYTHON_DOTENV_DISABLED=1 .venv/bin/python -m pytest -q` → **1026 passed / 15 skipped / 2 warnings / 118.44초**.
 - 실행 초기에는 아직 file 결과가 없어도 submission.accepted로 분석 중 버튼을 유지. 한 파일 실패의 바로 재시도는 새 추출 대신 기존 job checkpoint를 사용한다.
+
+최종 JS 회귀는 **122 passed**. 파일별 완료 결과가 아직 없는 queued/running job도 수락한 문서 목록으로 화면을 복원한다. 재시도 버튼은 즉시 대기로 전환하고, 요청이 실패하면 기존 실패 결과를 유지한다. 운영의 첫 재시도에서 gpt-5-mini 호출 수 1회 유지(재추출 없음), 다른 예약 7개 행 digest 동일 확인. 누락 검색 자료 5건 복구 후 최종 결과는 아래에 기록한다.
