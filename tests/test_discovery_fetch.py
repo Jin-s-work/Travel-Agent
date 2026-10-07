@@ -146,3 +146,18 @@ def test_retry_after_accepts_dates_and_rejects_untrusted_text():
     assert retry_after('600')==600
     assert 598<=retry_after(format_datetime(datetime.now(timezone.utc)+timedelta(seconds=600)))<=600
     assert retry_after('<script>') is None and retry_after(None) is None
+
+
+def test_ipv4_remains_reachable_when_dns_lists_two_ipv6_answers_first():
+    con=Connection(Response());seen=[]
+    def connect(parsed,ip,timeout):seen.append(ip);return con
+    fetch_public('https://example.org/',resolver=lambda *_:['2001:4860:4860::8888','2606:4700:4700::1111','93.184.216.34'],connector=connect)
+    assert seen==['93.184.216.34']
+
+
+def test_connect_failure_keeps_only_numeric_diagnostic_not_exception_text():
+    def connect(*args):raise OSError(101,'network unreachable PRIVATE DATA')
+    with pytest.raises(FetchRejected) as error:
+        fetch_public('https://example.org/',resolver=lambda *_:['93.184.216.34'],connector=connect)
+    assert error.value.network_errno==101
+    assert str(error.value)=='CONNECT_FAILED'

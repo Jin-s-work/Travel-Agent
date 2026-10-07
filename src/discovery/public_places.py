@@ -148,7 +148,7 @@ class PublicDiscovery:
     def _status(self, city, state, **changes):
         c = center(city)
         return {'state': state, 'provider': PROVIDER, 'calls': 0, 'cost': {'currency': 'USD', 'micros': 0},
-                'cache_hit': False, 'scope': 'city_center', 'radius_m': c['radius_m'] if c else None,
+                'cache_hit': False, 'endpoint': ENDPOINT, 'scope': 'city_center', 'radius_m': c['radius_m'] if c else None,
                 'center': c, 'center_attribution':{'text':'GeoNames','url':'https://www.geonames.org/','license':'CC BY 4.0','license_url':CENTERS['license_url']}, 'attribution': ATTRIBUTION, 'policy_version': POLICY,
                 'notice': '도심 3km 주변 공개지도 장소예요. 지점·영업·가격·리뷰는 방문 전에 확인해 주세요.', **changes}
 
@@ -169,7 +169,7 @@ class PublicDiscovery:
             return self._status(city, 'unavailable', reason='CITY_UNSUPPORTED')
         ctx.guard()
         now = self.clock().astimezone(timezone.utc)
-        request_hash = hashlib.sha256((POLICY + ':' + query(city)).encode()).hexdigest()
+        request_hash = hashlib.sha256((POLICY + ':' + ENDPOINT + ':' + query(city)).encode()).hexdigest()
         pack_id = 'osm_pack_' + city
         context = CallContext(actor.id, trip_id, trip_id, job_id=ctx.job['id'])
         try:
@@ -226,7 +226,7 @@ class PublicDiscovery:
                 delay = max(int((PROVIDER_ERROR_TTL if http_status else ERROR_TTL).total_seconds()), getattr(exc, 'retry_after_seconds', None) or 0)
                 failed_at = self.clock().astimezone(timezone.utc)
                 with self.db.connect() as con:
-                    con.execute('BEGIN IMMEDIATE'); self._settle(con, call_id, None, failed_at, code, delay, http_status)
+                    con.execute('BEGIN IMMEDIATE'); self._settle(con, call_id, None, failed_at, code, delay, http_status, getattr(exc, 'network_errno', None))
                 if isinstance(exc, DomainError) and exc.code in FATAL:
                     raise
                 return self._waiting(city, code, failed_at+timedelta(seconds=delay), failed_at, calls=1)
@@ -235,12 +235,14 @@ class PublicDiscovery:
                 raise
             return self._status(city, 'unavailable', reason=exc.code, retry_after_seconds=900)
 
-    def _settle(self, con, call_id, received, now, code=None, delay=None, http_status=None):
+    def _settle(self, con, call_id, received, now, code=None, delay=None, http_status=None, network_errno=None):
         units = {'calls': 1, 'response_bytes': received}
         if delay is not None:
             units['retry_after_seconds'] = delay
         if http_status is not None:
             units['http_status'] = http_status
+        if network_errno is not None:
+            units['network_errno'] = network_errno
         con.execute("UPDATE usage_reservations SET state='settled',actual_units_json=?,actual_cost_micros=0,error_code=?,updated_at=? WHERE call_id=?", (encode(units), code, now.isoformat(), call_id))
         Budget._ledger(con, call_id, 'settled', 0, units, now.isoformat(), reason=code or 'EXPLICIT_FREE_PUBLIC_DATA')
 

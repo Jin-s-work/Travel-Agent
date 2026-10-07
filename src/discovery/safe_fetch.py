@@ -21,7 +21,8 @@ from urllib.parse import urlsplit, urlunsplit, urljoin
 
 
 class FetchRejected(ValueError):
-    def __init__(self, code, *, http_status=None, retry_after_seconds=None):
+    def __init__(self, code, *, http_status=None, retry_after_seconds=None, network_errno=None):
+        self.network_errno = network_errno
         self.code = code
         self.http_status = http_status
         self.retry_after_seconds = retry_after_seconds
@@ -140,7 +141,8 @@ def fetch_public(url, *, max_bytes=1_048_576, timeout_seconds=8, max_redirects=3
         if remaining <= 0:
             raise FetchRejected('FETCH_TIMEOUT')
         addresses = resolver(parsed.hostname, 443 if parsed.scheme == 'https' else 80, deadline)
-        addresses = [public_ip(address) for address in addresses]
+        # Prefer routable IPv4 on IPv4-only hosts; preserve DNS order per family.
+        addresses = sorted([public_ip(address) for address in addresses], key=lambda ip: ':' in ip)
         if not addresses:
             raise FetchRejected('DNS_FAILED')
         connection = None
@@ -167,7 +169,7 @@ def fetch_public(url, *, max_bytes=1_048_576, timeout_seconds=8, max_redirects=3
                 except OSError as exc:
                     last_error = exc
             if connection is None:
-                raise FetchRejected('FETCH_TIMEOUT' if isinstance(last_error, TimeoutError) else 'CONNECT_FAILED')
+                raise FetchRejected('FETCH_TIMEOUT' if isinstance(last_error, TimeoutError) else 'CONNECT_FAILED', network_errno=getattr(last_error, 'errno', None))
             if connection.sock is not None:
                 peer = public_ip(connection.sock.getpeername()[0])
                 if ipaddress.ip_address(peer) != ipaddress.ip_address(selected_ip):
