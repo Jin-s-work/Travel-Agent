@@ -129,3 +129,9 @@
 - 공개 발표 6버전의 SCRIPT.md, JSON 대본/큐, PPTX 발표자 메모를 제외했다. Keynote는 메모 없는 PPTX를 다시 가져와 저장했다. PPTX 슬라이드 내용은 기존과 동일함을 검증했다. 원본은 Downloads의 비공개 백업에 보존했다. Git 과거 이력은 재작성하지 않았다.
 - 검증: `node --test tests/*.cjs` 197 passed. Python의 test_apify_preflight / test_local_mail / test_render_env_prepare / test_stage2_general_models / test_recommendation_v5 107 passed, 2 warnings, 5.71s. 최초 JS 1건 실패는 의도적으로 제거한 안내문을 기대하던 테스트이며 새 계약으로 수정 후 전체 재실행했다. 발표 validator는 `--v8`로 통과했다.
 - 이번 자동 시험은 실제 리뷰 수집/언어 품질 성능을 입증하지 않는다. 배포 결과는 별도 운영 기록에 추가한다.
+
+### 배포 확인
+
+- 2026-10-08 14:27 KST Render 배포 `dep-db3iiutg1s2s73ak5am0`, 앱 커밋 `2da85c0`, Live 확인. `https://travel-inbox-rag.onrender.com/health/ready`는 schema/storage/dispatcher/identity/restore 모두 true다. 롤링 배포 도중 첫 curl은 503, 완료 후 재조회는 ready=true였다.
+- Chrome 기존 로그인 세션에서 새로고침 → 여행 복원 → 추천 화면 진입을 실행했다. “여행에 물어보기”, 현지어 위주/관측 리뷰 모두 현지어 버튼, 준비 중 상태를 확인했다. 실제 리뷰 결과·수집 실행은 검증하지 않았다.
+- GitHub main과 codex/private-beta-launch에 반영했다. 로컬 원본의 별도 변경은 보존하며 일치하는 앱·문서 26파일만 동기화했다. 연습 메일은 Downloads/고잉-메일-연습에도 복사했다.
