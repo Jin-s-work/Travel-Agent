@@ -49,3 +49,15 @@ python3 scripts/version_web_assets.py --check
 - [Google Places 사용 정책](https://developers.google.com/maps/documentation/places/web-service/policies)
 
 정확도/만족도는 실사용 평가 전이므로 미측정이다. 입력 절약과 후보 정렬 계약 개선을 추천 품질 실측 상승으로 표현하지 않는다.
+
+## 운영 검증 후속
+
+- PostgreSQL 17(격리된 loopback 컨테이너): `TRAVEL_TEST_POSTGRES_DSN=… python -m pytest -p tests.postgres_plugin tests/test_public_place_photos.py tests/test_hybrid_recommender.py tests/test_public_discovery.py -q` → **65 passed**, 32.20초. 테스트 컨테이너 제거 완료.
+- GitHub `codex/private-beta-launch`에 반영. Render Free의 동일 서비스에 `41bde49` 배포 성공(12:58:56 KST), UI 후속 수정 `c8b7bee` 배포 성공(13:06:49 KST). 요금제·비밀·유료 공급자 설정 변경 없음.
+- Chrome 운영 UI: 홈의 최근 추천 3곳과 주 메뉴 AI 대화 확인. 메인에서 질문 예시 → 전송 → 대화 답변 완료. 빈 파리 여행은 0건, 합성 '배포 확인용 도쿄 여행'은 합성 수동 예약 1건과 '근거 1건 보기' → 예약 상세 연결을 확인했다. 외부 LLM 생성 정확도 실험은 아니다.
+- 파리 저장 결과 12곳에서 Au Vieux Paris d’Arcole의 실제 사진이 카드·상세 모두 `naturalWidth=960`, `naturalHeight=640`, `complete=true`로 로딩됨. 이 결과의 나머지 11곳은 연결 사진을 확보하지 못했다. 이후 새 추천으로 후보가 달라지면 사진 비율도 달라지므로 모든 식당 사진을 지원한다고 표현하지 않는다.
+- 파리 '다시 찾기' → 대기/출처 확인/결과 정리 → 실제 12곳 생성 확인. 계산 근거 대화상자에서 `hybrid_v5` 확인. 입력된 숙소가 위치 미확인인 경우 거리 점수도 미확인으로 유지됨을 확인했다.
+- 초안 저장의 일시 실패 안내를 관찰했으나 후속 저장은 정상 완료됨. 재현되지 않은 원인을 임의로 단정하지 않았다.
+- UI 후속: 리뷰 자격 부족 안내를 각 추천 구획으로 옮겨 둘러보기 위에 중복 나열하지 않는다. 추천 화면에서 여행을 바꿀 때 처음 탐색을 자동으로 이어 시작한다. 기존 결과가 있으면 다시 실행하지 않는다. 후속 JS 테스트 **194 passed**.
+- 모바일 실기기/좁은 viewport는 이번 검증에서 확인하지 못했다. 반응형 스타일·기존 논리 시험과 데스크톱 Chrome 실측을 구분한다.
+- 여행 전환 실측에서, 추천 화면이 대상 여행의 과거 AI 탭으로 이동하는 기존 동작을 발견해 보완했다. 명시적인 여행 선택은 현재 탭을 유지하고 해당 여행의 조건·선택 장소만 복원한다. 최초 로그인 복원은 기존 저장 탭을 유지한다. 진행 중 새 탭 선택도 존중하며 늦은 여행 전환 요청을 막는다. 후속 Node **196 passed**(탭 복원 및 늦은 이전 전환 시험 추가).

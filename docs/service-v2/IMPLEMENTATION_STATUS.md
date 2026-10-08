@@ -542,3 +542,5 @@ DB 비밀번호 확인/필요 시 소유자의 직접 재설정과 Google 웹 �
 ### 2026-10-08 — 추천 중심 홈과 AI 대화 접근
 
 홈 추천 3곳·바로 저장, 주 메뉴 AI 대화와 홈 질문, 저장 중복 방지, 공개 cuisine/명시적 도심 기준을 사용하는 hybrid_v5, 사진 공급자별 cooldown 및 식별 User-Agent를 구현했다. 기존 v4/소유권/엄격 언어·방문 조건 검사는 유지한다. Python 전체 1,183 passed/17 skipped, Node 194 passed. 유료 사진 공급자 추가 활성화와 실사용 추천 정확도 평가는 수행하지 않았다. [상세 계약·전후 비교·검증](../service-v3/MAIN_RECOMMENDATION_UX.md).
+
+후속 배포 확인: PostgreSQL 65 passed. Render Free `c8b7bee` 13:06:49 KST Live. Chrome에서 홈 AI 질문→합성 예약 1건→출처, 파리 새 추천 12곳 및 hybrid_v5 표시, 실제 Commons 이미지 960×640 로딩 확인. 무료 사진이 없는 장소와 엄격 리뷰 미지원은 유지하며, 모바일 실기기는 미검증이다. 리뷰 부족 경고의 중복과 여행 전환 후 첫 탐색 연결도 보완했다.

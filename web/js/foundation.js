@@ -44,7 +44,7 @@
   $('#dialog').addEventListener('click', e => { if (e.target === $('#dialog')) { const r = e.target.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) closeDialog(); } });
 
   function clearScope() {
-    state.workspaceSuspended=true;
+    state.workspaceSuspended=true;state.workspaceNavigationOverride=null;
     window.AccommodationTools?.clear();
     window.TravelTools?.clear();
     window.ProductTools?.clear();
@@ -170,9 +170,10 @@
     const epoch = state.epoch; const trips = await allPages('/trips'); if (epoch !== state.epoch) return;
     state.trips = trips; await selectTrip(trips.find(t => t.id === (preferred||navigationMemory().trip_id)) || trips[0] || null);
   }
-  async function selectTrip(trip) {
-    await window.WorkspaceUX?.leave();
-    clearScope(); state.workspaceScroll={};state.workspaceReturn={};state.trip = trip;navigationMemory({trip_id:trip?.id||null,tab:state.tab}); window.ProductTools?.bind(); renderTrip(); renderBookings(); renderDocuments(); resetChat();
+  async function selectTrip(trip,{preserveTab=false}={}) {
+    const selectionRevision=state.tripSelectionRevision=(state.tripSelectionRevision||0)+1;
+    await window.WorkspaceUX?.leave();if(selectionRevision!==state.tripSelectionRevision)return;
+    const selectedTab=state.tab;clearScope();state.workspaceNavigationOverride=preserveTab?selectedTab:null; state.workspaceScroll={};state.workspaceReturn={};state.trip = trip;navigationMemory({trip_id:trip?.id||null,tab:state.tab}); window.ProductTools?.bind(); renderTrip(); renderBookings(); renderDocuments(); resetChat();
     if (state.tab === 'reviews') loadReviews().catch(e => fail(e, $('#reviewError')));
     if (state.tab === 'mail') loadMailCapabilities();
     if (!trip) { renderDiscoveryConditions(); renderBookmarks(); renderRecommendationResults(); renderItinerary(); return; }
@@ -180,7 +181,7 @@
     const results = await Promise.allSettled([loadBookings(),loadDocuments(),loadJobs(),loadDiscovery()]);
     if (epoch !== state.epoch) return;
     results.forEach(r => { if (r.status === 'rejected') fail(r.reason); });
-    await window.WorkspaceUX?.load();if(epoch!==state.epoch)return;state.workspaceSuspended=false;
+    await window.WorkspaceUX?.load();if(epoch!==state.epoch)return;state.workspaceSuspended=false;state.workspaceNavigationOverride=null;if(preserveTab)window.WorkspaceUX?.changed();
     if (['trip','explore'].includes(state.tab)) loadRecommendations().then(()=>{if(epoch===state.epoch&&state.tab==='explore')window.DiscoveryFlow?.enter();}).catch(e => fail(e, $('#recommendationError')));
     if (state.tab === 'itinerary') loadItineraries().catch(e=>fail(e,$('#itineraryError')));
   }
@@ -198,7 +199,7 @@
   function setTab(tab) {
     window.WorkspaceUX?.beforeTab();
     state.navigationRevision=(state.navigationRevision||0)+1;
-    const aliases={home:'trip',reservations:'mail',offline:'today'};tab=aliases[tab]||tab;
+    const aliases={home:'trip',reservations:'mail',offline:'today'};tab=aliases[tab]||tab;if(state.workspaceNavigationOverride)state.workspaceNavigationOverride=tab;
     if(tab==='product')window.ProductTools?.load();
     if(['preparation','today'].includes(tab))window.TravelTools?.load(tab);
     const parent={today:'itinerary',preparation:'mail'}[tab]||tab;
@@ -230,7 +231,7 @@
     });
     body.append(menu);
   }));
-  $('#tripSelect').addEventListener('change', e => selectTrip(state.trips.find(t => t.id === e.target.value)).catch(fail));
+  $('#tripSelect').addEventListener('change', e => selectTrip(state.trips.find(t => t.id === e.target.value),{preserveTab:true}).catch(fail));
   $('#refreshBookings').addEventListener('click', () => loadBookings().then(() => notice('예약을 새로 불러왔습니다.')).catch(fail));
   $('#refreshDocuments').addEventListener('click', () => loadDocuments().catch(fail));
 

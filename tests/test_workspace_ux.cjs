@@ -106,3 +106,12 @@ test('changes made while a save is in flight are serialized with the returned ve
 test('absent draft and an explicitly saved empty selection remain distinguishable',async()=>{
   const seen=[];let version=0,expired=false;const store=createDraftStore({request:async()=>({version,expired,context:{},selected_places:[]}),snapshot:()=>({}),restore:(_value,meta)=>seen.push(meta.saved),status(){},currentTrip:()=> 'A',currentEpoch:()=>1});await store.load();version=2;await store.load();expired=true;await store.load();assert.deepEqual(seen,[false,true,false]);store.clear();
 });
+
+test('manual trip switch keeps the chosen screen while restoring that trips saved input',async()=>{
+  for(const override of [null,'explore','mail']){
+    const fs=require('node:fs'),vm=require('node:vm'),state={epoch:1,trip:{id:'B'},tab:'explore',workspaceNavigationOverride:override,workspaceSuspended:true,discovery:{view:'recommend',conditions:{}},recommendations:{},itineraries:{selected:new Map()}};
+    const node=()=>({prepend(){},append(){},replaceChildren(){},setAttribute(){}}),main=node(),status=node(),ctx=vm.createContext({module:{exports:{}},setTimeout,clearTimeout,window:{addEventListener(){}},document:{querySelector:s=>s==='#main'?main:s==='#workspaceDraftStatus'?status:null,addEventListener(){}}});vm.runInContext(fs.readFileSync('web/js/workspace.js','utf8'),ctx);const ux=ctx.module.exports;
+    ux.init({state,api:async()=>({version:3,context:{tab:'ask'},selected_places:[{place_id:'b-only',duration_minutes:60}],conditions_draft:null}),make:node,button:node,filters:()=>({}),restoreFilters(){},candidates:()=>new Map(),render(){},setExploreView:v=>state.discovery.view=v,setTab:v=>state.tab=v,notice(){}});
+    await ux.load();assert.equal(state.tab,override||'ask');assert.deepEqual([...state.itineraries.selected.keys()],['b-only']);ux.clear();
+  }
+});
