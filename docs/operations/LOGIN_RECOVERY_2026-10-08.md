@@ -32,7 +32,12 @@ git diff --check
 
 ## 운영 확인
 
-배포 후 실제 커밋·배포 ID·HTTPS/오류 안내/Google 로그인 결과를 아래에 추가한다. 사용자 쪽 다른 컴퓨터의 확인은 아직 필요하다.
+- 앱 커밋 `e89c647`, Render 배포 `dep-db3jo4qj9qps73fur9qg`. 2026-10-08 15:46 KST `Deploy succeeded | Live` 확인. 기존 Free 서비스와 기존 인증/저장소 설정을 사용했다.
+- HTTPS readiness200, 인증 설정 true, 로그인302→Google, 정확한 callback·S256 PKCE·Secure HttpOnly SameSite=Lax 임시 쿠키 확인.
+- 새 HTTP 클라이언트의 잘못된 state/callback은303과 `cookie_missing`으로 거절, 비로그인 여행 API는401 유지.
+- 실제 Chrome에서 기존 세션을 로그아웃한 뒤 초대 코드 없이 Google 기존 계정으로 새 로그인, 저장된 여행 조회, 새로고침 후 로그인 유지 확인. 브라우저 error/warn 로그0.
+- 브라우저에서 합성 invalid-state 콜백을 실행해 고정 안내와 오류 번호 표시, URL 파라미터 정리를 확인했다. 이 합성 오류를 사용자의 실제 실패 원인이라고 해석하지 않는다.
+- 사용자 쪽 다른 물리 컴퓨터·브라우저/쿠키/네트워크 조건은 직접 확인하지 못했다. 해당 기기의 재시도 결과와 실패 시 새 오류 번호 확인이 필요하다.
 
 ## 재현·복구
 

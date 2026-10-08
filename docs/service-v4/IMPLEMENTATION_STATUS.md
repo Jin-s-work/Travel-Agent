@@ -1,8 +1,15 @@
 # 고잉 v4 진행 기록
 
+## 2026-10-08 15:46 KST — 다른 기기 로그인 복구 배포
+
+- 운영 앱 `e89c647`, Render `dep-db3jo4qj9qps73fur9qg` Live. [수정·시험·운영 확인](../operations/LOGIN_RECOVERY_2026-10-08.md).
+- 로그인 실패 원인/요청 번호 표시, 기기 저장소·세션 조회 대기 상한, 로그인 이후 여행 조회 복구, 로그아웃과 늦은 초기화 경합 방지.
+- 관련 Python65건, JS 전체209건 통과. 실제 Chrome의 새 Google 로그인·여행 조회·새로고침 확인. 사용자 쪽 다른 물리 기기의 실패 원인은 미확정이며 재확인이 필요하다.
+- 인증·초대·CSRF·개인 자료 보호 유지. DB migration·새 비용·리뷰 기능 활성화 없음. 아래는 시점별 이전 기록이다.
+
 ## 2026-10-08 — 콘텐츠·여행 조건 추천 모델
 
-최신 기록이다. [모델 구조·수식·실제 평가 절차](RECOMMENDATION_MODEL.md), [구현 검증](reports/hybrid-v4-validation.md), [합성 개발 비교](reports/hybrid-v4-benchmark.md)를 함께 읽는다.
+당시 기록이다. [모델 구조·수식·실제 평가 절차](RECOMMENDATION_MODEL.md), [구현 검증](reports/hybrid-v4-validation.md), [합성 개발 비교](reports/hybrid-v4-benchmark.md)를 함께 읽는다.
 
 - 새 요청의 기본 모델을 `hybrid_v4`로 연결했다. TF-IDF 취향 유사도·같은 플랫폼의 표본 수 보정 평점·숙소 직선거리를 사용하며 v1/v2/v3 replay는 보존한다.
 - 모델·프로필·특징·비중·미확인·후보 집단 해시를 저장한다. 기존 장소 총점과 순위 utility를 구분하고, 카드에서 계산 근거를 확인할 수 있다.
