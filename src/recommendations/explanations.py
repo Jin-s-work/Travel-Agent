@@ -6,6 +6,18 @@ from copy import deepcopy
 
 
 def render(candidate):
+    if candidate.get('ranker_version','').endswith('_hybrid_v4'):
+        base = render_general(candidate)
+        diagnostics = candidate.get('ranking_diagnostics') or {}
+        extra = []
+        if diagnostics.get('matched_tags'):
+            extra.append({'code': 'CONTENT_MATCH', 'text': '선택한 취향과 장소 태그의 유사도를 반영했어요.', 'source_ids': [], 'aggregate_refs': []})
+        if diagnostics.get('rating'):
+            extra.append({'code': 'RATING_SHRINKAGE', 'text': '같은 플랫폼·도시·분류의 평점을 평가 수와 함께 비교했어요.', 'source_ids': diagnostics['rating']['source_ids'], 'aggregate_refs': []})
+        if diagnostics.get('soft_avoid_multiplier') == .5:
+            extra.insert(0, {'code': 'EXPLICIT_SOFT_AVOID', 'text': '반영하도록 선택한 피드백으로 추천 우선순위를 낮췄어요.', 'source_ids': [], 'aggregate_refs': []})
+        base = [r for r in base if r['code'] != 'POPULARITY_BASIS']
+        return (base[:1] + extra + base[1:])[:3]
     if candidate.get('ranker_version','').endswith('_general_v3'):
         return render_general(candidate)
     reasons = []

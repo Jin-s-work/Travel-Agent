@@ -1,0 +1,2985 @@
+{
+  "schema_version": 1,
+  "label_source": "synthetic_rubric",
+  "dataset_hash": "13e5a56a1edc08a5ad7c60eee391aeb3137ecc33bc9c22ad165e7dca8c31f389",
+  "k": 3,
+  "query_count": 12,
+  "summary": {
+    "general_v3": {
+      "by_split": {
+        "development": {
+          "queries": 12,
+          "ndcg": {
+            "value": 0.4155050508255388,
+            "measured_queries": 12
+          },
+          "precision": {
+            "value": 0.3888888888888889,
+            "measured_queries": 12
+          },
+          "recall": {
+            "value": 0.35,
+            "measured_queries": 12
+          },
+          "mrr": {
+            "value": 0.3888888888888889,
+            "measured_queries": 12
+          }
+        },
+        "holdout": {
+          "queries": 0,
+          "ndcg": {
+            "value": null,
+            "measured_queries": 0
+          },
+          "precision": {
+            "value": null,
+            "measured_queries": 0
+          },
+          "recall": {
+            "value": null,
+            "measured_queries": 0
+          },
+          "mrr": {
+            "value": null,
+            "measured_queries": 0
+          }
+        }
+      },
+      "latency_ms": {
+        "median": 10.099708495545201,
+        "p95": 10.866708995308727,
+        "samples": 60
+      },
+      "hard_violations": 0,
+      "deterministic_queries": 12
+    },
+    "hybrid_v4": {
+      "by_split": {
+        "development": {
+          "queries": 12,
+          "ndcg": {
+            "value": 0.9953535366354885,
+            "measured_queries": 12
+          },
+          "precision": {
+            "value": 0.7777777777777778,
+            "measured_queries": 12
+          },
+          "recall": {
+            "value": 0.9333333333333333,
+            "measured_queries": 12
+          },
+          "mrr": {
+            "value": 1.0,
+            "measured_queries": 12
+          }
+        },
+        "holdout": {
+          "queries": 0,
+          "ndcg": {
+            "value": null,
+            "measured_queries": 0
+          },
+          "precision": {
+            "value": null,
+            "measured_queries": 0
+          },
+          "recall": {
+            "value": null,
+            "measured_queries": 0
+          },
+          "mrr": {
+            "value": null,
+            "measured_queries": 0
+          }
+        }
+      },
+      "latency_ms": {
+        "median": 11.13899951451458,
+        "p95": 11.99274999089539,
+        "samples": 60
+      },
+      "hard_violations": 0,
+      "deterministic_queries": 12
+    }
+  },
+  "queries": [
+    {
+      "query_id": "tokyo_taste",
+      "city": "tokyo",
+      "section": "landmark",
+      "split": "development",
+      "input_hash": "2e7cc8648ab6d1a6958a8e2bb436f3204ff50588aa5573c20bc82513c6d592c1",
+      "models": {
+        "general_v3": {
+          "ranking": [
+            "tokyo_taste_0",
+            "tokyo_taste_1",
+            "tokyo_taste_2"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "mrr": 0,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "tokyo_taste_0": null,
+            "tokyo_taste_1": null,
+            "tokyo_taste_2": null
+          }
+        },
+        "hybrid_v4": {
+          "ranking": [
+            "tokyo_taste_3",
+            "tokyo_taste_4",
+            "tokyo_taste_0"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 1.0,
+            "precision": 0.6666666666666666,
+            "recall": 1.0,
+            "mrr": 1.0,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "tokyo_taste_3": {
+              "version": "hybrid_v4",
+              "profile": "taste",
+              "weights": {
+                "core": 0.55,
+                "preference": 0.45
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 0.55,
+                  "contribution": 0.55
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.45,
+                  "contribution": 0.45
+                }
+              },
+              "utility": 1.0,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 1.0,
+              "score_upper": 1.0,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "tokyo",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "c857aa79785c50915084319d74abe4e854c77fd9f8b8988b293bc0b4352bdab1",
+              "corpus_size": 5,
+              "matched_tags": [
+                "sushi"
+              ],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "tokyo_taste_4": {
+              "version": "hybrid_v4",
+              "profile": "taste",
+              "weights": {
+                "core": 0.55,
+                "preference": 0.45
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 0.55,
+                  "contribution": 0.55
+                },
+                "preference": {
+                  "value": 0.8198869039412203,
+                  "weight": 0.45,
+                  "contribution": 0.36894910677354914
+                }
+              },
+              "utility": 0.918949,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 0.918949,
+              "score_upper": 0.918949,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "tokyo",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "c857aa79785c50915084319d74abe4e854c77fd9f8b8988b293bc0b4352bdab1",
+              "corpus_size": 5,
+              "matched_tags": [
+                "sushi"
+              ],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "tokyo_taste_0": {
+              "version": "hybrid_v4",
+              "profile": "taste",
+              "weights": {
+                "core": 0.55,
+                "preference": 0.45
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 0.55,
+                  "contribution": 0.55
+                },
+                "preference": {
+                  "value": 0.0,
+                  "weight": 0.45,
+                  "contribution": 0.0
+                }
+              },
+              "utility": 0.55,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 0.55,
+              "score_upper": 0.55,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "tokyo",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "c857aa79785c50915084319d74abe4e854c77fd9f8b8988b293bc0b4352bdab1",
+              "corpus_size": 5,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            }
+          }
+        }
+      }
+    },
+    {
+      "query_id": "tokyo_origin",
+      "city": "tokyo",
+      "section": "landmark",
+      "split": "development",
+      "input_hash": "1b5fecbfe471098d89c2488608a396d0f2225f6593060235d94d1cd274ab1d8f",
+      "models": {
+        "general_v3": {
+          "ranking": [
+            "tokyo_origin_0",
+            "tokyo_origin_1",
+            "tokyo_origin_2"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 0.05323232387329983,
+            "precision": 0.0,
+            "recall": 0.0,
+            "mrr": 0,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "tokyo_origin_0": null,
+            "tokyo_origin_1": null,
+            "tokyo_origin_2": null
+          }
+        },
+        "hybrid_v4": {
+          "ranking": [
+            "tokyo_origin_3",
+            "tokyo_origin_4",
+            "tokyo_origin_2"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 1.0,
+            "precision": 0.6666666666666666,
+            "recall": 1.0,
+            "mrr": 1.0,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "tokyo_origin_3": {
+              "version": "hybrid_v4",
+              "profile": "origin",
+              "weights": {
+                "core": 0.65,
+                "proximity": 0.35
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 0.65,
+                  "contribution": 0.65
+                },
+                "proximity": {
+                  "value": 0.9473308100351431,
+                  "weight": 0.35,
+                  "contribution": 0.33156578351230004
+                }
+              },
+              "utility": 0.981566,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 0.981566,
+              "score_upper": 0.981566,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "tokyo",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "77f025d0138918a3a5034462140b778984949aa0ad72021546bed953c23d3702",
+              "corpus_size": 5,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "tokyo_origin_4": {
+              "version": "hybrid_v4",
+              "profile": "origin",
+              "weights": {
+                "core": 0.65,
+                "proximity": 0.35
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 0.65,
+                  "contribution": 0.65
+                },
+                "proximity": {
+                  "value": 0.642683999242831,
+                  "weight": 0.35,
+                  "contribution": 0.22493939973499086
+                }
+              },
+              "utility": 0.874939,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 0.874939,
+              "score_upper": 0.874939,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "tokyo",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "77f025d0138918a3a5034462140b778984949aa0ad72021546bed953c23d3702",
+              "corpus_size": 5,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "tokyo_origin_2": {
+              "version": "hybrid_v4",
+              "profile": "origin",
+              "weights": {
+                "core": 0.65,
+                "proximity": 0.35
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 0.65,
+                  "contribution": 0.65
+                },
+                "proximity": {
+                  "value": 0.3101834594971723,
+                  "weight": 0.35,
+                  "contribution": 0.1085642108240103
+                }
+              },
+              "utility": 0.758564,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 0.758564,
+              "score_upper": 0.758564,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "tokyo",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "77f025d0138918a3a5034462140b778984949aa0ad72021546bed953c23d3702",
+              "corpus_size": 5,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            }
+          }
+        }
+      }
+    },
+    {
+      "query_id": "tokyo_rating",
+      "city": "tokyo",
+      "section": "landmark",
+      "split": "development",
+      "input_hash": "02c4d352f744f9f98c9c4144a5b2855daf5a71aa97cba59f03d70f049e9150a1",
+      "models": {
+        "general_v3": {
+          "ranking": [
+            "tokyo_rating_0",
+            "tokyo_rating_1",
+            "tokyo_rating_3"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 0.439797981079933,
+            "precision": 0.3333333333333333,
+            "recall": 0.5,
+            "mrr": 0.3333333333333333,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "tokyo_rating_0": null,
+            "tokyo_rating_1": null,
+            "tokyo_rating_3": null
+          }
+        },
+        "hybrid_v4": {
+          "ranking": [
+            "tokyo_rating_3",
+            "tokyo_rating_4",
+            "tokyo_rating_2"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 0.9721212198129313,
+            "precision": 0.6666666666666666,
+            "recall": 1.0,
+            "mrr": 1.0,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "tokyo_rating_3": {
+              "version": "hybrid_v4",
+              "profile": "evidence",
+              "weights": {
+                "core": 1.0
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 0.9650000000000001,
+                  "weight": 1.0,
+                  "contribution": 0.9650000000000001
+                }
+              },
+              "utility": 0.965,
+              "complete": true,
+              "core_kind": "platform_quality",
+              "score_lower": 0.965,
+              "score_upper": 0.965,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.825,
+                "raw_rating": 4.9,
+                "count": 600,
+                "prior_mean": 4.6,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "tokyo",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "17976fa3548d918af0137f252b53e00dcebb2799d907a185249893b76153f0ff",
+              "corpus_size": 5,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "tokyo_rating_4": {
+              "version": "hybrid_v4",
+              "profile": "evidence",
+              "weights": {
+                "core": 1.0
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 0.9203980099502486,
+                  "weight": 1.0,
+                  "contribution": 0.9203980099502486
+                }
+              },
+              "utility": 0.920398,
+              "complete": true,
+              "core_kind": "platform_quality",
+              "score_lower": 0.920398,
+              "score_upper": 0.920398,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.601990049751243,
+                "raw_rating": 5,
+                "count": 1,
+                "prior_mean": 4.6,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "tokyo",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "17976fa3548d918af0137f252b53e00dcebb2799d907a185249893b76153f0ff",
+              "corpus_size": 5,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "tokyo_rating_2": {
+              "version": "hybrid_v4",
+              "profile": "evidence",
+              "weights": {
+                "core": 1.0
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 0.9199999999999999,
+                  "weight": 1.0,
+                  "contribution": 0.9199999999999999
+                }
+              },
+              "utility": 0.92,
+              "complete": true,
+              "core_kind": "platform_quality",
+              "score_lower": 0.92,
+              "score_upper": 0.92,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.6,
+                "raw_rating": 4.6,
+                "count": 600,
+                "prior_mean": 4.6,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "tokyo",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "17976fa3548d918af0137f252b53e00dcebb2799d907a185249893b76153f0ff",
+              "corpus_size": 5,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            }
+          }
+        }
+      }
+    },
+    {
+      "query_id": "tokyo_local_taste",
+      "city": "tokyo",
+      "section": "local_discovery",
+      "split": "development",
+      "input_hash": "d98945553bdd9cdb6bb79815afd3f0d31a56582763b7284ff474503e613772d4",
+      "models": {
+        "general_v3": {
+          "ranking": [
+            "tokyo_local_taste_0",
+            "tokyo_local_taste_1",
+            "tokyo_local_taste_2"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "mrr": 0,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "tokyo_local_taste_0": null,
+            "tokyo_local_taste_1": null,
+            "tokyo_local_taste_2": null
+          }
+        },
+        "hybrid_v4": {
+          "ranking": [
+            "tokyo_local_taste_3",
+            "tokyo_local_taste_4",
+            "tokyo_local_taste_0"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 1.0,
+            "precision": 0.6666666666666666,
+            "recall": 1.0,
+            "mrr": 1.0,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "tokyo_local_taste_3": {
+              "version": "hybrid_v4",
+              "profile": "taste",
+              "weights": {
+                "core": 0.55,
+                "preference": 0.45
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 0.7949999999999999,
+                  "weight": 0.55,
+                  "contribution": 0.43724999999999997
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.45,
+                  "contribution": 0.45
+                }
+              },
+              "utility": 0.88725,
+              "complete": true,
+              "core_kind": "language_quality",
+              "score_lower": 0.88725,
+              "score_upper": 0.88725,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "tokyo",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "85b5f730a5f1d587b4039d4937bc8694f1769236f0390e4d72aea948fa60a720",
+              "corpus_size": 5,
+              "matched_tags": [
+                "sushi"
+              ],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "tokyo_local_taste_4": {
+              "version": "hybrid_v4",
+              "profile": "taste",
+              "weights": {
+                "core": 0.55,
+                "preference": 0.45
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 0.7949999999999999,
+                  "weight": 0.55,
+                  "contribution": 0.43724999999999997
+                },
+                "preference": {
+                  "value": 0.8198869039412203,
+                  "weight": 0.45,
+                  "contribution": 0.36894910677354914
+                }
+              },
+              "utility": 0.806199,
+              "complete": true,
+              "core_kind": "language_quality",
+              "score_lower": 0.806199,
+              "score_upper": 0.806199,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "tokyo",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "85b5f730a5f1d587b4039d4937bc8694f1769236f0390e4d72aea948fa60a720",
+              "corpus_size": 5,
+              "matched_tags": [
+                "sushi"
+              ],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "tokyo_local_taste_0": {
+              "version": "hybrid_v4",
+              "profile": "taste",
+              "weights": {
+                "core": 0.55,
+                "preference": 0.45
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 0.7949999999999999,
+                  "weight": 0.55,
+                  "contribution": 0.43724999999999997
+                },
+                "preference": {
+                  "value": 0.0,
+                  "weight": 0.45,
+                  "contribution": 0.0
+                }
+              },
+              "utility": 0.43725,
+              "complete": true,
+              "core_kind": "language_quality",
+              "score_lower": 0.43725,
+              "score_upper": 0.43725,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "tokyo",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "85b5f730a5f1d587b4039d4937bc8694f1769236f0390e4d72aea948fa60a720",
+              "corpus_size": 5,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            }
+          }
+        }
+      }
+    },
+    {
+      "query_id": "tokyo_cold_start",
+      "city": "tokyo",
+      "section": "landmark",
+      "split": "development",
+      "input_hash": "f5add1971900e721442e7222f681ae9b22784082e35a85a7b9d8f5d1249ee3aa",
+      "models": {
+        "general_v3": {
+          "ranking": [
+            "tokyo_cold_start_0",
+            "tokyo_cold_start_1",
+            "tokyo_cold_start_2"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 1.0,
+            "precision": 1.0,
+            "recall": 0.6,
+            "mrr": 1.0,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "tokyo_cold_start_0": null,
+            "tokyo_cold_start_1": null,
+            "tokyo_cold_start_2": null
+          }
+        },
+        "hybrid_v4": {
+          "ranking": [
+            "tokyo_cold_start_0",
+            "tokyo_cold_start_1",
+            "tokyo_cold_start_2"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 1.0,
+            "precision": 1.0,
+            "recall": 0.6,
+            "mrr": 1.0,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "tokyo_cold_start_0": {
+              "version": "hybrid_v4",
+              "profile": "evidence",
+              "weights": {
+                "core": 1.0
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 1.0,
+                  "contribution": 1.0
+                }
+              },
+              "utility": 1.0,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 1.0,
+              "score_upper": 1.0,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "tokyo",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "f40fa9ae1b36d4fb737dbb42dff9b06a905ed84aa3d666c87e32399f96988360",
+              "corpus_size": 5,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "tokyo_cold_start_1": {
+              "version": "hybrid_v4",
+              "profile": "evidence",
+              "weights": {
+                "core": 1.0
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 1.0,
+                  "contribution": 1.0
+                }
+              },
+              "utility": 1.0,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 1.0,
+              "score_upper": 1.0,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "tokyo",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "f40fa9ae1b36d4fb737dbb42dff9b06a905ed84aa3d666c87e32399f96988360",
+              "corpus_size": 5,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "tokyo_cold_start_2": {
+              "version": "hybrid_v4",
+              "profile": "evidence",
+              "weights": {
+                "core": 1.0
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 1.0,
+                  "contribution": 1.0
+                }
+              },
+              "utility": 1.0,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 1.0,
+              "score_upper": 1.0,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "tokyo",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "f40fa9ae1b36d4fb737dbb42dff9b06a905ed84aa3d666c87e32399f96988360",
+              "corpus_size": 5,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            }
+          }
+        }
+      }
+    },
+    {
+      "query_id": "tokyo_closed",
+      "city": "tokyo",
+      "section": "landmark",
+      "split": "development",
+      "input_hash": "9c055da880a697e2b6a607ed2cba5482160e26ab06773ec4d72e506f58d88b90",
+      "models": {
+        "general_v3": {
+          "ranking": [
+            "tokyo_closed_2",
+            "tokyo_closed_3",
+            "tokyo_closed_4"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "mrr": 1.0,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "tokyo_closed_2": null,
+            "tokyo_closed_3": null,
+            "tokyo_closed_4": null
+          }
+        },
+        "hybrid_v4": {
+          "ranking": [
+            "tokyo_closed_2",
+            "tokyo_closed_3",
+            "tokyo_closed_4"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "mrr": 1.0,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "tokyo_closed_2": {
+              "version": "hybrid_v4",
+              "profile": "evidence",
+              "weights": {
+                "core": 1.0
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 1.0,
+                  "contribution": 1.0
+                }
+              },
+              "utility": 1.0,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 1.0,
+              "score_upper": 1.0,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "tokyo",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 3,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "8b3b79c9cac1587d1c48abdb0854d59abfedc2da7943f1dea956e1aae1c5d0bd",
+              "corpus_size": 3,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "tokyo_closed_3": {
+              "version": "hybrid_v4",
+              "profile": "evidence",
+              "weights": {
+                "core": 1.0
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 1.0,
+                  "contribution": 1.0
+                }
+              },
+              "utility": 1.0,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 1.0,
+              "score_upper": 1.0,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "tokyo",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 3,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "8b3b79c9cac1587d1c48abdb0854d59abfedc2da7943f1dea956e1aae1c5d0bd",
+              "corpus_size": 3,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "tokyo_closed_4": {
+              "version": "hybrid_v4",
+              "profile": "evidence",
+              "weights": {
+                "core": 1.0
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 1.0,
+                  "contribution": 1.0
+                }
+              },
+              "utility": 1.0,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 1.0,
+              "score_upper": 1.0,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "tokyo",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 3,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "8b3b79c9cac1587d1c48abdb0854d59abfedc2da7943f1dea956e1aae1c5d0bd",
+              "corpus_size": 3,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            }
+          }
+        }
+      }
+    },
+    {
+      "query_id": "barcelona_taste",
+      "city": "barcelona",
+      "section": "landmark",
+      "split": "development",
+      "input_hash": "0c4911b6816d63e3fea53cb450e0bec74c77ac231ad853269817b595cd7cd4f1",
+      "models": {
+        "general_v3": {
+          "ranking": [
+            "barcelona_taste_0",
+            "barcelona_taste_1",
+            "barcelona_taste_2"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "mrr": 0,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "barcelona_taste_0": null,
+            "barcelona_taste_1": null,
+            "barcelona_taste_2": null
+          }
+        },
+        "hybrid_v4": {
+          "ranking": [
+            "barcelona_taste_3",
+            "barcelona_taste_4",
+            "barcelona_taste_0"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 1.0,
+            "precision": 0.6666666666666666,
+            "recall": 1.0,
+            "mrr": 1.0,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "barcelona_taste_3": {
+              "version": "hybrid_v4",
+              "profile": "taste",
+              "weights": {
+                "core": 0.55,
+                "preference": 0.45
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 0.55,
+                  "contribution": 0.55
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.45,
+                  "contribution": 0.45
+                }
+              },
+              "utility": 1.0,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 1.0,
+              "score_upper": 1.0,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "barcelona",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "fcd428aae629abd73038341f309006f2e9d1c17d7c5078cc0ae21ec4db69602f",
+              "corpus_size": 5,
+              "matched_tags": [
+                "sushi"
+              ],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "barcelona_taste_4": {
+              "version": "hybrid_v4",
+              "profile": "taste",
+              "weights": {
+                "core": 0.55,
+                "preference": 0.45
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 0.55,
+                  "contribution": 0.55
+                },
+                "preference": {
+                  "value": 0.8198869039412203,
+                  "weight": 0.45,
+                  "contribution": 0.36894910677354914
+                }
+              },
+              "utility": 0.918949,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 0.918949,
+              "score_upper": 0.918949,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "barcelona",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "fcd428aae629abd73038341f309006f2e9d1c17d7c5078cc0ae21ec4db69602f",
+              "corpus_size": 5,
+              "matched_tags": [
+                "sushi"
+              ],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "barcelona_taste_0": {
+              "version": "hybrid_v4",
+              "profile": "taste",
+              "weights": {
+                "core": 0.55,
+                "preference": 0.45
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 0.55,
+                  "contribution": 0.55
+                },
+                "preference": {
+                  "value": 0.0,
+                  "weight": 0.45,
+                  "contribution": 0.0
+                }
+              },
+              "utility": 0.55,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 0.55,
+              "score_upper": 0.55,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "barcelona",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "fcd428aae629abd73038341f309006f2e9d1c17d7c5078cc0ae21ec4db69602f",
+              "corpus_size": 5,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            }
+          }
+        }
+      }
+    },
+    {
+      "query_id": "barcelona_origin",
+      "city": "barcelona",
+      "section": "landmark",
+      "split": "development",
+      "input_hash": "f1b2725dd43528ee5b3d3293693ea539dfc99c868ec0704344179daed47b5fc6",
+      "models": {
+        "general_v3": {
+          "ranking": [
+            "barcelona_origin_0",
+            "barcelona_origin_1",
+            "barcelona_origin_2"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 0.05323232387329983,
+            "precision": 0.0,
+            "recall": 0.0,
+            "mrr": 0,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "barcelona_origin_0": null,
+            "barcelona_origin_1": null,
+            "barcelona_origin_2": null
+          }
+        },
+        "hybrid_v4": {
+          "ranking": [
+            "barcelona_origin_3",
+            "barcelona_origin_4",
+            "barcelona_origin_2"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 1.0,
+            "precision": 0.6666666666666666,
+            "recall": 1.0,
+            "mrr": 1.0,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "barcelona_origin_3": {
+              "version": "hybrid_v4",
+              "profile": "origin",
+              "weights": {
+                "core": 0.65,
+                "proximity": 0.35
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 0.65,
+                  "contribution": 0.65
+                },
+                "proximity": {
+                  "value": 0.9473308100351431,
+                  "weight": 0.35,
+                  "contribution": 0.33156578351230004
+                }
+              },
+              "utility": 0.981566,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 0.981566,
+              "score_upper": 0.981566,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "barcelona",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "8390a1e174aa02fe0fdf5e0289335ef26842b9872b6f04fd78382e5bd7d07c72",
+              "corpus_size": 5,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "barcelona_origin_4": {
+              "version": "hybrid_v4",
+              "profile": "origin",
+              "weights": {
+                "core": 0.65,
+                "proximity": 0.35
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 0.65,
+                  "contribution": 0.65
+                },
+                "proximity": {
+                  "value": 0.6426839992429771,
+                  "weight": 0.35,
+                  "contribution": 0.22493939973504198
+                }
+              },
+              "utility": 0.874939,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 0.874939,
+              "score_upper": 0.874939,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "barcelona",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "8390a1e174aa02fe0fdf5e0289335ef26842b9872b6f04fd78382e5bd7d07c72",
+              "corpus_size": 5,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "barcelona_origin_2": {
+              "version": "hybrid_v4",
+              "profile": "origin",
+              "weights": {
+                "core": 0.65,
+                "proximity": 0.35
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 0.65,
+                  "contribution": 0.65
+                },
+                "proximity": {
+                  "value": 0.3101834594971723,
+                  "weight": 0.35,
+                  "contribution": 0.1085642108240103
+                }
+              },
+              "utility": 0.758564,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 0.758564,
+              "score_upper": 0.758564,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "barcelona",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "8390a1e174aa02fe0fdf5e0289335ef26842b9872b6f04fd78382e5bd7d07c72",
+              "corpus_size": 5,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            }
+          }
+        }
+      }
+    },
+    {
+      "query_id": "barcelona_rating",
+      "city": "barcelona",
+      "section": "landmark",
+      "split": "development",
+      "input_hash": "b05e1d38ab6649acb1d352f9b4104b4a76f540891b205a0d41792191bb27fd42",
+      "models": {
+        "general_v3": {
+          "ranking": [
+            "barcelona_rating_0",
+            "barcelona_rating_1",
+            "barcelona_rating_3"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 0.439797981079933,
+            "precision": 0.3333333333333333,
+            "recall": 0.5,
+            "mrr": 0.3333333333333333,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "barcelona_rating_0": null,
+            "barcelona_rating_1": null,
+            "barcelona_rating_3": null
+          }
+        },
+        "hybrid_v4": {
+          "ranking": [
+            "barcelona_rating_3",
+            "barcelona_rating_4",
+            "barcelona_rating_2"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 0.9721212198129313,
+            "precision": 0.6666666666666666,
+            "recall": 1.0,
+            "mrr": 1.0,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "barcelona_rating_3": {
+              "version": "hybrid_v4",
+              "profile": "evidence",
+              "weights": {
+                "core": 1.0
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 0.9650000000000001,
+                  "weight": 1.0,
+                  "contribution": 0.9650000000000001
+                }
+              },
+              "utility": 0.965,
+              "complete": true,
+              "core_kind": "platform_quality",
+              "score_lower": 0.965,
+              "score_upper": 0.965,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.825,
+                "raw_rating": 4.9,
+                "count": 600,
+                "prior_mean": 4.6,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "barcelona",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "cec8d991b17ac9376a394fbf5aded0b9b4d23783b906d683bc6537852cbd9f68",
+              "corpus_size": 5,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "barcelona_rating_4": {
+              "version": "hybrid_v4",
+              "profile": "evidence",
+              "weights": {
+                "core": 1.0
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 0.9203980099502486,
+                  "weight": 1.0,
+                  "contribution": 0.9203980099502486
+                }
+              },
+              "utility": 0.920398,
+              "complete": true,
+              "core_kind": "platform_quality",
+              "score_lower": 0.920398,
+              "score_upper": 0.920398,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.601990049751243,
+                "raw_rating": 5,
+                "count": 1,
+                "prior_mean": 4.6,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "barcelona",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "cec8d991b17ac9376a394fbf5aded0b9b4d23783b906d683bc6537852cbd9f68",
+              "corpus_size": 5,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "barcelona_rating_2": {
+              "version": "hybrid_v4",
+              "profile": "evidence",
+              "weights": {
+                "core": 1.0
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 0.9199999999999999,
+                  "weight": 1.0,
+                  "contribution": 0.9199999999999999
+                }
+              },
+              "utility": 0.92,
+              "complete": true,
+              "core_kind": "platform_quality",
+              "score_lower": 0.92,
+              "score_upper": 0.92,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.6,
+                "raw_rating": 4.6,
+                "count": 600,
+                "prior_mean": 4.6,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "barcelona",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "cec8d991b17ac9376a394fbf5aded0b9b4d23783b906d683bc6537852cbd9f68",
+              "corpus_size": 5,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            }
+          }
+        }
+      }
+    },
+    {
+      "query_id": "barcelona_local_taste",
+      "city": "barcelona",
+      "section": "local_discovery",
+      "split": "development",
+      "input_hash": "d38067afe45a8b88c04b2e5cb76d0e3ab2b7c638366e2ce3198d67f9e92a3b7b",
+      "models": {
+        "general_v3": {
+          "ranking": [
+            "barcelona_local_taste_0",
+            "barcelona_local_taste_1",
+            "barcelona_local_taste_2"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "mrr": 0,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "barcelona_local_taste_0": null,
+            "barcelona_local_taste_1": null,
+            "barcelona_local_taste_2": null
+          }
+        },
+        "hybrid_v4": {
+          "ranking": [
+            "barcelona_local_taste_3",
+            "barcelona_local_taste_4",
+            "barcelona_local_taste_0"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 1.0,
+            "precision": 0.6666666666666666,
+            "recall": 1.0,
+            "mrr": 1.0,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "barcelona_local_taste_3": {
+              "version": "hybrid_v4",
+              "profile": "taste",
+              "weights": {
+                "core": 0.55,
+                "preference": 0.45
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 0.7949999999999999,
+                  "weight": 0.55,
+                  "contribution": 0.43724999999999997
+                },
+                "preference": {
+                  "value": 1.0,
+                  "weight": 0.45,
+                  "contribution": 0.45
+                }
+              },
+              "utility": 0.88725,
+              "complete": true,
+              "core_kind": "language_quality",
+              "score_lower": 0.88725,
+              "score_upper": 0.88725,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "barcelona",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "8c4ceca3b409e6fe797b2377c3691cc83df4fec0c76ea16ed58a36e2065c2098",
+              "corpus_size": 5,
+              "matched_tags": [
+                "sushi"
+              ],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "barcelona_local_taste_4": {
+              "version": "hybrid_v4",
+              "profile": "taste",
+              "weights": {
+                "core": 0.55,
+                "preference": 0.45
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 0.7949999999999999,
+                  "weight": 0.55,
+                  "contribution": 0.43724999999999997
+                },
+                "preference": {
+                  "value": 0.8198869039412203,
+                  "weight": 0.45,
+                  "contribution": 0.36894910677354914
+                }
+              },
+              "utility": 0.806199,
+              "complete": true,
+              "core_kind": "language_quality",
+              "score_lower": 0.806199,
+              "score_upper": 0.806199,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "barcelona",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "8c4ceca3b409e6fe797b2377c3691cc83df4fec0c76ea16ed58a36e2065c2098",
+              "corpus_size": 5,
+              "matched_tags": [
+                "sushi"
+              ],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "barcelona_local_taste_0": {
+              "version": "hybrid_v4",
+              "profile": "taste",
+              "weights": {
+                "core": 0.55,
+                "preference": 0.45
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 0.7949999999999999,
+                  "weight": 0.55,
+                  "contribution": 0.43724999999999997
+                },
+                "preference": {
+                  "value": 0.0,
+                  "weight": 0.45,
+                  "contribution": 0.0
+                }
+              },
+              "utility": 0.43725,
+              "complete": true,
+              "core_kind": "language_quality",
+              "score_lower": 0.43725,
+              "score_upper": 0.43725,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "barcelona",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "8c4ceca3b409e6fe797b2377c3691cc83df4fec0c76ea16ed58a36e2065c2098",
+              "corpus_size": 5,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            }
+          }
+        }
+      }
+    },
+    {
+      "query_id": "barcelona_cold_start",
+      "city": "barcelona",
+      "section": "landmark",
+      "split": "development",
+      "input_hash": "83b5b83147769ef1d0ad6588e2c298788a01e714762c8348e02a129f4f76b373",
+      "models": {
+        "general_v3": {
+          "ranking": [
+            "barcelona_cold_start_0",
+            "barcelona_cold_start_1",
+            "barcelona_cold_start_2"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 1.0,
+            "precision": 1.0,
+            "recall": 0.6,
+            "mrr": 1.0,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "barcelona_cold_start_0": null,
+            "barcelona_cold_start_1": null,
+            "barcelona_cold_start_2": null
+          }
+        },
+        "hybrid_v4": {
+          "ranking": [
+            "barcelona_cold_start_0",
+            "barcelona_cold_start_1",
+            "barcelona_cold_start_2"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 1.0,
+            "precision": 1.0,
+            "recall": 0.6,
+            "mrr": 1.0,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "barcelona_cold_start_0": {
+              "version": "hybrid_v4",
+              "profile": "evidence",
+              "weights": {
+                "core": 1.0
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 1.0,
+                  "contribution": 1.0
+                }
+              },
+              "utility": 1.0,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 1.0,
+              "score_upper": 1.0,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "barcelona",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "14ca6853e6a77c6fa9b61043d80acf0be2530a38d6ecee076b246291447bec0c",
+              "corpus_size": 5,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "barcelona_cold_start_1": {
+              "version": "hybrid_v4",
+              "profile": "evidence",
+              "weights": {
+                "core": 1.0
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 1.0,
+                  "contribution": 1.0
+                }
+              },
+              "utility": 1.0,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 1.0,
+              "score_upper": 1.0,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "barcelona",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "14ca6853e6a77c6fa9b61043d80acf0be2530a38d6ecee076b246291447bec0c",
+              "corpus_size": 5,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "barcelona_cold_start_2": {
+              "version": "hybrid_v4",
+              "profile": "evidence",
+              "weights": {
+                "core": 1.0
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 1.0,
+                  "contribution": 1.0
+                }
+              },
+              "utility": 1.0,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 1.0,
+              "score_upper": 1.0,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "barcelona",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 5,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "14ca6853e6a77c6fa9b61043d80acf0be2530a38d6ecee076b246291447bec0c",
+              "corpus_size": 5,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            }
+          }
+        }
+      }
+    },
+    {
+      "query_id": "barcelona_closed",
+      "city": "barcelona",
+      "section": "landmark",
+      "split": "development",
+      "input_hash": "eb88bd4f5a36d6b90cb3b8c8e1466c18732b8a55f77255ce0c0781d3018f512e",
+      "models": {
+        "general_v3": {
+          "ranking": [
+            "barcelona_closed_2",
+            "barcelona_closed_3",
+            "barcelona_closed_4"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "mrr": 1.0,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "barcelona_closed_2": null,
+            "barcelona_closed_3": null,
+            "barcelona_closed_4": null
+          }
+        },
+        "hybrid_v4": {
+          "ranking": [
+            "barcelona_closed_2",
+            "barcelona_closed_3",
+            "barcelona_closed_4"
+          ],
+          "confirmation": [],
+          "metrics": {
+            "k": 3,
+            "judged": 5,
+            "candidates": 5,
+            "returned": 3,
+            "ndcg": 1.0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "mrr": 1.0,
+            "status": "measured",
+            "reason": null
+          },
+          "hard_violations": 0,
+          "deterministic": true,
+          "diversity": {
+            "categories": 1,
+            "neighborhoods": 3,
+            "chains": 0
+          },
+          "diagnostics": {
+            "barcelona_closed_2": {
+              "version": "hybrid_v4",
+              "profile": "evidence",
+              "weights": {
+                "core": 1.0
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 1.0,
+                  "contribution": 1.0
+                }
+              },
+              "utility": 1.0,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 1.0,
+              "score_upper": 1.0,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "barcelona",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 3,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "dd065c394dcb6bb5050d16009a8ed08f209fd9cfc2bcba4e61b462a07866999f",
+              "corpus_size": 3,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "barcelona_closed_3": {
+              "version": "hybrid_v4",
+              "profile": "evidence",
+              "weights": {
+                "core": 1.0
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 1.0,
+                  "contribution": 1.0
+                }
+              },
+              "utility": 1.0,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 1.0,
+              "score_upper": 1.0,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "barcelona",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 3,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "dd065c394dcb6bb5050d16009a8ed08f209fd9cfc2bcba4e61b462a07866999f",
+              "corpus_size": 3,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            },
+            "barcelona_closed_4": {
+              "version": "hybrid_v4",
+              "profile": "evidence",
+              "weights": {
+                "core": 1.0
+              },
+              "parameters": {
+                "rating_prior_count": 200,
+                "distance_scale_m": 2000,
+                "feature_version": "content_context_v1",
+                "tag_normalization": "nfkc_alias_v1"
+              },
+              "trained": false,
+              "selection": "explicit_request_context",
+              "missing": "null_no_redistribution",
+              "components": {
+                "core": {
+                  "value": 1.0,
+                  "weight": 1.0,
+                  "contribution": 1.0
+                }
+              },
+              "utility": 1.0,
+              "complete": true,
+              "core_kind": "evidence_gate_only",
+              "score_lower": 1.0,
+              "score_upper": 1.0,
+              "evidence_coverage": 1,
+              "missing_components": [],
+              "rating": {
+                "adjusted_rating": 4.5,
+                "raw_rating": 4.5,
+                "count": 300,
+                "prior_mean": 4.5,
+                "prior_count": 200,
+                "cohort": [
+                  "synthetic",
+                  "barcelona",
+                  "restaurant",
+                  5
+                ],
+                "cohort_places": 3,
+                "source_ids": [
+                  "source_1_official"
+                ]
+              },
+              "content_corpus_hash": "dd065c394dcb6bb5050d16009a8ed08f209fd9cfc2bcba4e61b462a07866999f",
+              "corpus_size": 3,
+              "matched_tags": [],
+              "soft_avoid_multiplier": 1.0,
+              "distance_basis": "straight_line_not_walking_time",
+              "score_meaning": "ranking_utility_not_probability"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "actual_user_quality": "unmeasured",
+  "automatic_winner": null,
+  "provider_calls": 0,
+  "interpretation": "Synthetic development regression, not real accuracy or held-out user satisfaction."
+}

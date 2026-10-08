@@ -1,0 +1,83 @@
+........................................................................ [  6%]
+..............FFF..sssssssssssss........................................ [ 12%]
+........................................................................ [ 18%]
+........................................................................ [ 24%]
+........................................................................ [ 30%]
+........................................................................ [ 36%]
+........................................................................ [ 43%]
+........................................................................ [ 49%]
+......sss........................F....F................................. [ 55%]
+........................................................................ [ 61%]
+.............................................F.......................... [ 67%]
+........................................................................ [ 73%]
+........................................................................ [ 79%]
+........................................................................ [ 86%]
+........................................................................ [ 92%]
+...FFs.................................................................. [ 98%]
+....................                                                     [100%]
+=================================== FAILURES ===================================
+_ test_official_minimal_facts_produce_honest_confirmation_cards_without_paid_calls[tokyo-Asia/Tokyo] _
+tests/test_catalog_registration.py:113: in test_official_minimal_facts_produce_honest_confirmation_cards_without_paid_calls
+    assert item['score'] is None and item['synthetic'] is False
+E   assert (1.0 is None)
+_ test_official_minimal_facts_produce_honest_confirmation_cards_without_paid_calls[barcelona-Europe/Madrid] _
+tests/test_catalog_registration.py:113: in test_official_minimal_facts_produce_honest_confirmation_cards_without_paid_calls
+    assert item['score'] is None and item['synthetic'] is False
+E   assert (1.0 is None)
+_ test_official_minimal_facts_produce_honest_confirmation_cards_without_paid_calls[madrid-Europe/Madrid] _
+tests/test_catalog_registration.py:113: in test_official_minimal_facts_produce_honest_confirmation_cards_without_paid_calls
+    assert item['score'] is None and item['synthetic'] is False
+E   assert (1.0 is None)
+__ test_public_candidates_are_provisional_saved_and_cached_while_paid_halted ___
+tests/test_public_discovery.py:113: in test_public_candidates_are_provisional_saved_and_cached_while_paid_halted
+    assert cards[0]['score'] is None and cards[0]['identity_status']=='needs_confirmation'
+E   assert (1.0 is None)
+_____________ test_display_is_bounded_without_fabricating_ranking ______________
+tests/test_public_discovery.py:196: in test_display_is_bounded_without_fabricating_ranking
+    assert len(cards)==12 and all(p['score'] is None for p in cards)
+E   AssertionError: assert (12 == 12 and False)
+E    +  where 12 = len([{'address': '1 Fixture Street', 'applied_thresholds': None, 'attribution': {'license': 'ODbL 1.0', 'license_url': 'ht...'https://www.openstreetmap.org/copyright'}, 'canonical_url': 'https://www.openstreetmap.org/node/700000005', ...}, ...])
+E    +  and   False = all(<generator object test_display_is_bounded_without_fabricating_ranking.<locals>.<genexpr> at 0x124687440>)
+_ test_sigkill_handler_recovers_checkpoint_without_rebilling[after_extraction] _
+tests/test_reliability_runtime.py:103: in test_sigkill_handler_recovers_checkpoint_without_rebilling
+    result=subprocess.run([sys.executable,'-c',script,str(tmp_path),point],env=child_env,timeout=30,capture_output=True,text=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.13/3.13.5/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py:556: in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.13/3.13.5/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py:1222: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/homebrew/Cellar/python@3.13/3.13.5/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py:2129: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+/opt/homebrew/Cellar/python@3.13/3.13.5/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py:1269: in _check_timeout
+    raise TimeoutExpired(
+E   subprocess.TimeoutExpired: Command '['/private/tmp/going-stage1-native313/bin/python', '-c', "\nimport sys\nfrom tests.test_reliability_runtime import construct,run_one\nrun_one(construct(sys.argv[1],sys.argv[2]),'killed-child')\n", '/private/var/folders/_t/v3j9htxd641cww9j6k4zpfpm0000gr/T/pytest-of-jinsangwoo/pytest-385/test_sigkill_handler_recovers_0', 'after_extraction']' timed out after 30 seconds
+_ test_actual_pilot_normal_import_and_cold_start_recommendation[tokyo-Asia/Tokyo] _
+tests/test_stage2_pilot_catalog.py:61: in test_actual_pilot_normal_import_and_cold_start_recommendation
+    assert card['rankable'] and not card['personalized'] and card['score'] is None
+E   assert (True and not False and 1.0 is None)
+_ test_actual_pilot_normal_import_and_cold_start_recommendation[barcelona-Europe/Madrid] _
+tests/test_stage2_pilot_catalog.py:61: in test_actual_pilot_normal_import_and_cold_start_recommendation
+    assert card['rankable'] and not card['personalized'] and card['score'] is None
+E   assert (True and not False and 1.0 is None)
+=============================== warnings summary ===============================
+../../../../../private/tmp/going-stage1-native313/lib/python3.13/site-packages/fastapi/testclient.py:1
+  /private/tmp/going-stage1-native313/lib/python3.13/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+../../../../../private/tmp/going-stage1-native313/lib/python3.13/site-packages/authlib/integrations/httpx_client/assertion_client.py:5
+  /private/tmp/going-stage1-native313/lib/python3.13/site-packages/authlib/integrations/httpx_client/assertion_client.py:5: AuthlibDeprecationWarning: The httpx module is deprecated; please use httpx2 instead.
+    from ._compat import httpx2
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_catalog_registration.py::test_official_minimal_facts_produce_honest_confirmation_cards_without_paid_calls[tokyo-Asia/Tokyo]
+FAILED tests/test_catalog_registration.py::test_official_minimal_facts_produce_honest_confirmation_cards_without_paid_calls[barcelona-Europe/Madrid]
+FAILED tests/test_catalog_registration.py::test_official_minimal_facts_produce_honest_confirmation_cards_without_paid_calls[madrid-Europe/Madrid]
+FAILED tests/test_public_discovery.py::test_public_candidates_are_provisional_saved_and_cached_while_paid_halted
+FAILED tests/test_public_discovery.py::test_display_is_bounded_without_fabricating_ranking
+FAILED tests/test_reliability_runtime.py::test_sigkill_handler_recovers_checkpoint_without_rebilling[after_extraction]
+FAILED tests/test_stage2_pilot_catalog.py::test_actual_pilot_normal_import_and_cold_start_recommendation[tokyo-Asia/Tokyo]
+FAILED tests/test_stage2_pilot_catalog.py::test_actual_pilot_normal_import_and_cold_start_recommendation[barcelona-Europe/Madrid]
+8 failed, 1147 passed, 17 skipped, 2 warnings in 296.27s (0:04:56)

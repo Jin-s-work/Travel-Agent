@@ -10,7 +10,7 @@ def summarize(snapshot, candidates, result):
     sections=result['sections']
     def ids(group):
         return {item['place_id'] for section in sections.values() for item in section.get(group,[])}
-    if snapshot.get('recommendation_model_version')=='general_v3':
+    if snapshot.get('recommendation_model_version') in ('general_v3', 'hybrid_v4'):
         return summarize_general(snapshot,candidates,result)
     qualified=ids('items')
     confirmation=ids('needs_confirmation')-qualified

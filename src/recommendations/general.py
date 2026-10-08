@@ -146,6 +146,9 @@ def candidate(snapshot, source, kind, current, config):
 
 
 def order_key(item):
+    if item.get('ranking_diagnostics'):
+        from .hybrid import order_key as hybrid_order
+        return hybrid_order(item)
     features=item['features'];ident=item['place_id'];nearby=item['ordering_profile']=='nearby'
     d=features['straight_distance']['value']
     distance=(d is None,d if d is not None else 0) if nearby else ()
@@ -203,6 +206,10 @@ def recommend(snapshot,candidates,current,config):
             item=candidate(snapshot,source,kind,current,config)
             target='excluded' if item['eligibility']=='ineligible' or kind=='reference' and not item['section_qualified'] else 'insufficient_data' if not item['section_qualified'] else 'needs_confirmation' if item['eligibility']=='needs_confirmation' else 'items'
             sections[kind][target].append(item)
+        if snapshot.get('recommendation_model_version') == 'hybrid_v4':
+            from .hybrid import prepare
+            prepare(sections[kind]['items'] + sections[kind]['needs_confirmation'],
+                    list(unique.values()), snapshot, current)
         for group in ('items','needs_confirmation'):
             if kind=='reference':
                 ordered=sorted(sections[kind][group],key=order_key)
@@ -229,9 +236,9 @@ def recommend(snapshot,candidates,current,config):
     applied['review_language_filter']={**(applied.get('review_language_filter') or {}),'required':True,'apply_to':['local_discovery'],'min_classified_texts':100,'max_unknown_share':.1}
     applied['rating_filter']={**(applied.get('rating_filter') or {}),'enabled':True,'apply_to':['local_discovery']}
     return {'sections':sections,'section_status':status,'section_models':section_models(snapshot),'counters':counters,
-        'engine_version':'recommendation-engine-v3','config_version':config.version,'config':asdict(config),
+        'engine_version':'recommendation-engine-v4' if snapshot.get('recommendation_model_version') == 'hybrid_v4' else 'recommendation-engine-v3','config_version':config.version,'config':asdict(config),
         'computed_at':current.isoformat(),'requested_constraints':deepcopy(snapshot),
         'applied_constraints':applied,
         'reason_codes':['INSUFFICIENT_QUALIFIED_'+k.upper() for k in snapshot['conditions']['recommendation_types'] if len(sections[k]['items'])<snapshot.get('limit',6)],
         'unsupported_constraints':sorted({c for state in status.values() for c in state['reason_codes']}),
-        'learning_status':'insufficient_evidence','personalization_status':'general_model'}
+        'learning_status':'insufficient_evidence','personalization_status':'explicit_context_model' if snapshot.get('recommendation_model_version') == 'hybrid_v4' else 'general_model'}

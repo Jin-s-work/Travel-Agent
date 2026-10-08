@@ -197,6 +197,9 @@ def test_withdrawn_or_expired_sources_withhold_affected_cards_and_preserve_snaps
     withheld=set(after['result']['withheld_place_ids'])
     assert stored['places'][0]['place_id'] in withheld
     assert not set(eligible_ids(after))&withheld
+    assert after['result']['ranking_status'] == 'stale'
+    assert all('ranking_diagnostics' not in item and item['score'] is None
+               for groups in after['result']['sections'].values() for items in groups.values() for item in items)
     compared=discovery.client.get(base+'/comparisons/'+comparison['comparison_id']).json()
     assert not {p['place_id'] for p in compared['items']}&withheld and compared['data_status']=='stale'
     if change!='disable':assert set(eligible_ids(run))-withheld<=set(eligible_ids(after))

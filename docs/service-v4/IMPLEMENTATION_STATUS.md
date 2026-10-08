@@ -1,8 +1,19 @@
 # 고잉 v4 진행 기록
 
+## 2026-10-08 — 콘텐츠·여행 조건 추천 모델
+
+최신 기록이다. [모델 구조·수식·실제 평가 절차](RECOMMENDATION_MODEL.md), [구현 검증](reports/hybrid-v4-validation.md), [합성 개발 비교](reports/hybrid-v4-benchmark.md)를 함께 읽는다.
+
+- 새 요청의 기본 모델을 `hybrid_v4`로 연결했다. TF-IDF 취향 유사도·같은 플랫폼의 표본 수 보정 평점·숙소 직선거리를 사용하며 v1/v2/v3 replay는 보존한다.
+- 모델·프로필·특징·비중·미확인·후보 집단 해시를 저장한다. 기존 장소 총점과 순위 utility를 구분하고, 카드에서 계산 근거를 확인할 수 있다.
+- 지점·언어·사용권·휴무·인원 등 필수 조건은 재사용한다. 출처 철회 시 후보 집단에 의존하는 파생 점수도 차단한다.
+- 최종 **Python 1,156 passed / 17 skipped**, **JavaScript 177 passed**. 원본 디렉터리의 파일 읽기·의존성 문제로 해시 대조한 별도 native 사본에서 전체 검증했다. 자세한 실패·수정 이력은 보고서에 있다.
+- 합성 개발 12질의 NDCG@3 0.4155→0.9954, Precision@3 0.3889→0.7778. **독립 holdout·실사용 정확도·만족도는 미측정**이다. 학습한 모델이라고 표현하지 않는다.
+- 리뷰 라이브 검증·엄격 언어 OFF·브라우저 미검증은 이전과 같다. 이번 변경의 운영 배포와 GitHub push는 하지 않았다. 기존 사용자 Keynote 변경과 발표 PDF를 보존했다.
+
 ## 2026-10-07 — 2단계 구현·발표·README 갱신
 
-현재 최신 기록이다. [2단계 상세 검증](reports/stage2-validation.md), [리뷰 계약/이관](reports/stage2-review-contracts.md), [추천 모델](reports/stage2-ranking.md), [UI](reports/stage2-ui-validation.md), [실제 12곳](reports/stage2-pilot-catalog.md)을 함께 읽는다.
+당시 완료 기록이다. [2단계 상세 검증](reports/stage2-validation.md), [리뷰 계약/이관](reports/stage2-review-contracts.md), [추천 모델](reports/stage2-ranking.md), [UI](reports/stage2-ui-validation.md), [실제 12곳](reports/stage2-pilot-catalog.md)을 함께 읽는다.
 
 - schema14 지점 연결·공급자 계약·실행 의존성·관리자 검증과 도시별 능력 상태 구현.
 - 현지어/유명한 곳 일반 v3 모델, 독립 참고 구획, 선택 입력 생략, 사용자 수치 완화, 관련 근거만 철회 구현. 기존 v1/v2 replay 유지.
@@ -100,3 +111,10 @@
 ### 다음 구현 시 갱신할 것
 
 기능별 code / synthetic_test / browser_test / live_provider / policy / quality / city_enabled 상태를 따로 기록한다. 위 미실행 항목을 이전 단계의 완료 기록만으로 통과시켜서는 안 된다. 각 단계 종료 시 사용한 commit·명령·실제 결과·잔여 제약을 추가한다.
+
+
+### 2026-10-08 — README와 기능 중심 발표 개편
+
+- README를 소개·실제 화면·추천 모델·실행 방법 중심으로 다시 작성했다. `hybrid_v4` 특징과 합성 개발 평가 12개 결과를 원본 JSON과 대조하고 실제 정확도·독립 평가 미측정을 명시했다.
+- [v5 발표](../presentation/v5/README.md)는 10장·목표 8분 30초다. 개인적인 제작 계기, 주요 기능, 추천 모델과 비교, 앞으로의 개발 방향을 다룬다. [대본](../presentation/v5/SCRIPT.md)에 5분 축약과 예상 질문을 함께 넣었다.
+- 기존 사용자 Keynote·PDF는 보존했다. 새 PPTX 10장 렌더링, Keynote 가져오기·메모·저장을 확인했다. 이번 문서 작업에서 운영 배포·실제 추천 품질·브라우저 기능 검증을 새로 수행한 것은 아니다.

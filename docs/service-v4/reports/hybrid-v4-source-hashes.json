@@ -1,0 +1,23 @@
+{
+  "base": "5da54dd",
+  "verification_checkout": "native temporary checkout",
+  "sha256": {
+    "src/recommendations/hybrid.py": "9528adb0cf09cee204f7900bdf9da3bd8091cad67a79e481094d439953a2a2e5",
+    "src/recommendations/benchmark.py": "afcd553dd9332359a69583063a586702fb2f05d68f9fdeb102c6bf4231c3e2b2",
+    "src/recommendations/registry.py": "c27448980e6ce0bae55615cba5d802676725425a6c82be7eb415537d2fedc273",
+    "src/recommendations/general.py": "13439d82ea50c4c4b037eceb08b65f2b63721e01bdc8f62384b660ee72cbc62f",
+    "src/recommendations/engine.py": "44574c6df93c06b5001b978b5c416ca185e9c06a2bac25d83a4f7eead2efbd79",
+    "src/recommendations/explanations.py": "23b36b530e27faec660fe7b832408f317746ce90f0be28d2bc18cfc649aa1dc2",
+    "src/recommendations/service.py": "2ef97a26f9a152f94a37512b698ca9066676663abf217c9a80f98dc8dbfe4cf5",
+    "src/recommendations/presentation.py": "32eb1577f8c98e4804303f1303cdbe482193b3123406d4694336fd549ba41bbb",
+    "src/product/events.py": "d252f5784f95465ab80a3dd700d96684c77c4e3ab44180e676ae51ba69baaa15",
+    "src/product/evaluation.py": "9bbea577f10e7425dcad4181a6ffd2993cb479691f785010718fb82206add4cd",
+    "scripts/build_recommender_benchmark.py": "b3e473fd3529f03dc63c510d7303718e5d9dd4725847a1fbe613a95d7f5e55c7",
+    "tests/test_hybrid_recommender.py": "4ae8c7ab50929712a0c052864d963cc894f97c1d079434121923ba943420a9b7",
+    "tests/test_recommendation_api.py": "a955d5adfbd8809f9d5c5ee75972071b9f43a9f37c4f4b447c2f658a5c113c2b",
+    "tests/test_stage2_discovery_ui.cjs": "55b77529095e1ba4393087b0ec114bcfebd4b467d904a533d22e763f89aa1732",
+    "web/js/discovery-experience.js": "3df71b4bf03c08b87db00b5a0c5e8aaf34836e3763bbf234172d3f262da54a9e",
+    "web/index.html": "0e1bb5f1125745e5d9d3cbf51f1714b96e25d9fb11191a1d2e24bc031e1e9727",
+    "web/sw.js": "8f3149b1a43b1be261baca614518627cc1f1583c5564b7124316e0d0309c12e2"
+  }
+}

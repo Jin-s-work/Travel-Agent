@@ -1,7 +1,7 @@
 """Versioned, untrained ordering policies. A section chooses once per run."""
 from copy import deepcopy
 
-VERSION = 'general_v3'
+VERSION = 'hybrid_v4'
 MODELS = {
     'local_observed_general_v3': {'section': 'local_discovery', 'ordering_kind': 'rule',
         'order': ['local_lower:desc', 'korean_upper:asc', 'language_unknown:asc', 'canonical_place_id:asc'],
@@ -23,15 +23,29 @@ FEATURES = {
     'straight_distance': 'Haversine distance from explicit origin; not walking duration',
     'preference_match': 'explicit requested tags only; absent input is unspecified',
 }
+MODELS.update({name.replace('_general_v3', '_hybrid_v4'): {
+    **deepcopy(value), 'ordering_kind': 'content_context_hybrid',
+    'order': ['evidence_group', 'comparable_platform_cohort', 'explicit_nearby_if_requested',
+              'utility_lower:desc', 'evidence_coverage:desc', 'canonical_place_id:asc'],
+    'trained': False,
+} for name, value in list(MODELS.items())})
+
 
 def section_models(snapshot):
-    # v3 only supports explicit general models. Having preferences is not enough
-    # evidence to claim that an untrained personalized model has been evaluated.
-    return {value['section']: name for name, value in MODELS.items()}
+    # Explicit preference matching is not learned behavioral personalization.
+    suffix = '_hybrid_v4' if snapshot.get('recommendation_model_version') == 'hybrid_v4' else '_general_v3'
+    return {value['section']: name for name, value in MODELS.items() if name.endswith(suffix)}
 
 
-def model_snapshot(snapshot):
-    return {'recommendation_model_version': VERSION, 'section_models': section_models(snapshot),
-            'model_registry': deepcopy(MODELS), 'feature_dictionary_version': 'evidence_features_v3',
+def model_snapshot(snapshot, version=VERSION):
+    selected = {**snapshot, 'recommendation_model_version': version}
+    models = section_models(selected)
+    result = {'recommendation_model_version': version, 'section_models': models,
+            'model_registry': {k: deepcopy(MODELS[k]) for k in models.values()}, 'feature_dictionary_version': 'evidence_features_v3',
             'learning_status': 'insufficient_evidence', 'personalization_status': 'general_model',
             'model_selection_reason': 'UNSUPPORTED_PERSONALIZATION_PROFILE' if (snapshot.get('conditions',{}).get('preferred') or {}).get('tags') else 'OPTIONAL_INPUTS_UNSPECIFIED'}
+    if version == 'hybrid_v4':
+        from .hybrid import spec
+        result.update(ranking_spec=spec(snapshot), personalization_status='explicit_context_model',
+                      model_selection_reason='EXPLICIT_REQUEST_CONTEXT', feature_dictionary_version='content_context_v1')
+    return result
