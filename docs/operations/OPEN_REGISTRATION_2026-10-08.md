@@ -27,4 +27,9 @@ git diff --check
 
 ## 운영 확인
 
-배포 후 기록한다. 다른 물리 컴퓨터의 로그인 결과는 직접 확인하지 않았다.
+- Render `dep-db3k527avr4c73a4uvb0`, 앱 커밋 `d154dc0`, 2026-10-08 16:14 KST **Live**. 서비스: https://travel-inbox-rag.onrender.com
+- 배포 페이지에서 해당 커밋과 Deploy succeeded / Live 확인. 공개 HTML에 초대 입력 없음·새 JS 해시 일치, readiness 모든 검사 통과.
+- 비로그인 여행 API401, 다른 Origin의 로그인 POST403. 기존 보호를 유지했다.
+- 실제 Chrome에서 로그아웃 → 초대 없는 로그인 화면 → 기존 Google 계정 로그인 → 기존 여행 목록 조회 → 새로고침 후 유지 확인. 콘솔 error/warn0.
+- 신규 사용자 가입·소유권 분리는 합성 A/B 시험 결과이며 새 실제 Google 계정 가입과 다른 물리 컴퓨터에서는 시험하지 않았다. Google OAuth 콘솔의 대상 사용자 설정은 변경하지 않았다.
+- 화면 증거는 기기 임시 파일 `/private/tmp/going-no-invitation-2026-10-08.jpg`로 저장했다. 개인정보 없는 로그인 화면이다.
