@@ -229,15 +229,15 @@ class PlacePhotos:
 
     def execute(self, job, ctx):
         actor = SimpleNamespace(id=job['actor_id'], session_id=job['session_id'])
-        ids = job['payload']['place_ids']; done = 0
+        ids = job['payload']['place_ids']; done = 0; results = []
         for ident in ids:
             ctx.guard()
             with self.db.connect() as con:
                 place = self._place(con, actor, job['trip_id'], ident)
-                cached = con.execute('SELECT identity_hash,expires_at FROM place_photo_cache WHERE place_id=?', (ident,)).fetchone()
+                cached = con.execute('SELECT identity_hash,expires_at,payload_json FROM place_photo_cache WHERE place_id=?', (ident,)).fetchone()
             now = datetime.now(timezone.utc)
             if cached and cached['identity_hash'] == identity_hash(place) and cached['expires_at'] > now.isoformat():
-                done += 1; continue
+                results.append(json.loads(cached['payload_json'])); done += 1; continue
             ctx.progress('place_photos', done=done, total=len(ids))
             read = lambda url: self._read(url, actor, job['trip_id'], ctx)
             result = unavailable('NO_LINKED_PHOTO'); expiry = now + TTL
@@ -262,6 +262,11 @@ class PlacePhotos:
                     raise DomainError('PLACE_CHANGED', '장소 정보가 바뀌었습니다.', 409)
                 con.execute('INSERT INTO place_photo_cache VALUES(?,?,?,?,?) ON CONFLICT(place_id) DO UPDATE SET identity_hash=excluded.identity_hash,payload_json=excluded.payload_json,checked_at=excluded.checked_at,expires_at=excluded.expires_at',
                     (ident, identity_hash(place), dump(result), now.isoformat(), expiry.isoformat()))
-            done += 1
+            results.append(result); done += 1
             ctx.checkpoint({'photos_checked': done}, stage='place_photos', done=done, total=len(ids))
-        return {'photos_checked': done}
+        available = sum(bool(value['photos']) for value in results)
+        missing = sum(not value['photos'] and value['photo_status']['reason_codes'] == ['NO_LINKED_PHOTO'] for value in results)
+        unresolved = done - available - missing
+        return {'state': 'partial' if unresolved else 'succeeded', 'result': {
+            'photos_checked': done, 'places_with_photos': available,
+            'places_without_photos': missing, 'places_unresolved': unresolved}}

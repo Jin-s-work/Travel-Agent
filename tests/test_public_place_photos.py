@@ -48,7 +48,9 @@ def test_background_photo_cache_is_read_without_network_and_revocation_wins(publ
         assert len(con.execute("SELECT * FROM usage_reservations WHERE provider=?",(provider.PROVIDER,)).fetchall())==2
         assert con.execute("SELECT SUM(actual_cost_micros) FROM usage_reservations WHERE provider=?",(provider.PROVIDER,)).fetchone()[0]==0
     again=submit(public,base);assert again.json()=={'state':'succeeded','cached':True}
-    public.client.get(base+'/recommendations/'+out['run_id'])
+    response=public.client.get(base+'/recommendations/'+out['run_id']).json()
+    entries=[item for section in response['result']['sections'].values() for group in section.values() for item in group]
+    assert next(p for p in entries if p['place_id']=='osm_node_700000000')['photos']
     assert len(calls)==2
     with public.app.state.db.connect() as con:
         con.execute("UPDATE evidence_sources SET display_permitted=0 WHERE place_id='osm_node_700000000'")
@@ -73,7 +75,8 @@ def test_provider_failure_is_bounded_and_does_not_erase_recommendations(public,f
         if failure=='429':raise FetchRejected('HTTP_ERROR',http_status=429)
         return Page(url,'text/html' if failure=='wrong_mime' else 'application/json',b'x'*(provider.MAX_BYTES+1) if failure=='too_big' else b'{"error":{"code":"bad"}}',0)
     trip,base,out,calls=setup(public,fail)
-    receipt=submit(public,base);assert _job(public.client,receipt.json())['state']=='succeeded'
+    receipt=submit(public,base);job=_job(public.client,receipt.json());assert job['state']=='partial'
+    assert job['result']['places_unresolved']==1 and job['result']['places_with_photos']==0
     assert len(calls)==1
     assert submit(public,base).json()['cached'] is True
     fetched=public.client.get(base+'/recommendations/'+out['run_id']);assert fetched.status_code==200 and fetched.json()['result']
