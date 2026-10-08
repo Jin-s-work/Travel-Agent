@@ -13,7 +13,7 @@ from src.foundation.repository import DomainError, dump, new_id, utcnow
 from src.discovery.models import Conditions
 from src.recommendations.models import RecommendationInput
 
-VERSIONS = ['local_observed_hybrid_v4','iconic_hybrid_v4','reference_hybrid_v4']
+VERSIONS = ['local_observed_hybrid_v5','iconic_hybrid_v5','reference_hybrid_v5']
 
 
 class CandidateBatch(list):
@@ -123,7 +123,7 @@ class Recommendations:
         current=datetime.fromisoformat(snapshot['evaluation_at']);ranked=[];reasons=Counter()
         for candidate in candidates:
             kinds=set(candidate.get('recommendation_types',[]))&set(snapshot['conditions']['recommendation_types'])
-            if snapshot.get('recommendation_model_version') in ('general_v3', 'hybrid_v4'):
+            if snapshot.get('recommendation_model_version') in ('general_v3', 'hybrid_v4', 'hybrid_v5'):
                 from .general import candidate as evaluate_general
                 evaluations=[evaluate_general(snapshot,candidate,kind,current,config) for kind in sorted(kinds|{'reference'})]
             else:evaluations=[_candidate(snapshot,candidate,kind,current,config) for kind in sorted(kinds)]
@@ -169,7 +169,7 @@ class Recommendations:
             ctx.progress('public_discovery',done=0,total=1)
             if len(reviewed)>=snapshot.get('limit',6):
                 external=self.discovery.public_provider._status(city,'not_needed',reason='REVIEWED_CATALOG_AVAILABLE')
-            elif strict and snapshot.get('recommendation_model_version') not in ('general_v3','hybrid_v4'):
+            elif strict and snapshot.get('recommendation_model_version') not in ('general_v3','hybrid_v4','hybrid_v5'):
                 external=self.discovery.public_provider._status(city,'unavailable',reason='PUBLIC_REVIEW_FILTER_UNSUPPORTED')
             else:
                 external=self.discovery.public_provider.ensure(actor,trip_id,city,ctx,origin=snapshot['conditions'].get('origin'),categories=snapshot['conditions']['categories'],radius_m=snapshot['conditions'].get('radius_m'))
@@ -231,7 +231,7 @@ class Recommendations:
         result['candidate_selection']={**snapshot.get('candidate_selection',{}),'provider_limit':60,'catalog_scan_limit_per_source':1000,'catalog_scan_limit':2000,'evaluation_limit':100,'evaluated':len(candidates),
             'excluded_by_reason':dict(sorted(reasons.items())),'display_limit':snapshot.get('limit',6),'reference_display_limit':12}
         for groups in result['sections'].values():
-            for group in (() if snapshot.get('recommendation_model_version') in ('general_v3', 'hybrid_v4') else ('needs_confirmation','insufficient_data')):
+            for group in (() if snapshot.get('recommendation_model_version') in ('general_v3', 'hybrid_v4', 'hybrid_v5') else ('needs_confirmation','insufficient_data')):
                 groups[group]=sorted(groups[group],key=lambda item:((item.get('movement') or {}).get('straight_line_m') if (item.get('movement') or {}).get('straight_line_m') is not None else float('inf'),item['place_id']))[:12]
         result['candidate_selection']['displayed']=sum(len(groups[group]) for groups in result['sections'].values() for group in ('items','needs_confirmation','insufficient_data'))
         result['requested_constraints']={k:snapshot[k] for k in ('conditions','review_language_filter','rating_filter','ordering_profile') if k in snapshot}
@@ -311,7 +311,7 @@ class Recommendations:
             current=self._catalog(actor,trip_id,snapshot['conditions']['city'],categories=snapshot['conditions']['categories'],snapshot=snapshot,place_ids=[p['place_id'] for p in captured])
             current_by_id={p['place_id']:p for p in current}
             changed=[p['place_id'] for p in captured if not self._same_candidate(p,current_by_id.get(p['place_id']))]
-            if snapshot.get('recommendation_model_version') in ('general_v3', 'hybrid_v4'):
+            if snapshot.get('recommendation_model_version') in ('general_v3', 'hybrid_v4', 'hybrid_v5'):
                 def without_review(value):
                     value=deepcopy(value);value.pop('review_evidence',None);value.pop('review_guard_token',None);return value
                 review_only=[p['place_id'] for p in captured if p['place_id'] in changed and current_by_id.get(p['place_id']) and self._same_candidate(without_review(p),without_review(current_by_id[p['place_id']]))]
@@ -336,7 +336,7 @@ class Recommendations:
                     result['withheld_place_ids']=[p for p in changed if p not in review_only]
                     result['withheld_review_place_ids']=review_only
                     result['previous_result']=True
-                    if snapshot.get('recommendation_model_version') == 'hybrid_v4':
+                    if snapshot.get('recommendation_model_version') in ('hybrid_v4','hybrid_v5'):
                         # TF-IDF and the rating prior depend on the whole frozen
                         # cohort. Removing one source invalidates derived scores
                         # for the remaining cards too; GET must not rerank/write.

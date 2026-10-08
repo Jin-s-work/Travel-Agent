@@ -1,7 +1,7 @@
 """Versioned, untrained ordering policies. A section chooses once per run."""
 from copy import deepcopy
 
-VERSION = 'hybrid_v4'
+VERSION = 'hybrid_v5'
 MODELS = {
     'local_observed_general_v3': {'section': 'local_discovery', 'ordering_kind': 'rule',
         'order': ['local_lower:desc', 'korean_upper:asc', 'language_unknown:asc', 'canonical_place_id:asc'],
@@ -30,10 +30,12 @@ MODELS.update({name.replace('_general_v3', '_hybrid_v4'): {
     'trained': False,
 } for name, value in list(MODELS.items())})
 
+MODELS.update({name.replace('_hybrid_v4', '_hybrid_v5'): deepcopy(value) for name,value in list(MODELS.items()) if name.endswith('_hybrid_v4')})
 
 def section_models(snapshot):
     # Explicit preference matching is not learned behavioral personalization.
-    suffix = '_hybrid_v4' if snapshot.get('recommendation_model_version') == 'hybrid_v4' else '_general_v3'
+    version = snapshot.get('recommendation_model_version')
+    suffix = '_' + version if version in ('hybrid_v4','hybrid_v5') else '_general_v3'
     return {value['section']: name for name, value in MODELS.items() if name.endswith(suffix)}
 
 
@@ -44,8 +46,17 @@ def model_snapshot(snapshot, version=VERSION):
             'model_registry': {k: deepcopy(MODELS[k]) for k in models.values()}, 'feature_dictionary_version': 'evidence_features_v3',
             'learning_status': 'insufficient_evidence', 'personalization_status': 'general_model',
             'model_selection_reason': 'UNSUPPORTED_PERSONALIZATION_PROFILE' if (snapshot.get('conditions',{}).get('preferred') or {}).get('tags') else 'OPTIONAL_INPUTS_UNSPECIFIED'}
-    if version == 'hybrid_v4':
-        from .hybrid import spec
-        result.update(ranking_spec=spec(snapshot), personalization_status='explicit_context_model',
-                      model_selection_reason='EXPLICIT_REQUEST_CONTEXT', feature_dictionary_version='content_context_v1')
+    if version in ('hybrid_v4','hybrid_v5'):
+        if version == 'hybrid_v5':
+            from .hybrid_v5 import spec
+            from src.discovery.public_places import center, CENTERS
+            anchor = center(snapshot['conditions']['city']) if not snapshot['conditions'].get('origin') else None
+            if anchor:
+                result['ranking_reference_origin'] = {k:anchor[k] for k in ('latitude','longitude')}
+                result['ranking_reference_origin'].update(basis='city_center', version=CENTERS['version'], source_url=anchor['source_url'])
+                selected.update(ranking_reference_origin=result['ranking_reference_origin'])
+        else:
+            from .hybrid import spec
+        result.update(ranking_spec=spec(selected), personalization_status='explicit_context_model',
+                      model_selection_reason='EXPLICIT_REQUEST_CONTEXT', feature_dictionary_version='content_context_v2' if version=='hybrid_v5' else 'content_context_v1')
     return result

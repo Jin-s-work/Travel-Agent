@@ -149,7 +149,7 @@
     $('#noTrip').hidden = !!t; $('#bookingArea').hidden = !t; $('#tripSummary').replaceChildren();
     ['#editTrip','#addBooking','#refreshBookings','#deleteTrip','#mailFiles','#uploadButton','#sendQuestion','#question','#refreshDocuments'].forEach(s => $(s).disabled = !t);
     $$('.scope-text').forEach(n => n.textContent = t ? `${t.title} · ${tripDates(t)}` : '먼저 여행을 만들어 주세요.');
-    renderHomePlaces();
+    renderHomePlaces(); globalThis.GoingHome?.render();
     if (t) {
       const p = t.party || t.conditions?.party || { adults:1, children:[] };
       const cities = tripCityLabel(t);
@@ -181,7 +181,7 @@
     if (epoch !== state.epoch) return;
     results.forEach(r => { if (r.status === 'rejected') fail(r.reason); });
     await window.WorkspaceUX?.load();if(epoch!==state.epoch)return;state.workspaceSuspended=false;
-    if (state.tab === 'explore') loadRecommendations().catch(e => fail(e, $('#recommendationError')));
+    if (['trip','explore'].includes(state.tab)) loadRecommendations().catch(e => fail(e, $('#recommendationError')));
     if (state.tab === 'itinerary') loadItineraries().catch(e=>fail(e,$('#itineraryError')));
   }
   async function loadBookings() {
@@ -204,13 +204,15 @@
     const parent={today:'itinerary',preparation:'mail'}[tab]||tab;
     state.tab = tab;navigationMemory({trip_id:state.trip?.id||null,tab}); $$('.view').forEach(n => n.hidden = n.id !== 'view-' + tab);
     $$('[data-tab]').forEach(n => { if ((n.closest('.sidebar')?n.dataset.tab===parent:n.dataset.tab===tab)) n.setAttribute('aria-current','page'); else n.removeAttribute('aria-current'); });
-    $('#openMore').toggleAttribute('data-current', !['trip','explore','itinerary','mail'].includes(parent));
-    $('#openMore').setAttribute('aria-label', !['trip','explore','itinerary','mail'].includes(parent) ? '더보기 · ' + (document.querySelector('.sidebar [data-tab="'+tab+'"]')?.textContent.trim()||'여행 도구') : '더보기');
+    $('#openMore').toggleAttribute('data-current', !['trip','explore','itinerary','mail','ask'].includes(parent));
+    $('#openMore').setAttribute('aria-label', !['trip','explore','itinerary','mail','ask'].includes(parent) ? '더보기 · ' + (document.querySelector('.sidebar [data-tab="'+tab+'"]')?.textContent.trim()||'여행 도구') : '더보기');
     clearTimeout(reviewPollTimer); clearTimeout(discoveryPollTimer); clearTimeout(recommendationPollTimer); clearTimeout(itineraryPollTimer);
     if (tab === 'explore') { Promise.all([loadDiscovery(),loadRecommendations()]).then(()=>window.DiscoveryFlow?.enter()).catch(e=>fail(e,$('#recommendationError'))); }
     if (tab === 'itinerary') {loadDiscovery().catch(e=>fail(e,$('#itineraryError')));loadItineraries().catch(e=>fail(e,$('#itineraryError')));}
     if (tab === 'reviews') { loadReviews().catch(e => fail(e, $('#reviewError'))); loadDiscovery().catch(e=>fail(e,$('#reviewError'))); }
     if (tab === 'mail') loadMailCapabilities();
+    if (tab === 'trip') loadRecommendations().catch(()=>globalThis.GoingHome?.render());
+    if (tab === 'ask') requestAnimationFrame(()=>$('#question').focus());
     $$('.section-switch[data-sections]').forEach(n=>n.hidden=!n.dataset.sections.split(',').includes(tab));
     if(window.WorkspaceUX)window.WorkspaceUX.afterTab();else window.scrollTo({top:0,behavior:'instant'});
   }
@@ -612,7 +614,7 @@
       const finished=terminal(j)&&!terminal(active);active.job=j;active.state=j.state;state.recommendations.connectionError=null;
       if(finished)state.recommendations.resultRecoveryPending=['succeeded','partial'].includes(j.state)&&!active.result&&active.data_status!=='stale';
       renderRecommendationProgress();
-      if(finished&&state.tab==='explore')loadRecommendations({runId:active.run_id}).catch(()=>{});
+      if(finished&&['trip','explore'].includes(state.tab))loadRecommendations({runId:active.run_id}).catch(()=>{});
     }
   }
   function renderJobs(){const host=$('#jobList');host.replaceChildren();$('#jobsPanel').hidden=!state.trip||!state.jobs.size;const active=[...state.jobs.values()].filter(j=>!terminal(j)).length,attention=[...state.jobs.values()].filter(j=>['failed','partial'].includes(j.state)).length;$('#jobSummary').textContent=active?`진행 ${active}${attention?' · 확인 '+attention:''}`:attention?`확인 필요 ${attention}`:`작업 ${state.jobs.size}`;$('#openJobs').setAttribute('aria-label',$('#jobSummary').textContent+'건 · 여행 작업 내역');$('#jobsPanel').dataset.status=attention?'attention':active?'active':'complete';for(const j of [...state.jobs.values()].sort((a,b)=>b.created_at.localeCompare(a.created_at)).slice(0,12)){const row=make('div','job-row');const text=make('div');text.append(make('strong','',j.operation==='reindex'?'검색 데이터 복구':j.operation==='place_photos'?'장소 사진 확인':j.operation==='bookmark_resolve'?'장소 지점 확인':['recommendation','recommendations','recommendation_generate'].includes(j.operation)?'장소 추천 준비':['itinerary','itinerary_generate'].includes(j.operation)?'여행 일정 준비':'예약 메일 분석'));text.append(make('p','hint',j.cancel_requested_at&&!terminal(j)?'취소 요청됨':j.operation==='place_photos'&&j.state==='succeeded'?'사진 확인 완료':statusText[j.state]||j.state));if(j.operation==='place_photos'&&j.result?.photos_checked!=null)text.append(make('p','hint',`${j.result.photos_checked}곳 확인 · 사진 ${j.result.places_with_photos||0}곳 · 연결 미완료 ${j.result.places_unresolved||0}곳`));if(!terminal(j))text.append(make('p','hint',(stageText[j.stage]||'작업 처리 중')+(j.total_count!=null?` · ${j.done_count}/${j.total_count}${['recommendation','recommendations','recommendation_generate','bookmark_resolve','itinerary','itinerary_generate'].includes(j.operation)?'건':'개 파일'}`:'')));const hint=nextAction(j);if(hint)text.append(make('p','hint',hint));if(j.error_code)text.append(make('p','error',fileError(j.error_code)));for(const f of j.files||[]){const detail=make('p','hint',`${f.filename} · ${statusText[f.state]||f.state}${f.error_code?' · '+fileError(f.error_code):''}`);text.append(detail);}row.append(text);const actions=make('div','actions');if(j.can_cancel)actions.append(button('작업 취소',async()=>{try{mergeJob(await api('/jobs/'+j.job_id+'/cancel',{method:'POST'}));}catch(e){fail(e);}},'text-button'));if(canRetryJob(j))actions.append(button(j.operation==='reindex'?'검색 복구 다시 시도':'실패한 파일만 재시도',async()=>{try{const next=await api('/jobs/'+j.job_id+'/retry',{method:'POST',headers:{'Idempotency-Key':uid()}});mergeJob(next);watchJob(next.job_id,state.epoch);}catch(e){fail(e);}},'secondary'));row.append(actions);host.append(row);}}
@@ -665,12 +667,14 @@
   $('#clearChat').addEventListener('click',()=>{if(state.asking){notice('답변을 받은 뒤 대화를 지울 수 있어요.');return;}resetChat();$('#question').value='';showError($('#questionError'));});
   ['1일차 예약을 전부 알려줘','체크아웃 시간은 언제야?','취소·환불 규정을 알려줘'].forEach(q=>$('#suggestions').append(button(q,()=>{if(!state.trip)return;$('#question').value=q;$('#question').focus();},'chip')));
   function sourcesDialog(sources,trip){openDialog('이 답변의 근거',body=>{sources.forEach(s=>{const row=make('div','source-card');row.append(make('strong','',s.provider||'예약 근거'),make('p','hint',s.source_file||(!s.document_id?'직접 입력한 예약':'예약 메일')));if(s.document_id)row.append(button('원문 보기',()=>viewDocument(s.document_id,s.source_file,trip,()=>sourcesDialog(sources,trip)),'primary'),button('원문 다운로드',()=>downloadDocument(s.document_id,s.source_file,trip)));if(s.booking_id){const b=state.bookings.find(x=>x.id===s.booking_id);if(b)row.append(button('예약 상세',()=>bookingDetail(b),'text-button'));}body.append(row);});body.append(make('p','hint','현재 여행에서 답변에 사용한 예약의 근거입니다. 직접 입력한 예약에는 메일 원문이 없습니다.'));});}
-  $('#questionForm').addEventListener('submit',async e=>{e.preventDefault();if(!state.trip||state.asking)return;const q=$('#question').value.trim();if(!q)return;state.asking=true;const epoch=state.epoch,trip=state.trip;$('#sendQuestion').disabled=true;$('#question').readOnly=true;showError($('#questionError'));const user=bubble('user',q);const progress=bubble('assistant pending','이 여행의 예약과 근거를 확인하는 중…');
+  async function submitQuestion(value=$('#question').value){if(!state.trip||state.asking)return false;const q=value.trim();if(!q)return;state.asking=true;globalThis.GoingHome?.render();const epoch=state.epoch,trip=state.trip;$('#sendQuestion').disabled=true;$('#question').readOnly=true;showError($('#questionError'));const user=bubble('user',q);const progress=bubble('assistant pending','이 여행의 예약과 근거를 확인하는 중…');
     try{const history=[];let size=0;for(const m of [...state.history].reverse()){if(history.length>=20||size+m.content.length>12000)break;history.unshift(m);size+=m.content.length;}
-      const res=await api(tripPath(trip)+'/ask',{method:'POST',body:{question:q,history}});if(epoch!==state.epoch)return;progress.remove();const answer=bubble('assistant',res.answer||'확인할 수 있는 답변이 없습니다.');if(res.sources?.length){const sources=make('div','source-links');sources.append(button(`근거 ${res.sources.length}건 보기`,()=>sourcesDialog(res.sources,trip)));answer.append(sources);}state.history.push({role:'user',content:q},{role:'assistant',content:(res.answer||'').slice(0,4000)});state.history=state.history.slice(-20);$('#question').value='';answer.scrollIntoView({block:'nearest'});
+      const res=await api(tripPath(trip)+'/ask',{method:'POST',body:{question:q,history}});if(epoch!==state.epoch)return;progress.remove();const answer=bubble('assistant',res.answer||'확인할 수 있는 답변이 없습니다.');if(res.sources?.length){const sources=make('div','source-links');sources.append(button(`근거 ${res.sources.length}건 보기`,()=>sourcesDialog(res.sources,trip)));answer.append(sources);}state.history.push({role:'user',content:q},{role:'assistant',content:(res.answer||'').slice(0,4000)});state.history=state.history.slice(-20);$('#question').value='';answer.scrollIntoView({block:'nearest'});return true;
     }catch(err){progress.remove();if(epoch===state.epoch){user.remove();fail(err,$('#questionError'));if(err.code==='SEARCH_REBUILDING')loadJobs().catch(fail);}}
-    finally{if(epoch===state.epoch){state.asking=false;$('#sendQuestion').disabled=false;$('#question').readOnly=false;}}
-  });
+    finally{if(epoch===state.epoch){state.asking=false;$('#sendQuestion').disabled=false;$('#question').readOnly=false;globalThis.GoingHome?.render();}}
+    return false;
+  }
+  $('#questionForm').addEventListener('submit',e=>{e.preventDefault();submitQuestion();});
 
   // Review evidence is cached only on the server; navigation never submits a collection.
   const reviewReasonText = {
@@ -744,7 +748,7 @@
   const discoveryCategoryNames = {restaurant:'음식점',cafe:'카페',attraction:'볼거리'};
   const bookmarkStateNames = {unresolved:'저장됨 · 지점 미확인',resolving:'지점 확인 중',resolved:'지점 확인 완료',ambiguous:'여러 지점 중 선택 필요',unsupported:'자동 확인 미지원',failed:'지점 확인 실패'};
   const discoveryReasonNames = {RESOLVE_UNAVAILABLE:'이 링크나 이름을 자동으로 확인할 자료가 없습니다.',PROVIDER_UNAVAILABLE:'외부 지점 확인 서비스를 사용할 수 없습니다. 저장한 입력과 메모는 유지됩니다.',POLICY_UNAVAILABLE:'지점 확인에 필요한 자료 이용 범위를 준비 중입니다.',BUDGET_EXHAUSTED:'현재 호출 예산이 부족합니다. 저장한 장소는 계속 확인할 수 있습니다.',AMBIGUOUS_PLACE:'같은 이름의 지점이 여러 개입니다. 주소를 보고 선택해 주세요.',UNSUPPORTED_URL:'이 링크의 자동 지점 확인을 지원하지 않습니다.',PLACE_UNVERIFIED:'지점과 주소를 먼저 확인해야 합니다.',VERSION_CONFLICT:'다른 화면에서 수정한 내용이 있습니다. 입력을 보존했으니 최신 내용을 확인해 주세요.'};
-  function clearDiscoveryScope(){if($('#discoveryConditionBrief'))$('#discoveryConditionBrief').textContent='선택한 여행의 조건을 불러오고 있어요…';$('#discoveryQuick')?.replaceChildren();clearTimeout(discoveryPollTimer);discoveryPollTimer=null;state.discovery={conditions:null,bookmarks:[],loaded:false,serial:0,packs:[]};setExploreView('recommend');['#discoveryConditions','#bookmarkList','#homePlaces','#discoveryPacks'].forEach(s=>$(s)?.replaceChildren());if($('#discoveryAdmin'))$('#discoveryAdmin').hidden=true;if($('#discoveryAdminError'))showError($('#discoveryAdminError'));if($('#bookmarkCount'))$('#bookmarkCount').textContent='';if($('#bookmarkFilter'))$('#bookmarkFilter').value='all';if($('#discoveryError'))showError($('#discoveryError'));if($('#discoveryMessage')){$('#discoveryMessage').hidden=true;$('#discoveryMessage').textContent='';}}
+  function clearDiscoveryScope(){globalThis.GoingHome?.clear();state.savingPlaces=new Set();if($('#discoveryConditionBrief'))$('#discoveryConditionBrief').textContent='선택한 여행의 조건을 불러오고 있어요…';$('#discoveryQuick')?.replaceChildren();clearTimeout(discoveryPollTimer);discoveryPollTimer=null;state.discovery={conditions:null,bookmarks:[],loaded:false,serial:0,packs:[]};setExploreView('recommend');['#discoveryConditions','#bookmarkList','#homePlaces','#discoveryPacks'].forEach(s=>$(s)?.replaceChildren());if($('#discoveryAdmin'))$('#discoveryAdmin').hidden=true;if($('#discoveryAdminError'))showError($('#discoveryAdminError'));if($('#bookmarkCount'))$('#bookmarkCount').textContent='';if($('#bookmarkFilter'))$('#bookmarkFilter').value='all';if($('#discoveryError'))showError($('#discoveryError'));if($('#discoveryMessage')){$('#discoveryMessage').hidden=true;$('#discoveryMessage').textContent='';}}
   function discoveryMessage(message){$('#discoveryMessage').textContent=message;$('#discoveryMessage').hidden=!message;}
   function renderHomePlaces(){
     const host=$('#homePlaces');if(!host)return;host.hidden=!state.trip;host.replaceChildren();
@@ -753,11 +757,11 @@
     // Primary journeys stay in the same place after the first reservation.
     host.classList.remove('has-bookings');
     const bookmarks=state.discovery.bookmarks,loaded=state.discovery.loaded,pending=bookmarks.filter(item=>item.resolve_state!=='resolved').length;
-    const intro=make('div','home-places-copy');intro.append(make('h2','','어디부터 준비할까요?'),make('p','hint',loaded?`보관함 ${bookmarks.length}곳 · 지점 확인 필요 ${pending}곳`:'장소 보관함을 확인하고 있습니다.'));
+    const intro=make('div','home-places-copy');intro.append(make('h2','','여행 준비 이어가기'),make('p','hint',loaded?`보관함 ${bookmarks.length}곳 · 지점 확인 필요 ${pending}곳`:'장소 보관함을 확인하고 있습니다.'));
     host.append(intro);
     const shortcuts=make('div','journey-shortcuts');
-    for(const [tab,title,note] of [['mail','예약 메일 업로드','메일 또는 직접 입력'],['explore','가고 싶은 곳 찾기','현지어 리뷰 · 유명한 곳'],['itinerary','하루 일정 만들기','예약을 지키면서 동선 정리']]){
-      const action=button('',()=>{setTab(tab);if(tab==='mail')$('#uploadForm').scrollIntoView({block:'start'});},'journey-shortcut');
+    for(const [tab,title,note] of [['mail','예약 메일 업로드','메일 또는 직접 입력'],['explore','저장한 장소','가고 싶은 곳 한곳에 모아 보기'],['itinerary','하루 일정 만들기','예약을 지키면서 동선 정리']]){
+      const action=button('',()=>{setTab(tab);if(tab==='explore')setExploreView('saved');if(tab==='mail')$('#uploadForm').scrollIntoView({block:'start'});},'journey-shortcut');
       action.append(document.querySelector('.sidebar [data-tab="'+tab+'"] svg').cloneNode(true),make('strong','',title),make('span','hint',note),make('span','shortcut-arrow','↗'));
       shortcuts.append(action);
     }
@@ -1088,7 +1092,7 @@
     clearTimeout(recommendationPollTimer);
     const epoch=state.epoch,serial=++r.serial,path=tripPath(),read={epoch,serial,runId:requestedId};r.resultLoad=read;
     if(r.active?.run_id===requestedId&&['succeeded','partial'].includes(r.active.state)&&!r.active.result&&r.active.data_status!=='stale')r.resultRecoveryPending=true;
-    renderRecommendationProgress();
+    renderRecommendationProgress();globalThis.GoingHome?.render();
     try{
       const history=await allPages(path+'/recommendations');
       if(epoch!==state.epoch||serial!==state.recommendations.serial)return;state.recommendations.runs=history;
@@ -1108,9 +1112,9 @@
       renderRecommendationResults();
       if(['queued','running'].includes(active.state)){
         if(active.job_id)watchJob(active.job_id,epoch);
-        if(state.tab==='explore')recommendationPollTimer=setTimeout(()=>loadRecommendations({runId:active.run_id}).catch(()=>{}),2200);
-      }else if(state.recommendations.resultRecoveryPending&&state.tab==='explore'){
-        recommendationPollTimer=setTimeout(()=>{if(epoch!==state.epoch||serial!==state.recommendations.serial||state.tab!=='explore')return;return loadRecommendations({runId:id,resultAttempt:resultAttempt+1}).catch(()=>{});},1200);
+        if(['trip','explore'].includes(state.tab))recommendationPollTimer=setTimeout(()=>loadRecommendations({runId:active.run_id}).catch(()=>{}),2200);
+      }else if(state.recommendations.resultRecoveryPending&&['trip','explore'].includes(state.tab)){
+        recommendationPollTimer=setTimeout(()=>{if(epoch!==state.epoch||serial!==state.recommendations.serial||!['trip','explore'].includes(state.tab))return;return loadRecommendations({runId:id,resultAttempt:resultAttempt+1}).catch(()=>{});},1200);
       }
     }catch(error){
       if(epoch!==state.epoch||serial!==state.recommendations.serial||error.status===401||error.name==='AbortError')return;
@@ -1118,11 +1122,11 @@
       const recoverResult=state.recommendations.resultRecoveryPending&&resultAttempt<3;
       if(!recoverResult)state.recommendations.resultRecoveryPending=false;renderRecommendationProgress();
       // Reconnect to the same saved run with GET only; never repeat a submission on a timer.
-      if(state.tab==='explore'&&['queued','running'].includes(state.recommendations.active?.state))recommendationPollTimer=setTimeout(()=>loadRecommendations({runId:runId||state.recommendations.active?.run_id}).catch(()=>{}),4000);
-      else if(state.tab==='explore'&&recoverResult)recommendationPollTimer=setTimeout(()=>{if(epoch!==state.epoch||serial!==state.recommendations.serial||state.tab!=='explore')return;return loadRecommendations({runId:runId||state.recommendations.active?.run_id,resultAttempt:resultAttempt+1}).catch(()=>{});},4000);
+      if(['trip','explore'].includes(state.tab)&&['queued','running'].includes(state.recommendations.active?.state))recommendationPollTimer=setTimeout(()=>loadRecommendations({runId:runId||state.recommendations.active?.run_id}).catch(()=>{}),4000);
+      else if(['trip','explore'].includes(state.tab)&&recoverResult)recommendationPollTimer=setTimeout(()=>{if(epoch!==state.epoch||serial!==state.recommendations.serial||!['trip','explore'].includes(state.tab))return;return loadRecommendations({runId:runId||state.recommendations.active?.run_id,resultAttempt:resultAttempt+1}).catch(()=>{});},4000);
       throw error;
     }finally{
-      if(r.resultLoad===read){r.resultLoad=null;if(epoch===state.epoch&&r===state.recommendations)renderRecommendationProgress();}
+      if(r.resultLoad===read){r.resultLoad=null;if(epoch===state.epoch&&r===state.recommendations){renderRecommendationProgress();globalThis.GoingHome?.render();}}
     }
   }
   async function applyRecommendations(){
@@ -1215,7 +1219,7 @@
   }
   function appendRecommendationReasons(host,codes){if(!codes?.length)return;const list=make('ul','recommendation-reasons');[...new Set(codes)].slice(0,6).forEach(code=>list.append(make('li','',recommendationReasonNames[code]||reviewReasonText[code]||'이 조건에 사용할 근거가 아직 충분하지 않습니다.')));host.append(list);}
   function recommendationConditionsLabel(conditions){if(!conditions)return '저장된 방문 조건';return `${discoveryCityNames[conditions.city]||conditions.city||'도시 미확인'} · ${conditions.visit?.date||'날짜 미확인'}${conditions.visit?.local_time?' '+conditions.visit.local_time:''} · 성인 ${conditions.party?.adults??'미확인'}명 · 아동 ${conditions.party?.children_status==='unknown'?'미확인':(conditions.party?.children||[]).length+'명'}`;}
-  function renderRecommendationResults(){const host=$('#recommendationResults');if(!host)return;const focused=host.contains(document.activeElement)?document.activeElement:null,focusPlace=focused?.closest?.('.recommendation-card')?.dataset.placeId,focusLabel=focused?.getAttribute('aria-label')||focused?.textContent;const r=state.recommendations||{},active=r.active,displayed=r.displayed;const submitting=r.submitting||r.resultRecoveryPending||['queued','running'].includes(active?.state);$('#applyRecommendations').disabled=!state.trip||!state.discovery.conditions||['unsupported_city'].includes(state.discovery.conditions?.context_state)||submitting;$('#reviewStrictFilter').disabled=!state.trip;$('#ratingFilterEnabled').disabled=!state.trip;
+  function renderRecommendationResults(){globalThis.GoingHome?.render();const host=$('#recommendationResults');if(!host)return;const focused=host.contains(document.activeElement)?document.activeElement:null,focusPlace=focused?.closest?.('.recommendation-card')?.dataset.placeId,focusLabel=focused?.getAttribute('aria-label')||focused?.textContent;const r=state.recommendations||{},active=r.active,displayed=r.displayed;const submitting=r.submitting||r.resultRecoveryPending||['queued','running'].includes(active?.state);$('#applyRecommendations').disabled=!state.trip||!state.discovery.conditions||['unsupported_city'].includes(state.discovery.conditions?.context_state)||submitting;$('#reviewStrictFilter').disabled=!state.trip;$('#ratingFilterEnabled').disabled=!state.trip;
     $('#recommendationFilterSummary').textContent=recommendationFilterSummary();
     const dirty=r.optionsDirty||r.conditionsDraft||displayed?.origin_status==='stale';$('#recommendationDraft').textContent=displayed?.origin_status==='stale'?'숙소가 바뀌어 이전 출발점 기준의 결과입니다. 현재 조건으로 장소 찾아보기를 눌러 주세요.':dirty?'입력 중인 조건은 아직 적용되지 않았습니다. 저장된 이전 결과를 유지하고 있습니다.':'';$('#recommendationDraft').hidden=!dirty;
     renderRecommendationProgress();window.DiscoveryExperience?.renderMode();window.DiscoveryFlow?.settled();
@@ -1374,14 +1378,26 @@
     if(item.checked_at||factChecked)card.append(make('p','hint',checkedLabel));
     const actions=make('div','actions recommendation-primary-actions'),selection=make('div','actions recommendation-selection-actions'),more=make('div','card-secondary'),secondary=make('div','actions');
 
-    actions.append(button('상세 보기',()=>discoveryPlaceDetail(item.place_id,run),'primary'),button('저장',()=>saveRecommendedPlace(item,run),'secondary'));
+    actions.append(button('상세 보기',()=>discoveryPlaceDetail(item.place_id,run),'primary'),placeSaveButton(item,run));
     if(comparable){selection.append(button('일정에 넣기',()=>addPlaceToItinerary(item,run),'secondary'));const compare=button('비교에 추가',()=>toggleComparison(item,run),'secondary compare-toggle');compare.dataset.placeId=item.place_id;compare.setAttribute('aria-pressed','false');selection.append(compare);}
     if(item.source_refs?.length)secondary.append(button(`추천 근거 ${item.source_refs.length}개`,()=>recommendationSources(item),'text-button'));
     window.ProductTools?.feedbackButton(secondary,item.place_id,{kind:'preference',run_id:run.run_id});if(rank!=null)window.ProductTools?.observe(card,item.place_id,run.run_id);
     const extra=button('더 보기',()=>openDialog(item.name||'장소 선택',body=>{if(comparable)body.append(selection);body.append(secondary);window.DiscoveryExperience?.cardEvidence(body,item,run);if(specificReasons.length){body.append(make('h3','','추천에 사용하지 못한 정보'));appendRecommendationReasons(body,specificReasons);}}),'text-button');
     actions.append(extra);card.append(actions);return card;
   }
-  async function saveRecommendedPlace(item,run){if(!state.trip)return;const epoch=state.epoch;try{const saved=await api(tripPath()+'/bookmarks',{method:'POST',body:{input_kind:'place',input_value:item.place_id,note:'',run_id:run?.run_id||null}});if(epoch!==state.epoch)return;await loadDiscovery({quiet:true});notice(saved.duplicate?'이미 보관함에 저장되어 있습니다. 개인 메모는 유지했습니다.':'현재 여행의 보관함에 저장했습니다.');}catch(error){fail(error,$('#recommendationError'));}}
+  function placeSaveButton(item,run){
+    const saved=globalThis.GoingHome?.savedPlace(state.discovery.bookmarks,item.place_id),busy=state.savingPlaces?.has(item.place_id);
+    const action=button(saved?'저장됨':busy?'저장 중…':'저장',()=>{if(saved){setTab('explore');setExploreView('saved');}else saveRecommendedPlace(item,run);},saved?'text-button place-saved':'secondary');
+    action.disabled=Boolean(busy);action.setAttribute('aria-label',(item.name||'장소')+' '+(saved?'저장됨 · 보관함 보기':busy?'저장 중':'저장'));return action;
+  }
+  async function saveRecommendedPlace(item,run){
+    if(!state.trip)return;const pending=state.savingPlaces??=new Set();if(pending.has(item.place_id))return;
+    pending.add(item.place_id);const epoch=state.epoch;renderRecommendationResults();
+    try{const saved=await api(tripPath()+'/bookmarks',{method:'POST',body:{input_kind:'place',input_value:item.place_id,note:'',run_id:run?.run_id||null}});if(epoch!==state.epoch)return;await loadDiscovery({quiet:true});notice(saved.duplicate?'이미 보관함에 저장되어 있어요.':'보관함에 저장했어요. 일정에서도 사용할 수 있어요.');}
+    catch(error){if(epoch===state.epoch)fail(error,state.tab==='trip'?$('#pageError'):$('#recommendationError'));}
+    finally{pending.delete(item.place_id);if(epoch===state.epoch)renderRecommendationResults();}
+  }
+
   function recommendationSources(item){openDialog('추천 이유에 사용한 근거',body=>{body.append(make('h3','',item.name));window.DiscoveryExperience?.evidenceDetail(body,item.review_evidence,item,state.recommendations.displayed);for(const source of item.source_refs||[]){const row=make('div','source-card');row.append(make('strong','',source.source_type==='official'?'공식 출처':source.source_group==='OpenStreetMap'?'공개 지도 자료':source.source_type==='synthetic'?'합성 검증 출처':source.source_type||'자료 출처'),make('p','hint',`확인 ${reviewDate(source.checked_at)}`));window.ProductTools?.sourceLink(safeDiscoveryLink(row,source.url,'이 출처 열기'),item.place_id,source.id,state.recommendations.displayed?.run_id);body.append(row);}body.append(make('p','hint','같은 내용의 재전재는 독립 근거 여러 개로 간주하지 않습니다. 출처가 있다는 사실은 특정 날짜의 예약 가능을 뜻하지 않습니다.'));});}
   function comparisonSelection(){const r=state.recommendations;if(!r.comparison)r.comparison={runId:null,selected:[],pending:false};return r.comparison;}
   function comparisonCandidates(run){const result=new Map();for(const section of Object.values(run?.result?.sections||{}))for(const key of ['items','needs_confirmation','insufficient_data'])for(const item of section[key]||[])if(!result.has(item.place_id))result.set(item.place_id,item);return result;}
@@ -1505,6 +1521,7 @@
   $('#editItineraryAdd').addEventListener('click',()=>itineraryEditForm(null,'add'));
   $('#undoItinerary').addEventListener('click',()=>itineraryEditForm(null,'undo'));
 
+  globalThis.GoingHome?.init({$,state,make,button,setTab,submitQuestion,destinationLabel,placePhotoGallery,discoveryPlaceDetail,placeSaveButton});
   window.DiscoveryFlow?.init({state,api,tripPath,applyRecommendations,loadRecommendations});
   window.DiscoveryExperience?.init({state,api,make,button,field,openDialog,closeDialog,notice,fail,tripPath,ensureDiscoveryDraft,setDiscoveryOverride,renderRecommendationResults,recommendationCard,discoveryPlaceDetail,appendRecommendationReasons,reviewDate,reviewCounts,reviewScope,reviewAttribution,reasonList,reviewReasons,percentage,reviewAdminAllowed,discoveryConditionsForm,bookmarkForm,applyRecommendations,commitRecommendationFilters,filterValues:recommendationFilterValues});
   window.ReviewLab?.init({state,api,make,button,field,formBase,openDialog,closeDialog,notice,fail,confirmAction,reviewDate,safeDiscoveryLink,loadReviews,reviewCollectForm,reviewControlsForm,reviewPolicyForm});

@@ -177,7 +177,7 @@ def fetch_public(url, *, max_bytes=1_048_576, timeout_seconds=8, max_redirects=3
                 connection.sock.settimeout(max(.001, deadline - time.monotonic()))
             connection.request('GET', urlunsplit(('', '', parsed.path, parsed.query, '')),
                 headers={'Accept': ', '.join(sorted(MIMES)), 'Accept-Encoding': 'identity',
-                         'User-Agent': 'TravelAgent-SourceCheck/1', 'Connection': 'close'})
+                         'User-Agent': 'GoingSourceBot/1.1 (https://github.com/Jin-s-work/Travel-Agent)' , 'Connection': 'close'})
             response = connection.getresponse()
             if response.status in {301, 302, 303, 307, 308}:
                 location = response.getheader('Location')

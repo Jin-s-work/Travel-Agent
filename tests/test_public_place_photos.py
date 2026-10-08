@@ -97,6 +97,22 @@ def test_quota_and_emergency_pause_block_before_call(public,monkeypatch):
     second=submit(public,base,['osm_node_700000001']);_job(public.client,second.json())
     assert len(calls)==1
 
+def test_commons_cooldown_does_not_block_osm_but_blocks_same_host_retries(public):
+    def fetch(url):
+        if 'commons.wikimedia.org' in url:raise FetchRejected('HTTP_ERROR',http_status=429)
+        ident=int(url.split('/')[-1].split('.')[0])
+        return Page(url,'application/json',json.dumps({'elements':[{'type':'node','id':ident,'tags':{'amenity':'restaurant','image':TITLE}}]}).encode(),0)
+    _,base,_,calls=setup(public,fetch)
+    _job(public.client,submit(public,base,ids=['osm_node_700000000','osm_node_700000001']).json())
+    assert sum('openstreetmap.org' in url for url in calls)==2
+    assert sum('commons.wikimedia.org' in url for url in calls)==1
+
+def test_optional_wikidata_failure_preserves_exact_osm_file_link():
+    def read(url):
+        if 'openstreetmap.org' in url:return {'elements':[{'type':'node','id':123,'tags':{'amenity':'restaurant','image':TITLE,'wikidata':'Q123'}}]}
+        raise FetchRejected('FETCH_TIMEOUT')
+    assert provider.linked_titles({'external_place_id':'node/123'},read)==[TITLE]
+
 def test_deleted_trip_cannot_activate_a_late_photo(public):
     trip,base,_,calls=setup(public)
     state=public.app.state

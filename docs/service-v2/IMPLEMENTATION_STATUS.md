@@ -538,3 +538,7 @@ DB 비밀번호 확인/필요 시 소유자의 직접 재설정과 Google 웹 �
 - 파리 실제 공개 식당 6곳 중 연결된 사진은 1곳 1장만 확인했다. 나머지 5곳을 임의 사진으로 채우지 않는다. 사진 없는 경우 지도 사진 링크를 제공한다. 실제 수집 범위와 무료 데이터 한계는 [상세 기록](../service-v3/EXPLORATION_SIMPLIFICATION.md)에 남겼다.
 - `ce5907e` / Render `dep-db3gugmgekts73eod1bg` Deploy succeeded, readiness 5개 검사 true. 운영 Chrome에서 저장된 추천 12곳 복원·간편 필터·상세·사진 작업을 확인했다. 마지막 사진 상태 수정 표적 Python16/전체JS187 통과.
 - 사진은 **운영 확보 미완료**다. 파리 12곳 중 연결 사진 없음8곳/공급자 연결 미완료4곳이며, 로컬에서 검증한 사진1장도 이번 Render 브라우저 표시를 확인하지 못했다. 사진 없는 경우와 연결 실패를 구분하고 새 작업은 partial로 기록한다. 모바일 실기기 미검증. [최종 검증 기록](../service-v3/EXPLORATION_SIMPLIFICATION.md#최종-운영-확인--2026-10-08). Keynote·발표 스크립트는 수정하지 않았다.
+
+### 2026-10-08 — 추천 중심 홈과 AI 대화 접근
+
+홈 추천 3곳·바로 저장, 주 메뉴 AI 대화와 홈 질문, 저장 중복 방지, 공개 cuisine/명시적 도심 기준을 사용하는 hybrid_v5, 사진 공급자별 cooldown 및 식별 User-Agent를 구현했다. 기존 v4/소유권/엄격 언어·방문 조건 검사는 유지한다. Python 전체 1,183 passed/17 skipped, Node 194 passed. 유료 사진 공급자 추가 활성화와 실사용 추천 정확도 평가는 수행하지 않았다. [상세 계약·전후 비교·검증](../service-v3/MAIN_RECOMMENDATION_UX.md).

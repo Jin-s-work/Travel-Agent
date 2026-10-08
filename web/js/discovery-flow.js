@@ -18,7 +18,7 @@
   function init(context){ui=context;auto=create({read:()=>{const s=ui.state,r=s.recommendations;return {epoch:s.epoch,tripId:s.trip?.id,visible:s.tab==='explore'&&s.discovery.view!=='saved',ready:Boolean(s.session?.authenticated&&s.trip&&s.discovery.loaded&&r.loaded&&s.discovery.conditions?.context_state==='ready'),hasRun:Boolean(r.active||r.displayed||r.runs?.length),dirty:s.discovery.dirty,busy:r.submitting||r.resultRecoveryPending||['queued','running'].includes(r.active?.state),connectionError:r.connectionError,requestError:r.requestError};},submit:ui.applyRecommendations});}
   function photoReset(){const key=ui.state.epoch+':'+ui.state.trip?.id;if(photoScope===key)return;photoScope=key;requested=new Set();photoPending=false;clearTimeout(photoTimer);photoTimer=null;}
   async function photos(items){
-    if(!ui||ui.state.tab!=='explore'||!ui.state.session?.authenticated)return;
+    if(!ui||!['trip','explore'].includes(ui.state.tab)||!ui.state.session?.authenticated)return;
     photoReset();if(photoPending)return;
     const ids=[...new Set(items.filter(p=>p.source_kind==='public_map'&&!p.photos?.length&&!requested.has(p.place_id)).map(p=>p.place_id))].slice(0,6);
     if(!ids.length)return;

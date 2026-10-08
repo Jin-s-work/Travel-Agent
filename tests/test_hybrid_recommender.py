@@ -175,8 +175,8 @@ def test_normal_api_saves_new_model_and_repeat_read_does_not_recompute(discovery
     assert _job(discovery.client, response.json())['state'] == 'succeeded'
     url = f"/api/v2/trips/{trip['id']}/recommendations/{response.json()['run_id']}"
     first = discovery.client.get(url).json(); second = discovery.client.get(url).json()
-    assert first['snapshot']['recommendation_model_version'] == 'hybrid_v4'
+    assert first['snapshot']['recommendation_model_version'] == 'hybrid_v5'
     assert first['snapshot']['ranking_spec']['trained'] is False
     assert first['result'] == second['result']
     items = first['result']['sections']['landmark']['items'] + first['result']['sections']['landmark']['needs_confirmation']
-    assert items and all(p['ranking_diagnostics']['version'] == 'hybrid_v4' for p in items)
+    assert items and all(p['ranking_diagnostics']['version'] == 'hybrid_v5' for p in items)

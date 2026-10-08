@@ -111,7 +111,12 @@ def linked_titles(place, read):
             titles.append(title)
     qid = tags.get('wikidata', '')
     if re.fullmatch(r'Q[1-9][0-9]{0,12}', qid) and qid != tags.get('brand:wikidata') and len(titles) < 3:
-        entity = read('https://www.wikidata.org/wiki/Special:EntityData/' + qid + '.json').get('entities', {}).get(qid, {})
+        try:
+            entity = read('https://www.wikidata.org/wiki/Special:EntityData/' + qid + '.json').get('entities', {}).get(qid, {})
+        except (FetchRejected, TimeoutError):
+            if titles:
+                return titles[:3]
+            raise
         claims = entity.get('claims', {})
         coordinates = [c.get('mainsnak', {}).get('datavalue', {}).get('value', {})
                        for c in claims.get('P625', []) if c.get('rank') != 'deprecated']
@@ -191,6 +196,7 @@ class PlacePhotos:
     def _read(self, url, actor, trip_id, ctx):
         from src.operations.controls import external_guard
         external_guard(self.db, PROVIDER)
+        sku = {'api.openstreetmap.org':'osm_metadata','www.wikidata.org':'wikidata_metadata','commons.wikimedia.org':'commons_metadata'}[urlsplit(url).hostname]
         ctx.guard(); now = datetime.now(timezone.utc); date = now.isoformat()
         context = CallContext(actor.id, trip_id, trip_id, job_id=ctx.job['id'])
         with self.db.connect() as con:
@@ -198,12 +204,12 @@ class PlacePhotos:
             counts = con.execute('SELECT owner_id FROM usage_reservations WHERE provider=? AND period_day=?', (PROVIDER, date[:10])).fetchall()
             if len(counts) >= GLOBAL_DAILY or sum(r['owner_id'] == actor.id for r in counts) >= USER_DAILY:
                 raise DomainError('PHOTO_DAILY_LIMIT', '오늘 사진 확인 한도에 도달했습니다.', 429)
-            recent = con.execute("SELECT updated_at FROM usage_reservations WHERE provider=? AND error_code IN ('HTTP_429','HTTP_403') ORDER BY updated_at DESC LIMIT 1", (PROVIDER,)).fetchone()
+            recent = con.execute("SELECT updated_at FROM usage_reservations WHERE provider=? AND sku=? AND error_code IN ('HTTP_429','HTTP_403') ORDER BY updated_at DESC LIMIT 1", (PROVIDER,sku)).fetchone()
             if recent and datetime.fromisoformat(recent['updated_at']) + timedelta(minutes=15) > now:
                 raise DomainError('PHOTO_PROVIDER_COOLDOWN', '사진 공급자 연결을 잠시 쉬고 있습니다.', 429)
             call_id = 'call_' + uuid4().hex
             con.execute('INSERT INTO usage_reservations(call_id,owner_id,trip_id,job_id,scope_kind,scope_id,provider,sku,operation,attempt,call_key,request_hash,state,currency,estimated_units_json,estimated_cost_micros,price_version,price_confirmed_at,price_rates_json,period_day,period_month,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-                (call_id, actor.id, trip_id, ctx.job['id'], 'personal_trip', trip_id, PROVIDER, 'commons_metadata', 'place_photos', 1, call_id,
+                (call_id, actor.id, trip_id, ctx.job['id'], 'personal_trip', trip_id, PROVIDER, sku, 'place_photos', 1, call_id,
                  sha256(url.encode()).hexdigest(), 'sent', 'USD', dump({'calls': 1}), 0, POLICY, date, dump({'calls': 0}), date[:10], date[:7], date, date))
             Budget._ledger(con, call_id, 'reserved', 0, {'calls': 1}, date, reason='EXPLICIT_FREE_PUBLIC_DATA')
         code = None; received = None
