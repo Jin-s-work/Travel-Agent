@@ -1,0 +1,49 @@
+{
+  "scope": "Document/package consistency only; not product tests or live quality",
+  "passed": true,
+  "local_links_checked": 52,
+  "slides": 11,
+  "pptx_notes_matching_script": 11,
+  "embedded_movie_matches_standalone": true,
+  "target_duration_seconds": 510,
+  "actual_spoken_duration_measured": false,
+  "native_keynote_visual_review": "Separate manual evidence: REVIEW.md",
+  "files": {
+    "README.md": {
+      "bytes": 15020,
+      "sha256": "551af7e214e1247fe9bed06a3100c68902bfa314591c48d395e47ee795f20ecf"
+    },
+    "docs/presentation/v7/README.md": {
+      "bytes": 2490,
+      "sha256": "eaac4f8cf8ca8f22044444a398d13e9f6b646acacd880e2aab08d4728036502d"
+    },
+    "docs/presentation/v7/SCRIPT.md": {
+      "bytes": 15748,
+      "sha256": "edae357a813a4e61458e2820170a38410b384d703f976e9012917cd4c02430f6"
+    },
+    "docs/presentation/v7/CREDITS.md": {
+      "bytes": 4117,
+      "sha256": "b3c5f81e4569b3cd8e5da7e4107998e0e02bd535c0c3773d88a3333ebb48057a"
+    },
+    "docs/presentation/v7/REVIEW.md": {
+      "bytes": 2182,
+      "sha256": "a5199944fda735ab9ec0f4a8449655c473d846d515a98f4945bd9479143ec9ce"
+    },
+    "docs/presentation/v7/going-v7-class-presentation.pptx": {
+      "bytes": 2630166,
+      "sha256": "d891436dbc5b813ad85c982b6a8795a0660349307236786343ae68779cb31317"
+    },
+    "docs/presentation/v7/going-v7-class-presentation.key": {
+      "bytes": 3064186,
+      "sha256": "1afd86a3095124cd1739c27e476571d27b115755c634509d2025265c3cdd51d4"
+    },
+    "docs/presentation/v7/slides-content.json": {
+      "bytes": 12969,
+      "sha256": "94e8c02a87a0529b3245e0d3435992f99fff213da50fcbf09eeee8391e744736"
+    },
+    "docs/presentation/v7/preview.webp": {
+      "bytes": 71640,
+      "sha256": "b1914daa56afe0cfa00012a1cb441f6641ea709055fad8a78ba8b55948a0efce"
+    }
+  }
+}
