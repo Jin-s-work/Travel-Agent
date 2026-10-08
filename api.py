@@ -144,6 +144,8 @@ def create_app(settings=None, *, parser=None, embedder=None, vector_factory=None
     if settings.public_discovery_enabled is True or settings.public_discovery_enabled is None and settings.environment!='development':
         from src.discovery.public_places import PublicDiscovery
         app.state.discovery.public_provider=PublicDiscovery(app.state.db)
+    from src.discovery.photo_provider import PlacePhotos
+    app.state.place_photos=PlacePhotos(app.state.db,app.state.repo,app.state.jobs,app.state.discovery,enabled=app.state.discovery.public_provider is not None)
     from src.location import build_location_providers, MatrixService
     location_config={}
     if settings.location_provider_config:
@@ -173,6 +175,8 @@ def create_app(settings=None, *, parser=None, embedder=None, vector_factory=None
     from src.travel_tools.today import Today
     app.state.today=Today(app.state.db,app.state.repo,app.state.itineraries,app.state.discovery,app.state.preparation)
     def dispatch(job,ctx):
+        if job['operation']=='place_photos':
+            return app.state.place_photos.execute(job,ctx)
         if job['operation']=='review_collection':
             return app.state.reviews.execute(job,ctx)
         if job['operation']=='accommodation_resolve':

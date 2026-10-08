@@ -488,3 +488,26 @@ input,select,textarea { min-width:0; }
 .journey-layout .trip-overview .page-heading>.actions { margin:0; }
 .journey-layout #tripSubtitle { display:none; } /* Dates remain in the persistent trip context. */
 :root[data-text-size="large"] .journey-layout .trip-overview .page-heading { flex-wrap:wrap; }
+
+/* Browse first: short cards, optional controls, no empty photo billboard. */
+.journey-layout .place-photo-gallery-empty { min-height:96px; aspect-ratio:auto; padding:20px; background:var(--fill-secondary); display:flex; flex-direction:column; justify-content:center; gap:4px; }
+.journey-layout .place-photo-gallery-empty .place-photo-unavailable { position:static; padding:0; margin:0; font-size:13px; }
+.journey-layout .place-photo-gallery-empty a { display:inline-flex; min-height:44px; align-items:center; font-size:13px; }
+.journey-layout .recommendation-card .recommendation-primary-actions { flex-wrap:wrap; }
+.journey-layout .recommendation-primary-actions>.text-button { flex:0 0 100%; min-height:44px; padding:4px 0; text-align:left; }
+.journey-layout .recommendation-filter-bar { align-items:center; margin-bottom:16px; padding-bottom:16px; }
+.journey-layout .recommendation-filter-bar #discoveryConditionBrief { display:none; }
+.journey-layout .recommendation-footer { justify-content:flex-end; border-top:1px solid var(--border-subtle); margin-top:24px; }
+.journey-layout .stay-summary-row { padding:0; }
+.journey-layout #exploreOrigin { padding:16px 0; border:0; border-bottom:1px solid var(--border-subtle); background:transparent; border-radius:0; }
+.journey-layout #exploreOrigin .stay-summary-copy h3 { font-size:14px; }
+.journey-layout .discovery-category-chips { display:flex; flex-wrap:wrap; gap:8px; }
+.journey-layout .category-chip { min-height:44px; padding:10px 16px; border-radius:24px; border:1px solid var(--border-default); background:var(--fill-surface); color:var(--text-secondary); }
+.journey-layout .category-chip[aria-pressed="true"] { background:var(--accent-wash); border-color:var(--accent); color:var(--accent); }
+.journey-layout .recommendation-result-context { padding:0; border:0; background:none; margin:16px 0; font-size:13px; color:var(--text-secondary); }
+.journey-layout .recommendation-result-context strong { display:none; }
+.journey-layout .recommendation-result-context p { margin:0; }
+.journey-layout .stage2-section>h2 { margin-bottom:20px; }
+#dialogBody .stay-explore-controls { display:grid; gap:16px; }
+#dialogBody .stay-explore-controls label { display:grid; gap:8px; }
+@media(max-width:600px) { .journey-layout #exploreOrigin .stay-summary-row { align-items:flex-start; } .journey-layout #exploreOrigin .actions { justify-content:flex-start; } }

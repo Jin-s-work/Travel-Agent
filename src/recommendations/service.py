@@ -169,7 +169,7 @@ class Recommendations:
             ctx.progress('public_discovery',done=0,total=1)
             if len(reviewed)>=snapshot.get('limit',6):
                 external=self.discovery.public_provider._status(city,'not_needed',reason='REVIEWED_CATALOG_AVAILABLE')
-            elif strict:
+            elif strict and snapshot.get('recommendation_model_version') not in ('general_v3','hybrid_v4'):
                 external=self.discovery.public_provider._status(city,'unavailable',reason='PUBLIC_REVIEW_FILTER_UNSUPPORTED')
             else:
                 external=self.discovery.public_provider.ensure(actor,trip_id,city,ctx,origin=snapshot['conditions'].get('origin'),categories=snapshot['conditions']['categories'],radius_m=snapshot['conditions'].get('radius_m'))

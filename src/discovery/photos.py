@@ -1,7 +1,7 @@
 """Read-only, independently reviewed restaurant image metadata.
 
 A photo license does not follow from permission to show a place's factual data.
-Only this curated manifest can approve photos; there is no network fetch, user
+A curated manifest or a verified, licensed public cache supplies photos. No network fetch, user
 URL proxy, provider call, image byte persistence, or ranking input here.
 """
 from __future__ import annotations
@@ -177,9 +177,29 @@ def select_photos(manifest, identity, *, approved, clock=None):
 
 
 def for_places(con, place_ids, *, manifest=None, clock=None):
-    """Current photo permission in two reads for a bounded set of identities."""
+    """Current photo permission in at most three reads for bounded identities."""
     ids=sorted(set(place_ids)); result={ident:unavailable('PHOTO_NOT_REVIEWED') for ident in ids}
-    ids=[ident for ident in ids if not isinstance(ident,str) or not re.fullmatch(r'osm_(?:node|way|relation)_[1-9][0-9]*',ident)]
+    public_ids=[ident for ident in ids if isinstance(ident,str) and re.fullmatch(r'osm_(?:node|way|relation)_[1-9][0-9]*',ident)]
+    if public_ids:
+        from .photo_provider import identity_hash
+        from .public_places import POLICY
+        public_marks=','.join('?' for _ in public_ids)
+        instant=clock or datetime.now(timezone.utc)
+        # Permission/identity is rechecked at read time; photo cache cannot revive a revoked place.
+        rows=con.execute(f"SELECT p.*,x.identity_hash,x.payload_json,x.expires_at AS cache_expires FROM place_identities p JOIN place_photo_cache x ON x.place_id=p.id WHERE p.id IN ({public_marks}) AND p.deleted_at IS NULL AND p.provider='openstreetmap' AND EXISTS(SELECT 1 FROM research_candidates c JOIN candidate_packs k ON k.id=c.pack_id JOIN evidence_sources s ON s.place_id=p.id WHERE c.place_id=p.id AND c.status='public_data' AND k.status='public_data' AND s.status='active' AND s.read_confirmed=1 AND s.display_permitted=1 AND s.policy_version=? AND s.source_group='OpenStreetMap' AND NOT EXISTS(SELECT 1 FROM discovery_tombstones t WHERE (t.kind='pack' AND t.target_id=k.id) OR (t.kind='source' AND t.target_id=s.id)))",[*public_ids,POLICY])
+        for row in rows:
+            expiry=_stamp(row['cache_expires'])
+            if row['identity_hash']!=identity_hash(dict(row)) or not expiry or expiry<=instant:continue
+            try:
+                payload=json.loads(row['payload_json'])
+                if not isinstance(payload,dict):continue
+                valid=[]
+                for photo in payload.get('photos',[])[:MAX_PHOTOS]:
+                    value,_=_photo({**photo,'enabled':True,'identity_evidence':'Exact feature media link'},instant)
+                    if value:valid.append(value)
+                result[row['id']]={'photos':valid,'photo_status':{'state':'available' if valid else 'unavailable','available_count':len(valid),'reason_codes':[] if valid else payload.get('photo_status',{}).get('reason_codes',['NO_LINKED_PHOTO'])}}
+            except (ValueError,TypeError,KeyError):pass
+    ids=[ident for ident in ids if ident not in public_ids]
     if not ids:return result
     marks=','.join('?' for _ in ids)
     rows={r['id']:dict(r) for r in con.execute(f'SELECT * FROM place_identities WHERE id IN ({marks}) AND deleted_at IS NULL',ids)}

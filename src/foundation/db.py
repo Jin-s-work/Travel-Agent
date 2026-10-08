@@ -8,7 +8,7 @@ import sqlite3
 import fcntl
 
 
-SCHEMA_VERSION = 14
+SCHEMA_VERSION = 15
 SCHEMA = """
 CREATE TABLE users (
  id TEXT PRIMARY KEY, email TEXT NOT NULL, auth_provider TEXT NOT NULL,
@@ -204,6 +204,10 @@ COMMIT;''')
             if version == 13:
                 from src.research.stage2_schema import SCHEMA as stage2_schema
                 connection.executescript('BEGIN IMMEDIATE;\n' + stage2_schema + '\nPRAGMA user_version=14;\nCOMMIT;')
+                version = 14
+            if version == 14:
+                from src.discovery.photo_schema import SCHEMA as photo_schema
+                connection.executescript('BEGIN IMMEDIATE;\n' + photo_schema + '\nPRAGMA user_version=15;\nCOMMIT;')
 
     @contextmanager
     def connect(self):

@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const source = fs.readFileSync('web/js/foundation.js', 'utf8');
 function load(names, globals={}) {
-  const context = vm.createContext(globals);
+  const context = vm.createContext({window:{},...globals});
   for (const name of names) {
     const pattern = new RegExp('^  (?:async )?function '+name+'\\(', 'm');
     const start = pattern.exec(source)?.index;

@@ -335,8 +335,10 @@ def test_only_one_exterior_is_selected_when_food_or_interior_exists():
 
 
 @pytest.mark.parametrize('place_id',['osm_node_123','osm_way_456','osm_relation_789'])
-def test_public_map_identity_never_runs_photo_sql_or_uses_curated_permissions(place_id):
-    class NoQueries:
-        def execute(self,*args):
-            pytest.fail('Unreviewed public map photo lookup must not run SQL')
-    assert photos.for_place(NoQueries(),place_id)['photos']==[]
+def test_public_map_identity_reads_only_public_cache_never_curated_manifest(place_id):
+    class CacheOnly:
+        def execute(self,sql,*args):
+            assert 'place_photo_cache' in sql
+            assert "source_group='OpenStreetMap'" in sql
+            return []
+    assert photos.for_place(CacheOnly(),place_id)['photos']==[]

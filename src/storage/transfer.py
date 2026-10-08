@@ -38,7 +38,7 @@ def inspect_source(source, documents_root):
         con.row_factory=sqlite3.Row
         if con.execute('PRAGMA integrity_check').fetchone()[0]!='ok' or con.execute('PRAGMA foreign_key_check').fetchall():raise ValueError('Source integrity failed')
         version=con.execute('PRAGMA user_version').fetchone()[0]
-        if version not in (7,8,9,12,13,SCHEMA_VERSION):raise ValueError(f'Unsupported source schema; make a validated version 7, 8, 9, 12, 13 or {SCHEMA_VERSION} snapshot first')
+        if version not in (7,8,9,12,13,14,SCHEMA_VERSION):raise ValueError(f'Unsupported source schema; make a validated version 7, 8, 9, 12, 13, 14 or {SCHEMA_VERSION} snapshot first')
         for row in con.execute('SELECT d.* FROM source_documents d JOIN trips t ON t.id=d.trip_id WHERE d.deleted_at IS NULL AND t.deleted_at IS NULL'):
             path=Path(row['opaque_path'])
             if not path.is_absolute() or not path.resolve().is_relative_to(root) or any(p.is_symlink() for p in [path,*path.parents]) or not path.is_file():raise ValueError('Missing or unsafe owned original')

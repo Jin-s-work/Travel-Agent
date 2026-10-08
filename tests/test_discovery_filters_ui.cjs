@@ -26,7 +26,7 @@ function setup(){
   const stays=[{city:'tokyo',stop_id:'stop-a',start_date:'2026-11-06',end_date:'2026-11-08',timezone:'Asia/Tokyo'},{city:'barcelona',stop_id:'stop-b',start_date:'2026-11-09',end_date:'2026-11-11',timezone:'Europe/Madrid'}];
   const state={epoch:1,trip:{id:'trip-a',version:2,title:'여행',start_date:'2026-11-06',end_date:'2026-11-11',party:structuredClone(conditions.party)},discovery:{conditions:{version:3,conditions:structuredClone(conditions),stay_options:stays},draft:{conditions:structuredClone(conditions),overrides:{},stop_id:'stop-a'},dirty:false},recommendations:{optionsDirty:false}};
   let changed=0;
-  const context=load(['recommendationFilterValues','recommendationFilterSummary','commitRecommendationFilters','discoveryFilterTabs','discoveryFilterChoice','sparseChanges','mergeDraft','discoveryStayChoice','discoveryConditionsForm','closeDialog'],{
+  const context=load(['recommendationFilterValues','recommendationFilterSummary','commitRecommendationFilters','discoveryFilterTabs','discoveryFilterChoice','sparseChanges','mergeDraft','discoveryStayChoice','discoveryConditionsForm','discoveryQuickFilterForm','closeDialog'],{
     state,$:id=>nodes.get(id),make:node,structuredClone,window:{},dialogBusy:false,dialogReturnFocus:null,
     button:(label,action,cls)=>{const b=node('button',cls,label);b.addEventListener('click',action);b.type='button';return b;},
     openDialog:(_title,build)=>build(body),
@@ -80,3 +80,12 @@ test('validation reveals the first invalid panel rather than moving focus to the
 test('filter summary states the selected constraints without switch jargon or inferred review percentages',()=>{
   const t=setup();assert.match(t.context.recommendationFilterSummary(),/리뷰 언어 제한 없음.*평점 제한 없음.*최대 6곳/);t.context.commitRecommendationFilters({strict:true,ratingEnabled:true,minRating:4.5,minCount:350,limit:3});assert.match(t.context.recommendationFilterSummary(),/검증된 리뷰 언어만.*4.5점.*350개.*최대 3곳/);assert.doesNotMatch(t.context.recommendationFilterSummary(),/ON|OFF|0%/);
 });
+
+test('quick filters contain three optional fields and preserve trip, budget basis and hard constraints',async()=>{
+  const t=setup();t.state.discovery.draft.conditions.budget={currency:'EUR',basis:'group',period:'day',amount_min:'50',amount_max:'200'};const original=structuredClone(t.state.discovery.draft.conditions);t.context.discoveryQuickFilterForm();
+  assert.equal(t.fields.size,3);t.fields.get('preferred.tags').value='seafood';t.fields.get('budget.amount_max').value='150';await t.forms[0].handler();
+  assert.equal(t.requests.length,1);const after=t.requests[0].draft.conditions;assert.deepEqual(after.party,original.party);assert.deepEqual(after.required,original.required);assert.deepEqual(after.visit,original.visit);assert.deepEqual(after.origin,original.origin);assert.deepEqual(after.budget,{...original.budget,amount_max:'150'});
+});
+test('quick filter invalid amount preserves inputs and cannot lower hidden minimum',async()=>{const t=setup();t.state.discovery.draft.conditions.budget={currency:'JPY',basis:'per_person',period:'meal',amount_min:'500',amount_max:null};t.context.discoveryQuickFilterForm();t.fields.get('budget.amount_max').value='100';await t.forms[0].handler();assert.equal(t.requests.length,0);assert.equal(t.errors[0].field,'budget.amount_max');assert.equal(t.fields.get('budget.amount_max').value,'100');});
+
+test('advanced prefill stays uncommitted until apply and preserves its sparse override',async()=>{const t=setup(),before=structuredClone(t.state.discovery.draft);const prefill=structuredClone(before.conditions);prefill.preferred.tags=['seafood'];t.context.discoveryConditionsForm(prefill);assert.deepEqual(t.state.discovery.draft,before);assert.equal(t.fields.get('preferred.tags').value,'seafood');await t.forms[0].handler();assert.deepEqual(Array.from(t.requests[0].draft.overrides.preferred.tags),['seafood']);});
