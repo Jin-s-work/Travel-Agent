@@ -2,11 +2,14 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import logging
 import secrets
 from typing import Literal
 from fastapi import APIRouter, Depends, File, Request, UploadFile, Query, Form
 from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse, Response
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+from authlib.integrations.base_client.errors import MismatchingStateError, OAuthError
+from httpx import TransportError
 from .auth import Actor, require_actor, digest
 from .repository import DomainError
 from .models import TripCreate, TripPatch, BookingCreate, BookingPatch
@@ -86,7 +89,30 @@ async def start_login(request,invitation):
     request.session.clear()
     request.session['invitation_hash']=digest(invitation.strip())
     callback=auth.settings.public_base_url+'/api/v2/auth/callback'
-    return await auth.oauth.identity.authorize_redirect(request,callback)
+    try:
+        return await auth.oauth.identity.authorize_redirect(request,callback)
+    except Exception as exc:
+        return login_failure(request,exc,stage='start')
+
+
+def login_failure(request,exc,*,stage='callback'):
+    """Expose fixed recovery codes; never log tokens, claims, query strings or errors."""
+    code='login_failed'
+    if isinstance(exc,MismatchingStateError):
+        cookie='__Host-oidc' if request.app.state.settings.secure_cookie else 'travel_dev_oidc'
+        code='state_expired' if request.cookies.get(cookie) else 'cookie_missing'
+    elif isinstance(exc,DomainError):
+        code={'INVITATION_REQUIRED':'invitation_required','ACCESS_REVOKED':'access_revoked'}.get(exc.code,'login_failed')
+    elif isinstance(exc,OAuthError):
+        code={'access_denied':'login_cancelled','invalid_client':'provider_configuration',
+              'unauthorized_client':'provider_configuration','invalid_grant':'state_expired'}.get(exc.error,'identity_unverified')
+    elif isinstance(exc,TransportError):
+        code='provider_unavailable'
+    from src.operations.failures import diagnostic
+    logging.getLogger(__name__).warning('login_failed stage=%s code=%s request_id=%s diagnostic=%s',
+        stage,code,request.state.request_id,diagnostic(exc)['errors'])
+    request.session.clear()
+    return RedirectResponse('/?auth_error='+code+'&auth_request='+request.state.request_id,status_code=303)
 
 
 @router.get('/auth/callback')
@@ -100,9 +126,8 @@ async def callback(request:Request):
         if not claims:
             raise ValueError('Missing verified ID token')
         session_token=auth.complete_identity(claims,None,invitation_hash=request.session.get('invitation_hash'))
-    except Exception:
-        request.session.clear()
-        return RedirectResponse('/?auth_error=login_denied',status_code=303)
+    except Exception as exc:
+        return login_failure(request,exc)
     request.session.clear()
     response=RedirectResponse('/',status_code=303)
     response.set_cookie(auth.settings.cookie_name,session_token,max_age=auth.settings.session_hours*3600,secure=auth.settings.secure_cookie,httponly=True,samesite='lax',path='/')

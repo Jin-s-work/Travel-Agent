@@ -90,3 +90,74 @@ def test_production_callback_cookie_and_replay_of_invalid_state(tmp_path,monkeyp
     state=client.get('/api/v2/session').json()
     assert state['authenticated']
     assert client.get('/').headers['referrer-policy']=='strict-origin-when-cross-origin'
+
+
+def production_app(tmp_path):
+    from api import create_app
+    return create_app(Settings(database_path=tmp_path/'multi-device.sqlite',environment='production',
+        public_base_url='https://testserver',oidc_client_id='fixture',oidc_client_secret='fixture',session_secret='s'*40))
+
+
+def test_existing_identity_can_sign_in_on_fresh_devices_without_invitation(tmp_path,monkeypatch):
+    app=production_app(tmp_path)
+    app.state.auth.complete_identity(claims(),app.state.auth.invite('a@example.test'))
+    async def verified(_request):return {'userinfo':claims()}
+    monkeypatch.setattr(app.state.auth.oauth.identity,'authorize_access_token',verified)
+    first=TestClient(app,base_url='https://testserver')
+    second=TestClient(app,base_url='https://testserver')
+    for client in [first,second]:
+        assert not client.get('/api/v2/session').json()['authenticated']
+        response=client.get('/api/v2/auth/callback',follow_redirects=False)
+        assert response.headers['location']=='/'
+        assert client.get('/api/v2/session').json()['authenticated']
+    a,b=first.get('/api/v2/session').json(),second.get('/api/v2/session').json()
+    assert a['user']['id']==b['user']['id']
+    assert a['csrf_token']!=b['csrf_token']
+    assert first.cookies.get('__Host-session')!=second.cookies.get('__Host-session')
+    response=first.post('/api/v2/auth/logout',headers={'Origin':'https://testserver','X-CSRF-Token':a['csrf_token']})
+    assert response.status_code==204
+    assert not first.get('/api/v2/session').json()['authenticated']
+    assert second.get('/api/v2/session').json()['authenticated']
+
+
+@pytest.mark.parametrize('kind,expected',[
+    ('invite','invitation_required'),('revoked','access_revoked'),('cancel','login_cancelled'),
+    ('configuration','provider_configuration'),('transport','provider_unavailable'),('unexpected','login_failed')])
+def test_callback_failure_is_actionable_and_never_logs_provider_secrets(tmp_path,monkeypatch,caplog,kind,expected):
+    from authlib.integrations.base_client.errors import OAuthError
+    from httpx import ConnectError
+    app=production_app(tmp_path)
+    secret='synthetic-credential-never-log'
+    failures={'invite':DomainError('INVITATION_REQUIRED',secret,403),
+        'revoked':DomainError('ACCESS_REVOKED',secret,403),'cancel':OAuthError(error='access_denied',description=secret),
+        'configuration':OAuthError(error='invalid_client',description=secret),'transport':ConnectError(secret),
+        'unexpected':RuntimeError(secret)}
+    async def rejected(_request):raise failures[kind]
+    monkeypatch.setattr(app.state.auth.oauth.identity,'authorize_access_token',rejected)
+    client=TestClient(app,base_url='https://testserver')
+    response=client.get('/api/v2/auth/callback?code=synthetic-code&state=synthetic-state',follow_redirects=False)
+    assert response.status_code==303
+    assert 'auth_error='+expected in response.headers['location']
+    assert response.headers['x-request-id'] in response.headers['location']
+    assert secret not in caplog.text and secret not in response.text
+    assert '__Host-session=' not in response.headers.get('set-cookie','')
+    assert not client.get('/api/v2/session').json()['authenticated']
+    assert 'code='+expected in caplog.text
+
+
+def test_missing_state_cookie_has_recovery_code_but_never_bypasses_state_check(tmp_path):
+    app=production_app(tmp_path)
+    response=TestClient(app,base_url='https://testserver').get('/api/v2/auth/callback?state=unknown&code=invalid',follow_redirects=False)
+    assert 'auth_error=cookie_missing' in response.headers['location']
+    with app.state.db.connect() as con:
+        assert con.execute('SELECT count(*) FROM sessions').fetchone()[0]==0
+
+
+def test_provider_discovery_failure_returns_to_working_login_screen(tmp_path,monkeypatch):
+    from httpx import ConnectTimeout
+    app=production_app(tmp_path)
+    async def unavailable(_request,_callback):raise ConnectTimeout('no sensitive error output')
+    monkeypatch.setattr(app.state.auth.oauth.identity,'authorize_redirect',unavailable)
+    response=TestClient(app,base_url='https://testserver').get('/api/v2/auth/login',follow_redirects=False)
+    assert response.status_code==303
+    assert 'auth_error=provider_unavailable' in response.headers['location']

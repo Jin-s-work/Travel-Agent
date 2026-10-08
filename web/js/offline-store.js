@@ -22,8 +22,37 @@
     scan(b);return raw;
   }
   async function hash(value){return [...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value)))].map(x=>x.toString(16).padStart(2,'0')).join('');}
-  function open(){if(handle)return Promise.resolve(handle);return new Promise((resolve,reject)=>{const r=indexedDB.open(DB,1);r.onupgradeneeded=()=>{for(const n of ['meta','bundles','staging'])r.result.createObjectStore(n);};r.onsuccess=()=>{handle=r.result;handle.onversionchange=()=>{handle.close();handle=null;};resolve(handle);};r.onerror=()=>reject(r.error);r.onblocked=()=>reject(error('다른 창의 저장소를 닫은 뒤 다시 시도해 주세요.'));});}
-  async function tx(stores,mode,fn){const db=await open();return new Promise((resolve,reject)=>{const t=db.transaction(stores,mode);let result;try{fn(t,x=>{result=x;});}catch(e){t.abort();reject(e);return;}t.oncomplete=()=>resolve(result);t.onerror=()=>reject(t.error||error('저장 공간이 부족하거나 저장하지 못했습니다. 이전 저장본을 유지합니다.'));t.onabort=()=>reject(t.error||error('저장이 중단되었습니다. 이전 저장본을 유지합니다.'));});}
+  function open(){
+    if(handle)return Promise.resolve(handle);
+    return new Promise((resolve,reject)=>{
+      const r=indexedDB.open(DB,1);let settled=false;
+      const fail=message=>{if(settled)return;settled=true;clearTimeout(timer);reject(message);};
+      const timer=setTimeout(()=>fail(error('이 기기의 오프라인 저장소가 응답하지 않습니다. 온라인 여행은 계속 이용할 수 있어요.')),5000);
+      r.onupgradeneeded=()=>{if(settled){r.transaction.abort();return;}for(const n of ['meta','bundles','staging'])r.result.createObjectStore(n);};
+      r.onsuccess=()=>{
+        if(settled){r.result.close();return;}
+        settled=true;clearTimeout(timer);const db=r.result;handle=db;
+        db.onversionchange=()=>{db.close();if(handle===db)handle=null;};resolve(db);
+      };
+      r.onerror=()=>fail(r.error);
+      r.onblocked=()=>fail(error('다른 창의 저장소를 닫은 뒤 다시 시도해 주세요.'));
+    });
+  }
+  async function tx(stores,mode,fn){
+    const db=await open();
+    return new Promise((resolve,reject)=>{
+      const t=db.transaction(stores,mode);let result,settled=false;
+      const fail=message=>{if(settled)return;settled=true;clearTimeout(timer);reject(message);};
+      const timer=setTimeout(()=>{
+        fail(error('기기 저장소 응답이 지연되어 중단했습니다. 온라인 여행은 계속 이용할 수 있어요.'));
+        try{t.abort();}catch{}db.close();if(handle===db)handle=null;
+      },5000);
+      t.oncomplete=()=>{if(settled)return;settled=true;clearTimeout(timer);resolve(result);};
+      t.onerror=()=>fail(t.error||error('저장 공간이 부족하거나 저장하지 못했습니다. 이전 저장본을 유지합니다.'));
+      t.onabort=()=>fail(t.error||error('저장이 중단되었습니다. 이전 저장본을 유지합니다.'));
+      try{fn(t,x=>{result=x;});}catch(e){fail(e);try{t.abort();}catch{}}
+    });
+  }
   async function meta(){return tx(['meta'],'readonly',(t,set)=>{const r=t.objectStore('meta').get('identity');r.onsuccess=()=>set(r.result);});}
   async function purge(broadcast=true){mark(true);revocation++;signal();if(broadcast)channel?.postMessage('purge');return tx(['meta','bundles','staging'],'readwrite',t=>{t.objectStore('meta').put({owner:null,epoch:crypto.randomUUID()},'identity');t.objectStore('bundles').clear();t.objectStore('staging').clear();});}
   async function bind(owner){if(revoked())await purge(false);const m=await meta();if(m?.owner&&m.owner!==owner)await purge();await tx(['meta'],'readwrite',t=>{const s=t.objectStore('meta'),r=s.get('identity');r.onsuccess=()=>s.put({owner,epoch:r.result?.epoch||crypto.randomUUID()},'identity');});mark(false);}

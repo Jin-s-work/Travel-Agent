@@ -13,6 +13,29 @@
   const state = { session:null, mailCapabilities:null, trips:[], trip:null, bookings:[], documents:[], history:[], tab:'trip', epoch:0, controllers:new Set(), uploads:[], files:[], asking:false, uploading:false, reprocessing:new Set(), jobs:new Map(), watchers:new Map(), intents:new Map(), reviews:{places:[],policies:[],runs:[],controls:null,evidence:[]}, discovery:{conditions:null,bookmarks:[],loaded:false,serial:0,packs:[]}, itineraries:{runs:[],active:null,displayed:null,serial:0,submitting:false,loaded:false,day:null,selected:new Map()}, recommendations:{runs:[],active:null,displayed:null,serial:0,submitting:false,optionsDirty:false,loaded:false} };
   let toastTimer, sessionExpiryTimer, reviewPollTimer, discoveryPollTimer, recommendationPollTimer, itineraryPollTimer, dialogReturnFocus, dialogBusy = false, sessionCheck = false, installPrompt = null;
   const channel = 'BroadcastChannel' in window ? new BroadcastChannel('travel-inbox-session') : null;
+  const loginFeedback = readLoginFeedback(window.location.href);
+  if (loginFeedback) {
+    const clean = new URL(window.location.href);
+    clean.searchParams.delete('auth_error'); clean.searchParams.delete('auth_request');
+    window.history.replaceState(null,'',clean.pathname+clean.search+clean.hash);
+  }
+
+  function readLoginFeedback(href) {
+    const params=new URL(href).searchParams,code=params.get('auth_error');
+    if(!code)return '';
+    const messages={
+      cookie_missing:'이 브라우저에서 로그인 연결 정보를 확인하지 못했습니다. 고잉 사이트의 쿠키를 허용하고, 같은 브라우저에서 다시 로그인해 주세요.',
+      state_expired:'로그인 연결이 만료되었거나 다른 로그인 요청으로 바뀌었습니다. 이 창에서 다시 로그인해 주세요.',
+      invitation_required:'이 Google 계정으로 가입된 여행을 찾지 못했습니다. 이전에 사용한 계정을 선택해 주세요. 처음 이용한다면 초대 코드가 필요합니다.',
+      access_revoked:'이 계정의 이용 권한이 회수되었습니다. 운영자에게 확인해 주세요.',
+      login_cancelled:'Google 로그인이 취소되었습니다. 로그인 버튼을 눌러 다시 진행할 수 있어요.',
+      provider_configuration:'로그인 제공자 설정을 확인해야 합니다. 아래 오류 번호를 운영자에게 알려주세요.',
+      provider_unavailable:'Google 로그인 서버에 잠시 연결하지 못했습니다. 잠시 후 다시 로그인해 주세요.',
+      identity_unverified:'Google 계정 정보를 확인하지 못했습니다. 다시 로그인하고, 계속되면 아래 오류 번호를 알려주세요.'
+    };
+    const id=params.get('auth_request')||'';
+    return (messages[code]||'로그인을 완료하지 못했습니다. 다시 시도하고, 계속되면 오류 번호를 알려주세요.')+(/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(id)?' · 오류 번호 '+id:'');
+  }
 
   let toastRemaining = 0, toastStarted = 0;
   function resumeNotice() {
@@ -59,18 +82,20 @@
     $('#sendQuestion').disabled = false; $('#uploadButton').disabled = false; $('#question').readOnly = false;
   }
   function clearPrivate() {
+    state.authRevision=(state.authRevision||0)+1;
     clearTimeout(sessionExpiryTimer); sessionExpiryTimer = null;
     window.WorkspaceUX?.clear();purgeJourneyMemory();clearScope(); state.mailCapabilities=null;renderMailCapabilities();state.intents.clear(); state.trip = null; state.trips = []; state.session = null;
     $('#app').hidden = true; $('#tripSelect').replaceChildren(); $('#tripSummary').replaceChildren();
     $('#usageSummary').replaceChildren(); $('#tripTitle').textContent = '나의 여행'; $('#tripSubtitle').textContent = ''; $('#tripScope').textContent = ''; $('#accountName').textContent = ''; $('#sessionExpiry').textContent = ''; $('#bookingCount').textContent = '';
     $$('.scope-text').forEach(n => n.textContent = ''); clearTimeout(toastTimer); toastRemaining = 0; $('#notice').hidden = true; $('#notice').textContent = ''; document.title = '고잉';
+    $('#workspaceRecovery').hidden=true;
   }
   function authScreen(message = '') {
     $('#boot').hidden = true; $('#app').hidden = true; $('#auth').hidden = false;
     window.scrollTo({top:0,behavior:'instant'});
-    const configured = state.session?.auth_configured === true;
-    $('#loginButton').disabled = !configured;
-    $('#authMessage').textContent = configured ? '초대받은 이메일 계정으로 로그인해 주세요.' : '로그인 제공자 설정을 준비 중입니다. 운영자 설정 후 초대받은 계정으로 이용할 수 있어요.';
+    const configured = state.session?.auth_configured;
+    $('#loginButton').disabled = configured === false;
+    $('#authMessage').textContent = configured === false ? '로그인 제공자 설정을 준비 중입니다. 운영자 설정 후 초대받은 계정으로 이용할 수 있어요.' : '이전에 사용한 Google 계정으로 로그인해 주세요. 다른 기기에서도 같은 여행을 볼 수 있어요.';
     showError($('#authError'), message);
   }
   function expire(message = '세션이 만료되었습니다. 다시 로그인해 주세요.') {
@@ -99,8 +124,12 @@
   }
   async function api(path, options = {}) {
     const controller = new AbortController(); state.controllers.add(controller);
+    let timedOut=false;
     const headers = new Headers(options.headers || {});
     const method = options.method || 'GET';
+    // Bound reads, including cold-start verification. Never automatically replay writes.
+    const timeoutMs=path==='/session'?65000:['GET','HEAD'].includes(method)?30000:0;
+    const timer=timeoutMs?setTimeout(()=>{timedOut=true;controller.abort();},timeoutMs):null;
     if (!['GET','HEAD'].includes(method) && state.session?.csrf_token) headers.set('X-CSRF-Token', state.session.csrf_token);
     let body = options.body;
     if (body != null && !(body instanceof FormData)) { headers.set('Content-Type','application/json'); body = JSON.stringify(body); }
@@ -120,7 +149,10 @@
         throw err;
       }
       return data;
-    } finally { state.controllers.delete(controller); }
+    } catch(err) {
+      if(timedOut){const timeout=new Error(path==='/session'?'서버를 깨우는 데 시간이 걸리고 있어요. 연결 다시 확인을 눌러 주세요.':'자료를 불러오는 데 시간이 걸리고 있어요. 잠시 후 다시 확인해 주세요.');timeout.code='SERVER_UNAVAILABLE';throw timeout;}
+      throw err;
+    } finally { if(timer!==null)clearTimeout(timer);state.controllers.delete(controller); }
   }
   function fail(err, target = $('#pageError')) { if (err.name !== 'AbortError' && err.status !== 401) showError(target, err.message); }
   async function allPages(path) {
@@ -1530,13 +1562,45 @@
   window.AccommodationTools?.init({state,api,make,button,field,formBase,openDialog,closeDialog,confirmAction,safeDiscoveryLink,fail,notice,tripPath,ensureDiscoveryDraft,draftChanged,setTab});
   window.TravelTools?.init({state,api,make,button,field,formBase,openDialog,closeDialog,fail,notice,loadItineraries,setTab,knownDestination,destinations:()=>destinationCatalog});
   window.ProductTools?.init({state,api,make,button,field,formBase,openDialog,closeDialog,fail,notice,destinations:()=>destinationCatalog});
-  async function boot(){if(sessionCheck)return;const navigationAtStart=state.navigationRevision||0;sessionCheck=true;$('#retrySession').disabled=true;
-    try{const old=state.session?.user?.id;const s=await api('/session');if(!s.authenticated){await window.TravelTools?.purge().catch(()=>{});clearPrivate();state.session=s;authScreen();return;}if(old&&old!==s.user?.id)clearPrivate();await window.TravelTools?.bind(s.user.id).catch(()=>{});state.session=s;window.ProductTools?.bind();if(!armSessionExpiry())return;$('#boot').hidden=true;$('#auth').hidden=true;$('#app').hidden=false;$('#accountName').textContent=s.user?.display_name||s.user?.name||s.user?.email||'내 계정';$('#sessionExpiry').textContent=s.expires_at?`세션 만료: ${new Date(s.expires_at).toLocaleString('ko-KR')}`:'개인 여행은 로그인한 계정만 볼 수 있습니다.';await loadDestinations().catch(()=>notice('도시 목록을 불러오지 못했습니다. 기존 여행은 계속 볼 수 있어요.'));if(!old||!state.trip){const previous=navigationMemory();await loadTrips(previous.trip_id);if((state.navigationRevision||0)===navigationAtStart&&['trip','explore','itinerary','mail','today','preparation','product','ask','reviews','settings'].includes(previous.tab))setTab(previous.tab);}await loadUsage();if(state.tab==='reviews')await loadReviews({quiet:true});
-    }catch(err){if(err.name!=='AbortError'){clearPrivate();authScreen(err.code==='SERVER_UNAVAILABLE'?err.message:'서버에 연결하지 못했습니다. 잠시 후 다시 연결을 확인해 주세요.');}}
-    finally{sessionCheck=false;$('#retrySession').disabled=false;}
+  async function boot(){
+    if(sessionCheck)return;
+    const navigationAtStart=state.navigationRevision||0,configured=state.session?.auth_configured;
+    let verifiedSession=null,authRevision=state.authRevision||0;
+    sessionCheck=true;$('#retrySession').disabled=true;$('#retryWorkspace').disabled=true;
+    try{
+      const old=state.session?.user?.id,s=await api('/session');
+      if(authRevision!==(state.authRevision||0))return;
+      if(!s.authenticated){await window.TravelTools?.purge().catch(()=>{});clearPrivate();state.session=s;authScreen(loginFeedback);return;}
+      if(old&&old!==s.user?.id){clearPrivate();authRevision=state.authRevision;}
+      await window.TravelTools?.bind(s.user.id).catch(()=>{});
+      if(authRevision!==(state.authRevision||0))return;
+      state.session=s;verifiedSession=s;window.ProductTools?.bind();
+      if(!armSessionExpiry())return;
+      $('#boot').hidden=true;$('#auth').hidden=true;$('#app').hidden=false;$('#workspaceRecovery').hidden=true;
+      $('#accountName').textContent=s.user?.display_name||s.user?.name||s.user?.email||'내 계정';
+      $('#sessionExpiry').textContent=s.expires_at?`세션 만료: ${new Date(s.expires_at).toLocaleString('ko-KR')}`:'개인 여행은 로그인한 계정만 볼 수 있습니다.';
+      await loadDestinations().catch(()=>notice('도시 목록을 불러오지 못했습니다. 기존 여행은 계속 볼 수 있어요.'));
+      if(!old||old!==s.user?.id||!state.trip||state.workspaceNeedsReload){
+        const previous=navigationMemory();await loadTrips(previous.trip_id);
+        if((state.navigationRevision||0)===navigationAtStart&&['trip','explore','itinerary','mail','today','preparation','product','ask','reviews','settings'].includes(previous.tab))setTab(previous.tab);
+      }
+      state.workspaceNeedsReload=false;
+      await loadUsage();if(state.tab==='reviews')await loadReviews({quiet:true});
+    }catch(err){
+      if(err.name!=='AbortError'){
+        if(verifiedSession&&state.session===verifiedSession&&err.status!==401){
+          state.workspaceNeedsReload=true;$('#boot').hidden=true;$('#auth').hidden=true;$('#app').hidden=false;
+          $('#workspaceRecovery').hidden=false;
+        }else if(err.status!==401){
+          clearPrivate();state.session={authenticated:false,auth_configured:configured};
+          authScreen(err.code==='SERVER_UNAVAILABLE'?err.message:'서버 연결을 확인하지 못했습니다. 연결을 다시 확인하거나 Google 로그인으로 다시 시작해 주세요.');
+        }
+      }
+    }finally{sessionCheck=false;$('#retrySession').disabled=false;$('#retryWorkspace').disabled=false;}
   }
   $('#loginForm').addEventListener('submit',()=>{$('#invitation').value=$('#invitation').value.trim();});
   $('#retrySession').addEventListener('click',boot);
+  $('#retryWorkspace').addEventListener('click',boot);
   $('#logout').addEventListener('click',async()=>{const b=$('#logout');b.disabled=true;await window.TravelTools?.purge().catch(()=>{});channel?.postMessage('logout');let message='로그아웃했습니다.';try{await api('/auth/logout',{method:'POST',body:{}});channel?.postMessage('logout');}catch(err){if(err.status!==401)message='화면의 개인 정보는 지웠지만 서버 로그아웃을 확인하지 못했습니다. 연결 후 다시 로그인 상태를 확인해 주세요.';}finally{const configured=state.session?.auth_configured;clearPrivate();state.session={authenticated:false,auth_configured:configured===true};authScreen(message==='로그아웃했습니다.'?'':message);if(message==='로그아웃했습니다.')notice(message);b.disabled=false;}});
   if(channel)channel.onmessage=e=>{if(e.data==='logout')expire('다른 창에서 로그아웃했습니다.');};
   window.addEventListener('focus',()=>{if(!sessionDeadlinePassed()&&state.session?.authenticated)boot();});
