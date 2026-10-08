@@ -48,10 +48,20 @@
 - PostgreSQL: 루프백 disposable pgvector 17 컨테이너에서 `TRAVEL_TEST_POSTGRES_DSN=… python -m pytest -p tests.postgres_plugin tests/test_public_place_photos.py tests/test_stage1_migration.py tests/test_stage2_review_migration.py tests/test_stage2_postgres_migration.py tests/test_public_discovery.py -q`.
 - 신규 표적: 정상 사진/권리 철회/중복 요청/타인 여행/삭제 중 완료/실패 캐시/실제 tracking URL/상한/운영 OFF, 첫 진입/연속 변경/기존 결과/에러 재시도 방지/간편 필터 기준 보존.
 - PostgreSQL **43 passed, 1 skipped**. SQLite 전용 dry-run 1건만 해당 백엔드에서 제외. SQLite 이관·사진 관련 **67 passed**. JS **186 passed**. Python 전체 **1171 passed, 17 skipped**, 외부 제공자/별도 PostgreSQL 전용 시험은 표시된 조건에 따라 제외했다. 실제 API 유료 호출 성공이나 모든 도시 사진 확보를 뜻하지 않는다.
-- 인증된 로컬 브라우저 검증은 이전 접근 차단 설정 때문에 이번 변경의 근거로 사용하지 않았다. 운영 브라우저 확인과 배포 결과는 완료 후 별도 기록한다.
+- 인증된 로컬 브라우저 검증은 이전 접근 차단 설정 때문에 이번 변경의 근거로 사용하지 않았다. 운영 브라우저 확인과 배포 결과는 아래에 기록한다.
 
 ## 배포·복구
 
 새 schema15는 공개 사진 metadata 테이블 하나를 추가한다. 개인 예약·일정·여행 행을 수정하는 이관은 없다. SQLite/PostgreSQL 두 경로와 schema11/12/13/14 → 15를 격리 시험한다. 이전 이미지로 바로 rollback하면 구형 앱이 schema15를 거절하므로, UI 문제는 schema15를 이해하는 이 버전 기반의 수정 배포로 복구한다. 사진 공급자만 문제면 운영 제어로 새 사진 호출을 중단한다. 임의로 운영 DB 버전을 낮추거나 개인 자료를 복원하지 않는다.
 
 후속 검증: 이전 schema13 전 추천에는 `trip_places` 연결이 없어 사진 요청이 거절되는 호환성 문제를 수정했다. 해당 사용자의 해당 여행에 저장한 후보 snapshot의 **정확한 장소 ID**로만 기존 연결을 인정한다. 다른 여행의 ID는 계속 404다. 사진 표적 시험은 SQLite/PostgreSQL 각각 **16 passed**. 운영 Chrome에서 새 필터·이전 추천 12곳·상세 읽기를 확인했다.
+
+## 최종 운영 확인 — 2026-10-08
+
+- 코드 `ce5907e`, 기존 Render Free 서비스 `travel-inbox-rag`에 수동 배포했다. 배포 `dep-db3gugmgekts73eod1bg`는 Deploy succeeded, 12:35:19 KST에 application startup complete를 확인했다. `/health/ready`의 schema/storage/dispatcher/identity/restore가 모두 true였다.
+- 실제 Chrome에서 이전 파리 추천 12곳 복원, 세 가지 선택 필터 열기·취소, 식당 상세, 사진 확인 작업 생성·완료를 확인했다. 필터 취소는 저장 조건을 바꾸지 않는다. 운영 사용자 자료를 검증 목적으로 저장·삭제하지 않았으며 실제 저장 버튼 성공 검증은 합성 API 시험 범위다.
+- **사진 확보 완료가 아니다.** 운영 파리 12곳은 8곳이 연결 사진 없음, 4곳이 사진 제공처 연결 미완료로 표시됐다. 로컬 공개 자료 확인에서 찾은 1장도 이번 Render 브라우저에서는 표시되지 않았다. 따라서 동적 수집 코드·소유권·캐시 시험 통과를 운영 사진 확보 성공으로 보고하지 않는다. 무료 원천의 낮은 사진 연결률과 운영 공급자 연결 제한이 남아 있다.
+- 공급자 장애를 ‘사진 없음’으로 표시하지 않도록 구분했다. 새 사진 작업은 미완료가 있으면 partial, 완료 수·사진이 있는 장소 수·연결 미완료 수를 저장한다. 반복 자동 호출 대신 실패 15분 캐시와 공급자 cooldown을 적용한다. 사진과 무관하게 장소 조회·상세는 유지된다.
+- 마지막 상태 구분 수정 후 사진 Python 표적 시험 **16 passed**, JavaScript 전체 **187 passed**, 자산 hash·JS 문법·git diff 검사 통과. 앞선 전체 Python **1171 passed / 17 skipped** 및 격리 PostgreSQL **43 passed / 1 skipped**와 구분해 기록한다.
+- 실제 확인 환경은 데스크톱 Chrome이다. 모바일 viewport 도구가 요청 크기를 적용하지 않아 모바일 실기기/390px 확인 완료로 보고하지 않는다. 임시 viewport를 해제했다. 인증 API 직접 문서 열기가 브라우저에서 차단되어 우회하지 않았고, 서비스의 정상 화면으로만 운영 상태를 확인했다.
+- 다음 사진 개선은 라이선스·지점 정보가 함께 제공되는 공급자 선택과 사용량 한도부터 결정해야 한다. 이번 작업에서는 새 유료 공급자·과금 계정을 만들지 않았다.
