@@ -156,3 +156,12 @@ def test_schema14_photo_upgrade_preserves_identity_and_is_repeatable(tmp_path):
         assert [dict(r) for r in con.execute('SELECT * FROM place_identities')]==before
         assert con.execute('SELECT count(*) FROM place_photo_cache').fetchone()[0]==0
     assert db.schema_version()==15;db.close();db=Database(path);assert db.schema_version()==15;db.close()
+
+def test_legacy_saved_run_can_resolve_photos_without_post_schema13_trip_links(public):
+    trip,base,out,calls=setup(public)
+    with public.app.state.db.connect() as con:con.execute('DELETE FROM trip_places WHERE trip_id=?',(trip['id'],))
+    response=submit(public,base);assert response.status_code==202,response.text
+    assert _job(public.client,response.json())['state']=='succeeded'
+    assert len(calls)==2
+    other_trip,other_base=prepare(public)
+    assert submit(public,other_base).status_code==404

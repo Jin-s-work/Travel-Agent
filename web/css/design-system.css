@@ -490,8 +490,8 @@ input,select,textarea { min-width:0; }
 :root[data-text-size="large"] .journey-layout .trip-overview .page-heading { flex-wrap:wrap; }
 
 /* Browse first: short cards, optional controls, no empty photo billboard. */
-.journey-layout .place-photo-gallery-empty { min-height:96px; aspect-ratio:auto; padding:20px; background:var(--fill-secondary); display:flex; flex-direction:column; justify-content:center; gap:4px; }
-.journey-layout .place-photo-gallery-empty .place-photo-unavailable { position:static; padding:0; margin:0; font-size:13px; }
+.journey-layout .place-photo-gallery-empty { min-height:0; aspect-ratio:auto; padding:8px 12px; background:var(--fill-secondary); display:flex; flex-direction:row; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:4px 12px; }
+.journey-layout .place-photo-gallery-empty .place-photo-unavailable { position:static; min-height:0; padding:0; margin:0; font-size:13px; }
 .journey-layout .place-photo-gallery-empty a { display:inline-flex; min-height:44px; align-items:center; font-size:13px; }
 .journey-layout .recommendation-card .recommendation-primary-actions { flex-wrap:wrap; }
 .journey-layout .recommendation-primary-actions>.text-button { flex:0 0 100%; min-height:44px; padding:4px 0; text-align:left; }

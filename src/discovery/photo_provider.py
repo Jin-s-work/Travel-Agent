@@ -140,6 +140,18 @@ class PlacePhotos:
         self.jobs._scope(con, actor.id, actor.session_id, 'personal_trip', trip_id)
         self.repo._trip(con, actor.id, trip_id)
         linked = con.execute('SELECT 1 FROM trip_places WHERE trip_id=? AND place_id=?', (trip_id, ident)).fetchone()
+        if not linked:
+            # Pre-schema13 recommendations did not have trip_places. Recover
+            # only an exact identity from this owner's saved candidate snapshot.
+            snapshots = con.execute('SELECT candidates_json FROM recommendation_runs WHERE owner_id=? AND trip_id=? AND candidates_json LIKE ? ORDER BY created_at DESC LIMIT 5',
+                                    (actor.id, trip_id, '%' + ident + '%')).fetchall()
+            for snapshot in snapshots:
+                try:
+                    candidates = json.loads(snapshot['candidates_json'])
+                    linked = isinstance(candidates, list) and any(isinstance(p, dict) and p.get('place_id') == ident for p in candidates)
+                except (ValueError, TypeError):
+                    linked = False
+                if linked:break
         row = self.discovery._visible_place(con, ident) if linked else None
         if not row or row['provider'] != 'openstreetmap':
             raise DomainError('NOT_FOUND', '장소를 찾을 수 없습니다.', 404)
