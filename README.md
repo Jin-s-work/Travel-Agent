@@ -176,6 +176,6 @@ PYTHON_DOTENV_DISABLED=1 .venv/bin/python -m src.recommendations.benchmark \
 
 <a id="발표-자료"></a>
 
-[Keynote](docs/presentation/v5/going-v5-class-presentation.key?raw=1) · [PowerPoint](docs/presentation/v5/going-v5-class-presentation.pptx?raw=1) · [발표 자료 안내](docs/presentation/v5/README.md)
+[Keynote](docs/presentation/v6/going-v6-class-presentation.key?raw=1) · [PowerPoint](docs/presentation/v6/going-v6-class-presentation.pptx?raw=1) · [70초 데모](docs/presentation/v6/going-demo.mp4?raw=1) · [발표 자료 안내](docs/presentation/v6/README.md)
 
-<sub>[수업 발표 PDF](docs/presentation/going-class-presentation.pdf) · 기존 PDF이며 최신 모델 설명은 위 자료에 있습니다.</sub>
+<sub>[수업 발표 PDF](docs/presentation/going-class-presentation.pdf) · 이전 발표 PDF입니다. 위 자료는 기획 배경과 사용 흐름을 중심으로 정리한 최신 발표입니다.</sub>
