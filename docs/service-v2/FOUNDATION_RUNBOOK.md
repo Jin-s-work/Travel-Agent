@@ -35,35 +35,24 @@ cd /Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag
 
 개인 원문·SQLite·검색 디렉터리를 `web/` 안에 두지 않는다. 공개 정적 경로에는 앱 셸만 둔다. 서비스 워커도 개인 API 응답을 저장하지 않는다.
 
-## 2. OIDC 제공자 등록과 초대
+## 2. OIDC 제공자 등록과 로그인
 
-Authlib가 OIDC state·nonce·PKCE와 ID token 검증을 담당한다. 애플리케이션은 검증된 이메일에 대한 초대 여부를 별도로 확인한다.
+2026-10-08부터 서비스 초대 코드를 사용하지 않는다. Authlib가 OIDC state·nonce·PKCE와 ID token을 검증하고, 이메일 인증이 완료된 계정의 첫 로그인 시 일반 사용자(`member`)를 만든다. 기존 사용자는 제공자와 `sub`로 식별하므로 다른 기기에서도 같은 Google 계정을 사용한다. 이메일이 같다는 이유만으로 서로 다른 제공자·subject의 계정을 합치지 않는다.
 
 1. OIDC 제공자 콘솔에서 웹 애플리케이션용 client를 만든다.
-2. 실제 사용 Origin을 설정하고 callback을 다음과 같이 정확히 등록한다.
+2. 실제 사용 Origin을 설정하고 callback을 정확히 등록한다.
    - 개발: `http://localhost:8000/api/v2/auth/callback`
    - 운영: `https://실제서비스도메인/api/v2/auth/callback`
-3. 제공자가 테스트 사용자 목록을 요구하면 본인과 초대한 지인 계정만 넣는다.
+3. 제공자 자체의 테스트 사용자/조직 제한은 서비스 초대 코드와 별개다. Google 측에서 접근을 거절하면 OAuth 대상 사용자 설정을 확인한다.
 4. client ID, secret, metadata URL을 설정하고 서버를 재시작한다.
-5. 운영자는 아래 명령으로 이메일별 초대를 만든다.
+5. 로그인 화면에서 **Google 계정으로 로그인**을 누른다. 별도 초대 발급·입력은 필요 없다.
+
+사용자·여행 소유권과 관리자 권한은 기존대로 분리한다. 비활성화된 계정의 로그인은 거절한다. 초대 테이블과 기존 유지보수 CLI는 이전 자료·복구 호환용으로 남아 있지만 현재 로그인 허용 여부를 결정하지 않는다. 새 가입자의 역할은 `member`이며 Google claims의 role/owner 값을 권한으로 사용하지 않는다.
 
 ```bash
-.venv/bin/python -m src.foundation.cli invite --email friend@example.com --hours 72
-```
-
-출력된 토큰은 최초 한 번만 평문으로 보여주고 DB에는 해시만 저장한다. 초대 대상에게 별도로 전달하고 로그인 화면의 초대 입력란에 넣는다. 토큰을 공개 URL·Git·스크린샷·로그에 넣지 않는다. 이 명령 자체는 이메일이나 메시지를 발송하지 않는다.
-
-초대받은 이메일의 검증된 OIDC 계정으로 첫 로그인해야 한다. 초대는 1회 사용·만료·회수를 지원한다. 첫 가입 이후 같은 계정의 로그인에는 새 초대가 필요하지 않다. 다른 계정으로 인증한 경우 서비스 가입이 거절된다.
-
-```bash
-# 토큰을 커맨드 인수나 shell history에 넣지 않고 stdin으로 회수
-.venv/bin/python -m src.foundation.cli revoke-invitation
-
 # 이미 발급된 세션까지 회수하고 사용자 비활성화
 .venv/bin/python -m src.foundation.cli disable-user --user-id 사용자_ID
 ```
-
-`revoke-invitation`은 stdin 한 줄을 읽는다. 보호된 토큰 파일이 있으면 `--token-file /비공개경로/token.txt`를 사용할 수 있다.
 
 `GET /api/v2/session`으로 현재 인증·설정 상태를 확인할 수 있다. 신규·기존 모든 개인 경로는 인증이 필요하며, 과거 공용 API는 인증 후에도 410으로 폐기된다. 인증이 미설정이면 개인 자료는 닫힌 상태다. 외부 계정이 준비되지 않은 테스트는 합성 identity claims 및 로컬 합성 OIDC 제공자로 검증하며, 운영 우회 계정이나 고정 비밀번호를 제공하지 않는다.
 
@@ -165,7 +154,7 @@ API와 다른 쓰기 명령을 먼저 중단한다. 아래 `--offline`은 운영
 
 - 원문 경로를 새 `documents/` 위치로 변경한다.
 - 모든 복원된 세션을 지우고 session epoch를 증가시킨다.
-- 미사용 과거 초대를 회수한다. 필요한 초대는 새로 발급한다.
+- 미사용 과거 초대 기록을 회수한다. 현재 로그인에는 초대 발급이 필요 없다.
 - 현재 DB가 제공되면 이후의 삭제 tombstone과 사용자 비활성 상태도 반영한다.
 - 여행·문서·예약의 삭제 자료가 다시 활성 조회에 등장하지 않게 한다.
 

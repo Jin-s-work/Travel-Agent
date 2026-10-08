@@ -5,12 +5,12 @@ import json
 import logging
 import secrets
 from typing import Literal
-from fastapi import APIRouter, Depends, File, Request, UploadFile, Query, Form
+from fastapi import APIRouter, Depends, File, Request, UploadFile, Query
 from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse, Response
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from authlib.integrations.base_client.errors import MismatchingStateError, OAuthError
 from httpx import TransportError
-from .auth import Actor, require_actor, digest
+from .auth import Actor, require_actor
 from .repository import DomainError
 from .models import TripCreate, TripPatch, BookingCreate, BookingPatch
 from .search import SearchContext, answer
@@ -71,23 +71,22 @@ def mail_capabilities(request:Request,actor:Actor=Depends(require_actor)):
 
 @router.get('/auth/login')
 async def login(request:Request):
-    return await start_login(request,'')
+    return await start_login(request)
 
 
 @router.post('/auth/login')
-async def invitation_login(request:Request,invitation:str=Form(default='',max_length=200)):
+async def login_post(request:Request):
     if request.headers.get('origin') != request.app.state.settings.public_base_url:
         raise DomainError('ORIGIN_REJECTED','요청 출처를 확인할 수 없습니다.',403)
-    return await start_login(request,invitation)
+    return await start_login(request)
 
 
-async def start_login(request,invitation):
+async def start_login(request):
     auth=request.app.state.auth
     if not auth.settings.auth_configured:
         raise DomainError('AUTH_NOT_CONFIGURED','운영자가 로그인 제공자를 설정해야 합니다.',503)
-    # Invitation plaintext stays only in signed HttpOnly transient state cookie.
+    # A fresh provider flow owns the transient state cookie.
     request.session.clear()
-    request.session['invitation_hash']=digest(invitation.strip())
     callback=auth.settings.public_base_url+'/api/v2/auth/callback'
     try:
         return await auth.oauth.identity.authorize_redirect(request,callback)
@@ -102,7 +101,7 @@ def login_failure(request,exc,*,stage='callback'):
         cookie='__Host-oidc' if request.app.state.settings.secure_cookie else 'travel_dev_oidc'
         code='state_expired' if request.cookies.get(cookie) else 'cookie_missing'
     elif isinstance(exc,DomainError):
-        code={'INVITATION_REQUIRED':'invitation_required','ACCESS_REVOKED':'access_revoked'}.get(exc.code,'login_failed')
+        code={'IDENTITY_UNVERIFIED':'identity_unverified','ACCESS_REVOKED':'access_revoked'}.get(exc.code,'login_failed')
     elif isinstance(exc,OAuthError):
         code={'access_denied':'login_cancelled','invalid_client':'provider_configuration',
               'unauthorized_client':'provider_configuration','invalid_grant':'state_expired'}.get(exc.error,'identity_unverified')
@@ -125,7 +124,7 @@ async def callback(request:Request):
         claims=token.get('userinfo')
         if not claims:
             raise ValueError('Missing verified ID token')
-        session_token=auth.complete_identity(claims,None,invitation_hash=request.session.get('invitation_hash'))
+        session_token=auth.complete_identity(claims)
     except Exception as exc:
         return login_failure(request,exc)
     request.session.clear()

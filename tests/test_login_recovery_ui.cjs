@@ -26,7 +26,7 @@ test('callback errors use fixed text and a bounded request id, never provider er
   const c=load(['readLoginFeedback'],{});
   assert.match(c.readLoginFeedback('https://test/?auth_error=cookie_missing'),/쿠키/);
   assert.match(c.readLoginFeedback('https://test/?auth_error=state_expired'),/만료/);
-  assert.match(c.readLoginFeedback('https://test/?auth_error=invitation_required'),/이전에 사용한 계정/);
+  assert.match(c.readLoginFeedback('https://test/?auth_error=invitation_required'),/바로 시작/);
   assert.doesNotMatch(c.readLoginFeedback('https://test/?auth_error=%3Cscript%3E&auth_request=secret-token'),/script|secret-token/);
   assert.equal(c.readLoginFeedback('https://test/'),'');
 });
@@ -50,4 +50,18 @@ test('logout during offline initialization cannot reactivate a stale verified se
 
 test('a newly verified account clears previous account data before reloading its own trips',async()=>{
   const f=fixture({session:session(),old:{...session(),user:{id:'B'}}});f.state.trip={id:'private-B'};await f.c.boot();assert.equal(f.clears,1);assert.equal(f.state.session.user.id,'A');assert.equal(f.loads,1);assert.equal(f.state.trip.id,'trip');
+});
+
+
+test('first-time login asks for no invitation and has a direct Google action',()=>{
+  const html=fs.readFileSync('web/index.html','utf8');
+  const login=html.slice(html.indexOf('<main id="auth"'),html.indexOf('<main id="offlineApp"'));
+  assert.doesNotMatch(login,/초대|id="invitation"|<input/);
+  assert.match(login,/Google 계정으로 로그인/);
+  assert.match(login,/로그인과 함께 계정이 만들어져요/);
+  assert.doesNotMatch(source,/\$\(['"]#invitation['"]\)/);
+  const f=fixture({session:{authenticated:false,auth_configured:true}});
+  f.state.session={authenticated:false,auth_configured:true};f.c.authScreen();
+  assert.equal(f.$('#loginButton').disabled,false);
+  assert.match(f.$('#authMessage').textContent,/계정이 만들어져요/);
 });

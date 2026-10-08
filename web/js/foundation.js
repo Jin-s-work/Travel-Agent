@@ -26,7 +26,7 @@
     const messages={
       cookie_missing:'이 브라우저에서 로그인 연결 정보를 확인하지 못했습니다. 고잉 사이트의 쿠키를 허용하고, 같은 브라우저에서 다시 로그인해 주세요.',
       state_expired:'로그인 연결이 만료되었거나 다른 로그인 요청으로 바뀌었습니다. 이 창에서 다시 로그인해 주세요.',
-      invitation_required:'이 Google 계정으로 가입된 여행을 찾지 못했습니다. 이전에 사용한 계정을 선택해 주세요. 처음 이용한다면 초대 코드가 필요합니다.',
+      invitation_required:'이제 Google 계정으로 바로 시작할 수 있어요. 다시 로그인해 주세요.',
       access_revoked:'이 계정의 이용 권한이 회수되었습니다. 운영자에게 확인해 주세요.',
       login_cancelled:'Google 로그인이 취소되었습니다. 로그인 버튼을 눌러 다시 진행할 수 있어요.',
       provider_configuration:'로그인 제공자 설정을 확인해야 합니다. 아래 오류 번호를 운영자에게 알려주세요.',
@@ -95,7 +95,7 @@
     window.scrollTo({top:0,behavior:'instant'});
     const configured = state.session?.auth_configured;
     $('#loginButton').disabled = configured === false;
-    $('#authMessage').textContent = configured === false ? '로그인 제공자 설정을 준비 중입니다. 운영자 설정 후 초대받은 계정으로 이용할 수 있어요.' : '이전에 사용한 Google 계정으로 로그인해 주세요. 다른 기기에서도 같은 여행을 볼 수 있어요.';
+    $('#authMessage').textContent = configured === false ? '로그인 제공자 설정을 준비 중입니다. 잠시 후 다시 확인해 주세요.' : '처음이라면 로그인과 함께 계정이 만들어져요.';
     showError($('#authError'), message);
   }
   function expire(message = '세션이 만료되었습니다. 다시 로그인해 주세요.') {
@@ -1598,7 +1598,6 @@
       }
     }finally{sessionCheck=false;$('#retrySession').disabled=false;$('#retryWorkspace').disabled=false;}
   }
-  $('#loginForm').addEventListener('submit',()=>{$('#invitation').value=$('#invitation').value.trim();});
   $('#retrySession').addEventListener('click',boot);
   $('#retryWorkspace').addEventListener('click',boot);
   $('#logout').addEventListener('click',async()=>{const b=$('#logout');b.disabled=true;await window.TravelTools?.purge().catch(()=>{});channel?.postMessage('logout');let message='로그아웃했습니다.';try{await api('/auth/logout',{method:'POST',body:{}});channel?.postMessage('logout');}catch(err){if(err.status!==401)message='화면의 개인 정보는 지웠지만 서버 로그아웃을 확인하지 못했습니다. 연결 후 다시 로그인 상태를 확인해 주세요.';}finally{const configured=state.session?.auth_configured;clearPrivate();state.session={authenticated:false,auth_configured:configured===true};authScreen(message==='로그아웃했습니다.'?'':message);if(message==='로그아웃했습니다.')notice(message);b.disabled=false;}});

@@ -22,7 +22,7 @@
 <script src="/js/discovery-experience.js?v=aeaa03848fc0" defer></script>
 <script src="/js/review-lab.js?v=7222f7d6695e" defer></script>
 <script src="/js/home.js?v=7cfaedaae102" defer></script>
-<script src="/js/foundation.js?v=17808bc72853" defer></script>
+<script src="/js/foundation.js?v=7744d2f4aac9" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">본문으로 이동</a>
@@ -31,13 +31,11 @@
   <div class="brand-mark"><img src="/icon.svg?v=4bbd16dbaddf" alt="" width="32" height="32"><strong>고잉</strong></div>
 
   <h1>다음 여행을 준비해요</h1>
-  <p class="auth-intro">가고 싶은 곳과 예약을 한곳에 모아두세요.<br>초대받은 계정으로 로그인할 수 있어요.</p>
+  <p class="auth-intro">가고 싶은 곳과 예약을 한곳에 모아두세요.<br>Google 계정으로 바로 시작할 수 있어요.</p>
   <form id="loginForm" class="panel auth-panel" action="/api/v2/auth/login" method="post">
     <h2>내 여행 시작하기</h2>
-    <p id="authMessage" class="muted">초대받은 이메일 계정으로 로그인해 주세요.</p>
-    <label for="invitation">초대 코드 <span class="muted">· 처음 이용할 때</span></label>
-    <input id="invitation" name="invitation" type="text" autocomplete="off" maxlength="200" placeholder="전달받은 초대 코드" spellcheck="false">
-    <p class="hint">이미 가입했다면 다른 기기에서도 같은 Google 계정을 선택해 주세요. 초대 코드는 다시 입력하지 않아도 됩니다.</p>
+    <p id="authMessage" class="muted">처음이라면 로그인과 함께 계정이 만들어져요.</p>
+    <p class="hint">다른 기기에서도 같은 Google 계정으로 로그인하면 내 여행을 이어서 볼 수 있어요.</p>
     <p id="authError" class="error" role="alert" hidden></p>
     <button id="loginButton" class="primary" type="submit">Google 계정으로 로그인</button>
     <button id="openOffline" class="secondary" type="button">이 기기에 저장한 여행 보기</button>

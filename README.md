@@ -6,7 +6,7 @@
 
 [서비스](https://travel-inbox-rag.onrender.com) · [사용 흐름](#사용-흐름) · [추천 모델](#추천-모델) · [실행하기](#실행하기) · [발표 자료](#발표-자료)
 
-<sub>소수 지인용 비공개 베타 · 초대된 Google 계정으로 로그인</sub>
+<sub>여행 서비스 베타 · Google 계정으로 바로 시작</sub>
 
 </div>
 
@@ -149,11 +149,11 @@ PYTHON_DOTENV_DISABLED=1 .venv/bin/python scripts/presentation_browser_fixture.p
 
 `http://127.0.0.1:8766`에서 합성 사용자 A로 로그인합니다. 임시 DB를 사용하는 로컬 예시이며 운영용 인증이 아닙니다.
 
-실제 로그인과 AI 연결은 [인증·초대 안내](docs/service-v2/FOUNDATION_RUNBOOK.md)와 [`.env.example`](.env.example)을 따릅니다. 비밀값은 Git에 올리지 않는 `.env` 또는 호스팅 secret에 둡니다.
+실제 로그인과 AI 연결은 [로그인·인증 안내](docs/service-v2/FOUNDATION_RUNBOOK.md)와 [`.env.example`](.env.example)을 따릅니다. 비밀값은 Git에 올리지 않는 `.env` 또는 호스팅 secret에 둡니다.
 
 ```bash
 test -e .env || cp .env.example .env
-# 인증·초대·저장소·필요한 공급자를 설정한 뒤 실행
+# 인증·저장소·필요한 공급자를 설정한 뒤 실행
 .venv/bin/python -m uvicorn api:app --host 127.0.0.1 --port 8000 --workers 1 --no-access-log
 ```
 

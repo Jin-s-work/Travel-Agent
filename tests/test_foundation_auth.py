@@ -1,4 +1,4 @@
-"""Authentication ≠ invitation authorization; all identities here are synthetic."""
+"""Verified open registration and private sessions; all identities are synthetic."""
 from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
 import pytest
@@ -16,38 +16,56 @@ def claims(who='a',verified=True):
     return {'iss':'https://synthetic.test','sub':who,'email':who+'@example.test','email_verified':verified}
 
 @pytest.mark.parametrize('verified',[False,'true',None])
-def test_unverified_identity_is_not_invited(auth,verified):
-    invitation=auth.invite('a@example.test')
-    with pytest.raises(DomainError):auth.complete_identity(claims(verified=verified),invitation)
-    with auth.db.connect() as con: assert con.execute('SELECT count(*) FROM users').fetchone()[0]==0
+def test_unverified_identity_cannot_register(auth,verified):
+    with pytest.raises(DomainError) as error:auth.complete_identity(claims(verified=verified))
+    assert error.value.code=='IDENTITY_UNVERIFIED'
+    with auth.db.connect() as con:
+        assert con.execute('SELECT count(*) FROM users').fetchone()[0]==0
+        assert con.execute('SELECT count(*) FROM sessions').fetchone()[0]==0
 
-def test_wrong_email_expired_and_revoked_invites(auth):
+@pytest.mark.parametrize('field',['iss','sub','email'])
+def test_incomplete_identity_cannot_register(auth,field):
+    identity=claims();identity.pop(field)
+    with pytest.raises(DomainError):auth.complete_identity(identity)
+
+def test_new_verified_account_registers_as_member_without_invitation(auth):
+    identity={**claims(),'role':'admin','owner_id':'someone-else'}
+    assert auth.complete_identity(identity)
+    with auth.db.connect() as con:
+        user=con.execute('SELECT * FROM users').fetchone()
+        assert user['role']=='member' and user['id']!='someone-else'
+        assert user['status']=='active'
+        assert con.execute('SELECT count(*) FROM invitations').fetchone()[0]==0
+
+def test_legacy_invites_do_not_gate_registration_or_grant_permissions(auth):
     invitation=auth.invite('a@example.test')
-    with pytest.raises(DomainError):auth.complete_identity(claims('b'),invitation)
     auth.revoke_invitation(invitation)
-    with pytest.raises(DomainError):auth.complete_identity(claims(),invitation)
-    invitation=auth.invite('a@example.test')
     with auth.db.connect() as con:con.execute('UPDATE invitations SET expires_at=?',((now()-timedelta(hours=1)).isoformat(),))
-    with pytest.raises(DomainError):auth.complete_identity(claims(),invitation)
+    auth.complete_identity(claims('b'),invitation)
+    auth.complete_identity(claims(),None,invitation_hash='irrelevant')
+    with auth.db.connect() as con:
+        assert con.execute("SELECT count(*) FROM users WHERE role='member'").fetchone()[0]==2
+        assert con.execute('SELECT count(*) FROM invitations WHERE used_at IS NOT NULL').fetchone()[0]==0
 
-def test_invitation_single_consumer_under_competing_subjects(auth):
-    invitation=auth.invite('a@example.test')
-    def consume(subject):
-        c=claims();c['sub']=subject
-        try:return auth.complete_identity(c,invitation)
-        except DomainError:return None
-    with ThreadPoolExecutor(2) as executor: results=list(executor.map(consume,['first','second']))
-    assert sum(result is not None for result in results)==1
+def test_concurrent_first_logins_create_one_identity_and_independent_sessions(auth):
+    with ThreadPoolExecutor(2) as executor:
+        results=list(executor.map(lambda _:auth.complete_identity(claims()),range(2)))
+    assert len(set(results))==2
     with auth.db.connect() as con:
         assert con.execute('SELECT count(*) FROM users').fetchone()[0]==1
-        assert con.execute('SELECT count(*) FROM invitations WHERE used_at IS NOT NULL').fetchone()[0]==1
+        assert con.execute('SELECT count(*) FROM sessions').fetchone()[0]==2
 
-def test_existing_subject_needs_no_new_invite_but_disabled_is_denied(auth):
-    auth.complete_identity(claims(),auth.invite('a@example.test'))
-    auth.complete_identity(claims(),None)
+def test_matching_email_does_not_link_distinct_provider_identities(auth):
+    for change in [{},{'sub':'other'},{'iss':'https://other-provider.test'}]:
+        auth.complete_identity({**claims(),**change})
+    with auth.db.connect() as con:assert con.execute('SELECT count(*) FROM users').fetchone()[0]==3
+
+def test_existing_disabled_identity_remains_denied_after_open_registration(auth):
+    auth.complete_identity(claims())
     with auth.db.connect() as con:uid=con.execute('SELECT id FROM users').fetchone()[0]
     auth.disable_user(uid)
-    with pytest.raises(DomainError):auth.complete_identity(claims(),None)
+    with pytest.raises(DomainError) as error:auth.complete_identity(claims())
+    assert error.value.code=='ACCESS_REVOKED'
     with auth.db.connect() as con:assert con.execute('SELECT count(*) FROM sessions').fetchone()[0]==0
 
 def test_production_configuration_fails_closed_and_cookie_policy(tmp_path):
@@ -63,7 +81,7 @@ def test_production_configuration_fails_closed_and_cookie_policy(tmp_path):
         assert res.headers['cache-control']=='private, no-store'
     assert client.get('/api/v2/auth/login').status_code==503
 
-def test_invitation_post_has_origin_check(auth,tmp_path):
+def test_login_post_still_has_origin_check(auth,tmp_path):
     from api import create_app
     app=create_app(auth.settings)
     response=TestClient(app).post('/api/v2/auth/login',data={'invitation':'secret'},headers={'Origin':'https://evil.test'})
@@ -79,7 +97,7 @@ def test_production_callback_cookie_and_replay_of_invalid_state(tmp_path,monkeyp
     # No state: Authlib rejects callback before any identity or session is created.
     rejected=client.get('/api/v2/auth/callback?code=synthetic-invalid&state=unknown',follow_redirects=False)
     assert rejected.status_code==303 and 'auth_error=' in rejected.headers['location']
-    app.state.auth.complete_identity(claims(),app.state.auth.invite('a@example.test'))
+    app.state.auth.complete_identity(claims())
     async def verified_claims(request): return {'userinfo':claims()}
     # Mock only the verified-provider boundary; session and cookie code are real.
     monkeypatch.setattr(app.state.auth.oauth.identity,'authorize_access_token',verified_claims)
@@ -100,7 +118,7 @@ def production_app(tmp_path):
 
 def test_existing_identity_can_sign_in_on_fresh_devices_without_invitation(tmp_path,monkeypatch):
     app=production_app(tmp_path)
-    app.state.auth.complete_identity(claims(),app.state.auth.invite('a@example.test'))
+    app.state.auth.complete_identity(claims())
     async def verified(_request):return {'userinfo':claims()}
     monkeypatch.setattr(app.state.auth.oauth.identity,'authorize_access_token',verified)
     first=TestClient(app,base_url='https://testserver')
@@ -121,14 +139,14 @@ def test_existing_identity_can_sign_in_on_fresh_devices_without_invitation(tmp_p
 
 
 @pytest.mark.parametrize('kind,expected',[
-    ('invite','invitation_required'),('revoked','access_revoked'),('cancel','login_cancelled'),
+    ('unverified','identity_unverified'),('revoked','access_revoked'),('cancel','login_cancelled'),
     ('configuration','provider_configuration'),('transport','provider_unavailable'),('unexpected','login_failed')])
 def test_callback_failure_is_actionable_and_never_logs_provider_secrets(tmp_path,monkeypatch,caplog,kind,expected):
     from authlib.integrations.base_client.errors import OAuthError
     from httpx import ConnectError
     app=production_app(tmp_path)
     secret='synthetic-credential-never-log'
-    failures={'invite':DomainError('INVITATION_REQUIRED',secret,403),
+    failures={'unverified':DomainError('IDENTITY_UNVERIFIED',secret,403),
         'revoked':DomainError('ACCESS_REVOKED',secret,403),'cancel':OAuthError(error='access_denied',description=secret),
         'configuration':OAuthError(error='invalid_client',description=secret),'transport':ConnectError(secret),
         'unexpected':RuntimeError(secret)}
@@ -161,3 +179,43 @@ def test_provider_discovery_failure_returns_to_working_login_screen(tmp_path,mon
     response=TestClient(app,base_url='https://testserver').get('/api/v2/auth/login',follow_redirects=False)
     assert response.status_code==303
     assert 'auth_error=provider_unavailable' in response.headers['location']
+
+
+def test_first_login_callback_registers_without_code_and_isolates_trips(tmp_path,monkeypatch):
+    app=production_app(tmp_path)
+    who='a'
+    async def verified(_request):return {'userinfo':claims(who)}
+    monkeypatch.setattr(app.state.auth.oauth.identity,'authorize_access_token',verified)
+    first=TestClient(app,base_url='https://testserver')
+    second=TestClient(app,base_url='https://testserver')
+    for name,client in [('a',first),('b',second)]:
+        who=name
+        assert client.get('/api/v2/auth/callback',follow_redirects=False).headers['location']=='/'
+        session=client.get('/api/v2/session').json()
+        assert session['authenticated'] and session['user']['role']=='member'
+        client.headers.update({'Origin':'https://testserver','X-CSRF-Token':session['csrf_token']})
+    response=first.post('/api/v2/trips',json={'title':'Synthetic private trip','start_date':'2026-11-06','end_date':'2026-11-09'})
+    assert response.status_code==201,response.text
+    trip_id=response.json()['id']
+    assert first.get('/api/v2/trips/'+trip_id).status_code==200
+    assert second.get('/api/v2/trips/'+trip_id).status_code==404
+    assert second.get('/api/v2/trips').json()['items']==[]
+    with app.state.db.connect() as con:
+        assert con.execute('SELECT count(*) FROM invitations').fetchone()[0]==0
+        assert con.execute('SELECT count(*) FROM users').fetchone()[0]==2
+
+
+def test_login_post_without_invitation_starts_oidc_and_preserves_provider_state(tmp_path,monkeypatch):
+    from fastapi.responses import RedirectResponse
+    app=production_app(tmp_path)
+    async def authorize(request,callback):
+        assert dict(request.session)=={}
+        assert callback=='https://testserver/api/v2/auth/callback'
+        request.session['_state_synthetic']='provider-owned-state'
+        return RedirectResponse('https://synthetic.test/authorize',status_code=302)
+    monkeypatch.setattr(app.state.auth.oauth.identity,'authorize_redirect',authorize)
+    response=TestClient(app,base_url='https://testserver').post('/api/v2/auth/login',headers={'Origin':'https://testserver'},follow_redirects=False)
+    assert response.status_code==302
+    assert response.headers['location']=='https://synthetic.test/authorize'
+    cookie=response.headers['set-cookie']
+    assert '__Host-oidc=' in cookie and 'httponly' in cookie.lower() and 'secure' in cookie.lower()
