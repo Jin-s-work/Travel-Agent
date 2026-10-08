@@ -181,7 +181,7 @@
     if (epoch !== state.epoch) return;
     results.forEach(r => { if (r.status === 'rejected') fail(r.reason); });
     await window.WorkspaceUX?.load();if(epoch!==state.epoch)return;state.workspaceSuspended=false;
-    if (['trip','explore'].includes(state.tab)) loadRecommendations().catch(e => fail(e, $('#recommendationError')));
+    if (['trip','explore'].includes(state.tab)) loadRecommendations().then(()=>{if(epoch===state.epoch&&state.tab==='explore')window.DiscoveryFlow?.enter();}).catch(e => fail(e, $('#recommendationError')));
     if (state.tab === 'itinerary') loadItineraries().catch(e=>fail(e,$('#itineraryError')));
   }
   async function loadBookings() {
