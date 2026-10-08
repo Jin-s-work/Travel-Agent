@@ -87,7 +87,7 @@
 
 ## 추천 모델
 
-현재 배포 코드의 기본 모델은 **`hybrid_v5`**입니다. 장소 자료와 여행 조건을 조합하는 콘텐츠 기반 모델입니다. 사용자 행동을 학습한 모델은 아니며 순위 계산에 LLM을 호출하지 않습니다.
+현재 배포 코드의 기본 모델은 `hybrid_v5`입니다. 장소 자료와 여행 조건을 조합하는 콘텐츠 기반 모델입니다. 사용자 행동을 학습한 모델은 아니며 순위 계산에 LLM을 호출하지 않습니다.
 
 | 성분 | 계산과 입력 |
 | :--- | :--- |
@@ -121,7 +121,7 @@ NDCG 0.9954는 정확도 99.54%를 뜻하지 않습니다. 정해 둔 예시에�
 
 ## 구현과 실행
 
-FastAPI가 PWA와 API를 제공합니다. 운영은 Render Free와 Supabase PostgreSQL·비공개 Storage·pgvector를 사용하고, 로컬은 SQLite·Chroma를 사용합니다. 메일 AI 추출은 OpenAI **`gpt-5-mini`**, 검색 임베딩은 **`text-embedding-3-small`**입니다. 추천 순위와 일정 제약은 서버 코드로 계산합니다.
+FastAPI가 PWA와 API를 제공합니다. 운영은 Render Free와 Supabase PostgreSQL·비공개 Storage·pgvector를 사용하고, 로컬은 SQLite·Chroma를 사용합니다. 메일 AI 추출은 OpenAI **`gpt-5-mini`**, 검색 임베딩은 `text-embedding-3-small`입니다. 추천 순위와 일정 제약은 서버 코드로 계산합니다.
 
 ```text
 web/                    화면과 PWA
