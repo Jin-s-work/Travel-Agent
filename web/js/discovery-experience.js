@@ -71,7 +71,7 @@
   function modelDetail(host,item){
     const data=item.ranking_diagnostics;if(!data)return;
     host.append(ui.make('p','form-note','선택한 취향·출발점과 확인된 장소 자료를 비교한 추천입니다. 점수는 순서를 정하기 위한 값이며 정확도나 만족할 확률이 아닙니다.'));
-    const labels={core:'추천 구획의 근거',preference:'선택한 취향과의 유사도',proximity:'출발점에서의 직선거리'};
+    const labels={core:'추천 구획의 근거',preference:'선택한 취향과의 유사도',proximity:data.proximity_reference==='city_center'?'도심 기준 직선거리':'출발점에서의 직선거리'};
     for(const [key,part] of Object.entries(data.components||{})){
       const value=key==='core'&&data.core_kind==='evidence_gate_only'?'자료 자격 통과':typeof part.value==='number'?Math.round(part.value*100)+'/100':'자료 미확인';
       host.append(ui.make('p','',`${labels[key]||key}: ${value} · 비중 ${Math.round(part.weight*100)}%`));
