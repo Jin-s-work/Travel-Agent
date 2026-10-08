@@ -16,7 +16,8 @@
 [화면으로 보기](#사용-흐름) &nbsp;·&nbsp;
 [작동 원리](#작동-원리) &nbsp;·&nbsp;
 [평가 결과](#평가-결과) &nbsp;·&nbsp;
-[발표 자료](docs/presentation/README.md)
+[발표 자료](docs/presentation/README.md) &nbsp;·&nbsp;
+[발표 PDF](docs/presentation/going-class-presentation.pdf)
 
 <br>
 
