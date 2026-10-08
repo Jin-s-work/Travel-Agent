@@ -188,8 +188,8 @@ PYTHON_DOTENV_DISABLED=1 .venv/bin/python -m src.recommendations.benchmark \
 
 ## 발표 자료
 
-기존 디자인을 유지한 **11장, 영상 70초 포함 약 8분 30초** 구성입니다. 서비스의 기획 배경과 사용 흐름, 구현 방법을 소개합니다.
+기존 디자인을 유지한 **12장, 약 10분** 구성입니다. 여행 준비에서 느낀 불편함과 기획 방향, 주요 기능, 구현 방법을 소개합니다.
 
-[Keynote](docs/presentation/v7/going-v7-class-presentation.key?raw=1) · [PowerPoint](docs/presentation/v7/going-v7-class-presentation.pptx?raw=1) · [발표 대본](docs/presentation/v7/SCRIPT.md) · [화면 영상](docs/presentation/v7/going-demo.mp4?raw=1) · [자료 안내](docs/presentation/v7/README.md)
+[Keynote](docs/presentation/v8/going-v8-class-presentation.key?raw=1) · [PowerPoint](docs/presentation/v8/going-v8-class-presentation.pptx?raw=1) · [발표 대본](docs/presentation/v8/SCRIPT.md) · [자료 안내](docs/presentation/v8/README.md)
 
-<sub>[수업 발표 PDF](docs/presentation/going-class-presentation.pdf)는 이전 발표입니다. 최신 자료의 메인·AI·도쿄 탐색은 2026-10-08 운영 화면, 메일·일정과 사진 예시는 2026-10-07 합성 화면입니다. [화면과 사진 출처](docs/presentation/v7/CREDITS.md)</sub>
+<sub>[이전 수업 발표 PDF](docs/presentation/going-class-presentation.pdf)</sub>
