@@ -1365,11 +1365,11 @@
     names.append(make('p','hint',`${discoveryCategoryNames[item.category]||item.category||'분류 미확인'} · ${item.address||'주소 미확인'}`));heading.append(names);card.append(heading);
 
     if(item.synthetic)card.append(make('p','badge warn','합성 검증 자료 · 실제 추천 아님'));
-    const reasons=(item.reason_sentences||item.supported_reasons||[]).filter(reason=>(typeof reason==='string'?reason:reason.text)!=='공개 지도에 등록된 장소입니다. 지점과 영업 상태를 확인해 주세요.').filter(reason=>!((item.important_unknowns||[]).length&&(typeof reason==='string'?reason:reason.text)==='방문 조건과 추천 근거를 추가로 확인해야 합니다.'));
+    const reasons=(item.reason_sentences||item.supported_reasons||[]).filter(reason=>!['REFERENCE_ONLY','EVIDENCE_PENDING'].includes(reason.code)&&!['지점 자료를 확인한 주변 장소예요. 리뷰 언어나 유명함을 보장하지 않아요.','방문 조건과 추천 근거를 추가로 확인해야 합니다.'].includes(typeof reason==='string'?reason:reason.text)).filter(reason=>(typeof reason==='string'?reason:reason.text)!=='공개 지도에 등록된 장소입니다. 지점과 영업 상태를 확인해 주세요.').filter(reason=>!((item.important_unknowns||[]).length&&(typeof reason==='string'?reason:reason.text)==='방문 조건과 추천 근거를 추가로 확인해야 합니다.'));
     if(reasons.length){const list=make('ul','recommendation-reasons');reasons.slice(0,3).forEach(reason=>list.append(make('li','',typeof reason==='string'?reason:reason.text)));card.append(list);}
     const mustCheck=(item.important_unknowns||[]).filter(code=>!/^(OPENING|OPERATING|LIVE_AVAILABILITY|PARTY|PRICE|ORIGIN|FACT|CHILDREN_UNKNOWN|MIN_PARTY|MAX_PARTY|PUBLIC_MAP|HOURS_UNKNOWN|VISIT_TIME_UNKNOWN)/.test(code));
     if(mustCheck.length)recommendationUnknowns(card,mustCheck);
-    else if(item.important_unknowns?.length)card.append(make('p','hint','영업·예약은 방문 전 확인해 주세요.'));
+
     const specificReasons=(window.DiscoveryFlow?.cardReasons(item)||item.reason_codes||[]).filter(code=>!(item.important_unknowns||[]).includes(code));
     if(item.eligibility==='ineligible'&&specificReasons.length){const reasonDetails=make('section','card-options');reasonDetails.append(make('h4','','이번 목록에서 제외한 이유'));appendRecommendationReasons(reasonDetails,specificReasons);card.append(reasonDetails);}
     const factChecked=(item.facts||[]).filter(fact=>fact.usable===true&&['verified','provisional'].includes(fact.status)&&Number.isFinite(Date.parse(fact.checked_at||''))).sort((a,b)=>Date.parse(b.checked_at)-Date.parse(a.checked_at))[0]?.checked_at;

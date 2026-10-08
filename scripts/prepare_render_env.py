@@ -35,7 +35,7 @@ RUNTIME_DEFAULTS = {
 }
 
 
-def render_values(source, profile="free"):
+def render_values(source, profile="free", *, with_apify=False):
     if profile not in {"free", "openai"}:
         raise ValueError("알 수 없는 배포 프로필")
     values = {**RUNTIME_DEFAULTS, **{key: value or '' for key, value in source.items()}}
@@ -70,7 +70,16 @@ def render_values(source, profile="free"):
         if values.get(key) != expected:
             raise ValueError(key + ': 기존 무료 비공개 배포 설정을 유지하세요')
     # Existing paid credentials on Render must be overridden when importing this profile.
-    values.update(TAVILY_API_KEY='', APIFY_TOKEN='')
+    values.update(TAVILY_API_KEY='')
+    if with_apify:
+        if profile != 'openai':
+            raise ValueError('Apify 연결은 openai 프로필과 함께 준비하세요. free 프로필은 외부 호출 OFF입니다.')
+        if not values.get('APIFY_TOKEN'):
+            raise ValueError('입력 필요: APIFY_TOKEN')
+        # Credential preparation does not enable research/production or change
+        # pricing. Those remain separately gated by reviewed server settings.
+    else:
+        values['APIFY_TOKEN']=''
     if profile == 'free':
         values.update(OPENAI_API_KEY='', MAIL_ANALYSIS_MODE='local',
             PRICING_CONFIG=RUNTIME_DEFAULTS['PRICING_CONFIG'])
@@ -81,12 +90,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--check', action='store_true', help='값을 노출하거나 파일을 생성하지 않고 검사')
     parser.add_argument('--profile', choices=['free','openai'], default='free', help='free: 외부 과금 OFF / openai: 월 3 USD 상한으로 메일 AI 활성화')
+    parser.add_argument('--with-apify', action='store_true', help='입력한 Apify 토큰도 전달. 수집·예산·운영 기능은 별도 검토 후 활성화')
     args = parser.parse_args()
     path = ROOT / 'deploy/render-supabase/.env'
     if not path.exists():
         print('입력 필요: deploy/render-supabase/.env'); return 2
     try:
-        values = render_values(dotenv_values(path, interpolate=False), args.profile)
+        values = render_values(dotenv_values(path, interpolate=False), args.profile, with_apify=args.with_apify)
     except ValueError as exc:
         print(str(exc)); return 2
     if args.check:

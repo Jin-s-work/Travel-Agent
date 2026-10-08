@@ -1,0 +1,30 @@
+[
+  {
+    "file": "01-tokyo-dinner.eml",
+    "date": "2026-11-07",
+    "time": "18:30",
+    "date_end": "2026-11-07",
+    "time_end": "20:00"
+  },
+  {
+    "file": "02-tokyo-hotel.eml",
+    "date": "2026-11-06",
+    "time": "15:00",
+    "date_end": "2026-11-09",
+    "time_end": "11:00"
+  },
+  {
+    "file": "03-barcelona-tour.eml",
+    "date": "2026-11-12",
+    "time": "10:00",
+    "date_end": "2026-11-12",
+    "time_end": "12:30"
+  },
+  {
+    "file": "04-tokyo-night-tour.eml",
+    "date": "2026-11-07",
+    "time": "23:00",
+    "date_end": "2026-11-08",
+    "time_end": "00:30"
+  }
+]

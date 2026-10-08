@@ -33,6 +33,15 @@
   function restoreRequest(request){criteria={minLocal:safeNumber(request.review_language_filter?.min_local_share,0.6),maxKorean:safeNumber(request.review_language_filter?.max_korean_share,0.1),ordering:request.ordering_profile==='nearby'?'nearby':'evidence'};}
   function filterSummary(options){return criteria.ordering==='nearby'?'가까운 곳 우선':'여행 조건으로 찾고 있어요';}
   function selectMode(type){if(!modes[type])return;selected=type;window.WorkspaceUX?.changed();ui.renderRecommendationResults();document.querySelector('#discoveryModes [aria-selected="true"]')?.focus({preventScroll:true});}
+  const languagePresets={mostly:{label:'현지어 위주',minLocal:0.6,maxKorean:0.1},only:{label:'관측 리뷰 모두 현지어',minLocal:1,maxKorean:0}};
+  function languagePreset(value){return Object.hasOwn(languagePresets,value)?{...languagePresets[value]}:null;}
+  async function applyLanguagePreset(value){
+    const preset=languagePreset(value),r=ui?.state.recommendations;
+    if(!preset||r?.submitting||r?.resultRecoveryPending||['queued','running'].includes(r?.active?.state))return;
+    ui.commitRecommendationFilters({...ui.filterValues(),minLocal:preset.minLocal,maxKorean:preset.maxKorean,discoveryMode:'local_discovery'});
+    window.WorkspaceUX?.changed();
+    await ui.applyRecommendations();
+  }
   function renderMode(){if(!ui)return;const host=document.querySelector('#discoveryModes');if(!host)return;const focusId=document.activeElement?.id?.startsWith('discovery-mode-')?document.activeElement.id:null;host.replaceChildren();host.setAttribute('role','tablist');host.setAttribute('aria-label','추천 근거');
     const tabs=[];for(const key of ['reference','local_discovery','landmark']){const mode=modes[key],tab=ui.button('',()=>selectMode(key),'discovery-mode');tab.id='discovery-mode-'+key;tab.setAttribute('role','tab');tab.setAttribute('aria-selected',String(selected===key));tab.setAttribute('aria-controls','recommendationResults');tab.tabIndex=selected===key?0:-1;tab.append(ui.make('strong','',mode.title),ui.make('span','hint',mode.note));tab.addEventListener('keydown',event=>{if(['ArrowRight','ArrowLeft','Home','End'].includes(event.key)){event.preventDefault();const order=['reference','local_discovery','landmark'];selectMode(order[event.key==='Home'?0:event.key==='End'?2:(order.indexOf(key)+(event.key==='ArrowRight'?1:-1)+3)%3]);}});tabs.push(tab);host.append(tab);}if(focusId)tabs.find(t=>t.id===focusId)?.focus({preventScroll:true});
     const panel=document.querySelector('#recommendationResults');panel?.setAttribute('role','tabpanel');panel?.setAttribute('aria-labelledby','discovery-mode-'+selected);
@@ -40,7 +49,13 @@
     const support=document.querySelector('#discoveryCapability');support?.replaceChildren();if(!support)return;
     const city=ui.ensureDiscoveryDraft()?.conditions?.city,value=capabilityFor(capabilities,city),copy=capabilityState(value);
     support.hidden=selected!=='local_discovery';
-    if(selected==='local_discovery')support.append(ui.make('p','hint',copy.title+' · '+copy.note));
+    if(selected==='local_discovery'){
+      const choices=ui.make('div','discovery-category-chips');choices.setAttribute('role','group');choices.setAttribute('aria-label','리뷰 언어 조건');
+      const r=ui.state.recommendations,busy=r?.submitting||r?.resultRecoveryPending||['queued','running'].includes(r?.active?.state);
+      for(const [key,preset] of Object.entries(languagePresets)){const action=ui.button(preset.label,()=>applyLanguagePreset(key),'category-chip');action.setAttribute('aria-pressed',String(criteria.minLocal===preset.minLocal&&criteria.maxKorean===preset.maxKorean));action.disabled=Boolean(busy);choices.append(action);}
+      support.append(choices,ui.make('p','hint','최근 180일, 최대 200개 리뷰 기준으로 찾아요.'));
+      if(copy.title.includes('준비 중')||!value)support.append(ui.make('p','hint','Google 지도 리뷰를 준비 중이에요. 준비된 장소부터 이곳에 표시됩니다.'));
+    }
   }
   async function loadCapabilities(){if(!ui?.state.session?.authenticated||loading)return;const request=++serial,epoch=ui.state.epoch;loading=true;try{const data=await ui.api('/review-capabilities');if(request!==serial||epoch!==ui.state.epoch)return;capabilities=data;renderMode();}catch(error){if(request===serial&&epoch===ui.state.epoch){capabilities=null;renderMode();const host=document.querySelector('#discoveryCapability');host?.append(ui.make('p','hint','자료 준비 상태를 불러오지 못했습니다. 저장된 여행과 유명한 곳은 계속 확인할 수 있어요.'));}}finally{if(request===serial)loading=false;}}
   function quickFilters(host,conditions){const group=ui.make('div','discovery-category-chips');group.setAttribute('role','group');group.setAttribute('aria-label','장소 종류');for(const [key,label] of [['all','전체'],['restaurant','음식점'],['cafe','카페'],['attraction','볼거리']]){const chosen=conditions.categories||[],active=key==='all'?chosen.length===3:chosen.length===1&&chosen[0]===key;const b=ui.button(label,()=>ui.setDiscoveryOverride('categories',key==='all'?['restaurant','cafe','attraction']:[key]),'category-chip');b.setAttribute('aria-pressed',String(active));group.append(b);}host.append(group);}
@@ -90,5 +105,5 @@
     ui.reasonList(section,ui.reviewReasons(evidence||{}));ui.reviewScope(section,evidence?.coverage,evidence?.checked_at,evidence?.expires_at);ui.reviewAttribution(section,evidence?.attribution);const provenance=evidence?.provenance||{};const model=evidence?.detector_version||provenance.detector_version||evidence?.evaluation?.detector_version,policy=evidence?.policy_version||provenance.policy_version||evidence?.dependencies?.policy_version;section.append(ui.make('p','hint',`현지어 범위: ${(evidence?.local_languages||evidence?.evaluation?.local_languages||[]).join(' · ')||'도시 프로필 확인 필요'} · 추천 모델 ${run?.result?.section_models?.local_discovery||place.ranker_version||'저장된 실행에서 확인'}`));if(model||policy)section.append(ui.make('p','hint',`언어 판별기 ${model||'미확인'} · 정책 ${policy||'미확인'}`));section.append(ui.make('p','form-note','리뷰 원문의 언어를 관측한 결과입니다. 작성자의 거주지·국적·맛의 보장이 아니며, 공급자 자료 종료는 Google 전체 리뷰 확보를 뜻하지 않습니다.'));
     if(!data&&(place?.id||place?.place_id)){const request=ui.button('이 장소의 리뷰 검토 요청',async()=>{request.disabled=true;const epoch=ui.state.epoch;try{const result=await ui.api(ui.tripPath()+'/places/'+encodeURIComponent(place.place_id||place.id)+'/review-request',{method:'POST',body:{}});if(epoch!==ui.state.epoch)return;request.textContent=result.duplicate?'이미 검토 요청한 장소예요':'검토 요청을 접수했어요';}catch(error){if(epoch===ui.state.epoch){request.disabled=false;section.append(ui.make('p','error',error.message));}}},'secondary');section.append(request,ui.make('p','hint','검토 대기열에만 추가합니다. 유료 수집이나 알림 발송은 자동 실행하지 않아요.'));}host.append(section);
   }
-  return {init,clear,filters,restoreFilters,restoreMode,requestFilters,restoreRequest,filterSummary,selectMode,renderMode,loadCapabilities,quickFilters,qualityFields,readQuality,renderSections,cardEvidence,modelDetail,evidenceDetail,evidenceData,evidenceLines,sectionGroups,browseSection,sectionStateCopy,capabilityFor,capabilityState};
+  return {languagePreset,applyLanguagePreset,init,clear,filters,restoreFilters,restoreMode,requestFilters,restoreRequest,filterSummary,selectMode,renderMode,loadCapabilities,quickFilters,qualityFields,readQuality,renderSections,cardEvidence,modelDetail,evidenceDetail,evidenceData,evidenceLines,sectionGroups,browseSection,sectionStateCopy,capabilityFor,capabilityState};
 });

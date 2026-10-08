@@ -4,10 +4,10 @@
 
 **12장, 약 10분 구성.** 기존 남색 표지와 밝은 본문, Pretendard 글꼴을 유지했습니다.
 
-[Keynote](going-v8-class-presentation.key?raw=1) · [PowerPoint](going-v8-class-presentation.pptx?raw=1) · [발표 대본](SCRIPT.md)
+[Keynote](going-v8-class-presentation.key?raw=1) · [PowerPoint](going-v8-class-presentation.pptx?raw=1)
 
 ![발표 미리보기](preview.webp)
 
 기획 계기와 사용자 문제를 설명한 뒤 장소 추천, 현지 탐색과 유명한 곳, 메일 정리, AI 대화와 일정을 소개합니다. 이어서 FastAPI·OpenAI·Render·Supabase의 역할과 추천 순위를 계산하는 방식, 직접 사용하면서 바꾼 점을 이야기합니다.
 
-대본은 각 장의 발표자 메모에도 넣었습니다. Keynote에서 **보기 > 발표자 메모 보기**로 열 수 있습니다. 말하는 속도에 따라 발표 시간은 달라지므로 연습하며 조절하면 됩니다.
+GitHub에는 발표 화면만 공유합니다. 대본과 발표자 메모는 로컬 원본에 별도로 보관합니다.

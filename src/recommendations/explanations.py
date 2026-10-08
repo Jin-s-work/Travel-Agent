@@ -91,5 +91,6 @@ def render_general(candidate):
     distance=((candidate.get('features') or {}).get('straight_distance') or {}).get('value')
     if distance is not None and len(reasons)<3:
         add('STRAIGHT_DISTANCE',f"선택한 출발점에서 직선거리 약 {round(distance):,}m예요. 실제 이동 경로와는 달라요.")
-    if not reasons:add('REFERENCE_ONLY','지점 자료를 확인한 주변 장소예요. 리뷰 언어나 유명함을 보장하지 않아요.',[r['id'] for r in candidate.get('source_refs',[])])
+    # Reference cards already show their name, category and address. Do not
+    # invent a recommendation reason when no additional evidence exists.
     return reasons[:3]

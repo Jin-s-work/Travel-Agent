@@ -27,7 +27,7 @@ def headings(text):
             for line in re.findall(r'^#{1,6} (.+)$', text, re.M)}
 
 def validate(presentation=PRESENTATION, prefix='going-class-presentation', expected_slides=10, embedded_movie=False, duration=510, concise=False):
-    names=('README.md','SCRIPT.md') if concise else ('README.md','SCRIPT.md','CREDITS.md','REVIEW.md')
+    names=tuple(name for name in ('README.md','CREDITS.md','REVIEW.md') if (presentation/name).exists())
     docs = [ROOT/'README.md'] + [presentation/name for name in names]
     errors, count = [], 0
     for doc in docs:
@@ -48,7 +48,8 @@ def validate(presentation=PRESENTATION, prefix='going-class-presentation', expec
     data=json.loads((presentation/'slides-content.json').read_text())
     assert len(data)==expected_slides, 'Unexpected slide count'
     assert sum(x['seconds'] for x in data)==duration, 'Timing allocation changed'
-    script=normalized((presentation/'SCRIPT.md').read_text())
+    assert not (presentation/'SCRIPT.md').exists(), 'Private script must not be published'
+    assert all('notes' not in row and 'cue' not in row for row in data), 'Private notes in slide data'
     with zipfile.ZipFile(presentation/f'{prefix}.pptx') as z:
         assert z.testzip() is None
         if concise:
@@ -60,12 +61,7 @@ def validate(presentation=PRESENTATION, prefix='going-class-presentation', expec
         assert (size.get('cx'),size.get('cy'))==('12192000','6858000')
         for i,d in enumerate(data,1):
             note=normalized(''.join(ET.fromstring(z.read(f'ppt/notesSlides/notesSlide{i}.xml')).itertext()))
-            expected=normalized(d['notes'])
-            assert expected in note, f'Slide {i}: PPTX notes differ'
-            if concise:
-                assert 'http' not in note and '자료출처' not in note, f'Slide {i}: unwanted references'
-                assert '30+90+30' not in note and '영상시작' not in note, f'Slide {i}: removed content remains'
-            assert expected in script, f'Slide {i}: SCRIPT.md differs'
+            assert not note, f'Slide {i}: private presenter notes remain'
             text=normalized(''.join(ET.fromstring(z.read(f'ppt/slides/slide{i}.xml')).itertext()))
             if concise:
                 assert '30+90+30' not in text and '150분' not in text, f'Slide {i}: removed calculation remains'
@@ -85,7 +81,7 @@ def validate(presentation=PRESENTATION, prefix='going-class-presentation', expec
     assert not errors, '\n'.join(errors)
     files = docs + [presentation/n for n in (f'{prefix}.pptx',f'{prefix}.key','slides-content.json','preview.webp')]
     return {'scope':'Document/package consistency only; not product tests or live quality',
-            'passed':True,'local_links_checked':count,'slides':expected_slides,'pptx_notes_matching_script':expected_slides,
+            'passed':True,'local_links_checked':count,'slides':expected_slides,'pptx_slides_without_notes':expected_slides,
             'embedded_movie_matches_standalone':embedded_movie,
             'target_duration_seconds':duration,'actual_spoken_duration_measured':False,
             'native_keynote_visual_review':'Separate from this package checker',

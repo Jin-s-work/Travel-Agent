@@ -4,7 +4,7 @@
 
 - [Keynote 다운로드](going-v5-class-presentation.key?raw=1)
 - [PowerPoint 다운로드](going-v5-class-presentation.pptx?raw=1)
-- [발표 스크립트·5분 축약·예상 질문](SCRIPT.md)
+- 발표 대본(로컬 별도 보관)
 - [슬라이드 문안](slides-content.json) · [화면·사진 출처](../CREDITS.md)
 
 ![슬라이드 미리보기](preview.webp)

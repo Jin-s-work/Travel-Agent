@@ -52,7 +52,7 @@
 
 ### 메인에서 시작하는 AI 질문
 
-메인 입력창이나 상단 **AI 대화**에서 현재 여행의 예약을 물어볼 수 있습니다. 예시 질문을 고르면 입력되고, 전송하면 대화와 출처 확인으로 이어집니다. 질문이 실패하면 입력을 유지합니다.
+메인 입력창이나 상단 **여행에 물어보기**에서 현재 여행의 예약을 물어볼 수 있습니다. 예시 질문을 고르면 입력되고, 전송하면 대화와 출처 확인으로 이어집니다. 질문이 실패하면 입력을 유지합니다.
 
 “첫날 예약을 모두 알려줘”는 날짜 범위로 조회해 해당 예약을 빠짐없이 가져옵니다. 환불 규정처럼 본문이 필요한 질문은 관련 메일을 검색해 답변의 근거를 연결합니다. 직접 입력한 예약과 메일에서 읽은 예약의 출처도 구분합니다.
 
@@ -186,10 +186,18 @@ PYTHON_DOTENV_DISABLED=1 .venv/bin/python -m src.recommendations.benchmark \
 
 [최신 개선 기록](docs/service-v3/MAIN_RECOMMENDATION_UX.md) · [전체 진행 기록](docs/service-v2/IMPLEMENTATION_STATUS.md) · [배포 안내](docs/operations/RENDER_SUPABASE.md) · [백업·복구](docs/operations/RUNBOOK.md) · [초기 README](docs/history/README-before-going.md)
 
+## 리뷰 조건과 메일 연습
+
+현지어 리뷰 탭에서는 **현지어 위주**와 **관측 리뷰 모두 현지어**를 한 번에 선택합니다. 모두 현지어 조건은 미판별을 포함해 다른 언어가 있는 관측을 통과시키지 않습니다. 지점·수집·언어 품질이 준비된 자료만 사용하며, 일반 지도 장소는 둘러보기에서 따로 보여줍니다.
+
+Google 지도 리뷰 수집은 Apify 연결을 준비했습니다. 토큰 연결만으로 수집이나 추천이 켜지는 것은 아닙니다. [설정과 현재 단계](docs/operations/APIFY_SETUP.md)
+
+[시작·종료 시간 메일 4개](examples/mail-time-pack)는 식당, 숙소, 투어, 자정 이후 종료 사례입니다. 연습 여행에 파일을 올려 예약 시간을 확인할 수 있습니다.
+
 ## 발표 자료
 
 기존 디자인을 유지한 **12장, 약 10분** 구성입니다. 여행 준비에서 느낀 불편함과 기획 방향, 주요 기능, 구현 방법을 소개합니다.
 
-[Keynote](docs/presentation/v8/going-v8-class-presentation.key?raw=1) · [PowerPoint](docs/presentation/v8/going-v8-class-presentation.pptx?raw=1) · [발표 대본](docs/presentation/v8/SCRIPT.md) · [자료 안내](docs/presentation/v8/README.md)
+[Keynote](docs/presentation/v8/going-v8-class-presentation.key?raw=1) · [PowerPoint](docs/presentation/v8/going-v8-class-presentation.pptx?raw=1) · [자료 안내](docs/presentation/v8/README.md)
 
 <sub>[이전 수업 발표 PDF](docs/presentation/going-class-presentation.pdf)</sub>

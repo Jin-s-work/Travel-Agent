@@ -68,7 +68,7 @@ services:
       - key: TAVILY_API_KEY
         value: ""
       - key: APIFY_TOKEN
-        value: ""
+        sync: false
       - key: JOB_POLL_SECONDS
         value: "3"
       - key: JOB_LEASE_SECONDS

@@ -6,7 +6,7 @@
 
 - [Keynote 다운로드](going-v7-class-presentation.key?raw=1)
 - [PowerPoint 다운로드](going-v7-class-presentation.pptx?raw=1)
-- [발표 대본과 5분 축약 안내](SCRIPT.md)
+- 발표 대본(로컬 별도 보관)
 - [70초 화면 영상](going-demo.mp4?raw=1)
 - [화면·사진 출처](CREDITS.md)
 
