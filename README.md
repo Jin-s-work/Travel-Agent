@@ -344,13 +344,9 @@ test -e .env || cp .env.example .env
 [service-v3](docs/service-v3/IMPLEMENTATION_STATUS.md), 백업·복구는
 [운영 절차](docs/operations/RUNBOOK.md)에 기록했습니다.
 
-## 발표 자료
-
-**최신 v4 · 10장 · 8분 30초 목표.** 두 추천 방식과 리뷰 계산, 예약·일정 연결, 구현과 실제 검증의
-차이를 자연스럽게 설명합니다. 각 슬라이드에 발표자 메모를 넣었고 5분 축약·10분 시연안도 제공합니다.
 
 - [Keynote 다운로드](docs/presentation/v4/going-v4-class-presentation.key?raw=1) · [PowerPoint 다운로드](docs/presentation/v4/going-v4-class-presentation.pptx?raw=1)
-- [발표 대본·예상 질문](docs/presentation/v4/SCRIPT.md) · [새 발표 자료 안내](docs/presentation/v4/README.md)
+ [새 발표 자료 안내](docs/presentation/v4/README.md)
 - [근거·렌더링 검증](docs/presentation/v4/REVIEW.md) · [기존 화면·사진 출처](docs/presentation/CREDITS.md)
 
-![고잉 v4 발표 10장 미리보기](docs/presentation/v4/preview.webp)
+
