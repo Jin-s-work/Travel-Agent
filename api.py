@@ -209,9 +209,12 @@ def create_app(settings=None, *, parser=None, embedder=None, vector_factory=None
                     response=JSONResponse({'error':{'code':'RESTORE_VALIDATION_REQUIRED' if restoring else 'SERVICE_READ_ONLY','message':'운영 점검 중입니다. 잠시 후 다시 시도해 주세요.','request_id':request.state.request_id,'retryable':True,'details':None}},status_code=503)
                 else:response=await call_next(request)
             else:response=await call_next(request)
-        except Exception:
-            logging.getLogger(__name__).error('request_failed request_id=%s code=INTERNAL_ERROR',request.state.request_id)
-            response=JSONResponse({'error':{'code':'INTERNAL_ERROR','message':'요청을 처리하지 못했습니다.','request_id':request.state.request_id,'retryable':False,'details':None}},status_code=500)
+        except Exception as exc:
+            from src.operations.failures import diagnostic
+            info=diagnostic(exc)
+            code='DATABASE_BUSY' if info['busy'] else 'INTERNAL_ERROR'
+            logging.getLogger(__name__).error('request_failed request_id=%s code=%s diagnostic=%s',request.state.request_id,code,info['errors'])
+            response=JSONResponse({'error':{'code':code,'message':'저장 요청이 몰려 잠시 기다리고 있어요. 입력은 유지됩니다. 잠시 후 다시 시도해 주세요.' if info['busy'] else '요청을 처리하지 못했습니다.','request_id':request.state.request_id,'retryable':info['busy'],'details':None}},status_code=503 if info['busy'] else 500,headers={'Retry-After':'3'} if info['busy'] else None)
         if request.url.path not in {'/api/health','/health/live','/health/ready'}:
             app.state.metrics.record(response.status_code,time.monotonic()-started)
         response.headers['X-Request-ID']=request.state.request_id
