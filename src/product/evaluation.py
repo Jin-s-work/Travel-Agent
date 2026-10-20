@@ -14,7 +14,7 @@ def compare(snapshot,candidates,candidate_version='diversity-v2'):
     left_input=deepcopy(snapshot);right_input=deepcopy(snapshot)
     if candidate_version=='general-v3':
         left_input.pop('recommendation_model_version',None);left_input.pop('section_models',None)
-        right_input.update(model_snapshot(right_input))
+        right_input.update(model_snapshot(right_input, version='general_v3'))
     left=recommend(left_input,frozen,now=clock,config=CONFIGS['baseline'])
     right=recommend(right_input,frozen,now=clock,config=CONFIGS[candidate_version])
     output=[]

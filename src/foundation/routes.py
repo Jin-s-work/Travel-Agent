@@ -2,12 +2,15 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import logging
 import secrets
 from typing import Literal
-from fastapi import APIRouter, Depends, File, Request, UploadFile, Query, Form
+from fastapi import APIRouter, Depends, File, Request, UploadFile, Query
 from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse, Response
 from pydantic import BaseModel, ConfigDict, Field, model_validator
-from .auth import Actor, require_actor, digest
+from authlib.integrations.base_client.errors import MismatchingStateError, OAuthError
+from httpx import TransportError
+from .auth import Actor, require_actor
 from .repository import DomainError
 from .models import TripCreate, TripPatch, BookingCreate, BookingPatch
 from .search import SearchContext, answer
@@ -57,8 +60,8 @@ def session(request:Request):
     try:
         actor=request.app.state.auth.actor(request)
     except DomainError:
-        return {'authenticated':False,'auth_configured':configured,'user':None,'csrf_token':None,'login_url':'/api/v2/auth/login'}
-    return {'authenticated':True,'auth_configured':configured,'user':{'id':actor.id,'display_name':actor.display_name,'role':actor.role},'expires_at':actor.expires_at,'csrf_token':actor.csrf_token,'login_url':'/api/v2/auth/login'}
+        return {'authenticated':False,'auth_configured':configured,'user':None,'csrf_token':None,'login_url':'/api/v2/auth/login','features':{'simple_discovery':request.app.state.settings.simple_discovery_enabled}}
+    return {'authenticated':True,'auth_configured':configured,'user':{'id':actor.id,'display_name':actor.display_name,'role':actor.role},'expires_at':actor.expires_at,'csrf_token':actor.csrf_token,'login_url':'/api/v2/auth/login','features':{'simple_discovery':request.app.state.settings.simple_discovery_enabled}}
 
 
 @router.get('/mail-capabilities')
@@ -68,25 +71,47 @@ def mail_capabilities(request:Request,actor:Actor=Depends(require_actor)):
 
 @router.get('/auth/login')
 async def login(request:Request):
-    return await start_login(request,'')
+    return await start_login(request)
 
 
 @router.post('/auth/login')
-async def invitation_login(request:Request,invitation:str=Form(default='',max_length=200)):
+async def login_post(request:Request):
     if request.headers.get('origin') != request.app.state.settings.public_base_url:
         raise DomainError('ORIGIN_REJECTED','요청 출처를 확인할 수 없습니다.',403)
-    return await start_login(request,invitation)
+    return await start_login(request)
 
 
-async def start_login(request,invitation):
+async def start_login(request):
     auth=request.app.state.auth
     if not auth.settings.auth_configured:
         raise DomainError('AUTH_NOT_CONFIGURED','운영자가 로그인 제공자를 설정해야 합니다.',503)
-    # Invitation plaintext stays only in signed HttpOnly transient state cookie.
+    # A fresh provider flow owns the transient state cookie.
     request.session.clear()
-    request.session['invitation_hash']=digest(invitation.strip())
     callback=auth.settings.public_base_url+'/api/v2/auth/callback'
-    return await auth.oauth.identity.authorize_redirect(request,callback)
+    try:
+        return await auth.oauth.identity.authorize_redirect(request,callback)
+    except Exception as exc:
+        return login_failure(request,exc,stage='start')
+
+
+def login_failure(request,exc,*,stage='callback'):
+    """Expose fixed recovery codes; never log tokens, claims, query strings or errors."""
+    code='login_failed'
+    if isinstance(exc,MismatchingStateError):
+        cookie='__Host-oidc' if request.app.state.settings.secure_cookie else 'travel_dev_oidc'
+        code='state_expired' if request.cookies.get(cookie) else 'cookie_missing'
+    elif isinstance(exc,DomainError):
+        code={'IDENTITY_UNVERIFIED':'identity_unverified','ACCESS_REVOKED':'access_revoked'}.get(exc.code,'login_failed')
+    elif isinstance(exc,OAuthError):
+        code={'access_denied':'login_cancelled','invalid_client':'provider_configuration',
+              'unauthorized_client':'provider_configuration','invalid_grant':'state_expired'}.get(exc.error,'identity_unverified')
+    elif isinstance(exc,TransportError):
+        code='provider_unavailable'
+    from src.operations.failures import diagnostic
+    logging.getLogger(__name__).warning('login_failed stage=%s code=%s request_id=%s diagnostic=%s',
+        stage,code,request.state.request_id,diagnostic(exc)['errors'])
+    request.session.clear()
+    return RedirectResponse('/?auth_error='+code+'&auth_request='+request.state.request_id,status_code=303)
 
 
 @router.get('/auth/callback')
@@ -99,10 +124,9 @@ async def callback(request:Request):
         claims=token.get('userinfo')
         if not claims:
             raise ValueError('Missing verified ID token')
-        session_token=auth.complete_identity(claims,None,invitation_hash=request.session.get('invitation_hash'))
-    except Exception:
-        request.session.clear()
-        return RedirectResponse('/?auth_error=login_denied',status_code=303)
+        session_token=auth.complete_identity(claims)
+    except Exception as exc:
+        return login_failure(request,exc)
     request.session.clear()
     response=RedirectResponse('/',status_code=303)
     response.set_cookie(auth.settings.cookie_name,session_token,max_age=auth.settings.session_hours*3600,secure=auth.settings.secure_cookie,httponly=True,samesite='lax',path='/')

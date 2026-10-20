@@ -6,6 +6,15 @@ import os
 
 @dataclass
 class Settings:
+    candidate_expansion_enabled: bool = field(default_factory=lambda: os.getenv('CANDIDATE_EXPANSION_ENABLED', 'true').lower() == 'true')
+    candidate_pool_limit: int = field(default_factory=lambda: int(os.getenv('CANDIDATE_POOL_LIMIT', '200')))
+    candidate_raw_record_limit: int = field(default_factory=lambda: int(os.getenv('CANDIDATE_RAW_RECORD_LIMIT', '400')))
+    candidate_query_limit: int = field(default_factory=lambda: int(os.getenv('CANDIDATE_QUERY_LIMIT', '7')))
+    candidate_deadline_seconds: int = field(default_factory=lambda: int(os.getenv('CANDIDATE_DEADLINE_SECONDS', '120')))
+    bounded_review_enabled: bool = field(default_factory=lambda: os.getenv('BOUNDED_REVIEW_ENABLED', 'false').lower() == 'true')
+    photo_collection_enabled: bool = field(default_factory=lambda: os.getenv('PHOTO_COLLECTION_ENABLED', 'true').lower() == 'true')
+    ranker_shadow_enabled: bool = field(default_factory=lambda: os.getenv('RANKER_SHADOW_ENABLED', 'false').lower() == 'true')
+    simple_discovery_enabled: bool = field(default_factory=lambda: os.getenv("SIMPLE_DISCOVERY_ENABLED", "true").lower() == "true")
     mail_analysis_mode: str = field(default_factory=lambda: os.getenv("MAIL_ANALYSIS_MODE", "auto").lower())
     public_discovery_enabled: bool | None = field(default_factory=lambda: None if 'PUBLIC_DISCOVERY_ENABLED' not in os.environ else os.getenv('PUBLIC_DISCOVERY_ENABLED','').lower() in {'true','1'})
     preparation_enabled: bool = field(default_factory=lambda: os.getenv('PREPARATION_ENABLED', 'true').lower() == 'true')

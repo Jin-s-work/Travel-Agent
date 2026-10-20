@@ -33,7 +33,8 @@ _LABELS = {
     'return': r'반납|drop[ -]?off',
     'visit': r'이용일|방문일|예약일|visit\s*date|date\s*of\s*visit|fecha',
     'meeting': r'집합\s*시간|집합\s*시각|meeting\s*time',
-    'ending': r'종료\s*예정|end\s*time',
+    'starting': r'시작\s*(?:시간|시각)|start\s*time',
+    'ending': r'종료\s*(?:예정|시간|시각)|end\s*time',
 }
 
 
@@ -301,7 +302,7 @@ def parse_local_document(raw):
             if start and end:
                 events.append(_safe_event('outbound' if match[1].lower() == 'outbound' else 'return', start, end, sz, ez, None, reasons))
         if not events:
-            pair = ('checkin', 'checkout', 'stay') if kind == '숙소' else ('departure', 'arrival', 'flight') if kind == '항공' else ('pickup', 'return', 'pickup') if kind == '렌터카' else None
+            pair = ('checkin', 'checkout', 'stay') if kind == '숙소' else ('departure', 'arrival', 'flight') if kind == '항공' else ('pickup', 'return', 'pickup') if kind == '렌터카' else ('starting', 'ending', 'activity')
             if pair:
                 first, last = _label_part(block, pair[0]), _label_part(block, pair[1])
                 if first and _dates(first):
@@ -318,8 +319,10 @@ def parse_local_document(raw):
             first_date = next((v for v in days if v[0] == day), None)
             line = block[first_date[2]:].split('\n', 1)[0] if first_date else ''
             clocks = _following_clocks(line)
+            starting = _label_part(block, 'starting')
+            if starting: line = starting; clocks = _clocks(line)
             meeting = _label_part(block, 'meeting')
-            if meeting: clocks = _clocks(meeting)
+            if meeting: line = meeting; clocks = _clocks(line)
             start = day + 'T' + clocks[0][0] + ':00' if day and clocks else day
             end = None
             # Only a syntactic time range means duration; a later price/policy

@@ -28,7 +28,7 @@ def calendar(task):
     description=['예약 준비 알림. 예약 확정이 아닙니다. 다운로드 시점의 snapshot이며 자동 갱신되지 않습니다.',
         '시설 시간대: '+task['timezone'], '시설 현지 준비 시점: '+local_due,
         '희망 방문일: '+task.get('visit_date','미확인'),
-        f"성인 {party.get('adults','미확인')}명 · 아동 {len(party.get('children',[]))}명"]
+        f"성인 {party.get('adults') if party.get('adults') is not None else '미확인'}명 · 아동 {len(party.get('children',[]))}명"]
     source=((task.get('rule') or {}).get('source') or {}).get('url')
     if source:
         parts=urlsplit(source)
@@ -51,7 +51,7 @@ def calendar(task):
 def inquiry(task, language):
     slots={k:task.get(k) for k in ('title','place_name','visit_date','requested_time','party','requests','request_keys','timezone')}
     party=slots['party']; ages=', '.join('?' if c['age'] is None else str(c['age']) for c in party['children']) or '—'
-    day=slots['visit_date'];time=slots['requested_time'] or '—';title=slots.get('place_name') or slots['title'];adults=party['adults'];children=len(party['children'])
+    day=slots['visit_date'];time=slots['requested_time'] or '—';title=slots.get('place_name') or slots['title'];adults=party['adults'] if party.get('adults') is not None else '—';children=len(party['children'])
     # User supplied requests are quoted as original content, never invented translations.
     common=f"{day} / {time} / {slots['timezone']}"
     texts={

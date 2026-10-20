@@ -1,4 +1,4 @@
-"""Authlib OIDC authentication followed by independent invitation authorization."""
+"""Verified OIDC sign-in, ordinary-member registration and revocable sessions."""
 from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -57,10 +57,12 @@ class Auth:
             con.execute("UPDATE users SET status='disabled',session_epoch=session_epoch+1,updated_at=? WHERE id=?", (now().isoformat(), user_id))
             con.execute('DELETE FROM sessions WHERE user_id=?', (user_id,))
 
-    def complete_identity(self, claims, invitation, *, invitation_hash=None):
+    def complete_identity(self, claims, invitation=None, *, invitation_hash=None):
         # Only claims returned by Authlib's verified ID token path may enter here.
+        # Legacy invitation arguments remain compatible with maintenance callers;
+        # they no longer grant or restrict access. Roles come from the database.
         if not claims.get('sub') or not claims.get('iss') or not claims.get('email') or claims.get('email_verified') is not True:
-            raise DomainError('INVITATION_REQUIRED', '확인된 이메일이 있는 초대 계정만 이용할 수 있습니다.', 403)
+            raise DomainError('IDENTITY_UNVERIFIED', '이메일 인증이 완료된 Google 계정으로 로그인해 주세요.', 403)
         stamp = now().isoformat()
         provider, subject = str(claims['iss']), str(claims['sub'])
         email = str(claims['email']).casefold()
@@ -70,12 +72,8 @@ class Auth:
             if user and user['status'] != 'active':
                 raise DomainError('ACCESS_REVOKED', '서비스 이용 권한이 회수되었습니다.', 403)
             if not user:
-                invited = con.execute('SELECT * FROM invitations WHERE token_hash=? AND email=? AND used_at IS NULL AND revoked_at IS NULL AND expires_at>?', (invitation_hash or digest(invitation or ''),email,stamp)).fetchone()
-                if not invited:
-                    raise DomainError('INVITATION_REQUIRED', '초대가 없거나 만료되었습니다. 초대받은 계정으로 로그인해 주세요.',403)
                 uid = str(uuid.uuid4())
                 con.execute('INSERT INTO users(id,email,auth_provider,auth_subject,display_name,created_at,updated_at) VALUES (?,?,?,?,?,?,?)', (uid,email,provider,subject,str(claims.get('name') or email)[:200],stamp,stamp))
-                con.execute('UPDATE invitations SET used_at=?,user_id=? WHERE id=? AND used_at IS NULL', (stamp,uid,invited['id']))
                 user = con.execute('SELECT * FROM users WHERE id=?',(uid,)).fetchone()
             token = secrets.token_urlsafe(32)
             sid, csrf = str(uuid.uuid4()), secrets.token_urlsafe(32)

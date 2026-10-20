@@ -138,12 +138,18 @@ def create_app(settings=None, *, parser=None, embedder=None, vector_factory=None
                                     answer_generator=answer_generator,fault_hook=fault_hook)
     app.state.documents.operations=app.state.operations
     from src.research.service import ReviewService
-    app.state.reviews=ReviewService(app.state.db,app.state.repo,app.state.jobs,app.state.gateway,provider=review_provider,detector=review_detector,fault_hook=fault_hook)
+    app.state.reviews=ReviewService(app.state.db,app.state.repo,app.state.jobs,app.state.gateway,provider=review_provider,detector=review_detector,fault_hook=fault_hook,bounded_enabled=settings.bounded_review_enabled)
     from src.discovery.service import DiscoveryService
     app.state.discovery=DiscoveryService(app.state.db,app.state.repo,app.state.jobs,app.state.reviews,allow_synthetic=settings.environment=='development')
     if settings.public_discovery_enabled is True or settings.public_discovery_enabled is None and settings.environment!='development':
         from src.discovery.public_places import PublicDiscovery
-        app.state.discovery.public_provider=PublicDiscovery(app.state.db)
+        if settings.candidate_expansion_enabled:
+            from src.discovery.candidate_pool import ExpandedPublicDiscovery
+            app.state.discovery.public_provider=ExpandedPublicDiscovery(app.state.db,settings=settings)
+        else:
+            app.state.discovery.public_provider=PublicDiscovery(app.state.db)
+    from src.discovery.photo_provider import PlacePhotos
+    app.state.place_photos=PlacePhotos(app.state.db,app.state.repo,app.state.jobs,app.state.discovery,enabled=settings.photo_collection_enabled and app.state.discovery.public_provider is not None)
     from src.location import build_location_providers, MatrixService
     location_config={}
     if settings.location_provider_config:
@@ -158,7 +164,7 @@ def create_app(settings=None, *, parser=None, embedder=None, vector_factory=None
     from src.accommodations.service import Accommodations
     app.state.accommodations=Accommodations(app.state.db,app.state.repo,app.state.jobs,geocoder=geocoding_provider or geocoder,gateway=app.state.gateway,allow_synthetic=settings.environment=='development')
     from src.recommendations.service import Recommendations
-    app.state.recommendations=Recommendations(app.state.db,app.state.repo,app.state.jobs,app.state.discovery,app.state.reviews,matrix=app.state.location_matrix)
+    app.state.recommendations=Recommendations(app.state.db,app.state.repo,app.state.jobs,app.state.discovery,app.state.reviews,matrix=app.state.location_matrix,shadow_enabled=settings.ranker_shadow_enabled)
     from src.itineraries.travel_time import TravelTime
     from src.itineraries.service import Itineraries
     app.state.travel_time=TravelTime(app.state.gateway,app.state.jobs,provider=route_provider)
@@ -173,6 +179,8 @@ def create_app(settings=None, *, parser=None, embedder=None, vector_factory=None
     from src.travel_tools.today import Today
     app.state.today=Today(app.state.db,app.state.repo,app.state.itineraries,app.state.discovery,app.state.preparation)
     def dispatch(job,ctx):
+        if job['operation']=='place_photos':
+            return app.state.place_photos.execute(job,ctx)
         if job['operation']=='review_collection':
             return app.state.reviews.execute(job,ctx)
         if job['operation']=='accommodation_resolve':
@@ -205,9 +213,12 @@ def create_app(settings=None, *, parser=None, embedder=None, vector_factory=None
                     response=JSONResponse({'error':{'code':'RESTORE_VALIDATION_REQUIRED' if restoring else 'SERVICE_READ_ONLY','message':'운영 점검 중입니다. 잠시 후 다시 시도해 주세요.','request_id':request.state.request_id,'retryable':True,'details':None}},status_code=503)
                 else:response=await call_next(request)
             else:response=await call_next(request)
-        except Exception:
-            logging.getLogger(__name__).error('request_failed request_id=%s code=INTERNAL_ERROR',request.state.request_id)
-            response=JSONResponse({'error':{'code':'INTERNAL_ERROR','message':'요청을 처리하지 못했습니다.','request_id':request.state.request_id,'retryable':False,'details':None}},status_code=500)
+        except Exception as exc:
+            from src.operations.failures import diagnostic
+            info=diagnostic(exc)
+            code='DATABASE_BUSY' if info['busy'] else 'INTERNAL_ERROR'
+            logging.getLogger(__name__).error('request_failed request_id=%s code=%s diagnostic=%s',request.state.request_id,code,info['errors'])
+            response=JSONResponse({'error':{'code':code,'message':'저장 요청이 몰려 잠시 기다리고 있어요. 입력은 유지됩니다. 잠시 후 다시 시도해 주세요.' if info['busy'] else '요청을 처리하지 못했습니다.','request_id':request.state.request_id,'retryable':info['busy'],'details':None}},status_code=503 if info['busy'] else 500,headers={'Retry-After':'3'} if info['busy'] else None)
         if request.url.path not in {'/api/health','/health/live','/health/ready'}:
             app.state.metrics.record(response.status_code,time.monotonic()-started)
         response.headers['X-Request-ID']=request.state.request_id

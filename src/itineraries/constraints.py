@@ -196,10 +196,12 @@ def assess_visit(item, candidate, snapshot, now, distance_evidence=None):
         if not known:add('UNKNOWN_REQUIRED_WALKING_TIME',field='distance_filter')
         elif duration>distance_filter['max_duration_minutes']:add('MAXIMUM_WALKING_TIME_EXCEEDED','violated',field='distance_filter')
         else:add('WALKING_TIME_MATCH','satisfied',field='distance_filter')
-    count = party['adults']+len(party.get('children', []))
+    count = party['adults']+len(party.get('children', [])) if party.get('adults') is not None else None
     for field, compare in (('min_party', lambda value: count >= value), ('max_party', lambda value: count <= value)):
         value, rows, _ = facts.get(field)
-        if type(value) is not int or value < 1:
+        if count is None:
+            add('PARTY_UNKNOWN', field=field)
+        elif type(value) is not int or value < 1:
             add('MISSING_REQUIRED_FACT', field=field)
         else:
             add('PARTY_MATCH' if compare(value) else 'PARTY_MISMATCH', 'satisfied' if compare(value) else 'violated', facts.refs(rows), field)

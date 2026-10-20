@@ -15,7 +15,7 @@ import uuid
 from src.foundation.repository import DomainError
 
 TERMINAL = frozenset({'succeeded', 'partial', 'failed', 'cancelled'})
-PERSONAL_OPERATIONS = frozenset({'documents', 'reindex', 'bookmark_resolve', 'recommendations', 'itinerary_generate', 'accommodation_resolve'})
+PERSONAL_OPERATIONS = frozenset({'documents', 'reindex', 'bookmark_resolve', 'recommendations', 'itinerary_generate', 'accommodation_resolve', 'place_photos'})
 FORBIDDEN_KEYS = frozenset({'raw_text', 'body', 'access_token', 'refresh_token', 'id_token',
                             'password', 'api_key', 'secret', 'authorization', 'cookie'})
 

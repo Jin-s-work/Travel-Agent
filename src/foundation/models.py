@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime, time, timezone
+import re
 from typing import Any, Literal
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
@@ -15,6 +16,8 @@ class StrictModel(BaseModel):
 
 def valid_date(value: str | None) -> str | None:
     if value is not None:
+        if not isinstance(value,str) or not re.fullmatch(r'[0-9]{4}-[0-9]{2}-[0-9]{2}',value):
+            raise ValueError('날짜는 네 자리 연도의 YYYY-MM-DD 형식이어야 합니다.')
         if date.fromisoformat(value).isoformat() != value:
             raise ValueError('날짜는 YYYY-MM-DD 형식이어야 합니다.')
     return value
@@ -51,7 +54,7 @@ class Child(StrictModel):
 
 
 class Party(StrictModel):
-    adults: int = Field(default=1, ge=1, le=50)
+    adults: int | None = Field(default=None, ge=1, le=50)
     children: list[Child] = Field(default_factory=list, max_length=30)
     children_status: Literal['unknown','none','present'] = 'unknown'
 

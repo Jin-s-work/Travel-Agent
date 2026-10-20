@@ -154,7 +154,7 @@ class Repository:
             stop['recommendation_supported'] = bool(city_key(stop['city']))
             stop['recommendation_coverage'] = 'checked_per_request'
         return {'id': row['id'], 'title': row['title'], 'start_date': row['start_date'], 'end_date': row['end_date'],
-                'party': {**conditions.get('party', {'adults': 1, 'children': []}), 'children_status': conditions.get('party', {}).get('children_status', 'present' if conditions.get('party', {}).get('children') else 'unknown')}, 'stops': stops,
+                'party': {**conditions.get('party', {'adults': None, 'children': []}), 'children_status': conditions.get('party', {}).get('children_status', 'present' if conditions.get('party', {}).get('children') else 'unknown')}, 'stops': stops,
                 'active_index_id': row['active_index_id'],
                 'version': row['version'], 'created_at': row['created_at'], 'updated_at': row['updated_at']}
 

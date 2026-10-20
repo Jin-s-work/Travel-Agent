@@ -162,7 +162,7 @@ def _structured_answer(question, rows):
             value = booking.get('location') or '주소·집합 장소 미확인'
         elif re.search(r'인원|몇\s*명', question):
             party = booking.get('party')
-            value = (f"성인 {party['adults']}명 · " + (f"아동 {len(party['children'])}명" if party.get('children_status') != 'unknown' else '아동 인원 미확인')) if party else '예약 인원 미확인'
+            value = (f"성인 {party['adults'] if party.get('adults') is not None else '미확인'}명 · " + (f"아동 {len(party['children'])}명" if party.get('children_status') != 'unknown' else '아동 인원 미확인')) if party else '예약 인원 미확인'
         else:
             value = f"{booking.get('date') or '날짜 미확인'} · {booking.get('time') or '시각 미확인'}"
             if booking.get('date_end'):

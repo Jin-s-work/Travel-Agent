@@ -209,7 +209,7 @@ class Product:
             if versions[iid]!=body['itinerary_version'] or entry['override_version']!=body['expected_version']:fail('VERSION_CONFLICT','일정 또는 가격 입력이 바뀌었습니다.',409)
             if body['party']:
                 triprow=self.repo._trip_dto(con,self.scope(con,actor,trip));party=triprow['party']
-                if body['party']['adults']>party['adults'] or len(body['party']['children'])>len(party['children']):fail('PARTY_EXCEEDS_TRIP','실제 참여 인원을 확인해 주세요.')
+                if (body['party'].get('adults') is not None and party.get('adults') is not None and body['party']['adults']>party['adults']) or (party.get('children_status')!='unknown' and len(body['party']['children'])>len(party['children'])):fail('PARTY_EXCEEDS_TRIP','실제 참여 인원을 확인해 주세요.')
             if body['included_by']:
                 parent=next((e for e in entries if e['key']==iid+':'+body['included_by']),None)
                 if not parent:fail('NOT_FOUND','포함하는 비용 항목을 찾을 수 없습니다.',404)

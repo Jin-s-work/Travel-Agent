@@ -54,6 +54,12 @@ class Generation(Input):
     buffers:Buffers=Field(default_factory=Buffers)
     rest_preferences:RestPreferences=Field(default_factory=RestPreferences)
     meal_windows:list[MealWindow]=Field(default_factory=list,max_length=3)
+    @field_validator('start_date','end_date',mode='before')
+    @classmethod
+    def dates(cls,value):
+        from src.foundation.models import valid_date
+        return valid_date(value.isoformat() if type(value) is date else value)
+
     @model_validator(mode='after')
     def valid(self):
         if self.end_date<self.start_date or (self.end_date-self.start_date).days>=14:raise ValueError('Plan one to fourteen days at a time')

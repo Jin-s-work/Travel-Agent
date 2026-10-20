@@ -26,7 +26,7 @@ def estimate(entries):
         def money(v):return str(v.quantize(unit,rounding=ROUND_HALF_UP)) if v is not None else None
         result['currency']=p.currency;party=entry.get('party')
         lo,hi=p.amount_min,p.amount_max
-        if not party:lo=hi=None;result['reasons'].append('PARTY_UNKNOWN')
+        if not party or party.get('adults') is None:lo=hi=None;result['reasons'].append('PARTY_UNKNOWN')
         elif (p.min_party and party['adults']+len(party['children'])<p.min_party) or (p.max_party and party['adults']+len(party['children'])>p.max_party):
             lo=hi=None;result['reasons'].append('PARTY_OUTSIDE_PRICE_RANGE')
         elif p.basis=='per_person':
