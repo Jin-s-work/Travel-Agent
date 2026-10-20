@@ -12,32 +12,34 @@
 <meta name="apple-mobile-web-app-title" content="고잉">
 <link rel="preload" href="/fonts/PretendardVariable-v1.3.9.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/foundation.css?v=a126fd2ba73a">
-<link rel="stylesheet" href="/css/design-system.css?v=727c090b8664">
-<script src="/js/offline-store.js?v=f2e23f13122c" defer></script>
+<link rel="stylesheet" href="/css/design-system.css?v=3c7b089928d4">
+<script src="/js/offline-store.js?v=085a3ed4db8a" defer></script>
 <script src="/js/product.js?v=0c4bb5414da3" defer></script>
 <script src="/js/travel-tools.js?v=babbf4751245" defer></script>
-<script src="/js/accommodations.js?v=05844caeb0b8" defer></script>
-<script src="/js/workspace.js?v=6ae42c65719a" defer></script>
-<script src="/js/discovery-experience.js?v=298a513027d3" defer></script>
-<script src="/js/review-lab.js?v=7222f7d6695e" defer></script>
-<script src="/js/foundation.js?v=24be4c062c63" defer></script>
+<script src="/js/accommodations.js?v=6d21c2198b4e" defer></script>
+<script src="/js/workspace.js?v=93cfb2844fba" defer></script>
+<script src="/js/discovery-flow.js?v=45e697bd43fb" defer></script>
+<script src="/js/discovery-experience.js?v=f34760390cb9" defer></script>
+<script src="/js/review-lab.js?v=a1e2ef103f42" defer></script>
+<script src="/js/home.js?v=e724d24c217a" defer></script>
+<script src="/js/recommendation-pages.js?v=373219eefc5e" defer></script>
+<script src="/js/simple-discovery.js?v=8598a9ac17cd" defer></script>
+<script src="/js/foundation.js?v=ed0eeee36ad3" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">본문으로 이동</a>
-<div id="boot" class="boot" role="status">여행을 불러오고 있어요…</div>
+<div id="boot" class="boot" role="status"><span>로그인 정보를 확인하고 있어요…</span><p class="hint">서버가 쉬고 있었다면 약 1분 걸릴 수 있어요.</p><a href="/" class="text-button">화면 다시 열기</a></div>
 <main id="auth" class="auth" hidden>
   <div class="brand-mark"><img src="/icon.svg?v=4bbd16dbaddf" alt="" width="32" height="32"><strong>고잉</strong></div>
 
   <h1>다음 여행을 준비해요</h1>
-  <p class="auth-intro">가고 싶은 곳과 예약을 한곳에 모아두세요.<br>초대받은 계정으로 로그인할 수 있어요.</p>
+  <p class="auth-intro">가고 싶은 곳과 예약을 한곳에 모아두세요.<br>Google 계정으로 바로 시작할 수 있어요.</p>
   <form id="loginForm" class="panel auth-panel" action="/api/v2/auth/login" method="post">
     <h2>내 여행 시작하기</h2>
-    <p id="authMessage" class="muted">초대받은 이메일 계정으로 로그인해 주세요.</p>
-    <label for="invitation">초대 코드 <span class="muted">· 처음 이용할 때</span></label>
-    <input id="invitation" name="invitation" type="text" autocomplete="off" maxlength="200" placeholder="전달받은 초대 코드" spellcheck="false">
-    <p class="hint">이미 가입했다면 초대 코드를 다시 입력하지 않아도 됩니다.</p>
+    <p id="authMessage" class="muted">처음이라면 로그인과 함께 계정이 만들어져요.</p>
+    <p class="hint">다른 기기에서도 같은 Google 계정으로 로그인하면 내 여행을 이어서 볼 수 있어요.</p>
     <p id="authError" class="error" role="alert" hidden></p>
-    <button id="loginButton" class="primary" type="submit">로그인</button>
+    <button id="loginButton" class="primary" type="submit">Google 계정으로 로그인</button>
     <button id="openOffline" class="secondary" type="button">이 기기에 저장한 여행 보기</button>
     <button id="retrySession" class="text-button" type="button">연결 다시 확인</button>
   </form>
@@ -49,16 +51,17 @@
     <a class="brand" href="/" aria-label="고잉 홈"><img class="brand-symbol" src="/icon.svg?v=4bbd16dbaddf" alt="" width="28" height="28"><span class="brand-wordmark">고잉</span></a>
     <nav aria-label="주 메뉴">
       <p class="nav-label">내 여행</p>
-      <button type="button" data-tab="trip" class="nav-primary" aria-current="page"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h16v11H4z M8 9V5h8v4 M9 13v3 M15 13v3"/></svg><span class="nav-text">홈</span></button>
-      <button type="button" data-tab="explore" class="nav-primary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18 M16 8l-2.5 5.5L8 16l2.5-5.5z"/></svg><span class="nav-text">탐색</span></button>
+      <button type="button" data-tab="trip" class="nav-primary legacy-home-nav" aria-current="page"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h16v11H4z M8 9V5h8v4 M9 13v3 M15 13v3"/></svg><span class="nav-text">홈</span></button>
+      <button type="button" data-tab="saved" class="nav-primary saved-nav"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h16v11H4z M8 9V5h8v4 M9 13v3 M15 13v3"/></svg><span class="nav-text">저장한 곳</span></button>
+      <button type="button" data-tab="explore" class="nav-primary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18 M16 8l-2.5 5.5L8 16l2.5-5.5z"/></svg><span class="nav-text">찾기</span></button>
       <button type="button" data-tab="itinerary" class="nav-primary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3v4 M18 3v4 M3 10h18 M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2 M7 14h3 M7 17h7"/></svg><span class="nav-text">일정</span></button>
 
       <button type="button" data-tab="mail" class="nav-primary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18v14H3z M3 6l9 7 9-7"/></svg><span class="nav-text">예약</span></button>
       <button type="button" data-tab="today" class="nav-secondary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v2 M12 20v2 M2 12h2 M20 12h2 M5 5l1.5 1.5 M17.5 17.5L19 19 M5 19l1.5-1.5 M17.5 6.5L19 5 M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0"/></svg><span class="nav-text">오프라인</span></button>
+      <button type="button" data-tab="ask" class="nav-primary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11a8 8 0 0 1-8 8H8l-5 3 1.5-6A8 8 0 1 1 21 11 M8 10h8 M8 14h4"/></svg><span class="nav-text">여행에 물어보기</span></button>
       <p class="nav-label nav-tools-label">여행 도구</p>
       <button type="button" data-tab="preparation" class="nav-secondary nav-alias"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4H5v17h14V4h-3 M8 2h8v5H8z M8 13l2.5 2.5L16 10"/></svg><span class="nav-text">예약 준비</span></button>
       <button type="button" data-tab="product" class="nav-secondary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14v18l-3-2-4 2-4-2-3 2z M9 7h6 M9 11h6 M9 15h2"/></svg><span class="nav-text">기록·지출</span></button>
-      <button type="button" data-tab="ask" class="nav-secondary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11a8 8 0 0 1-8 8H8l-5 3 1.5-6A8 8 0 1 1 21 11 M8 10h8 M8 14h4"/></svg><span class="nav-text">질문</span></button>
 
       <button type="button" data-tab="reviews" class="nav-secondary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v6c0 5-8 9-8 9s-8-4-8-9V7z M8 12l3 3 5-6"/></svg><span class="nav-text">리뷰 근거</span></button>
       <button type="button" data-tab="settings" class="nav-secondary"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16 M4 17h16 M8 4v6 M16 14v6"/></svg><span class="nav-text">설정</span></button>
@@ -74,12 +77,22 @@
     </header>
     <main id="main" class="main" tabindex="-1">
       <div id="pageError" class="banner error" role="alert" hidden></div>
+      <div id="workspaceRecovery" class="banner error" role="alert" hidden>로그인은 완료됐지만 여행을 불러오지 못했어요. 다시 로그인할 필요 없이 연결을 확인할 수 있어요. <button id="retryWorkspace" class="text-button" type="button">여행 다시 불러오기</button></div>
       <div class="section-switch" data-sections="mail,preparation" hidden role="group" aria-label="예약 보기"><button type="button" data-tab="mail">예약·메일</button><button type="button" data-tab="preparation">예약 준비 할 일</button></div>
       <div class="section-switch" data-sections="itinerary,today" hidden role="group" aria-label="일정 보기"><button type="button" data-tab="itinerary">전체 일정</button><button type="button" data-tab="today">오늘·오프라인</button></div>
       <section id="view-trip" class="view" aria-labelledby="tripTitle">
         <div class="trip-overview">
         <div class="page-heading"><div><h1 id="tripTitle">나의 여행</h1><p id="tripSubtitle" class="muted"></p></div><div class="actions"><button id="editTrip" class="secondary" type="button">여행 수정</button><button id="refreshBookings" class="icon-button" type="button" aria-label="예약 새로고침">↻</button></div></div>
         <div id="tripSummary" class="summary-grid"></div></div>
+        <section id="homeDiscovery" class="home-discovery" aria-labelledby="homeDiscoveryTitle" hidden>
+          <div class="home-discovery-heading"><div><p class="eyebrow">이번 여행의 발견</p><h2 id="homeDiscoveryTitle">이번 여행, 어디로 가볼까요?</h2><p id="homeDiscoveryNote" class="hint" role="status"></p></div><button id="homeFindPlaces" type="button" class="primary">추천 받기</button></div>
+          <div id="homeRecommendations" class="home-recommendations"></div>
+        </section>
+        <section id="homeAssistant" class="home-assistant" aria-labelledby="homeAssistantTitle" hidden>
+          <div><h2 id="homeAssistantTitle">내 여행에 물어보세요</h2><p class="hint">AI가 이 여행의 예약 메일과 직접 입력한 예약을 확인하고, 답변의 출처를 함께 보여줘요.</p></div>
+          <form id="homeAskForm"><label class="sr-only" for="homeQuestion">AI에게 예약 질문</label><div class="home-ask-composer"><textarea id="homeQuestion" rows="2" maxlength="1000" placeholder="첫날 예약과 체크인 시간을 알려줘" required></textarea><button id="homeAskSubmit" type="submit" class="primary">물어보기</button></div></form>
+          <div id="homeAskSuggestions" class="chips" aria-label="질문 예시"></div>
+        </section>
         <section id="homeOrigin" class="panel stay-summary" aria-label="여행 숙소와 출발점" hidden></section>
         <div id="homePlaces" class="panel home-places" hidden></div>
         <div id="noTrip" class="empty panel" hidden><span aria-hidden="true">↗</span><h2>첫 여행을 만들어 보세요</h2><p>예약 메일이 없어도 괜찮아요.<br>날짜와 도시를 정하고 예약을 직접 추가할 수 있어요.</p><button type="button" id="emptyCreateTrip" class="primary">여행 만들기</button></div>
@@ -120,12 +133,12 @@
 <div id="discoveryAvailability"></div>
         <div id="discoveryMessage" class="form-note" role="status" hidden></div>
         <section id="recommendationWorkspace" class="recommendation-workspace" aria-labelledby="recommendationTitle">
-          <div class="section-heading"><h2 id="recommendationTitle">이번 여행에서 가볼 곳</h2><button id="applyRecommendations" type="button" class="primary">장소 찾아보기</button></div>
+          <div class="section-heading"><h2 id="recommendationTitle">가볼 곳</h2><button id="applyRecommendations" type="button" class="secondary">장소 찾아보기</button></div>
           <div id="discoveryModes" class="discovery-modes"></div>
-          <div class="discovery-support-row"><section id="discoveryCapability" class="discovery-capability" aria-live="polite"></section><button id="showReferencePlaces" type="button" class="text-button reference-entry" aria-pressed="false">주변 장소 참고하기 ↗</button></div>
+          <div class="discovery-support-row"><section id="discoveryCapability" class="discovery-capability" aria-live="polite"></section><button id="showReferencePlaces" type="button" class="text-button reference-entry" aria-pressed="false">주변 장소 둘러보기</button></div>
           <section class="recommendation-filter-bar discovery-conditions" aria-labelledby="discoveryConditionsTitle">
-            <div class="filter-summary-copy"><h3 id="discoveryConditionsTitle">나에게 맞는 조건</h3><p id="discoveryConditionBrief" class="hint"></p><p id="recommendationFilterSummary" class="hint">관점별 최대 6곳</p><div id="discoveryConditions"></div></div>
-            <button id="editDiscoveryConditions" type="button" class="secondary filter-trigger" aria-haspopup="dialog">조건 변경</button>
+            <div class="filter-summary-copy"><h3 id="discoveryConditionsTitle">취향과 예산은 선택이에요</h3><p id="discoveryConditionBrief" class="hint"></p><p id="recommendationFilterSummary" class="hint">관점별 최대 6곳</p><div id="discoveryConditions"></div></div>
+            <button id="editDiscoveryConditions" type="button" class="secondary filter-trigger" aria-haspopup="dialog">필터</button>
           </section>
           <div id="recommendationOptionState" hidden aria-hidden="true">
             <input id="reviewStrictFilter" type="checkbox"><input id="ratingFilterEnabled" type="checkbox">
@@ -137,19 +150,20 @@
           <p id="recommendationError" class="banner error" role="alert" hidden></p>
           <div id="recommendationRunStatus" class="recommendation-run-status" role="status"></div>
           <section id="recommendationHistoryWrap" class="history-disclosure" hidden><h3 class="section-label">이전 추천 기록</h3><div class="filters"><div><label for="recommendationHistory">저장된 추천 요청</label><select id="recommendationHistory"></select></div><button id="refreshRecommendations" type="button" class="text-button">결과 상태 새로고침</button></div></section>
-          <div id="recommendationResults" aria-live="polite"></div>
+          <div id="recommendationResults"></div>
           <div id="exploreItinerarySelection" class="form-note" hidden></div>
           <section id="comparisonTray" class="panel comparison-tray" aria-label="비교할 장소" aria-live="polite" hidden></section>
         </section>
         <section id="bookmarkWorkspace" hidden>
         <div class="section-heading"><h2>장소 보관함 <span id="bookmarkCount" class="count"></span></h2><button id="refreshBookmarks" class="text-button" type="button">보관함 새로고침</button></div>
         <div class="filters"><div><label for="bookmarkFilter">보관함 표시</label><select id="bookmarkFilter"><option value="all">모든 장소</option><option value="resolved">지점 확인 완료</option><option value="needs_confirmation">지점 확인 필요</option><option value="excluded">추천에서 제외한 장소</option></select></div></div>
+        <section id="savedJourney" class="panel saved-journey"></section>
         <div id="bookmarkList" aria-live="polite"></div>
         </section>
 
       </section>
       <section id="view-ask" class="view" aria-labelledby="askTitle" hidden>
-        <div class="page-heading"><div><h1 id="askTitle">내 여행에 물어보기</h1><p class="muted scope-text"></p></div><button id="clearChat" type="button" class="text-button">대화 지우기</button></div>
+        <div class="page-heading"><div><h1 id="askTitle">AI 여행 도우미</h1><p class="muted scope-text"></p></div><button id="clearChat" type="button" class="text-button">대화 지우기</button></div>
         <div id="suggestions" class="chips"></div><div id="thread" class="thread" aria-live="polite" aria-relevant="additions"></div>
         <form id="questionForm" class="composer panel"><label for="question">여행 질문</label><textarea id="question" rows="2" maxlength="1000" placeholder="2일차 예약을 전부 알려줘" required></textarea><div class="composer-footer"><span class="hint">현재 여행의 예약과 출처를 확인해 답합니다.</span><button id="sendQuestion" class="primary" type="submit">질문하기 ↑</button></div><p id="questionError" class="error" role="alert" hidden></p></form>
       </section>
