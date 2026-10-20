@@ -4,7 +4,7 @@
 
 - [Keynote 다운로드](going-v4-class-presentation.key?raw=1)
 - [PowerPoint 다운로드](going-v4-class-presentation.pptx?raw=1)
-- [자연스러운 기본 대본·5분 축약·10분 시연·예상 질문](SCRIPT.md)
+- 발표 대본(로컬 별도 보관)
 - [문안 원본](slides-content.json) · [검증 기록](REVIEW.md) · [출처](CREDITS.md)
 
 ![10장 미리보기](preview.webp)
