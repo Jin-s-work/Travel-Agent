@@ -13,8 +13,13 @@ def runs(trip_id:str,request:Request,actor=Depends(require_actor),limit:int=Quer
     return request.app.state.recommendations.list(actor,trip_id,limit,cursor)
 
 @router.get('/trips/{trip_id}/recommendations/{ident}')
-def run(trip_id:str,ident:str,request:Request,actor=Depends(require_actor)):
-    return request.app.state.recommendations.get(actor,trip_id,ident)
+def run(trip_id:str,ident:str,request:Request,actor=Depends(require_actor),page_size:int|None=Query(None,ge=12,le=12),section:str|None=None,cursor:str|None=Query(None,max_length=2500)):
+    value=request.app.state.recommendations.get(actor,trip_id,ident)
+    if page_size is not None or cursor is not None:
+        from src.recommendations.pages import page
+        return page(value,actor.id,trip_id,request.app.state.settings.session_secret,section,cursor)
+    from src.recommendations.pages import legacy_view
+    return legacy_view(value)
 
 @router.post('/trips/{trip_id}/comparisons',status_code=201)
 def compare(trip_id:str,body:ComparisonInput,request:Request,actor=Depends(require_actor)):

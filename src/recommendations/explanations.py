@@ -6,6 +6,20 @@ from copy import deepcopy
 
 
 def render(candidate):
+    if candidate.get('ranker_version','').endswith(('_hybrid_v4','_hybrid_v5')):
+        base = render_general(candidate)
+        diagnostics = candidate.get('ranking_diagnostics') or {}
+        extra = []
+        if diagnostics.get('matched_tags'):
+            extra.append({'code': 'CONTENT_MATCH', 'text': '공개지도에 등록된 음식 종류가 취향과 맞아요. 실제 메뉴는 확인해 주세요.' if (diagnostics.get('tag_evidence') or {}).get('kind') == 'public_cuisine_provisional' else '선택한 취향과 장소 태그의 유사도를 반영했어요.', 'source_ids': (diagnostics.get('tag_evidence') or {}).get('source_ids', []), 'aggregate_refs': []})
+        if diagnostics.get('proximity_reference') == 'city_center' and diagnostics.get('proximity_distance_m') is not None:
+            extra.append({'code':'CITY_CENTER_DISTANCE','text':f"도심 기준 직선거리 약 {round(diagnostics['proximity_distance_m']):,}m예요. 숙소를 선택하면 숙소 기준으로 비교해요.",'source_ids':[],'aggregate_refs':[]})
+        if diagnostics.get('rating'):
+            extra.append({'code': 'RATING_SHRINKAGE', 'text': '같은 플랫폼·도시·분류의 평점을 평가 수와 함께 비교했어요.', 'source_ids': diagnostics['rating']['source_ids'], 'aggregate_refs': []})
+        if diagnostics.get('soft_avoid_multiplier') == .5:
+            extra.insert(0, {'code': 'EXPLICIT_SOFT_AVOID', 'text': '반영하도록 선택한 피드백으로 추천 우선순위를 낮췄어요.', 'source_ids': [], 'aggregate_refs': []})
+        base = [r for r in base if r['code'] != 'POPULARITY_BASIS']
+        return (base[:1] + extra + base[1:])[:3]
     if candidate.get('ranker_version','').endswith('_general_v3'):
         return render_general(candidate)
     reasons = []
@@ -77,5 +91,6 @@ def render_general(candidate):
     distance=((candidate.get('features') or {}).get('straight_distance') or {}).get('value')
     if distance is not None and len(reasons)<3:
         add('STRAIGHT_DISTANCE',f"선택한 출발점에서 직선거리 약 {round(distance):,}m예요. 실제 이동 경로와는 달라요.")
-    if not reasons:add('REFERENCE_ONLY','지점 자료를 확인한 주변 장소예요. 리뷰 언어나 유명함을 보장하지 않아요.',[r['id'] for r in candidate.get('source_refs',[])])
+    # Reference cards already show their name, category and address. Do not
+    # invent a recommendation reason when no additional evidence exists.
     return reasons[:3]

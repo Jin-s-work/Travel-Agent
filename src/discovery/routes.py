@@ -1,7 +1,7 @@
 """Trip-owned bookmark/conditions endpoints and separate administrator reviews."""
 from fastapi import APIRouter,Depends,Request
 from src.foundation.auth import require_actor
-from .models import ConditionsPatch,BookmarkInput,BookmarkPatch,VersionInput,Selection,PackInput,Approval,SourceReview,FactInput
+from .models import ConditionsPatch,BookmarkInput,BookmarkPatch,VersionInput,Selection,PackInput,Approval,SourceReview,FactInput,ContextPreview
 
 from .intents import DiscoveryIntent
 
@@ -27,6 +27,11 @@ def cities(actor=Depends(require_actor)):
 @router.get('/trips/{trip_id}/discovery-conditions')
 def conditions(trip_id:str,request:Request,actor=Depends(require_actor)):
     return service(request).get_conditions(actor,trip_id)
+
+
+@router.post('/trips/{trip_id}/discovery-context/preview')
+def context_preview(trip_id:str,body:ContextPreview,request:Request,actor=Depends(require_actor)):
+    return service(request).preview_context(actor,trip_id,body.model_dump())
 @router.patch('/trips/{trip_id}/discovery-conditions')
 def conditions_save(trip_id:str,body:ConditionsPatch,request:Request,actor=Depends(require_actor)):
     return service(request).save_conditions(actor,trip_id,body.model_dump(mode='json'))
@@ -81,3 +86,15 @@ def source_review(ident:str,body:SourceReview,request:Request,actor=Depends(requ
 @router.post('/admin/discovery-places/{place_id}/facts',status_code=201)
 def add_fact(place_id:str,body:FactInput,request:Request,actor=Depends(require_actor)):
     return service(request).add_fact(actor,place_id,body.model_dump(mode='json'))
+
+
+from pydantic import BaseModel, ConfigDict, Field
+from typing import Annotated
+
+class PhotoRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    place_ids: list[Annotated[str, Field(pattern=r'^osm_(?:node|way|relation)_[1-9][0-9]{0,15}$')]] = Field(min_length=1, max_length=6)
+
+@router.post('/trips/{trip_id}/place-photos',status_code=202)
+def resolve_photos(trip_id:str,body:PhotoRequest,request:Request,actor=Depends(require_actor)):
+    return request.app.state.place_photos.submit(actor,trip_id,body.place_ids,request.headers.get('Idempotency-Key'))

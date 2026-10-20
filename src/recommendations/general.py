@@ -146,6 +146,14 @@ def candidate(snapshot, source, kind, current, config):
 
 
 def order_key(item):
+    if item.get('ranking_diagnostics'):
+        if item['ranking_diagnostics'].get('version')=='hybrid_v6':
+            from .hybrid_v6 import order_key as hybrid_order
+        elif item['ranking_diagnostics'].get('version')=='hybrid_v5':
+            from .hybrid_v5 import order_key as hybrid_order
+        else:
+            from .hybrid import order_key as hybrid_order
+        return hybrid_order(item)
     features=item['features'];ident=item['place_id'];nearby=item['ordering_profile']=='nearby'
     d=features['straight_distance']['value']
     distance=(d is None,d if d is not None else 0) if nearby else ()
@@ -172,6 +180,19 @@ def _select(items,limit,config):
 
 
 
+def _pool_order(items,config):
+    """Existing diversity selection, repeated for later pages; never a new score."""
+    remaining=deepcopy(items);result=[]
+    while remaining:
+        selected,deferred=_select(remaining,12,config)
+        result.extend(selected)
+        for row in deferred:
+            row['reason_codes']=[code for code in row['reason_codes'] if code not in ('RESULT_LIMIT','CHAIN_ID_LIMIT','NEIGHBORHOOD_LIMIT','CATEGORY_LIMIT')]
+        if not selected:break
+        remaining=deferred
+    return result[:200]
+
+
 def _state(count,reasons):
     if count:return 'ready'
     if not reasons:return 'empty'
@@ -179,9 +200,9 @@ def _state(count,reasons):
     if any(word in joined for word in ('EXPIRED','STALE')):return 'expired'
     if any(word in joined for word in ('BUDGET','COST_LIMIT')):return 'budget_exhausted'
     if any(word in joined for word in ('PROVIDER_FAILED','PROVIDER_UNAVAILABLE')):return 'provider_failed'
+    if any(word in joined for word in ('PRODUCTION_DISABLED','PRODUCTION_OFF','FEATURE_DISABLED','CITY_UNSUPPORTED')):return 'disabled'
     if any(word in joined for word in ('QUALITY','CLASSIFICATION','UNKNOWN','INSUFFICIENT_CLASSIFIED')):return 'quality_insufficient'
     if any(word in joined for word in ('BELOW_MIN','ABOVE_MAX','BELOW_THRESHOLD')):return 'criteria_not_met'
-    if any(word in joined for word in ('PRODUCTION_DISABLED','PRODUCTION_OFF','FEATURE_DISABLED')):return 'disabled'
     return 'unavailable'
 
 def recommend(snapshot,candidates,current,config):
@@ -203,8 +224,21 @@ def recommend(snapshot,candidates,current,config):
             item=candidate(snapshot,source,kind,current,config)
             target='excluded' if item['eligibility']=='ineligible' or kind=='reference' and not item['section_qualified'] else 'insufficient_data' if not item['section_qualified'] else 'needs_confirmation' if item['eligibility']=='needs_confirmation' else 'items'
             sections[kind][target].append(item)
+        if snapshot.get('recommendation_model_version') in ('hybrid_v4','hybrid_v5','hybrid_v6'):
+            if snapshot['recommendation_model_version']=='hybrid_v6':
+                from .hybrid_v6 import prepare
+            elif snapshot['recommendation_model_version'] == 'hybrid_v5':
+                from .hybrid_v5 import prepare
+            else:
+                from .hybrid import prepare
+            prepare(sections[kind]['items'] + sections[kind]['needs_confirmation'],
+                    list(unique.values()), snapshot, current)
         for group in ('items','needs_confirmation'):
-            if kind=='reference':
+            if snapshot.get('result_contract')=='discovery_result_v1':
+                # Keep qualified candidates for read-only pagination; unchanged score order.
+                selected=_pool_order(sections[kind][group],config);deferred=[]
+                for row in selected:row['selection_status']='selected'
+            elif kind=='reference':
                 ordered=sorted(sections[kind][group],key=order_key)
                 selected,deferred=ordered[:12],ordered[12:]
                 for row in selected:row['selection_status']='selected'
@@ -216,8 +250,9 @@ def recommend(snapshot,candidates,current,config):
     status={}
     for kind,groups in sections.items():
         reasons=sorted({code for row in groups['insufficient_data'] for code in row['section_reason_codes']})
+        if kind=='local_discovery' and snapshot.get('local_feature_enabled') is False and not groups['items'] and not groups['needs_confirmation']:reasons=list(dict.fromkeys(['REVIEW_PRODUCTION_DISABLED']+reasons))
         count=len(groups['items'])+len(groups['needs_confirmation'])
-        status[kind]={'label':LABELS[kind],'model':section_models(snapshot)[kind],'state':_state(count,reasons),
+        status[kind]={'label':LABELS[kind],'model':section_models(snapshot)[kind],'state':_state(count,reasons) if count or reasons else 'criteria_not_met' if groups['excluded'] else 'empty',
             'reason_codes':reasons,'displayable_count':count,'criteria_group':'custom_criteria' if kind=='local_discovery' and relaxed(thresholds(snapshot)) else 'default_strict' if kind=='local_discovery' else kind,
             'personalized':False,'ordering_profile':snapshot.get('ordering_profile','evidence')}
     # Insufficient evidence is reported as reason counts, not misleading cards.
@@ -229,9 +264,9 @@ def recommend(snapshot,candidates,current,config):
     applied['review_language_filter']={**(applied.get('review_language_filter') or {}),'required':True,'apply_to':['local_discovery'],'min_classified_texts':100,'max_unknown_share':.1}
     applied['rating_filter']={**(applied.get('rating_filter') or {}),'enabled':True,'apply_to':['local_discovery']}
     return {'sections':sections,'section_status':status,'section_models':section_models(snapshot),'counters':counters,
-        'engine_version':'recommendation-engine-v3','config_version':config.version,'config':asdict(config),
+        'engine_version':'recommendation-engine-v6' if snapshot.get('recommendation_model_version')=='hybrid_v6' else 'recommendation-engine-v5' if snapshot.get('recommendation_model_version') == 'hybrid_v5' else 'recommendation-engine-v4' if snapshot.get('recommendation_model_version') == 'hybrid_v4' else 'recommendation-engine-v3','config_version':config.version,'config':asdict(config),
         'computed_at':current.isoformat(),'requested_constraints':deepcopy(snapshot),
         'applied_constraints':applied,
         'reason_codes':['INSUFFICIENT_QUALIFIED_'+k.upper() for k in snapshot['conditions']['recommendation_types'] if len(sections[k]['items'])<snapshot.get('limit',6)],
         'unsupported_constraints':sorted({c for state in status.values() for c in state['reason_codes']}),
-        'learning_status':'insufficient_evidence','personalization_status':'general_model'}
+        'learning_status':'insufficient_evidence','personalization_status':'explicit_context_model' if snapshot.get('recommendation_model_version') in ('hybrid_v4','hybrid_v5','hybrid_v6') else 'general_model'}

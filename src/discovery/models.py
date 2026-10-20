@@ -13,7 +13,7 @@ class Input(BaseModel):
 class Child(Input):
     age:int|None=Field(default=None,ge=0,le=17)
 class Party(Input):
-    adults:int=Field(ge=1,le=50)
+    adults:int|None=Field(default=None,ge=1,le=50)
     children:list[Child]=Field(default_factory=list,max_length=30)
     children_status: Literal['unknown','none','present'] = 'unknown'
 
@@ -27,6 +27,11 @@ class Party(Input):
 
 class Visit(Input):
     date:date
+    @field_validator('date', mode='before')
+    @classmethod
+    def calendar_date(cls, value):
+        from src.foundation.models import valid_date
+        return valid_date(value.isoformat() if type(value) is date else value)
     local_time:time|None=None
     timezone:IanaTimezone
     @field_validator('local_time')
@@ -106,6 +111,25 @@ class Conditions(Input):
 class ConditionsPatch(Input):
     expected_version:int=Field(ge=0)
     conditions:Conditions
+class ContextPreview(Input):
+    expected_conditions_version: int | None = Field(default=None, ge=0)
+    expected_trip_version:int=Field(ge=1)
+    stop_id:str|None=Field(default=None,max_length=100)
+    visit_date:str|None=None
+    overrides:dict=Field(default_factory=dict)
+    @field_validator('visit_date')
+    @classmethod
+    def calendar_date(cls,value):
+        from src.foundation.models import valid_date
+        return valid_date(value)
+    @model_validator(mode='after')
+    def bounded(self):
+        if len(json.dumps(self.overrides).encode())>16000 or set(self.overrides)-set(Conditions.model_fields):
+            raise ValueError('방문 조건의 필드와 크기를 확인해 주세요.')
+        for key in ('visit','party','required','preferred'):
+            if key in self.overrides and not isinstance(self.overrides[key],dict):
+                raise ValueError('방문 조건의 구조를 확인해 주세요.')
+        return self
 class BookmarkInput(Input):
     run_id:str|None=Field(default=None,max_length=100)
     input_kind:Literal['url','name','place']

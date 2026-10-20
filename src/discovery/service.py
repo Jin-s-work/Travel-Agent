@@ -83,13 +83,36 @@ class DiscoveryService:
         unsupported=bool(trip['stops'] and not stays)
         issue=resolved['validation']
         confirmed=not issue and bool(row or trip['stops'])
-        return {**resolved,'version':row['version'] if row else 0,'trip_version':trip['version'],
+        return {**resolved,'actor_id':actor.id,'version':row['version'] if row else 0,'trip_version':trip['version'],
             'saved_trip_version':row['trip_version'] if row else trip['version'],'trip_snapshot':trip,
             'city_needs_confirmation':not confirmed,
             'context_state':'unsupported_city' if unsupported else 'selection_required' if not trip['stops'] and not row else 'outdated' if issue else 'ready',
             'stay_options':stays,'catalog_availability':self.availability(resolved['conditions'].get('city')),
             'city_metadata':CITIES.get(resolved['conditions'].get('city')),
             'unsupported_cities':[s['city'] for s in trip['stops'] if not city_key(s['city'])]}
+
+    def preview_context(self,actor,trip_id,body):
+        """Resolve an unsaved form through the same domain rules, without a job."""
+        from copy import deepcopy
+        from .context import load, resolve, enrich_origin
+        with self.db.connect() as con:
+            trip=self.repo._trip_dto(con,self._owner(con,actor,trip_id))
+            if trip['version']!=body['expected_trip_version']:
+                deny('VERSION_CONFLICT','다른 화면에서 여행 정보가 바뀌었어요. 입력은 유지됩니다.')
+            saved=con.execute('SELECT * FROM discovery_conditions WHERE trip_id=? AND owner_id=?',(trip_id,actor.id)).fetchone()
+            if body.get('expected_conditions_version') is not None and body['expected_conditions_version']!=(saved['version'] if saved else 0):
+                deny('VERSION_CONFLICT','다른 화면에서 방문 조건이 바뀌었어요. 초안은 유지됩니다.')
+            _,_,basis=load(con,trip_id,saved)
+            overrides=deepcopy(body['overrides'])
+            if body.get('visit_date') is not None:overrides.setdefault('visit',{})['date']=body['visit_date']
+            resolved=resolve(trip,overrides,body.get('stop_id'),basis)
+            if not resolved['validation']:resolved=enrich_origin(con,self.repo,actor,trip_id,resolved,allow_deleted_selection=True)
+        return {**resolved,'actor_id':actor.id,'version':saved['version'] if saved else 0,'trip_version':trip['version'],
+            'context_state':'outdated' if resolved['validation'] else 'ready',
+            'stay_options':[{'stop_id':s['id'],'city':city_key(s['city']),'label':s['city'],
+                'start_date':s['start_date'],'end_date':s['end_date'],'timezone':s['timezone']} for s in trip['stops']],
+            'context_version':hashlib.sha256(encode({'owner':actor.id,'trip':trip_id,'version':trip['version'],
+                'conditions':resolved['conditions'],'stop':resolved['trip_context']['stop_id']}).encode()).hexdigest()}
 
     @staticmethod
     def context_issue(trip,conditions):

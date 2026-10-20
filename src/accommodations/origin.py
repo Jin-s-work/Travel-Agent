@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from src.destinations import city_key
 from src.foundation.models import valid_date, local_to_instant
 
-VERSION='stay_origin_v1'
+VERSION='stay_origin_v2'
 
 def coordinates(value):
     lat,lon=value.get('latitude'),value.get('longitude')
@@ -20,7 +20,7 @@ def _utc(value):
     if isinstance(value,datetime): return value.astimezone(timezone.utc)
     return datetime.fromisoformat(value.replace('Z','+00:00')).astimezone(timezone.utc)
 
-def resolve_origin(trip,stays,visit,overrides,clock):
+def resolve_origin(trip,stays,visit,overrides,clock,*,resolver_version=VERSION):
     visit=dict(visit);overrides=overrides or {};selection=overrides.get('origin_selection') or {}
     day=visit.get('date');valid_date(day)
     if not day: raise ValueError('방문일이 필요합니다.')
@@ -30,12 +30,18 @@ def resolve_origin(trip,stays,visit,overrides,clock):
     stop=selected[0] if len(selected)==1 else None
     relevant=sorted([s for s in stays if not s.get('deleted_at') and stop and s.get('stop_id')==stop['id']],key=lambda s:s['id'])
     warnings=[];result={'status':'missing','reason_codes':['ACCOMMODATION_NOT_ADDED'],'origin':None,'candidates':[],
-        'resolver_version':VERSION,'visit':visit,'overrides':{'origin_selection':selection,**({'origin':overrides['origin']} if 'origin' in overrides else {})},
+        'resolver_version':resolver_version,'visit':visit,'overrides':{'origin_selection':selection,**({'origin':overrides['origin']} if 'origin' in overrides else {})},
         'booking_status':'not_inferred','luggage_storage':'unknown','early_checkin':'unknown','hotel_arrival':'unknown'}
     def finish():
-        basis={'version':VERSION,'trip_id':trip.get('id'),'trip_version':trip.get('version'),'stop':stop,'visit':visit,
+        basis={'version':resolver_version,'trip_id':trip.get('id'),'trip_version':trip.get('version'),'stop':stop,'visit':visit,
                'selection':selection,'manual':overrides.get('origin'),'stays':[(s['id'],s.get('version'),s.get('deleted_at')) for s in sorted(stays,key=lambda s:s['id'])],
                'status':result['status'],'origin':result['origin'],'reasons':result['reason_codes']}
+        if resolver_version=='stay_origin_v2':
+            # A mail extraction bumps trip.version even for unrelated tickets.
+            # Only actual departure dependencies invalidate the origin choice.
+            basis.pop('trip_version',None)
+            basis['trip_dates']=[trip.get('start_date'),trip.get('end_date')]
+            basis['stays']=[(s['id'],s.get('version'),s.get('deleted_at')) for s in relevant]
         result['origin_version']=hashlib.sha256(json.dumps(basis,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest()[:32]
         result['warnings']=warnings;return result
     if not trip['start_date']<=day<=trip['end_date']:
@@ -107,7 +113,7 @@ def resolve_origin(trip,stays,visit,overrides,clock):
     return finish()
 
 
-def context_in_connection(con,repo,actor,trip_id,visit,overrides=None,clock=None,*,allow_deleted_selection=False):
+def context_in_connection(con,repo,actor,trip_id,visit,overrides=None,clock=None,*,allow_deleted_selection=False,resolver_version=VERSION):
     """Owner-scoped read suitable for the recommendation submission transaction."""
     from .service import dto
     trip=repo._trip_dto(con,repo._trip(con,actor.id,trip_id))
@@ -124,12 +130,12 @@ def context_in_connection(con,repo,actor,trip_id,visit,overrides=None,clock=None
             from src.foundation.repository import DomainError
             raise DomainError('NOT_FOUND','숙소를 찾을 수 없습니다.',404)
     stays=[dto(r,clock) for r in con.execute('SELECT * FROM trip_accommodations WHERE trip_id=? AND owner_id=? ORDER BY id',(trip_id,actor.id))]
-    return resolve_origin(trip,stays,visit,overrides or {},clock)
+    return resolve_origin(trip,stays,visit,overrides or {},clock,resolver_version=resolver_version)
 
 
 def snapshot_is_current(con,repo,actor,trip_id,snapshot,clock=None):
     from src.foundation.repository import DomainError
     try:
-        current=context_in_connection(con,repo,actor,trip_id,snapshot['visit'],snapshot.get('overrides') or {},clock)
+        current=context_in_connection(con,repo,actor,trip_id,snapshot['visit'],snapshot.get('overrides') or {},clock,resolver_version=snapshot.get('resolver_version','stay_origin_v1'))
         return current['origin_version']==snapshot.get('origin_version')
     except (DomainError,KeyError,ValueError):return False

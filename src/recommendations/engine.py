@@ -353,7 +353,7 @@ def route_candidates(snapshot,candidates,now,limit):
     for candidate in candidates:
         kinds=set(candidate.get('recommendation_types',[]))&set(snapshot['conditions']['recommendation_types'])
         if not kinds:continue
-        if snapshot.get('recommendation_model_version')=='general_v3':
+        if snapshot.get('recommendation_model_version') in ('general_v3', 'hybrid_v4', 'hybrid_v5', 'hybrid_v6'):
             from .general import candidate as evaluate_general
             output=evaluate_general(snapshot,candidate,'reference',_stamp(now),config)
         else:output=_candidate(snapshot,candidate,sorted(kinds)[0],_stamp(now),config)
@@ -379,6 +379,8 @@ def _price(facts, conditions):
     if budget.get("basis") != price["basis"]:
         if conditions["party"].get("children"):
             return price, "unknown", "CHILD_PRICE_UNKNOWN", refs, None
+        if conditions["party"].get("adults") is None:
+            return price, "unknown", "PARTY_UNKNOWN", refs, None
         factor = Decimal(conditions["party"]["adults"])
         if price["basis"] == "group" and budget.get("basis") == "per_person":
             factor = 1 / factor
@@ -489,10 +491,12 @@ def _candidate(snapshot, candidate, kind, current, config):
     check("opening_hours", *_hours(facts, visit))
     for special_check in _special_hours(facts, visit):
         check(*special_check)
-    total_party = party["adults"] + len(party.get("children", []))
+    total_party = party["adults"] + len(party.get("children", [])) if party.get("adults") is not None else None
     for field, compare in (("min_party", lambda n: total_party >= n), ("max_party", lambda n: total_party <= n)):
         value, rows, conflict = facts.get(field)
-        if type(value) is not int or value < 1:
+        if total_party is None:
+            check(field, "unknown", "PARTY_UNKNOWN")
+        elif type(value) is not int or value < 1:
             check(field, "unknown", "PARTY_LIMIT_CONFLICT" if conflict == "FACT_CONFLICT" else field.upper() + "_UNKNOWN")
         else:
             check(field, "confirmed" if compare(value) else "failed", field.upper() + ("_MATCH" if compare(value) else "_MISMATCH"), facts.refs(rows))
@@ -651,7 +655,7 @@ def recommend(snapshot: Mapping[str, Any], candidates: list[dict], now=None, con
     limit = snapshot.get("limit", 6)
     if type(limit) is not int or not 1 <= limit <= 20:
         raise ValueError("Recommendation limit must be 1 to 20")
-    if snapshot.get('recommendation_model_version') == 'general_v3':
+    if snapshot.get('recommendation_model_version') in ('general_v3', 'hybrid_v4', 'hybrid_v5', 'hybrid_v6'):
         from .general import recommend as general_recommend
         return general_recommend(snapshot, candidates, current, config)
     sections = {kind: {key: [] for key in ("items", "needs_confirmation", "insufficient_data", "excluded")} for kind in ("local_discovery", "landmark")}

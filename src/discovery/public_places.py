@@ -1,6 +1,6 @@
 """Small, explicitly free OSM discovery for the private beta.
 
-Only fixed city-center queries leave the server. This is not a general crawler,
+Only fixed city/public-area queries leave the server. This is not a general crawler,
 review provider or guarantee of current business information. Public data stays
 provisional. Existing SQL holds the cache and zero-cost, rate-capped call ledger;
 paid-provider budget/stop settings are never changed.
@@ -49,13 +49,13 @@ def center(city):
     return CENTERS['cities'].get(city)
 
 
-def query(city,*,categories=None):
-    c = center(city)
+def query(city,*,categories=None,area=None):
+    c = area or center(city)
     if not c:
         raise DomainError('CITY_UNSUPPORTED', '등록된 도시를 선택해 주세요.', 422)
     # No user text, private location, date or address leaves the server.
     return urlencode({'lat': c['latitude'], 'lon': c['longitude'],
-                      'radius': c['radius_m']/1000, 'limit': MAX_CANDIDATES,
+                      'radius': c['radius_m']/1000, 'limit': min(MAX_CANDIDATES, c.get('record_limit',MAX_CANDIDATES)),
                       'osm_tag': ['amenity:'+category for category in (['restaurant','cafe'] if categories is None else sorted(set(categories)&{'restaurant','cafe'}))]}, doseq=True)
 
 
@@ -72,13 +72,13 @@ def _distance(a, b, c, d):
     return 6371000 * 2 * math.asin(min(1, math.sqrt(hav)))
 
 
-def normalize(payload, city):
-    c = center(city)
+def normalize(payload, city, *, area=None):
+    c = area or center(city)
     if not isinstance(payload, dict) or payload.get('remark') or not isinstance(payload.get('elements'), list):
         raise DomainError('PUBLIC_DISCOVERY_INCOMPLETE', '공개지도 응답이 불완전해요. 잠시 후 다시 찾아 주세요.', 503)
     if len(payload['elements']) > MAX_CANDIDATES:
         raise DomainError('PUBLIC_DISCOVERY_OVERSIZED', '공개지도 응답이 허용 크기를 넘었어요.', 503)
-    result, identities, branches = [], set(), []
+    result, identities, branches = [], set(), [];deduped=0
     for raw in payload['elements']:
         if not isinstance(raw, dict):
             continue
@@ -97,11 +97,12 @@ def normalize(payload, city):
         if not -90 <= lat <= 90 or not -180 <= lon <= 180 or _distance(c['latitude'], c['longitude'], lat, lon) > c['radius_m']:
             continue
         if external in identities:
-            continue
+            deduped+=1;continue
         # OSM sometimes maps one branch as both node and building/area.
-        if any(name.casefold() == prior[0] and _distance(lat, lon, prior[1], prior[2]) < 25 for prior in branches):
-            continue
-        identities.add(external); branches.append((name.casefold(), lat, lon))
+        branch_address = (_text(tags.get('addr:full')) or '|'.join(_text(tags.get(k)) for k in ('addr:street','addr:housenumber'))).strip('|')
+        if branch_address and any(name.casefold() == prior[0] and branch_address == prior[3] and _distance(lat, lon, prior[1], prior[2]) < 25 for prior in branches):
+            deduped+=1;continue
+        identities.add(external); branches.append((name.casefold(), lat, lon, branch_address))
         source_url = 'https://www.openstreetmap.org/' + external
         address = _text(tags.get('addr:full')) or ', '.join(filter(None, (
             ' '.join(filter(None, (_text(tags.get('addr:housenumber'), 30), _text(tags.get('addr:street'))))),
@@ -120,10 +121,13 @@ def normalize(payload, city):
                        'tags': [x.strip()[:80] for x in _text(tags.get('cuisine')).split(';') if x.strip()][:10],
                        'neighborhood': _text(tags.get('addr:suburb')) or None, 'source_url': source_url,
                        'observed_tags': observed, 'center_distance_m': round(_distance(c['latitude'], c['longitude'], lat, lon))})
-    return sorted(result, key=lambda p: (p['center_distance_m'], p['external_id']))
+    output=FetchedPlaces(sorted(result,key=lambda p:(p['center_distance_m'],p['external_id'])))
+    output.raw_count=len(payload['elements']);output.deduped_count=deduped
+    output.rejected_count=output.raw_count-len(output)-deduped
+    return output
 
 
-def normalize_photon(payload, city):
+def normalize_photon(payload, city, *, area=None):
     """Adapt documented GeoJSON only; reuse branch, radius and tag validation."""
     features = payload.get('features') if isinstance(payload, dict) else None
     if not isinstance(features, list):
@@ -155,11 +159,20 @@ def normalize_photon(payload, city):
         point = {'lat': coords[1], 'lon': coords[0]}
         kind = {'N':'node','W':'way','R':'relation'}.get(props.get('osm_type'))
         elements.append({'type':kind, 'id':props.get('osm_id'), **point, 'center':point, 'tags':tags})
-    return normalize({'elements': elements}, city)
+    result=normalize({'elements':elements},city,area=area)
+    result.rejected_count+=len(features)-len(elements)
+    result.raw_count=len(features)
+    return result
 
 
-def fetch(city,*,categories=None):
-    page = fetch_public(ENDPOINT + '?' + query(city,categories=categories), max_bytes=MAX_BYTES,
+class FetchedPlaces(list):
+    raw_count = None
+    deduped_count = None
+    rejected_count = None
+
+
+def fetch(city,*,categories=None,area=None):
+    page = fetch_public(ENDPOINT + '?' + query(city,categories=categories,area=area), max_bytes=MAX_BYTES,
                         timeout_seconds=15, max_redirects=0)
     if page.mime != 'application/json':
         raise FetchRejected('UNSUPPORTED_MIME')
@@ -167,7 +180,7 @@ def fetch(city,*,categories=None):
         payload = json.loads(page.content)
     except (ValueError, UnicodeError):
         raise DomainError('PUBLIC_DISCOVERY_INVALID', '공개지도 응답을 읽을 수 없어요. 잠시 후 다시 찾아 주세요.', 503) from None
-    return normalize_photon(payload, city), len(page.content)
+    return normalize_photon(payload, city, area=area), len(page.content)
 
 
 def is_public_candidate(candidate):
@@ -201,7 +214,7 @@ class PublicDiscovery:
         delay = units.get('retry_after_seconds', 900)
         return stamp(row['updated_at']) + timedelta(seconds=delay)
 
-    def ensure(self, actor, trip_id, city, ctx, *, origin=None,categories=None,radius_m=None):
+    def ensure(self, actor, trip_id, city, ctx, *, origin=None,categories=None,radius_m=None,_area=None):
         """Called only by an authenticated recommendation job, never by GET."""
         if not center(city):
             return self._status(city, 'unavailable', reason='CITY_UNSUPPORTED')
@@ -211,8 +224,8 @@ class PublicDiscovery:
         except (TypeError,ValueError):category_support=False
         selected=sorted(set(categories or ['restaurant','cafe'])&{'restaurant','cafe'}) if category_support else None
         now = self.clock().astimezone(timezone.utc)
-        request_hash = hashlib.sha256((POLICY + ':' + QUERY_VERSION + ':' + ENDPOINT + ':' + query(city,categories=selected)).encode()).hexdigest()
-        pack_id = 'osm_pack_' + city + ('_'+request_hash[:20] if selected is not None and set(selected)!={'restaurant','cafe'} else '')
+        request_hash = hashlib.sha256((POLICY + ':' + QUERY_VERSION + ':' + ENDPOINT + ':' + query(city,categories=selected,area=_area)).encode()).hexdigest()
+        pack_id = 'osm_pack_' + city + ('_'+request_hash[:20] if _area is not None or selected is not None and set(selected)!={'restaurant','cafe'} else '')
         context = CallContext(actor.id, trip_id, trip_id, job_id=ctx.job['id'])
         try:
             from src.operations.controls import external_guard
@@ -222,7 +235,7 @@ class PublicDiscovery:
                 cached = con.execute('SELECT * FROM candidate_packs WHERE id=? AND status=?', (pack_id, 'public_data')).fetchone()
                 if cached and stamp(cached['updated_at']) + TTL > now:
                     count = con.execute('SELECT count(*) FROM research_candidates WHERE pack_id=? AND status=?', (pack_id, 'public_data')).fetchone()[0]
-                    return self._status(city, 'ready' if count else 'empty', cache_hit=True, candidate_count=count, display_limit=DISPLAY_CANDIDATES,
+                    return self._status(city, 'ready' if count else 'empty', cache_hit=True, candidate_count=count, fetched_count=0, deduped_count=0, rejected_count=0, pack_id=pack_id, display_limit=DISPLAY_CANDIDATES,
                                         fetched_at=cached['updated_at'], expires_at=(stamp(cached['updated_at']) + TTL).isoformat())
             external_guard(self.db, PROVIDER)
             with self.db.connect() as con:
@@ -250,17 +263,20 @@ class PublicDiscovery:
                 date = now.isoformat()
                 units = encode({'calls': 1, 'response_bytes': MAX_BYTES})
                 con.execute('INSERT INTO usage_reservations(call_id,owner_id,trip_id,job_id,scope_kind,scope_id,provider,sku,operation,attempt,call_key,request_hash,state,currency,estimated_units_json,estimated_cost_micros,price_version,price_confirmed_at,price_rates_json,period_day,period_month,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-                    (call_id, actor.id, trip_id, context.job_id, 'personal_trip', trip_id, PROVIDER, 'public_city_restaurants', 'public_discovery', 1, 'job:' + context.job_id + ':' + city, request_hash, 'sent', 'USD', units, 0, POLICY, date, encode({'calls':0,'response_bytes':0}), day, now.strftime('%Y-%m'), date, date))
+                    (call_id, actor.id, trip_id, context.job_id, 'personal_trip', trip_id, PROVIDER, 'public_city_restaurants', 'public_discovery', max(1,ctx.job.get('attempt',1)), 'job:' + context.job_id + ':' + request_hash, request_hash, 'sent', 'USD', units, 0, POLICY, date, encode({'calls':0,'response_bytes':0}), day, now.strftime('%Y-%m'), date, date))
                 Budget._ledger(con, call_id, 'reserved', 0, {'calls':1,'response_bytes':MAX_BYTES}, date, reason='EXPLICIT_FREE_PUBLIC_DATA')
             try:
-                ctx.guard(); items, received = self.fetcher(city,categories=selected) if category_support else self.fetcher(city); ctx.guard()
-                if type(received) is not int or not 0 <= received <= MAX_BYTES or len(items) > MAX_CANDIDATES:
+                ctx.guard()
+                options={'categories':selected} if category_support else {}
+                if _area is not None:options['area']=_area
+                items, received = self.fetcher(city,**options); ctx.guard()
+                if type(received) is not int or not 0 <= received <= MAX_BYTES or len(items) > min(MAX_CANDIDATES,(_area or {}).get('record_limit',MAX_CANDIDATES)) or (getattr(items,'raw_count',None) or 0) > min(MAX_CANDIDATES,(_area or {}).get('record_limit',MAX_CANDIDATES)):
                     raise DomainError('PUBLIC_DISCOVERY_OVERSIZED', '공개지도 응답이 허용 크기를 넘었어요.', 503)
                 with self.db.connect() as con:
                     con.execute('BEGIN IMMEDIATE'); ctx.guard(con=con); Budget._scope(con, context)
                     self._store(con, actor, city, items, now,pack_id=pack_id)
                     self._settle(con, call_id, received, now)
-                return self._status(city, 'ready' if items else 'empty', calls=1, candidate_count=len(items), display_limit=DISPLAY_CANDIDATES, fetched_at=date, expires_at=(now+TTL).isoformat())
+                return self._status(city, 'ready' if items else 'empty', calls=1, candidate_count=len(items), fetched_count=getattr(items,'raw_count',None), deduped_count=getattr(items,'deduped_count',None), rejected_count=getattr(items,'rejected_count',None), pack_id=pack_id, display_limit=DISPLAY_CANDIDATES, fetched_at=date, expires_at=(now+TTL).isoformat())
             except Exception as exc:
                 code = exc.code if isinstance(exc, (DomainError, FetchRejected)) else 'PUBLIC_DISCOVERY_UNAVAILABLE'
                 http_status = getattr(exc, 'http_status', None)

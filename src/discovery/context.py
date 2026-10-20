@@ -1,5 +1,7 @@
 """Sparse personal overrides and inherited travel context. No network or writes."""
 from copy import deepcopy
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 import json
 import hashlib
 from pydantic import ValidationError
@@ -7,7 +9,7 @@ from src.destinations import CITIES, city_key
 from src.foundation.repository import DomainError
 from .models import Conditions
 
-VERSION = 'inherited_context_v1'
+VERSION = 'inherited_context_v2'
 
 
 def merge(base, overrides):
@@ -36,22 +38,58 @@ def flatten(value, prefix=''):
     return result
 
 
-def resolve(trip, overrides, stop_id=None, basis=None):
+def selection(trip, overrides, stop_id=None, basis=None, clock=None):
+    """Shared inclusive stop-date contract for reads, previews and submission."""
+    current = clock or datetime.now(timezone.utc)
+    if current.tzinfo is None: raise ValueError('Context clock must include a timezone')
+    stops = trip['stops']
+    explicit = (overrides.get('visit') or {}).get('date')
+    if explicit is not None:
+        from src.foundation.models import valid_date
+        try: valid_date(explicit)
+        except (ValueError, TypeError):
+            raise DomainError('VALIDATION_FAILED','유효한 방문일을 YYYY-MM-DD로 입력해 주세요.',422,
+                [{'field':'visit.date','message':'네 자리 연도와 실제 달력 날짜를 입력해 주세요.'}])
+    desired = overrides.get('city')
+    chosen = next((s for s in stops if s['id'] == stop_id), None)
+    errors = []
+    if stop_id and not chosen:
+        errors.append({'field':'stop_id','code':'STOP_REMOVED','message':'선택한 도시 구간이 삭제되었어요. 도시 구간을 다시 골라 주세요.'})
+    local_days = [(s, current.astimezone(ZoneInfo(s['timezone'])).date().isoformat()) for s in stops]
+    ongoing = [(s, day) for s, day in local_days if s['start_date'] <= day <= s['end_date']]
+    if explicit:
+        day, reason = explicit, 'user_selected'
+    elif ongoing:
+        _, day = next(((s,d) for s,d in ongoing if s['id']==stop_id),ongoing[0])
+        reason = 'city_local_today'
+    else:
+        today = local_days[0][1] if local_days else current.date().isoformat()
+        previous = (basis or {}).get('visit_date')
+        ended = today > trip['end_date']
+        day = previous if ended and previous and trip['start_date']<=previous<=trip['end_date'] else trip['start_date']
+        reason = 'completed_previous' if ended and day==previous else 'completed_start' if ended else 'future_start'
+    matching = [s for s in stops if s['start_date']<=day<=s['end_date']]
+    if chosen and chosen not in matching: chosen = None
+    options = [s for s in matching if not desired or city_key(s['city'])==desired]
+    if not chosen and not errors and len(options)==1: chosen = options[0]
+    if stops and not chosen:
+        errors.append({'field':'visit.date' if not matching else 'stop_id',
+            'code':'STOP_DATE_GAP' if not matching else 'STOP_CHOICE_REQUIRED',
+            'message':'이 날짜에 머무는 도시가 없어요. 방문일을 바꾸거나 여행의 도시 구간을 수정해 주세요.' if not matching else '이 날짜에 방문할 도시를 골라 주세요.'})
+    return {'date':day,'date_reason':reason,'stop':chosen,'matching_stops':matching,
+            'validation':errors,'evaluated_at':current.isoformat()}
+
+
+def resolve(trip, overrides, stop_id=None, basis=None, clock=None):
     basis = basis or {}
     legacy_explicit_origin = bool("legacy_trip" in basis and (overrides.get("origin") or {}).get("latitude") is not None)
     stops = trip['stops']
-    stop = next((s for s in stops if s['id'] == stop_id), None)
-    errors = []
-    if stop_id and not stop:
-        errors.append({'field': 'stop_id', 'message': '선택한 도시 구간이 삭제되었습니다. 현재 여행의 구간을 골라 주세요.'})
-    if not stop_id:
-        desired = overrides.get('city')
-        day = (overrides.get('visit') or {}).get('date')
-        stop = next((s for s in stops if city_key(s['city']) == desired and (not day or s['start_date'] <= day <= s['end_date'])), None) if desired else None
-        if not stop: stop = next((s for s in stops if city_key(s['city'])), stops[0] if stops else None)
-    city = city_key(stop['city']) if stop else overrides.get('city')
+    chosen = selection(trip, overrides, stop_id, basis, clock)
+    stop = chosen['stop']
+    errors = list(chosen['validation'])
+    city = city_key(stop['city']) if stop else overrides.get('city') or (city_key(chosen['matching_stops'][0]['city']) if chosen['matching_stops'] else city_key(stops[0]['city']) if stops else None)
     # Legacy trips without stops need an explicit city; no inference from their title.
-    base = Conditions.model_validate({'city': city if isinstance(city,str) and city in CITIES else 'tokyo', 'visit': {'date': stop['start_date'] if stop else trip['start_date'], 'timezone': CITIES[city]['timezone'] if isinstance(city,str) and city in CITIES else 'Asia/Tokyo'}, 'party': trip['party']}).model_dump(mode='json')
+    base = Conditions.model_validate({'city': city if isinstance(city,str) and city in CITIES else 'tokyo', 'visit': {'date': chosen['date'], 'timezone': CITIES[city]['timezone'] if isinstance(city,str) and city in CITIES else 'Asia/Tokyo'}, 'party': trip['party']}).model_dump(mode='json')
     base['city'] = city
     if stop: base['visit']['timezone'] = stop['timezone']
     if stop and stop.get('base_location'):
@@ -73,7 +111,7 @@ def resolve(trip, overrides, stop_id=None, basis=None):
         errors.append({'field': 'visit.date', 'message': f"이 도시 구간의 체류일({stop['start_date']} ~ {stop['end_date']})에서 선택해 주세요."})
     if stop and visit.get('timezone') != stop['timezone']:
         errors.append({'field': 'visit.timezone', 'message': '도시의 현지 시간대를 다시 확인해 주세요.'})
-    current_basis = {'stop_id': stop['id'] if stop else stop_id, 'city': value.get('city'), 'visit_date': day, 'base_location': stop.get('base_location') if stop else None}
+    current_basis = {'stop_id': stop['id'] if stop else stop_id if errors and stop_id else None, 'city': value.get('city'), 'visit_date': day, 'base_location': stop.get('base_location') if stop else None}
     if 'legacy_trip' in basis:
         old = basis['legacy_trip']; oldstop = next((s for s in old.get('stops', []) if s['id'] == current_basis['stop_id']), None)
         basis = {'stop_id': oldstop['id'] if oldstop else None, 'city': city_key(oldstop['city']) if oldstop else overrides.get('city'), 'visit_date': (overrides.get('visit') or {}).get('date'), 'base_location': oldstop.get('base_location') if oldstop else None}
@@ -90,7 +128,7 @@ def resolve(trip, overrides, stop_id=None, basis=None):
     for key, val in flatten(value).items():
         origin_type = 'user_override' if key in overridden or any(key.startswith(k+'.') for k,v in overridden.items() if v is None) else 'trip_default' if key.startswith(('party.', 'visit.')) or key in ('city',) or key.startswith('origin.') and base.get('origin') else 'planning_default'
         provenance[key] = {'origin': origin_type if val is not None or origin_type=='user_override' else 'unknown', 'validation': 'needs_confirmation' if any(e['field'] == key or key.startswith(e['field']+'.') for e in errors+warnings) else 'valid'}
-    return {'legacy_explicit_origin':legacy_explicit_origin, 'conditions': value, 'overrides': deepcopy(overrides), 'trip_context': {'trip_id': trip['id'], 'trip_version': trip['version'], 'stop_id': current_basis['stop_id'], 'city_id': city, 'visit_date': day, 'party': trip['party'], 'timezone': visit.get('timezone')}, 'provenance': provenance, 'validation': errors, 'warnings': warnings, 'basis': current_basis, 'resolver_version': VERSION, 'origin_version': hashlib.sha256(json.dumps({'origin':value.get('origin'),'basis':current_basis},sort_keys=True,ensure_ascii=False).encode()).hexdigest()[:24]}
+    return {'legacy_explicit_origin':legacy_explicit_origin, 'conditions': value, 'overrides': deepcopy(overrides), 'selection': {'date_reason':chosen['date_reason'], 'evaluated_at':chosen['evaluated_at'], 'matching_stop_ids':[s['id'] for s in chosen['matching_stops']], 'state':'needs_selection' if errors else 'ready'}, 'trip_context': {'owner_id':trip.get('owner_id'), 'trip_id': trip['id'], 'trip_version': trip['version'], 'stop_id': current_basis['stop_id'], 'city_id': city, 'visit_date': day, 'party': trip['party'], 'timezone': visit.get('timezone')}, 'provenance': provenance, 'validation': errors, 'warnings': warnings, 'basis': current_basis, 'resolver_version': VERSION, 'origin_version': hashlib.sha256(json.dumps({'origin':value.get('origin'),'basis':current_basis},sort_keys=True,ensure_ascii=False).encode()).hexdigest()[:24]}
 
 
 def enrich_origin(con, repo, actor, trip_id, resolved, clock=None, *, allow_deleted_selection=False):

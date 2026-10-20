@@ -13,7 +13,7 @@ from src.foundation.repository import DomainError, dump, new_id, utcnow
 from src.discovery.models import Conditions
 from src.recommendations.models import RecommendationInput
 
-VERSIONS = ['local_observed_general_v3','iconic_general_v3','reference_general_v3']
+VERSIONS = ['local_observed_hybrid_v5','iconic_hybrid_v5','reference_hybrid_v5']
 
 
 class CandidateBatch(list):
@@ -28,9 +28,10 @@ def digest(value):
 
 
 class Recommendations:
-    def __init__(self, db, repo, jobs, discovery, reviews, matrix=None):
+    def __init__(self, db, repo, jobs, discovery, reviews, matrix=None, shadow_enabled=False):
         self.db,self.repo,self.jobs,self.discovery,self.reviews = db,repo,jobs,discovery,reviews
         self.matrix=matrix
+        self.shadow_enabled=bool(shadow_enabled)
 
     @staticmethod
     def _same_candidate(captured,current):
@@ -80,10 +81,14 @@ class Recommendations:
         if issue:
             raise DomainError('CONDITIONS_OUTDATED','여행 정보가 바뀌었습니다. '+issue['message'],409,[issue])
         snapshot={**body,'conditions':conditions,'trip':{k:trip[k] for k in ('id','version','start_date','end_date','stops')},
-                  'pipeline_version':'discovery_pipeline_v2','movement_version':'v2','origin_context':envelope.get('origin_context'),'ranker_versions':VERSIONS,
+                  'result_contract':'discovery_result_v1','candidate_pool_limit':200,'pipeline_version':'discovery_pipeline_v2','movement_version':'v2','origin_context':envelope.get('origin_context'),'ranker_versions':VERSIONS,
                   'explanation_version':'server_templates_v1','evaluation_at':utcnow()}
         from .registry import model_snapshot
         snapshot.update(model_snapshot(snapshot))
+        from src.discovery.candidate_pool import snapshot_limits
+        snapshot.update(snapshot_limits(self.discovery.public_provider))
+        snapshot['shadow_model_version']='hybrid_v6' if self.shadow_enabled else None
+        snapshot['local_feature_enabled']=self.reviews.controls()['production_enabled']
         with self.db.connect() as con:
             con.execute('BEGIN IMMEDIATE')
             current=self.jobs._scope(con,actor.id,actor.session_id,'personal_trip',trip_id)
@@ -114,8 +119,9 @@ class Recommendations:
                 'status_url':'/api/v2/jobs/'+job['id'],'events_url':'/api/v2/jobs/'+job['id']+'/events'}
 
     @staticmethod
-    def _select(snapshot,candidates,limit=100):
+    def _select(snapshot,candidates,limit=None):
         """Known failures cannot displace fitting candidates; unknowns remain explicit."""
+        limit=limit or min(200,(snapshot or {}).get('candidate_pool_limit',200) if (snapshot or {}).get('result_contract')=='discovery_result_v1' else 100)
         if not snapshot:return sorted(candidates,key=lambda p:p['place_id'])[:limit]
         from .engine import _candidate,RankerConfig,straight_line_distance
         config=RankerConfig(movement_version=snapshot.get('movement_version','v1'))
@@ -123,16 +129,16 @@ class Recommendations:
         current=datetime.fromisoformat(snapshot['evaluation_at']);ranked=[];reasons=Counter()
         for candidate in candidates:
             kinds=set(candidate.get('recommendation_types',[]))&set(snapshot['conditions']['recommendation_types'])
-            if snapshot.get('recommendation_model_version')=='general_v3':
+            if snapshot.get('recommendation_model_version') in ('general_v3', 'hybrid_v4', 'hybrid_v5', 'hybrid_v6'):
                 from .general import candidate as evaluate_general
                 evaluations=[evaluate_general(snapshot,candidate,kind,current,config) for kind in sorted(kinds|{'reference'})]
             else:evaluations=[_candidate(snapshot,candidate,kind,current,config) for kind in sorted(kinds)]
             rejected=not evaluations or all(item['eligibility']=='ineligible' for item in evaluations)
             if rejected:reasons.update({code for item in evaluations for code in item['reason_codes']})
-            distance=straight_line_distance(snapshot['conditions'].get('origin') or {},candidate)
+            distance=straight_line_distance(snapshot['conditions'].get('origin') or snapshot.get('ranking_reference_origin') or {},candidate)
             ranked.append((rejected,distance if distance is not None else float('inf'),candidate['place_id'],candidate))
         ranked.sort(key=lambda row:row[:3])
-        return CandidateBatch(sorted([row[3] for row in ranked[:limit]],key=lambda p:p['place_id']),{'stored_candidates_considered':len(candidates),'preselection_excluded_by_reason':dict(sorted(reasons.items())),'selection_truncated':len(ranked)>limit})
+        return CandidateBatch(sorted([row[3] for row in ranked[:limit]],key=lambda p:p['place_id']),{'version':'scope_distance_evidence_v2','stored_candidates_considered':len(candidates),'pool_category_counts':dict(Counter(p['category'] for p in [row[3] for row in ranked[:limit]])),'preselection_excluded_by_reason':dict(sorted(reasons.items())),'selection_truncated':len(ranked)>limit})
 
     def _catalog_on(self,con,trip_id,city,*,categories=None,snapshot=None,place_ids=None):
         candidates=self.discovery._catalog_on(con,trip_id,city,include_photos=False,categories=categories,place_ids=place_ids,
@@ -158,6 +164,8 @@ class Recommendations:
             return {'run_id':ident}
         snapshot=json.loads(row['snapshot_json'])
         if not row['candidates_json'] and self.discovery.public_provider and set(snapshot['conditions']['categories']) & {'restaurant','cafe'} and 'local_discovery' in snapshot['conditions']['recommendation_types']:
+            from src.discovery.candidate_pool import validate_retrieval_snapshot
+            validate_retrieval_snapshot(snapshot,self.discovery.public_provider)
             city=snapshot['conditions']['city']
             pool=self._catalog(actor,trip_id,city,categories=snapshot['conditions']['categories'],snapshot=snapshot)
             from .engine import _candidate,RankerConfig
@@ -167,12 +175,15 @@ class Recommendations:
             language=snapshot.get('review_language_filter') or {}
             strict=language.get('required') and 'local_discovery' in language.get('apply_to',['local_discovery'])
             ctx.progress('public_discovery',done=0,total=1)
-            if len(reviewed)>=snapshot.get('limit',6):
+            expanded=getattr(self.discovery.public_provider,'pool_limit',None)
+            enough_candidates=len(pool)>=expanded if expanded else len(reviewed)>=snapshot.get('limit',6)
+            if enough_candidates:
                 external=self.discovery.public_provider._status(city,'not_needed',reason='REVIEWED_CATALOG_AVAILABLE')
-            elif strict:
+            elif strict and snapshot.get('recommendation_model_version') not in ('general_v3','hybrid_v4','hybrid_v5','hybrid_v6'):
                 external=self.discovery.public_provider._status(city,'unavailable',reason='PUBLIC_REVIEW_FILTER_UNSUPPORTED')
             else:
-                external=self.discovery.public_provider.ensure(actor,trip_id,city,ctx,origin=snapshot['conditions'].get('origin'),categories=snapshot['conditions']['categories'],radius_m=snapshot['conditions'].get('radius_m'))
+                extra={'existing_count':len([p for p in pool if p.get('provider')!='openstreetmap'])} if expanded else {}
+                external=self.discovery.public_provider.ensure(actor,trip_id,city,ctx,**extra,origin=snapshot['conditions'].get('origin'),categories=snapshot['conditions']['categories'],radius_m=snapshot['conditions'].get('radius_m'))
             snapshot['public_discovery']=external
             snapshot['evaluation_at']=utcnow()
             with self.db.connect() as con:
@@ -198,6 +209,9 @@ class Recommendations:
         snapshot=self._routes(actor,trip_id,ident,snapshot,candidates,ctx)
         ctx.progress('constraints_and_scoring',done=0,total=len(candidates))
         result=recommend(snapshot,candidates,now=datetime.fromisoformat(snapshot['evaluation_at']))
+        if snapshot.get('shadow_model_version')=='hybrid_v6':
+            from .comparison import shadow_compare
+            result['shadow_comparison']=shadow_compare(snapshot,candidates,result)
         ctx.progress('constraints_and_scoring',done=len(candidates),total=len(candidates))
         from .presentation import summarize
         result['summary']=summarize(snapshot,candidates,result)
@@ -228,12 +242,14 @@ class Recommendations:
             result['summary']['empty_state']={'code':'PUBLIC_DISCOVERY_OUTSIDE_COVERAGE','title':'현재 자료는 도심 주변만 포함해요','description':'선택한 출발점 주변을 수집한 결과가 아니에요. 도심 기준으로 바꾸거나 가고 싶은 장소를 저장해 주세요.','actions':['edit_conditions','save_place']}
         from collections import Counter
         reasons=Counter(code for groups in result['sections'].values() for item in groups['excluded'] for code in set(item['reason_codes']))
-        result['candidate_selection']={**snapshot.get('candidate_selection',{}),'provider_limit':60,'catalog_scan_limit_per_source':1000,'catalog_scan_limit':2000,'evaluation_limit':100,'evaluated':len(candidates),
+        result['candidate_selection']={**snapshot.get('candidate_selection',{}),'provider_limit':external.get('provider_limit',60),'catalog_scan_limit_per_source':1000,'catalog_scan_limit':2000,'evaluation_limit':snapshot.get('candidate_pool_limit',100),'evaluated':len(candidates),
             'excluded_by_reason':dict(sorted(reasons.items())),'display_limit':snapshot.get('limit',6),'reference_display_limit':12}
         for groups in result['sections'].values():
-            for group in (() if snapshot.get('recommendation_model_version')=='general_v3' else ('needs_confirmation','insufficient_data')):
+            for group in (() if snapshot.get('recommendation_model_version') in ('general_v3', 'hybrid_v4', 'hybrid_v5', 'hybrid_v6') else ('needs_confirmation','insufficient_data')):
                 groups[group]=sorted(groups[group],key=lambda item:((item.get('movement') or {}).get('straight_line_m') if (item.get('movement') or {}).get('straight_line_m') is not None else float('inf'),item['place_id']))[:12]
         result['candidate_selection']['displayed']=sum(len(groups[group]) for groups in result['sections'].values() for group in ('items','needs_confirmation','insufficient_data'))
+        from .pages import counts
+        result['candidate_counts']=counts(snapshot,candidates,result)
         result['requested_constraints']={k:snapshot[k] for k in ('conditions','review_language_filter','rating_filter','ordering_profile') if k in snapshot}
         result.setdefault('applied_constraints',deepcopy(result['requested_constraints']))
         result.setdefault('unsupported_constraints',[])
@@ -269,7 +285,7 @@ class Recommendations:
         stats={'provider_calls':0,'matrix_elements':0,'candidates':0,'reason':'ROUTE_PROVIDER_DISABLED' if not self.matrix else 'ORIGIN_COORDINATES_UNKNOWN'}
         evidence={}
         if self.matrix and origin and origin.get('latitude') is not None and origin.get('longitude') is not None:
-            maximum=min(100,self.matrix.max_candidates)
+            maximum=min(12 if snapshot.get('result_contract')=='discovery_result_v1' else 100,self.matrix.max_candidates)
             filtered=route_candidates(snapshot,candidates,now,maximum)
             endpoints=[{'id':p['place_id'],'version':endpoint_version(p),'latitude':p['latitude'],'longitude':p['longitude'],'coordinate_permitted':True} for p in filtered]
             source={'id':origin.get('accommodation_id') or origin.get('place_id') or 'manual-origin','version':(snapshot.get('origin_context') or {}).get('origin_version') or 'manual-v1','latitude':origin['latitude'],'longitude':origin['longitude'],'coordinate_permitted':True}
@@ -311,7 +327,7 @@ class Recommendations:
             current=self._catalog(actor,trip_id,snapshot['conditions']['city'],categories=snapshot['conditions']['categories'],snapshot=snapshot,place_ids=[p['place_id'] for p in captured])
             current_by_id={p['place_id']:p for p in current}
             changed=[p['place_id'] for p in captured if not self._same_candidate(p,current_by_id.get(p['place_id']))]
-            if snapshot.get('recommendation_model_version')=='general_v3':
+            if snapshot.get('recommendation_model_version') in ('general_v3', 'hybrid_v4', 'hybrid_v5', 'hybrid_v6'):
                 def without_review(value):
                     value=deepcopy(value);value.pop('review_evidence',None);value.pop('review_guard_token',None);return value
                 review_only=[p['place_id'] for p in captured if p['place_id'] in changed and current_by_id.get(p['place_id']) and self._same_candidate(without_review(p),without_review(current_by_id[p['place_id']]))]
@@ -320,6 +336,7 @@ class Recommendations:
                 # from the response, including score/summary claims derived from it.
                 row['data_status']='stale'
                 if result:
+                    result.pop('shadow_comparison',None)
                     for kind,groups in result.get('sections',{}).items():
                         hidden=set(changed) if kind=='local_discovery' or not review_only else set(changed)-set(review_only)
                         for name,items in groups.items():
@@ -336,6 +353,19 @@ class Recommendations:
                     result['withheld_place_ids']=[p for p in changed if p not in review_only]
                     result['withheld_review_place_ids']=review_only
                     result['previous_result']=True
+                    if snapshot.get('recommendation_model_version') in ('hybrid_v4','hybrid_v5','hybrid_v6'):
+                        # TF-IDF and the rating prior depend on the whole frozen
+                        # cohort. Removing one source invalidates derived scores
+                        # for the remaining cards too; GET must not rerank/write.
+                        from .explanations import render
+                        result['ranking_status'] = 'stale'
+                        for groups in result['sections'].values():
+                            for items in groups.values():
+                                for item in items:
+                                    item.pop('ranking_diagnostics', None)
+                                    item.update(score=None, score_complete=False, ranking_status='stale')
+                                    item['supported_reasons'] = render(item)
+                                    item['reason_sentences'] = [{k:v for k,v in r.items() if k!='code'} for r in item['supported_reasons']]
         route_status='captured'
         route_policy=snapshot.get('route_policy_fingerprint')
         route_policy_current=not route_policy or self.matrix is not None and route_policy==self.matrix.policy_fingerprint()

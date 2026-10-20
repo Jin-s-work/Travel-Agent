@@ -95,11 +95,15 @@ def submit(service, actor, trip_id, body, key):
         from src.product.events import consented
         snapshot={**body['filters'],'trip_version':trip['version'],'conditions_version':cv,'conditions':conditions,
             'trip':{k:trip[k] for k in ('id','version','start_date','end_date','stops')},'resolved_context':resolved,'intent_id':ident,
-            'pipeline_version':'discovery_pipeline_v2','movement_version':'v2','origin_context':resolved['origin_context'],'ranker_versions':VERSIONS,'explanation_version':'server_templates_v1','evaluation_at':stamp,
+            'result_contract':'discovery_result_v1','candidate_pool_limit':200,'pipeline_version':'discovery_pipeline_v2','movement_version':'v2','origin_context':resolved['origin_context'],'ranker_versions':VERSIONS,'explanation_version':'server_templates_v1','evaluation_at':stamp,
             'analytics_opt_in':consented(con,actor.id),'feedback_policy_version':'soft_avoid_half_v1',
             'soft_avoid_place_ids':[r['place_id'] for r in con.execute('SELECT place_id,payload_json FROM visit_feedback WHERE owner_id=? AND trip_id=? AND withdrawn_at IS NULL',(actor.id,trip_id)) if json.loads(r['payload_json']).get('reflect_preference')]}
         from src.recommendations.registry import model_snapshot
         snapshot.update(model_snapshot(snapshot))
+        from src.discovery.candidate_pool import snapshot_limits
+        snapshot.update(snapshot_limits(service.discovery.public_provider))
+        snapshot['shadow_model_version']='hybrid_v6' if service.shadow_enabled else None
+        snapshot['local_feature_enabled']=bool(con.execute('SELECT production_enabled FROM review_controls WHERE singleton=1').fetchone()['production_enabled'])
         job=service.jobs.enqueue(actor.id,actor.session_id,'personal_trip',trip_id,'recommendations',{'run_id':run},trip['version'],'discovery-intent:'+key_hash,request_fingerprint=fingerprint,con=con)
         con.execute('INSERT INTO recommendation_runs(id,trip_id,owner_id,job_id,trip_version,conditions_version,snapshot_json,ranker_versions_json,created_at) VALUES(?,?,?,?,?,?,?,?,?)',
             (run,trip_id,actor.id,job['id'],trip['version'],cv,dump(snapshot),dump(VERSIONS),stamp))
