@@ -45,3 +45,6 @@ node_modules/
 deploy/render-supabase/.env
 deploy/render-supabase/.env.*
 !deploy/render-supabase/.env.example
+
+# Private presenter scripts stay on the local machine
+docs/presentation/**/SCRIPT.md
