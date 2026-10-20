@@ -1,7 +1,7 @@
 """Read-only, independently reviewed restaurant image metadata.
 
 A photo license does not follow from permission to show a place's factual data.
-Only this curated manifest can approve photos; there is no network fetch, user
+A curated manifest or a verified, licensed public cache supplies photos. No network fetch, user
 URL proxy, provider call, image byte persistence, or ranking input here.
 """
 from __future__ import annotations
@@ -26,7 +26,7 @@ LICENSE_URLS = {
     'CC0': 'https://creativecommons.org/publicdomain/zero/1.0/',
     'Public domain': 'https://creativecommons.org/publicdomain/mark/1.0/',
 }
-PHOTO_KIND_ORDER = {'food': 0, 'interior': 1, 'exterior': 2, 'other': 3}
+PHOTO_KIND_ORDER = {'food': 0, 'interior': 1, 'exterior': 2, 'other': 3, 'unknown': 3}
 MAX_PHOTOS = 3
 MAX_MANIFEST_BYTES = 1024 * 1024
 IMAGE_PATH = re.compile(r'^/wikipedia/commons/(?:thumb/)?[a-f0-9]/[a-f0-9]{2}/[^/]+(?:/[0-9]+px-[^/]+)?\.(?:jpe?g|png|webp)$', re.I)
@@ -125,8 +125,19 @@ def load_manifest():
     return _read_manifest(content)
 
 
+def photo_availability(reasons):
+    joined=' '.join(reasons)
+    if any(key in joined for key in ('EXPIRED','STALE')):return 'expired'
+    if any(key in joined for key in ('IDENTITY','PLACE_NOT_APPROVED','PLACE_CHANGED')):return 'identity_unresolved'
+    if any(key in joined for key in ('POLICY','DISABLED','METADATA_INVALID','WITHDRAWN')):return 'policy_blocked'
+    if any(key in joined for key in ('PROVIDER','FAILED','DAILY_LIMIT','HTTP_','COOLDOWN','FETCH')):return 'provider_failed'
+    return 'no_photo'
+
+
 def unavailable(reason):
-    return {'photos': [], 'photo_status': {'state': 'unavailable', 'available_count': 0, 'reason_codes': [reason]}}
+    # state is retained for old clients; availability_state is the v5 contract.
+    return {'photos': [], 'photo_status': {'state': 'unavailable',
+        'availability_state':photo_availability([reason]),'available_count': 0, 'reason_codes': [reason]}}
 
 
 def select_photos(manifest, identity, *, approved, clock=None):
@@ -173,13 +184,39 @@ def select_photos(manifest, identity, *, approved, clock=None):
             selected.append(photo)
         result = selected
     return {'photos': result, 'photo_status': {'state': 'available' if result else 'unavailable',
+            'availability_state':'available' if result else photo_availability(reasons),
             'available_count': len(result), 'reason_codes': reasons or ([] if result else ['PHOTO_NOT_REVIEWED'])}}
 
 
 def for_places(con, place_ids, *, manifest=None, clock=None):
-    """Current photo permission in two reads for a bounded set of identities."""
+    """Current photo permission in at most three reads for bounded identities."""
     ids=sorted(set(place_ids)); result={ident:unavailable('PHOTO_NOT_REVIEWED') for ident in ids}
-    ids=[ident for ident in ids if not isinstance(ident,str) or not re.fullmatch(r'osm_(?:node|way|relation)_[1-9][0-9]*',ident)]
+    public_ids=[ident for ident in ids if isinstance(ident,str) and re.fullmatch(r'osm_(?:node|way|relation)_[1-9][0-9]*',ident)]
+    if public_ids:
+        from .photo_provider import identity_hash
+        from .public_places import POLICY
+        public_marks=','.join('?' for _ in public_ids)
+        instant=clock or datetime.now(timezone.utc)
+        # Permission/identity is rechecked at read time; photo cache cannot revive a revoked place.
+        rows=con.execute(f"SELECT p.*,x.identity_hash,x.payload_json,x.expires_at AS cache_expires FROM place_identities p JOIN place_photo_cache x ON x.place_id=p.id WHERE p.id IN ({public_marks}) AND p.deleted_at IS NULL AND p.provider='openstreetmap' AND EXISTS(SELECT 1 FROM research_candidates c JOIN candidate_packs k ON k.id=c.pack_id JOIN evidence_sources s ON s.place_id=p.id WHERE c.place_id=p.id AND c.status='public_data' AND k.status='public_data' AND s.status='active' AND s.read_confirmed=1 AND s.display_permitted=1 AND s.policy_version=? AND s.source_group='OpenStreetMap' AND NOT EXISTS(SELECT 1 FROM discovery_tombstones t WHERE (t.kind='pack' AND t.target_id=k.id) OR (t.kind='source' AND t.target_id=s.id)))",[*public_ids,POLICY])
+        for row in rows:
+            expiry=_stamp(row['cache_expires'])
+            if row['identity_hash']!=identity_hash(dict(row)):
+                result[row['id']]=unavailable('PHOTO_IDENTITY_MISMATCH');continue
+            if not expiry or expiry<=instant:
+                result[row['id']]=unavailable('PHOTO_POLICY_EXPIRED');continue
+            try:
+                payload=json.loads(row['payload_json'])
+                if not isinstance(payload,dict):continue
+                valid=[];rejected=[]
+                for photo in payload.get('photos',[])[:MAX_PHOTOS]:
+                    value,code=_photo({**photo,'enabled':True,'identity_evidence':'Exact feature media link'},instant)
+                    if value:valid.append(value)
+                    elif code:rejected.append(code)
+                reasons=rejected or payload.get('photo_status',{}).get('reason_codes',['NO_LINKED_PHOTO'])
+                result[row['id']]={'photos':valid,'photo_status':{'state':'available' if valid else 'unavailable','availability_state':'available' if valid else photo_availability(reasons),'available_count':len(valid),'reason_codes':[] if valid else reasons}}
+            except (ValueError,TypeError,KeyError):pass
+    ids=[ident for ident in ids if ident not in public_ids]
     if not ids:return result
     marks=','.join('?' for _ in ids)
     rows={r['id']:dict(r) for r in con.execute(f'SELECT * FROM place_identities WHERE id IN ({marks}) AND deleted_at IS NULL',ids)}
