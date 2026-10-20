@@ -233,6 +233,29 @@ def test_no_live_routes_strict_omits_unknown_and_explicit_provisional_stays_unve
     assert planning.routes.calls==0
 
 
+def test_default_disabled_routes_estimate_walking_only_in_provisional_mode(planning):
+    # v6 G4 regression: create_app wires DisabledRouteProvider by default, which used to
+    # turn every leg into ROUTES_DISABLED before the walking estimate was reached.
+    from src.location import DisabledRouteProvider
+    default=planning.app.state.travel_time
+    assert isinstance(default.provider,DisabledRouteProvider) and not default.provider.enabled
+    planning.app.state.itineraries.travel=default
+    trip,pack,_,_=prepare(planning)
+    first,second=(place['place_id'] for place in pack['places'][:2])
+    def both(key,**changes):
+        return submit(planning,trip,first,key=key,selected=[{'place_id':pid,'duration_minutes':60,'duration_origin':'user'} for pid in (first,second)],**changes)
+    strict,_=done(planning,trip,both('default-strict'))
+    assert not {first,second}&{i.get('place_id') for i in strict['items']} and strict['unplaced']
+    relaxed,_=done(planning,trip,both('default-provisional',allow_provisional=True))
+    placed={i['item_id']:i.get('place_id') for i in relaxed['items']}
+    assert {first,second}<=set(placed.values()) and relaxed['validation_status']=='provisional'
+    between=[leg for leg in relaxed['legs'] if placed.get(leg['from_item_id']) in (first,second) and placed.get(leg['to_item_id']) in (first,second)]
+    assert between and all(leg['basis']=='estimate' and leg['duration_minutes']>0 for leg in between)
+    assert all('WALKING_ROUTE_UNVERIFIED' in leg['reason_codes'] and leg['verification_status']=='provisional' for leg in between)
+    assert not any('ROUTES_DISABLED' in leg['reason_codes'] for leg in between)
+    assert planning.routes.calls==0 and relaxed['route_usage']['provider_calls']==0
+
+
 def test_bounded_natural_language_returns_only_previewable_commands_and_clarifies(planning):
     trip,_,selected,_=prepare(planning)
     result,path=done(planning,trip,submit(planning,trip,selected));iid=next(i['item_id'] for i in result['items'] if i.get('place_id'))

@@ -249,10 +249,21 @@ def test_deleted_trip_late_matrix_cannot_publish_but_charge_settles(route):
     assert row['state']=='settled' and row['result_ref'] is None
 
 
-def test_explicit_disabled_route_preserves_geometry_without_minutes(route):
-    value=session(route,DisabledRouteProvider())(POINT_A,POINT_B,DEPART,'walking')
-    assert value['duration_minutes'] is None and value['reason_codes']==['ROUTES_DISABLED']
-    assert value['straight_line_meters']>0
+def test_disabled_route_provider_estimates_only_short_same_city_walking(route):
+    # v6 PRD decision 1 = A: the production-default disabled provider falls back
+    # to the straight-line walking estimate; it never calls or bills a provider.
+    lookup=session(route,DisabledRouteProvider())
+    value=lookup(POINT_A,POINT_B,DEPART,'walking')
+    assert value['basis']=='estimate' and value['duration_minutes']>0 and value['provider'] is None
+    assert value['reason_codes']==['WALKING_ROUTE_UNVERIFIED'] and value['straight_line_meters']>0
+    assert value['assumption']['distance']=='straight_line' and value['assumption']['barriers_verified'] is False
+    assert lookup.stats['provider_calls']==0 and lookup.stats['estimates']==1
+    far=lookup(POINT_A,{**POINT_B,'longitude':140},DEPART,'walking')
+    assert far['duration_minutes'] is None and far['reason_codes']==['ROUTE_DISTANCE_REQUIRES_PROVIDER']
+    for target,mode in (({**POINT_B,'city':'barcelona'},'walking'),(POINT_B,'transit'),(POINT_B,'car')):
+        other=lookup(POINT_A,target,DEPART,mode)
+        assert other['duration_minutes'] is None and other['reason_codes']==['ROUTES_DISABLED']
+        assert other['straight_line_meters']>0
 
 
 def test_travel_accessibility_constraints_are_keyed_and_preserved(route):

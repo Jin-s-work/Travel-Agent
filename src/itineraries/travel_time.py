@@ -165,8 +165,9 @@ class LookupSession:
                 if exc.status in (401,403,404) or exc.code in {'LEASE_LOST','JOB_DEADLINE','JOB_CANCELLED','VERSION_CONFLICT'}:raise
                 result=unknown(exc.code,stamp)
             finally:self._cost()
-        elif self.travel.provider is not None:
-            result=unknown('ROUTES_DISABLED',stamp)
+        # A disabled provider is the production default. It no longer blocks the
+        # same-city walking estimate (v6 PRD decision 1 = A); strict validation
+        # still treats basis=estimate as unconfirmed travel.
         elif mode=='walking' and a is not None and b is not None and origin.get('city')==destination.get('city'):
             meters=_distance(a,b)
             if meters>3000:return unknown('ROUTE_DISTANCE_REQUIRES_PROVIDER',stamp)
@@ -175,6 +176,8 @@ class LookupSession:
                 'basis':'estimate','provider':None,'checked_at':stamp,'expires_at':(now+timedelta(minutes=15)).isoformat(),
                 'source_refs':[],'policy_version':ESTIMATE_VERSION,'reason_codes':['WALKING_ROUTE_UNVERIFIED'],
                 'assumption':{'distance':'straight_line','detour_factor':1.4,'meters_per_minute':80,'barriers_verified':False}}
+        elif self.travel.provider is not None:
+            result=unknown('ROUTES_DISABLED',stamp)
         else:result=unknown('NO_ROUTE',stamp)
         result=self._with_geometry(result,origin,destination)
         result.setdefault('mode',mode)

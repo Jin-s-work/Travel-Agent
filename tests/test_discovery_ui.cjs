@@ -133,6 +133,8 @@ test('stale unknown travel hides retained identity claims while valid zero-minut
   }
   assert.equal(context.itinerarySamePlaceLeg({basis:'unknown',duration_minutes:0,reason_codes:['IDENTICAL_LOCATION']}),false);
 });
+test('walking estimate leg says it is a straight-line estimate, not a verified route',()=>{
+  const make=(_tag,_class,text)=>({text:text??'',children:[],append(...nodes){this.children.push(...nodes);}});
   const flatten=node=>[node.text,...node.children.map(flatten)].join(' ');
   const context=load(['itinerarySamePlaceLeg','itineraryLeg'],{
     make,reviewDate:()=> '미확인',safeDiscoveryLink(){},
