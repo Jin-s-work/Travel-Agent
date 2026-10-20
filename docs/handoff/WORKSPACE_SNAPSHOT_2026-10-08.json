@@ -2,7 +2,7 @@
   "schema_version": 1,
   "development_baseline_date": "2026-10-08",
   "timezone": "Asia/Seoul",
-  "repository_directory": "/Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag",
+  "repository_directory": "~/Desktop/ChatGPT/travel-inbox-rag",
   "branch": "codex/private-beta-launch",
   "head": "5da54ddc1db56168fff735755813aef7587b313b",
   "origin": "https://github.com/Jin-s-work/Travel-Agent.git",

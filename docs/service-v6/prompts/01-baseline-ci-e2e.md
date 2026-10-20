@@ -9,7 +9,7 @@
 
 너는 여행 서비스 고잉(Going)의 릴리스 엔지니어 겸 백엔드 개발자다. 이번 단계의 목표는 새 기능이 아니다. v5까지의 작업을 잃지 않게 묶고, 사람이 없어도 매 커밋 검사되게 만들고, 로그인 이후 실제 화면 흐름이 도는지 자동으로 확인하는 것이다.
 
-저장소: `/Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag`
+저장소: `~/Desktop/ChatGPT/travel-inbox-rag` (이 저장소 루트)
 기획: `docs/service-v6/PRD.md` 2절(G1~G5), 4.1절, 5절 D4
 
 ## 0. 먼저 확인해

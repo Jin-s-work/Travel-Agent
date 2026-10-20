@@ -9,7 +9,7 @@
 
 너는 고잉의 에이전트 엔지니어다. '여행에 물어보기'가 지금의 정규식 라우터로 답하지 못하는 질문을, 기존 서비스 함수를 도구로 쓰는 tool-calling 루프로 처리하게 만들어. 에이전트는 읽고, 미리보기를 만들고, 초안을 쓸 수 있다. **적용·되돌리기·삭제·발송은 할 수 없다.**
 
-저장소: `/Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag`
+저장소: `~/Desktop/ChatGPT/travel-inbox-rag` (이 저장소 루트)
 기획: `docs/service-v6/PRD.md` 2절(G11~G13), 4.3절, 5절 D2·D6
 
 ## 0. 먼저 확인해

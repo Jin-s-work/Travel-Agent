@@ -26,7 +26,7 @@
 **아래 폴더를 그대로 Claude의 작업 대상으로 연다.** GitHub를 다시 clone한 폴더나 `/private/tmp` 폴더로 바꾸지 않는다.
 
 ```text
-/Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag
+~/Desktop/ChatGPT/travel-inbox-rag
 ```
 
 - 저장소: https://github.com/Jin-s-work/Travel-Agent
@@ -225,7 +225,7 @@ Apify 당시 Free 잔여 크레딧은 거의$5였으나 유효 이용 정책/공
 ### 기존 폴더/환경 먼저 확인
 
 ```sh
-cd "/Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag"
+cd ~/Desktop/ChatGPT/travel-inbox-rag
 git status --short
 git branch --show-current
 git rev-parse HEAD

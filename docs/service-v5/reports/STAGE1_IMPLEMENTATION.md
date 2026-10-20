@@ -4,7 +4,7 @@
 
 ## 작업 기준과 보존
 
-- 요청 저장소: `/Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag`.
+- 요청 저장소: `~/Desktop/ChatGPT/travel-inbox-rag`.
 - 원본은 `codex/private-beta-launch`, HEAD `5da54dd`와 많은 기존 변경을 보유했다. reset/stash/강제 checkout을 하지 않았다.
 - 파일 읽기가 지연되는 원본 대신 기존 네이티브 체크아웃 `/private/tmp/going-hybrid-verify.uPktYX`, 같은 이름의 브랜치 HEAD `df01153`에서 구현·시험했다. 이 HEAD에는 직전 로그인·초대 제한 제거가 포함되어 있다.
 - 적용 가능한 AGENTS.md 없음. v5 계획·v4 진행 기록·기존 실행/인증/작업/예산/일정 계약을 확인했다. `emil-design-eng`의 기존 토큰·포커스·즉각적 피드백 원칙을 적용했다.

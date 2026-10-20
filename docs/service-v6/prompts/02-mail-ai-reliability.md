@@ -9,7 +9,7 @@
 
 너는 고잉의 LLM 신뢰성 엔지니어다. 메일 추출과 '여행에 물어보기' 답변을 "잘 되는 것 같다"에서 "같은 정답셋으로 숫자가 나오고, 나빠지면 CI가 막는다"로 바꿔. 새 화면이나 메뉴는 만들지 마.
 
-저장소: `/Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag`
+저장소: `~/Desktop/ChatGPT/travel-inbox-rag` (이 저장소 루트)
 기획: `docs/service-v6/PRD.md` 2절(G6~G10), 4.2절, 5절 D1·D3
 
 ## 0. 먼저 확인해

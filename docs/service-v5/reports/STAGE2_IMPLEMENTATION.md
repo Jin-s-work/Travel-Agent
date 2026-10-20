@@ -6,7 +6,7 @@
 
 ## 보존 및 재사용
 
-- 원본 `/Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag`, branch `codex/private-beta-launch`, HEAD `5da54dd`와 기존 변경을 보존했다. reset/stash/강제 checkout 없음.
+- 원본 `~/Desktop/ChatGPT/travel-inbox-rag`, branch `codex/private-beta-launch`, HEAD `5da54dd`와 기존 변경을 보존했다. reset/stash/강제 checkout 없음.
 - 기존 native 검증 체크아웃 `/private/tmp/going-hybrid-verify.uPktYX`에서 수정·시험하고 작업 시작 파일 hash와 원본을 비교해 이번 변경만 반영했다. 최종 코드·시험·문서/로그54파일의 byte hash가 일치한다. 원본과 다른 native HEAD를 통째로 복사하지 않는다.
 - v5 PRD/AUDIT/1단계 기록, v2~v4의 리뷰/운영/추천 계약과 `APIFY_SETUP.md`를 확인했다. 적용 가능한 AGENTS.md 없음.
 - 인증/소유권, admin_research scope, 단일 dispatcher, lease/fencing, SQL job/checkpoint, Idempotency-Key, 공통 비용 예약/정산, 삭제 tombstone, 일정 preview/apply/undo를 재사용했다.

@@ -9,7 +9,7 @@
 
 너는 고잉의 추천 품질 담당이다. 이번 단계의 산출물은 새 모델이 아니라 **사람 라벨로 hybrid_v5와 hybrid_v6를 비교한 결과와 그에 따른 결정 기록**이다. 결과가 '차이 없음'이어도 정상적인 결과다.
 
-저장소: `/Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag`
+저장소: `~/Desktop/ChatGPT/travel-inbox-rag` (이 저장소 루트)
 기획: `docs/service-v6/PRD.md` 2절(G14~G16), 4.4절, 5절 D5
 
 ## 0. 먼저 확인해

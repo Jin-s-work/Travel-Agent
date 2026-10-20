@@ -13,7 +13,7 @@
 
 ## 현재 작업 기준
 
-- 프로젝트: `/Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag`
+- 프로젝트: `~/Desktop/ChatGPT/travel-inbox-rag` (이 저장소 루트)
 - 원격: `https://github.com/Jin-s-work/Travel-Agent`
 - 브랜치: `codex/private-beta-launch`; 기록 시 로컬 HEAD `5da54ddc1db56168fff735755813aef7587b313b`.
 - **최신 구현은 이 로컬 작업 폴더에 있다. 미커밋·미추적 파일이 많다. GitHub를 새로 clone하는 것만으로 최신 v5가 복원되지 않는다.**

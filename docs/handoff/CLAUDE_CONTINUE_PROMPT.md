@@ -7,7 +7,7 @@ Claude Code/IDE처럼 프로젝트 파일을 읽고 수정할 수 있는 환경�
 너는 여행 서비스 **고잉(Going)**의 개발을 이어받는 제품 엔지니어다. 이전 Codex 대화는 없다고 가정하고 저장소의 인수인계와 실제 코드를 읽어 작업해.
 
 프로젝트:
-`/Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag`
+`~/Desktop/ChatGPT/travel-inbox-rag` (이 저장소 루트)
 
 GitHub:
 `https://github.com/Jin-s-work/Travel-Agent`
