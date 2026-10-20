@@ -231,7 +231,7 @@
   function setTab(tab) {
     window.WorkspaceUX?.beforeTab();
     state.navigationRevision=(state.navigationRevision||0)+1;
-    if(tab==='saved'){setTab('explore');setExploreView('saved');return;}
+    if(tab==='saved'){setTab('explore');setExploreView('saved');if(state.workspaceNavigationOverride)state.workspaceNavigationOverride='saved';return;}
     const aliases={home:'trip',reservations:'mail',offline:'today'};tab=aliases[tab]||tab;if(state.workspaceNavigationOverride)state.workspaceNavigationOverride=tab;
     if(tab==='product')window.ProductTools?.load();
     if(['preparation','today'].includes(tab))window.TravelTools?.load(tab);
@@ -250,7 +250,9 @@
     $$('.section-switch[data-sections]').forEach(n=>n.hidden=!n.dataset.sections.split(',').includes(tab));
     if(window.WorkspaceUX)window.WorkspaceUX.afterTab();else window.scrollTo({top:0,behavior:'instant'});
   }
-  $$('[data-tab]').forEach(b => b.addEventListener('click', () => {if(b.dataset.tab==='explore')setExploreView('recommend');setTab(b.dataset.tab);}));
+  // A tab the user picks while the trip workspace is still loading wins over the restored draft tab.
+  function navigate(tab){if(state.workspaceSuspended)state.workspaceNavigationOverride=tab;if(tab==='explore')setExploreView('recommend');setTab(tab);}
+  $$('[data-tab]').forEach(b => b.addEventListener('click', () => navigate(b.dataset.tab)));
   $('#openMore').addEventListener('click', () => openDialog('여행 도구', body => {
     body.append(make('p','hint','여행에 필요한 도구를 골라 주세요.'));
     const menu=make('div','more-menu');

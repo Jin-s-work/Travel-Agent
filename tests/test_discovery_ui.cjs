@@ -199,3 +199,14 @@ test('late city catalog recovery relabels the current trip without changing its 
   assert.equal(nodes['#tripScope'].textContent,'2026-11-06 — 2026-11-09 · 바르셀로나');assert.equal(nodes['#tripCitySummary'].textContent,'바르셀로나');assert.equal(trip.stops[0].city,'madrid');assert.equal(state.trip.stops[0].city,'barcelona');assert.equal(state.trip.title,'내가 적은 여행 이름');
   await context.loadDestinations();assert.equal(calls,1);
 });
+test('a tab chosen while the trip workspace is still loading wins over the restored draft tab',()=>{
+  const calls=[],state={workspaceSuspended:true,workspaceNavigationOverride:null};
+  const context=load(['navigate'],{state,$$:()=>[],setTab:tab=>calls.push(['tab',tab]),setExploreView:view=>calls.push(['view',view])});
+  context.navigate('itinerary');
+  assert.equal(state.workspaceNavigationOverride,'itinerary');
+  assert.deepEqual(calls,[['tab','itinerary']]);
+  state.workspaceSuspended=false;state.workspaceNavigationOverride=null;calls.length=0;
+  context.navigate('explore');
+  assert.equal(state.workspaceNavigationOverride,null);
+  assert.deepEqual(calls,[['view','recommend'],['tab','explore']]);
+});
