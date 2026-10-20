@@ -32,6 +32,7 @@ def translate(statement):
     statement = statement.strip().rstrip(';')
     statement = re.sub(r"json_extract\((\w+(?:\.\w+)?),'\$\.resume_from'\)", r"(\1::jsonb->>'resume_from')", statement)
     statement = re.sub(r"json_extract\((\w+(?:\.\w+)?),'\$\.strict_pass'\)=1", r"(\1::jsonb->>'strict_pass')='true'", statement)
+    statement = re.sub(r"json_extract\((\w+(?:\.\w+)?),'\$\.observation_profile'\)", r"(\1::jsonb->>'observation_profile')", statement)
     statement = statement.replace('MAX(attempt-1,0)', 'GREATEST(attempt-1,0)')
     statement = statement.replace('session_epoch=MAX(session_epoch,?)', 'session_epoch=GREATEST(session_epoch,?)')
     if statement.upper().startswith('INSERT OR IGNORE '):
