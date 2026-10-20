@@ -1,0 +1,933 @@
+{
+  "schema_version": 1,
+  "development_baseline_date": "2026-10-08",
+  "timezone": "Asia/Seoul",
+  "repository_directory": "/Users/jinsangwoo/Desktop/ChatGPT/travel-inbox-rag",
+  "branch": "codex/private-beta-launch",
+  "head": "5da54ddc1db56168fff735755813aef7587b313b",
+  "origin": "https://github.com/Jin-s-work/Travel-Agent.git",
+  "working_tree_is_authoritative": true,
+  "latest_v5_pushed_or_deployed": false,
+  "snapshot_scope": "Working-tree path/status inventory and selected code SHA256 only; no diff, secrets, personal data, or presentation script bodies.",
+  "git_status_before_snapshot_creation": [
+    {
+      "status": " M",
+      "path": ".env.example"
+    },
+    {
+      "status": " M",
+      "path": ".gitignore"
+    },
+    {
+      "status": " M",
+      "path": "README.md"
+    },
+    {
+      "status": " M",
+      "path": "api.py"
+    },
+    {
+      "status": " M",
+      "path": "deploy/render-supabase/.env.example"
+    },
+    {
+      "status": " M",
+      "path": "docs/presentation/README.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/presentation/going-class-presentation.key"
+    },
+    {
+      "status": " M",
+      "path": "docs/presentation/v4/SCRIPT.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/service-v2/FOUNDATION_RUNBOOK.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/service-v2/IMPLEMENTATION_STATUS.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/service-v4/IMPLEMENTATION_STATUS.md"
+    },
+    {
+      "status": " M",
+      "path": "docs/service-v4/RECOMMENDATION_MODEL.md"
+    },
+    {
+      "status": " M",
+      "path": "render.yaml"
+    },
+    {
+      "status": " M",
+      "path": "scripts/prepare_render_env.py"
+    },
+    {
+      "status": " M",
+      "path": "scripts/validate_presentation_docs.py"
+    },
+    {
+      "status": " M",
+      "path": "scripts/version_web_assets.py"
+    },
+    {
+      "status": " M",
+      "path": "src/accommodations/origin.py"
+    },
+    {
+      "status": " M",
+      "path": "src/discovery/context.py"
+    },
+    {
+      "status": " M",
+      "path": "src/discovery/intents.py"
+    },
+    {
+      "status": " M",
+      "path": "src/discovery/models.py"
+    },
+    {
+      "status": " M",
+      "path": "src/discovery/photos.py"
+    },
+    {
+      "status": " M",
+      "path": "src/discovery/public_places.py"
+    },
+    {
+      "status": " M",
+      "path": "src/discovery/routes.py"
+    },
+    {
+      "status": " M",
+      "path": "src/discovery/safe_fetch.py"
+    },
+    {
+      "status": " M",
+      "path": "src/discovery/service.py"
+    },
+    {
+      "status": " M",
+      "path": "src/foundation/auth.py"
+    },
+    {
+      "status": " M",
+      "path": "src/foundation/db.py"
+    },
+    {
+      "status": " M",
+      "path": "src/foundation/local_mail.py"
+    },
+    {
+      "status": " M",
+      "path": "src/foundation/models.py"
+    },
+    {
+      "status": " M",
+      "path": "src/foundation/repository.py"
+    },
+    {
+      "status": " M",
+      "path": "src/foundation/routes.py"
+    },
+    {
+      "status": " M",
+      "path": "src/foundation/search.py"
+    },
+    {
+      "status": " M",
+      "path": "src/foundation/settings.py"
+    },
+    {
+      "status": " M",
+      "path": "src/http/recommendations.py"
+    },
+    {
+      "status": " M",
+      "path": "src/itineraries/constraints.py"
+    },
+    {
+      "status": " M",
+      "path": "src/itineraries/models.py"
+    },
+    {
+      "status": " M",
+      "path": "src/product/evaluation.py"
+    },
+    {
+      "status": " M",
+      "path": "src/product/events.py"
+    },
+    {
+      "status": " M",
+      "path": "src/product/prices.py"
+    },
+    {
+      "status": " M",
+      "path": "src/product/service.py"
+    },
+    {
+      "status": " M",
+      "path": "src/providers/reviews.py"
+    },
+    {
+      "status": " M",
+      "path": "src/recommendations/engine.py"
+    },
+    {
+      "status": " M",
+      "path": "src/recommendations/explanations.py"
+    },
+    {
+      "status": " M",
+      "path": "src/recommendations/general.py"
+    },
+    {
+      "status": " M",
+      "path": "src/recommendations/presentation.py"
+    },
+    {
+      "status": " M",
+      "path": "src/recommendations/registry.py"
+    },
+    {
+      "status": " M",
+      "path": "src/recommendations/service.py"
+    },
+    {
+      "status": " M",
+      "path": "src/reliability/jobs.py"
+    },
+    {
+      "status": " M",
+      "path": "src/research/collection.py"
+    },
+    {
+      "status": " M",
+      "path": "src/research/contracts.py"
+    },
+    {
+      "status": " M",
+      "path": "src/research/evaluation.py"
+    },
+    {
+      "status": " M",
+      "path": "src/research/language.py"
+    },
+    {
+      "status": " M",
+      "path": "src/research/routes.py"
+    },
+    {
+      "status": " M",
+      "path": "src/research/service.py"
+    },
+    {
+      "status": " M",
+      "path": "src/storage/postgres.py"
+    },
+    {
+      "status": " M",
+      "path": "src/storage/transfer.py"
+    },
+    {
+      "status": " M",
+      "path": "src/travel_tools/exports.py"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_accommodation_ui.cjs"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_accommodations_api.py"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_discovery_filters_ui.cjs"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_discovery_intents.py"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_discovery_ui.cjs"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_foundation_api.py"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_foundation_auth.py"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_local_mail.py"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_product_feedback.py"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_public_discovery.py"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_recommendation_api.py"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_recommendation_progress_ui.cjs"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_render_env_prepare.py"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_restaurant_photos.py"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_restaurant_photos_ui.cjs"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_stage1_migration.py"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_stage2_discovery_ui.cjs"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_stage2_general_models.py"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_stage2_postgres_migration.py"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_stage2_review_migration.py"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_travel_offline.cjs"
+    },
+    {
+      "status": " M",
+      "path": "tests/test_workspace_ux.cjs"
+    },
+    {
+      "status": " M",
+      "path": "web/css/design-system.css"
+    },
+    {
+      "status": " M",
+      "path": "web/index.html"
+    },
+    {
+      "status": " M",
+      "path": "web/js/accommodations.js"
+    },
+    {
+      "status": " M",
+      "path": "web/js/discovery-experience.js"
+    },
+    {
+      "status": " M",
+      "path": "web/js/foundation.js"
+    },
+    {
+      "status": " M",
+      "path": "web/js/offline-store.js"
+    },
+    {
+      "status": " M",
+      "path": "web/js/review-lab.js"
+    },
+    {
+      "status": " M",
+      "path": "web/js/workspace.js"
+    },
+    {
+      "status": " M",
+      "path": "web/sw.js"
+    },
+    {
+      "status": "??",
+      "path": "CLAUDE.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/handoff/CLAUDE_CONTINUE_PROMPT.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/handoff/PROJECT_HANDOFF_2026-10-08.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/operations/APIFY_SETUP.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/operations/LOGIN_RECOVERY_2026-10-08.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/operations/OPEN_REGISTRATION_2026-10-08.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v5/README.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v5/going-v5-class-presentation.key"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v5/going-v5-class-presentation.pptx"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v5/preview.webp"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v5/slides-content.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v6/CREDITS.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v6/README.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v6/going-demo.mp4"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v6/going-v6-class-presentation.key"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v6/going-v6-class-presentation.pptx"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v6/preview.webp"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v6/slides-content.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v7/CREDITS.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v7/README.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v7/REVIEW.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v7/going-demo.mp4"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v7/going-v7-class-presentation.key"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v7/going-v7-class-presentation.pptx"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v7/preview.webp"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v7/slides-content.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v7/validation.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v8/README.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v8/going-v8-class-presentation.key"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v8/going-v8-class-presentation.pptx"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v8/preview.webp"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v8/slides-content.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v9/going-v9-class-presentation.key"
+    },
+    {
+      "status": "??",
+      "path": "docs/presentation/v9/going-v9-class-presentation.pptx"
+    },
+    {
+      "status": "??",
+      "path": "docs/screenshots/going-ask-v7.jpg"
+    },
+    {
+      "status": "??",
+      "path": "docs/screenshots/going-discovery-v7.jpg"
+    },
+    {
+      "status": "??",
+      "path": "docs/screenshots/going-home-v7.jpg"
+    },
+    {
+      "status": "??",
+      "path": "docs/screenshots/going-source-v7.jpg"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v3/EXPLORATION_SIMPLIFICATION.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v3/MAIN_RECOMMENDATION_UX.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v4/RECOMMENDATION_MODEL_V3.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v4/fixtures/hybrid-v4-development.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v4/reports/hybrid-v4-benchmark.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v4/reports/hybrid-v4-benchmark.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v4/reports/hybrid-v4-initial-python.log"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v4/reports/hybrid-v4-js-tests.log"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v4/reports/hybrid-v4-python-tests.log"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v4/reports/hybrid-v4-source-hashes.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v4/reports/hybrid-v4-validation.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/AUDIT.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/IMPLEMENTATION_STATUS.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/PRD.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/README.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/fixtures/blind-evaluation-plan.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/prompts/01-simple-discovery.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/prompts/02-recommendation-quality.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/reports/DATA_COVERAGE.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/reports/RECOMMENDATION_EVALUATION.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/reports/REVIEW_OBSERVATION_ADR.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/reports/STAGE1_IMPLEMENTATION.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/reports/STAGE2_IMPLEMENTATION.md"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/reports/stage1-js-tests.log"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/reports/stage1-original-js-tests.log"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/reports/stage1-original-python-tests.log"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/reports/stage1-python-tests.log"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/reports/stage1-source-hashes.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/reports/stage2-final-focused-tests.log"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/reports/stage2-final-integration-tests.log"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/reports/stage2-full-js-tests.log"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/reports/stage2-full-python-tests.log"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/reports/stage2-measurements.json"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/reports/stage2-original-js-tests.log"
+    },
+    {
+      "status": "??",
+      "path": "docs/service-v5/reports/stage2-original-python-tests.log"
+    },
+    {
+      "status": "??",
+      "path": "examples/mail-time-pack/01-tokyo-dinner.eml"
+    },
+    {
+      "status": "??",
+      "path": "examples/mail-time-pack/02-tokyo-hotel.eml"
+    },
+    {
+      "status": "??",
+      "path": "examples/mail-time-pack/03-barcelona-tour.eml"
+    },
+    {
+      "status": "??",
+      "path": "examples/mail-time-pack/04-tokyo-night-tour.eml"
+    },
+    {
+      "status": "??",
+      "path": "examples/mail-time-pack/README.md"
+    },
+    {
+      "status": "??",
+      "path": "examples/mail-time-pack/expected-results.json"
+    },
+    {
+      "status": "??",
+      "path": "scripts/build_recommender_benchmark.py"
+    },
+    {
+      "status": "??",
+      "path": "scripts/check_apify_setup.py"
+    },
+    {
+      "status": "??",
+      "path": "scripts/plan_v5_review_pilot.py"
+    },
+    {
+      "status": "??",
+      "path": "scripts/prepare_v5_blind_evaluation.py"
+    },
+    {
+      "status": "??",
+      "path": "scripts/v5_data_coverage.py"
+    },
+    {
+      "status": "??",
+      "path": "src/discovery/candidate_pool.py"
+    },
+    {
+      "status": "??",
+      "path": "src/discovery/photo_provider.py"
+    },
+    {
+      "status": "??",
+      "path": "src/discovery/photo_schema.py"
+    },
+    {
+      "status": "??",
+      "path": "src/operations/failures.py"
+    },
+    {
+      "status": "??",
+      "path": "src/recommendations/benchmark.py"
+    },
+    {
+      "status": "??",
+      "path": "src/recommendations/comparison.py"
+    },
+    {
+      "status": "??",
+      "path": "src/recommendations/evaluation_v5.py"
+    },
+    {
+      "status": "??",
+      "path": "src/recommendations/hybrid.py"
+    },
+    {
+      "status": "??",
+      "path": "src/recommendations/hybrid_v5.py"
+    },
+    {
+      "status": "??",
+      "path": "src/recommendations/hybrid_v6.py"
+    },
+    {
+      "status": "??",
+      "path": "src/recommendations/pages.py"
+    },
+    {
+      "status": "??",
+      "path": "src/research/observation.py"
+    },
+    {
+      "status": "??",
+      "path": "tests/test_apify_preflight.py"
+    },
+    {
+      "status": "??",
+      "path": "tests/test_discovery_flow_ui.cjs"
+    },
+    {
+      "status": "??",
+      "path": "tests/test_home_ui.cjs"
+    },
+    {
+      "status": "??",
+      "path": "tests/test_hybrid_recommender.py"
+    },
+    {
+      "status": "??",
+      "path": "tests/test_login_recovery_ui.cjs"
+    },
+    {
+      "status": "??",
+      "path": "tests/test_public_place_photos.py"
+    },
+    {
+      "status": "??",
+      "path": "tests/test_recommendation_v5.py"
+    },
+    {
+      "status": "??",
+      "path": "tests/test_request_failures.py"
+    },
+    {
+      "status": "??",
+      "path": "tests/test_v5_candidate_retrieval.py"
+    },
+    {
+      "status": "??",
+      "path": "tests/test_v5_concurrent_workload.py"
+    },
+    {
+      "status": "??",
+      "path": "tests/test_v5_context.py"
+    },
+    {
+      "status": "??",
+      "path": "tests/test_v5_photo_states.py"
+    },
+    {
+      "status": "??",
+      "path": "tests/test_v5_pilot_plan.py"
+    },
+    {
+      "status": "??",
+      "path": "tests/test_v5_ranker_evaluation.py"
+    },
+    {
+      "status": "??",
+      "path": "tests/test_v5_result_pages.py"
+    },
+    {
+      "status": "??",
+      "path": "tests/test_v5_review_observation.py"
+    },
+    {
+      "status": "??",
+      "path": "tests/test_v5_simple_ui.cjs"
+    },
+    {
+      "status": "??",
+      "path": "web/js/discovery-flow.js"
+    },
+    {
+      "status": "??",
+      "path": "web/js/home.js"
+    },
+    {
+      "status": "??",
+      "path": "web/js/recommendation-pages.js"
+    },
+    {
+      "status": "??",
+      "path": "web/js/simple-discovery.js"
+    }
+  ],
+  "status_counts": {
+    "modified_tracked": 88,
+    "untracked_files": 117
+  },
+  "critical_file_sha256": {
+    "api.py": "7bd9566d27ed760554ab9681252c93c2f185d242cfb4323d2811c4f856a4d860",
+    "Dockerfile": "daf6280f429e6a9f6e07fbac348c8ccdb2727fa601ef24bd0410d3ba3eb584c2",
+    "render.yaml": "3e5f54fbb9d8465c6a754e929ac7812a06656ad26059e191a7d69ed8016c6ff0",
+    "requirements.txt": "12d21592e9b0cd790fe9a33686c3d65f8051d7a1121a6abef9d82c6fa0ca6ff5",
+    "requirements-dev.txt": "2a8defd535e99b802734449ddd90a15e647314abe4103b5f575a834803e3a442",
+    "requirements.lock": "e80b09ec0000cb2ad895e228999bb3c58fc091c64cb5e1044e9df40a5d6e9fe3",
+    "package.json": "d5e10ba8100b3bdaf906572b03f167251fe4ec13f621dbfc0048046cf417d18f",
+    "package-lock.json": "e71530381d68dfc24b6dec2fbd8500428f80bf9412b5e1d7cb28d1aa744bdf3b",
+    ".gitignore": "c51f76c3efe291a174ae24c08b6eab16f89988f15186d26944ae250700ca7dcd",
+    ".env.example": "23975a882a9557443ce6439b9616846f4736fcd02e242d2a35a1bf7bf04635c0",
+    "src/foundation/auth.py": "ca9aeb268479c763f65d0e9e99506950091ca38260a9c0c3d50cf1aecd8c2a49",
+    "src/foundation/settings.py": "1aa4914c88681a0a8aaa1af6e5341acde4b3a474e3ae2c0ed7eae2be20d4caff",
+    "src/foundation/repository.py": "87ca58f7ced1f6374c0771c51a138d928ac276a034451c668223d1eb96f90ed8",
+    "src/foundation/local_mail.py": "21d829eba760ed1ac0c4dc8d4a3a9f66ef5465bf36c4fab0f24df8487cb1ff38",
+    "src/foundation/search.py": "cc5da6b1b94b2d19a18b2091168c3f2830d90cabb1d715e87714b459b503df85",
+    "src/storage/postgres.py": "be5302483a3004b600ad83f6280e0218146225b187fd50f0efe3da78328f3804",
+    "src/storage/objects.py": "ac10b5d14f8bee5fe83cc3858eb3b2dd325f1032d57c25319a7776b9ce45be9b",
+    "src/storage/vectors.py": "088b53f9e385d220fc4e764531f78d494f130d9be3d0243f399c84f28faf93f3",
+    "src/storage/transfer.py": "86705d55d791100ecde7df5d8d9d0c11b4fbcf3a5e06b1d2921dcea4641c2319",
+    "src/reliability/jobs.py": "3ab4570d6be7cf09016b1e4d471a0bd99ffdbcf7567e5e51eb05aaa01b914de6",
+    "src/reliability/budget.py": "cfa4a4260deb6f9aa0148e402cf8336ae6a8b44310b71e3b6f8d61e8ede15a40",
+    "src/reliability/dispatcher.py": "92bdf80a69ecbdc4441548200db66b60e4d8cba4a760ef4d71366f15391bebc5",
+    "src/reliability/handlers.py": "b8721bdc32f9c128f9811921ec5f98cd27957e05014c080e68e7aed644a71f82",
+    "src/discovery/context.py": "1a611a067339eb42ba7ba2cd52c8fc83dbcee2d19221bb590d382eeab760744b",
+    "src/discovery/candidate_pool.py": "3ee7eb0c42ce2e03cf5db57c5fd8e59e86f9d083795d84d5eb31851f6515a6af",
+    "src/discovery/public_places.py": "99c2aaeb382a207b56a465cf4d47f91ac92596a677970e70d72eeef59e5085cb",
+    "src/discovery/photos.py": "e4356f1f2dbc607d12f757562d44ce74d827c203fc82a66c64988cbaf9097dd1",
+    "src/discovery/photo_provider.py": "93f28609ce7c4adfcaaaeb295e5df14942b4b31fd601b0fdf21ee0659751ab2c",
+    "src/accommodations/origin.py": "c35c937868718af59125f15e879611bf680816e592166e4d91813dbd6a57938d",
+    "src/providers/apify_reviews.py": "a5095ad2f4ff92ad59afbed0526b88cce0b1a95fb697a9a549ad960785269b3c",
+    "src/providers/reviews.py": "094269db24d13a9badac039806d94da7720bd3e4bc522378c27462bc11a28c1d",
+    "src/research/contracts.py": "ebc919109d6289d2e59930a12c17a808be1bb3eec7414d1ffd05357f639ce49b",
+    "src/research/collection.py": "d3332959bc6760e6f36507483517c4b8d54c53f49dcf0a4bf73731428b86d487",
+    "src/research/observation.py": "fca4faf202fde07eb911e445d4035c7b5488b8143d2e1394625b130af9cd7e75",
+    "src/research/evaluation.py": "8452bcd08672119fdf7f2882243e83043f43ded2b38874728b94cbc5be5a9a22",
+    "src/recommendations/service.py": "661a5b37258e10bb9ed262e0d601fa1c5bc650503c44b403fac242baa5c23acf",
+    "src/recommendations/registry.py": "9aaf52f0e24ca4db33a7acf8d31f8efbcca2ccf0e00ee552f2186a20e25d6e8f",
+    "src/recommendations/hybrid_v5.py": "319a65f7688052754fcaf287943f9a61c53c3e7a98b389bb55ea9b3eefa8ac81",
+    "src/recommendations/hybrid_v6.py": "8c71445a9058d10bc27d82dc8c4b2539e09ba4f6d42ee7103d4714c2e80b1310",
+    "src/recommendations/pages.py": "c8c56490c8c0d69b1ed54b628de00ee2428017e3cea3a667ce7a5b15a0f9cd68",
+    "src/recommendations/evaluation_v5.py": "90f998c2986b1623f65a76b62ca8271b2473e1c38c3ce877a2adef1e1f4ee776",
+    "src/itineraries/service.py": "5926d3c8d8e7b3ebde3ef0e0f3eb5495c706077a047035024998c977705fd7a3",
+    "src/itineraries/constraints.py": "4c181723f9c3ee484c48046c5e14031bcf0f509602e8905f667db93db900b911",
+    "src/itineraries/edits.py": "333fb3bbcf1c3efbc0905904aa9702d14d276158a41cd9523bce0d83def2476c",
+    "web/index.html": "070443a3733f674029fd3cc0a632dbb79ed493e3d23417d7ce88c91cf7c3da8d",
+    "web/css/design-system.css": "3c7b089928d448558eb969217802d1e6864f72bcd1701a7af605248e868ba6f8",
+    "web/js/foundation.js": "ed0eeee36ad3ba9db99860ac44a8a71aa9dde9d37462e909e699d30c3d360d3e",
+    "web/js/home.js": "e724d24c217a3bb9d1bf075d095a9800516ae528928d2d6833ee2db6f6e1d631",
+    "web/js/simple-discovery.js": "8598a9ac17cd04469a60571637be51eab6e4e362cdcf388d8d3a37424e71234c",
+    "web/js/recommendation-pages.js": "373219eefc5ea6e2398c0cb93133a070692e3a15ad2b6577fd0fabfbac667ed5",
+    "web/js/review-lab.js": "a1e2ef103f42ce2a9ef20059c192970ded889830d7b9f80fb8459a57d64f8c78",
+    "web/sw.js": "f34b64a6651522c96f820a6c0eebe0f28a9a4d35a55da9f89db668f6df868fcf",
+    "scripts/prepare_render_env.py": "0eb37c85fbbbf332c3c49197db7d57f29df6ea25e6b977352997f7df0f43bfb5",
+    "scripts/stage1_browser_fixture.py": "a281c3eb49f66d14e5f38180414c4a4b6308b1c46a3fb3b90b88de5a2ce98b1f",
+    "scripts/v5_data_coverage.py": "80d166ee7be0fdc0bb46b1cfe7b94a54994663b6d541db152bea45c673126b13",
+    "scripts/plan_v5_review_pilot.py": "a45fd6565286586dbb58523e93e88011ced8d26737f4c228a9da8001deec8f4f",
+    "docs/service-v5/IMPLEMENTATION_STATUS.md": "9d9e9c13f4df8689280878809b13227752b67a313952536ce2fb247cee1e0171",
+    "docs/service-v5/reports/STAGE2_IMPLEMENTATION.md": "3b11074bb1c80c17b98d17c6f4a70316bbe12b738fca669fc45ed991520a09e9"
+  },
+  "private_config_presence_only": {
+    ".env": {
+      "exists": true,
+      "git_ignored": true,
+      "contents_read": false,
+      "hash_recorded": false
+    },
+    "deploy/render-supabase/.env": {
+      "exists": true,
+      "git_ignored": true,
+      "contents_read": false,
+      "hash_recorded": false
+    },
+    "deploy/render-supabase/.env.render": {
+      "exists": true,
+      "git_ignored": true,
+      "contents_read": false,
+      "hash_recorded": false
+    }
+  },
+  "tracked_presentation_scripts_do_not_publish": [
+    "docs/presentation/v4/SCRIPT.md"
+  ],
+  "last_recorded_live_auth_release": {
+    "app_commit": "d154dc0",
+    "confirmed_at": "2026-10-08 16:14 KST",
+    "rechecked_during_handoff": false
+  },
+  "previous_temp_paths_not_required": [
+    "/private/tmp/going-hybrid-verify.uPktYX",
+    "/private/tmp/going-stage1-native313"
+  ],
+  "handoff_entry": "CLAUDE.md",
+  "handoff_report": "docs/handoff/PROJECT_HANDOFF_2026-10-08.md",
+  "continuation_prompt": "docs/handoff/CLAUDE_CONTINUE_PROMPT.md"
+}
