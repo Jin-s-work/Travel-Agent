@@ -140,7 +140,9 @@ python3 scripts/check_publish_safety.py --ci --untracked
 | S7 | `8bf8add` | Record stage 1 baseline reports |
 | S8 | `1cec280` | Keep the tab a user picks while the trip workspace loads |
 | S9 | `1c9a75e` | Run stage 1 browser scenarios with Playwright in CI |
-| S10 | 이 문서를 담은 커밋 | Record stage 1 browser E2E results |
+| S10 | `50d705a` | Record stage 1 browser E2E results |
+| M1 | `27bdfaa` | Merge origin/codex/private-beta-launch (df01153) into local v5 and stage 1 work |
+| S11 | 이 문서를 담은 커밋 | Record the remote merge and its checks |
 
 `make ci`는 S6 시점 작업 트리에서, E2E 8개는 S9 시점 작업 트리에서 실행했다. 중간 커밋 각각은 실행하지 않았다.
 
@@ -153,7 +155,7 @@ python3 scripts/check_publish_safety.py --range origin/codex/private-beta-launch
 
 ### 남긴 파일
 
-S7 이후 `git status --short`에 남는 것은 발표 자료 8줄뿐이다. 이유는 위 "커밋하지 않는 것"과 같다.
+병합(M1) 전까지 `git status --short`에 남은 것은 아래 발표 자료 8줄뿐이었다. 병합 때 이 파일들은 iCloud 밖에 백업한 뒤 원격판으로 바뀌었고, 병합 뒤에는 `git status --short`가 비어 있다. 비공개 대본 6개는 무시 파일로 제자리에 복원했다([출시 체크리스트 2절](RELEASE_CHECKLIST.md#2-원격과-갈라진-이력--병합-완료)).
 
 ```text
  M docs/presentation/README.md

@@ -6,7 +6,7 @@
 
 **세 줄 요약**
 
-- push 전에 원격 브랜치와 로컬 브랜치가 갈라진 상태를 먼저 정리해야 한다. 원격 `codex/private-beta-launch`는 `df01153`, 로컬은 `5da54dd` 위에 1단계 커밋을 쌓았다.
+- 원격 `df01153`과의 병합을 2026-10-20 대표 지시로 마쳤다(병합 커밋 `27bdfaa`). 이제 원격이 로컬의 조상이라 push는 fast-forward다. push 자체는 아직 하지 않았다.
 - 운영 기록 커밋 `d154dc0`과 현재 모두 schema 15이고 `src/foundation/db.py`가 같아 migration 변경이 없다. 새 설정 이름 9개는 모두 코드 기본값이 있으나, 그중 2개는 기본이 켜짐(`true`)이다.
 - 되돌리기는 이전 이미지 재배포다. 같은 schema 15를 이해하는 이미지라 DB 복원 없이 가능하다고 판단하지만 실제 롤백은 해 본 적이 없다.
 
@@ -17,35 +17,54 @@
 | 1 | `git status --short`로 남은 변경이 발표 자료·비밀·데이터뿐인지 확인 | [STAGE1_COMMIT_PLAN.md](STAGE1_COMMIT_PLAN.md)의 "남긴 것"과 일치 |
 | 2 | `python3 scripts/check_publish_safety.py --ci` | `0 fail` |
 | 3 | `python3 scripts/check_publish_safety.py --range origin/codex/private-beta-launch..HEAD` | 비밀 0. 절대경로 경고는 [처리안](STAGE1_COMMIT_PLAN.md#절대경로-처리안) 결정대로 |
-| 4 | 원격과 갈라진 이력 정리 (아래 2절) | `git merge-base --is-ancestor origin/codex/private-beta-launch HEAD` 성공 |
+| 4 | 원격과 갈라진 이력 정리 (아래 2절, **완료**) | `git merge-base --is-ancestor origin/codex/private-beta-launch HEAD` 성공 — 2026-10-20 확인 |
 | 5 | `make ci` (PG는 일회용 컨테이너 DSN을 줄 때) | 전부 통과 |
 | 6 | `git config user.email`이 noreply 주소 | `…@users.noreply.github.com` |
 
-## 2. 원격과 갈라진 이력 — 사람이 결정
+## 2. 원격과 갈라진 이력 — 병합 완료
 
-2026-10-20 `git fetch`로 확인했다. 원격에는 로컬에 없던 커밋 25개(`5da54dd..df01153`, `d154dc0` 포함)가 있다. 내용 비교 결과 로컬 작업본이 원격 내용을 거의 모두 포함하고 그 위에서 더 고친 상태다.
+원격에는 로컬에 없던 커밋 25개(`5da54dd..df01153`, 운영 `d154dc0` 포함)가 있었다. 대표 지시(2026-10-20, "RELEASE_CHECKLIST 2절 권장안대로 병합해줘. 발표 자료는 원격 유지, 충돌은 로컬 기준으로 풀되 원격에만 있는 문단은 확인하고, 로컬 발표 파일은 먼저 iCloud 밖에 백업해. 병합 후 make ci 돌리고 push는 하지 마.")로 병합했다.
 
-| 비교 (발표 자료 제외 188경로) | 수 |
-| --- | ---: |
-| 로컬 = 원격 | 77 |
-| 로컬만 변경 (원격은 `5da54dd` 그대로) | 86 |
-| 원격만 변경 (로컬에 빠짐) | 0 |
-| 양쪽 변경 · 3-way 병합 시 로컬이 원격을 이미 포함 | 5 |
-| 양쪽 변경 · 3-way 병합 충돌 | 20 |
+### 백업 — 병합 전
 
-충돌 20파일은 표본 확인에서 로컬이 원격 줄을 고친 형태였다(예: 모델 목록에 `hybrid_v6` 추가, 자산 hash 갱신). 다만 `docs/service-v4/IMPLEMENTATION_STATUS.md`처럼 원격에만 있는 문단이 남은 파일도 있어 전수 검토는 하지 않았다.
+| 항목 | 값 |
+| --- | --- |
+| 위치 | `~/Backups/going-presentation-2026-10-20/` (iCloud 동기화 밖) |
+| 대상 | `docs/presentation/` 전체 54파일(추적·미추적·무시 파일 포함), 26MB |
+| 대조 | 복사 전 54개 모두 iCloud에서 내려받고 "읽은 바이트 = 표시 크기" 확인 → 원본·사본 sha256 목록 54줄 일치 (`source.sha256` = `copy.sha256`) |
+| 병합 전 상태 기록 | `git-status-before.txt` |
+| 작업 폴더에서 비킨 것 | 미추적 `v5~v9/` 32파일은 `moved-from-worktree/`로 이동. 추적 파일 3개(`README.md`·`.key`·`v4/SCRIPT.md`)는 대조 뒤 HEAD로 복원 |
 
-> [!WARNING]
-> 원격은 `docs/presentation/SCRIPT.md`·`v4/SCRIPT.md`를 이미 삭제했고 발표 자료 v5~v9를 공개했다. 로컬 발표 파일 대부분은 원격과 내용이 다르다. 병합 방식에 따라 공개된 발표 자료가 바뀌거나 지워질 수 있다.
+### 병합과 충돌 해결
 
-권장 순서. 원격은 로컬에서 미추적인 `docs/presentation/v5~v9` 경로를 추적하므로, 그대로 병합하면 Git이 "untracked working tree files would be overwritten"로 멈춘다. 로컬 발표 파일을 먼저 iCloud 밖 다른 폴더에 복사해 두고, 병합 뒤 어느 쪽을 쓸지 비교한다.
+`git merge --no-ff --no-commit origin/codex/private-beta-launch` → 충돌 21파일(이전 분석 20 + 1단계에서 고친 `.gitignore`). 발표 자료 38경로는 충돌 없이 원격판으로 들어왔다.
 
-```bash
-git merge --no-ff origin/codex/private-beta-launch
-# 충돌 20파일: 로컬(ours) 내용을 기준으로 해결하되 원격에만 있는 문단은 직접 확인
-# 발표 자료: 원격(theirs)을 유지하는 것이 기존 '대본 비공개' 결정과 맞음
-make ci
-```
+| 파일 | 원격 전용 줄 | 결정 · 이유 |
+| --- | ---: | --- |
+| `docs/service-v4/IMPLEMENTATION_STATUS.md` | 13 | **블록 2는 원격** — 원격에만 있는 10/8 "리뷰 조건·메일 연습·공개 발표 정리" 기록과 배포 기록(`2da85c0`, `dep-db3iiutg…`), 비공개 대본 링크를 "로컬 별도 보관"으로 바꾼 문장. 블록 1은 빈 줄만 달라 로컬 |
+| `web/js/foundation.js` | 15 | 로컬 — 원격 줄은 `setExploreView`·`ensureDiscoveryDraft`·카드 저장(`run_id` 없는 판)의 이전 형태 |
+| `web/js/discovery-experience.js` | 10 | 로컬 — 원격은 '둘러보기'를 탭으로 둔 이전 3탭 구조 |
+| `web/js/home.js` | 10 | 로컬 — 같은 필터(부적격·합성·상한 제외)를 구획별 라운드로빈으로 다시 쓴 판이 로컬에 있음 |
+| `src/recommendations/benchmark.py` | 10 | 로컬 — 재구성된 평가기. 원격 줄은 이전 반환 형태 |
+| `web/index.html` · `web/sw.js` | 9 · 2 | 로컬 — 자산 hash·캐시 버전. 로컬 JS 내용과 맞아야 함 |
+| `src/recommendations/{service,registry,general,engine}.py` | 5 · 4 · 4 · 2 | 로컬 — 원격 줄은 `hybrid_v6` 추가 전 모델 목록 |
+| `src/discovery/photos.py` · `photo_provider.py` | 4 · 1 | 로컬 — 사진 거절 사유를 더 잘게 나눈 판 |
+| `scripts/check_apify_setup.py` · `version_web_assets.py` | 4 · 1 | 로컬 — 이전 함수 형태·자산 목록 |
+| `tests/test_stage2_discovery_ui.cjs` · `test_recommendation_progress_ui.cjs` | 2 · 1 | 로컬 — 같은 이름의 시험이 로컬에 새 구조로 있음 |
+| `api.py` | 1 | 로컬 — `photo_collection_enabled` 조건이 붙은 판 |
+| `.gitignore` · `web/css/design-system.css` · `web/js/discovery-flow.js` | 0 | 로컬 |
+
+충돌 밖 원격 변경은 21파일 모두 이미 로컬에 있었다. 로컬 기준 해결안을 만들어 보니 20파일이 로컬 내용과 바이트 단위로 같았다. 결과적으로 발표 자료를 뺀 병합 변경은 v4 진행 기록 1파일(+18/−1)뿐이다.
+
+### 발표 자료 — 병합 뒤
+
+| 구분 | 수 | 처리 |
+| --- | ---: | --- |
+| 원격과 같음 | 24 | 그대로 |
+| 원격과 다름 (v4~v8 `README.md`·`.key`·`.pptx`·`slides-content.json`, 루트 4개) | 24 | **원격판 유지**. 원격판은 발표자 메모·대본을 뺀 공개판이다. 로컬판은 백업에 있음 |
+| 병합 트리에 없음 (비공개 대본 `SCRIPT.md` 6개: 루트·v4~v8) | 6 | 백업에서 같은 위치로 복원. `.gitignore` 대상이라 추적되지 않음 |
+
+추적 중인 발표 대본은 병합으로 0개가 됐다(원격이 삭제한 2개를 따름). 게시 점검의 `presentation_script_tracked` 경고도 0이다.
 
 ## 3. push — 사람
 
@@ -54,7 +73,7 @@ python3 scripts/check_publish_safety.py --range origin/codex/private-beta-launch
 git push origin codex/private-beta-launch
 ```
 
-force-push는 금지다. 거부되면 2절로 돌아간다.
+force-push는 금지다. 병합 이후 원격이 다시 바뀌었으면 거부되므로, `git fetch` 후 같은 방식으로 다시 병합한다.
 
 ## 4. Actions 확인 — 사람
 
@@ -105,4 +124,4 @@ Google 로그인 → 마지막 여행 → 추천 한 번 → 일정 미리보기
 | 빠진 설정 이름 | 0 |
 | 전체 저장소 | 156파일. 그중 문서 73(발표 자료 38 포함) · 시험 23 |
 
-발표 자료 38파일 차이는 로컬 이력이 원격의 발표 정리 커밋을 아직 받지 않았기 때문이다. 2절 병합 결정에 따라 달라진다.
+발표 자료 38파일 차이는 병합 전 계산이다. 병합(`27bdfaa`)으로 발표 자료는 원격판이 됐다.

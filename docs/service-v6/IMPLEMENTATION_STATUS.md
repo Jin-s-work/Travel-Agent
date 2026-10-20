@@ -6,7 +6,7 @@
 
 **세 줄 요약**
 
-- v5 미커밋 작업을 로컬 커밋 11개로 보존했고, 1단계 작업(게시 점검 · CI · 이동시간 · PG 결함 · E2E 골격 · 보고)을 이어 커밋했다. 원격은 로컬보다 25커밋 앞서 있어 push 전에 병합이 필요하다.
+- v5 미커밋 작업을 로컬 커밋 11개로 보존했고, 1단계 작업(게시 점검 · CI · 이동시간 · PG 결함 · E2E 골격 · 보고)을 이어 커밋했다. 원격의 앞선 25커밋은 대표 지시로 병합했다(`27bdfaa`, 발표 자료 원격판 유지, 로컬 발표 파일 백업).
 - 로컬에서 CI와 같은 명령과 브라우저 E2E(Chromium, 8개 통과)를 실행했다. GitHub Actions 실행·운영 배포는 하지 않았다.
 - 실행 중 결함 4건을 고치고 회귀 시험을 붙였다: 이동시간 정책(G4), PG에서 실패하던 리뷰 계약 SQL, 낡은 schema 12 재현 시험, 로드 중 고른 탭이 초안 복원에 덮이는 문제. CI 시험 환경에서는 `ZERO_SPEND`를 뺐다.
 
@@ -16,7 +16,7 @@
 
 | 영역 | code | synthetic | browser | live | 배포 |
 | --- | --- | --- | --- | --- | --- |
-| A 작업 보존 | 로컬 커밋 11 + 1단계 커밋 | 해당 없음 | 해당 없음 | 해당 없음 | push 안 함 · 원격과 병합 필요 |
+| A 작업 보존 | 로컬 커밋 11 + 1단계 커밋 + 원격 병합 `27bdfaa` | 해당 없음 | 해당 없음 | 해당 없음 | push 안 함 · fast-forward 가능 |
 | A 게시 안전 점검 | `check_publish_safety.py` | 시험 22개 통과 · 저장소 비밀 0 | 해당 없음 | 해당 없음 | 해당 없음 |
 | B CI | `ci.yml` 6 job · `make ci` | `make ci` 로컬 통과: Python 1302 통과 · 20 skip, JS 220, 자산·게시 점검 | 해당 없음 | Actions 미실행 | 해당 없음 |
 | B PostgreSQL | 기존 plugin + CI job | 일회용 pgvector 0.8.7/PG17: plugin 282 통과 · 자체 schema 16 통과 | 해당 없음 | 운영 DB 미사용 | 해당 없음 |
@@ -40,11 +40,12 @@
 
 ## 다음 실행 조건
 
-1. 대표: 원격 25커밋과의 병합 방식 결정 → push → Actions 확인 ([출시 체크리스트](reports/RELEASE_CHECKLIST.md))
-2. 대표: 절대경로 13줄 처리, 추적 중인 발표 대본 처리
-3. push 뒤 Actions `e2e` job이 Linux에서 통과하는지 확인
-4. `test_v5_concurrent_workload`의 409 — 느린 입출력에서만 1회 재현. 원인 조사 필요
-5. 2단계(메일 AI 신뢰성)는 1단계 push 뒤 시작
+1. 디스크 여유 확보(현재 98%) 뒤 `make ci`·`make e2e` 재실행 — 병합 뒤 PG 자체 시험과 E2E는 iCloud 대기로 미완료
+2. 대표: push → Actions 확인 ([출시 체크리스트](reports/RELEASE_CHECKLIST.md)). 병합은 완료
+3. 대표: 새로 올라갈 절대경로 13줄 처리 (추적 대본은 병합으로 0개)
+4. push 뒤 Actions `e2e` job이 Linux에서 통과하는지 확인
+5. `test_v5_concurrent_workload`의 409 — 느린 입출력에서만 1회 재현. 원인 조사 필요
+6. 2단계(메일 AI 신뢰성)는 1단계 push 뒤 시작
 
 ## 산출물
 

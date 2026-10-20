@@ -8,7 +8,7 @@
 
 - v5 작업을 로컬 커밋 11개로 묶고, 게시 점검 스크립트·CI 워크플로·`make ci`를 추가했다. `make ci` 로컬 실행 결과 Python 1302 · JS 220 · PG 282+16 통과, 실패 0이다.
 - 결함 4건을 고쳤다: 기본 배포의 이동시간 전부 미확인(G4, 결정 A), PG에서 500이 나던 리뷰 계약 SQL, 오래된 schema 12 재현 시험, 로드 중 고른 탭이 초안 복원에 덮이는 문제. 결함마다 회귀 시험을 붙였다.
-- Playwright 승인 뒤 브라우저 E2E E01~E05와 회귀 E01b를 실제로 돌려 8개 모두 통과했다. 첫 실행에서 앱 결함 1건(D4)을 찾아 고쳤다. 원격은 로컬보다 25커밋 앞서 있어 push 전 병합이 필요하다.
+- Playwright 승인 뒤 브라우저 E2E E01~E05와 회귀 E01b를 실제로 돌려 8개 모두 통과했다. 첫 실행에서 앱 결함 1건(D4)을 찾아 고쳤다. 원격의 앞선 25커밋은 대표 지시로 병합했다(`27bdfaa`). push는 하지 않았다.
 
 ## 출발점
 
@@ -90,7 +90,7 @@ v5 변경 212경로를 커밋 11개로 묶고 발표 자료 31경로는 남겼�
 | 양쪽 변경, 로컬이 원격을 포함 | 5 |
 | 양쪽 변경, 3-way 병합 충돌 | 20 |
 
-로컬 작업본은 원격 내용을 바탕으로 더 나아간 상태로 보인다. 그래도 병합은 하지 않았다. 원격은 발표 대본 2개를 이미 지웠고 발표 자료 v5~v9를 공개했는데, 로컬 발표 파일과 내용이 달라 병합 방식이 공개 범위를 바꾸기 때문이다. 권장 절차는 [출시 체크리스트 2절](RELEASE_CHECKLIST.md#2-원격과-갈라진-이력--사람이-결정)에 있다.
+로컬 작업본은 원격 내용을 바탕으로 더 나아간 상태였다. 처음에는 공개 범위가 걸려 병합하지 않았고, 대표가 권장안을 승인한 뒤 병합했다. 발표 자료는 iCloud 밖에 백업(54파일, sha256 일치)한 뒤 원격판을 따랐고, 21개 충돌은 로컬 기준으로 풀되 원격 전용 줄을 파일마다 검토했다. 원격 줄을 살린 곳은 v4 진행 기록 한 파일이다. 전체 기록은 [출시 체크리스트 2절](RELEASE_CHECKLIST.md#2-원격과-갈라진-이력--병합-완료)에 있다.
 
 ## 묶음 B — CI
 
@@ -264,6 +264,23 @@ TRAVEL_TEST_POSTGRES_DSN=postgresql://postgres@127.0.0.1:55432/postgres make ci 
 
 마지막 재실행은 iCloud가 파일을 다시 내려놓은 상태라 29분이 걸렸다. 실패한 `test_v5_concurrent_workload.py::test_five_users_overlap_documents_and_recommendations`(409 ≠ 202)는 이번 세션이 건드리지 않은 v5 시험이다. 단독으로 5회 돌려 4회 통과했고, 실패한 1회는 33초가 걸린 느린 실행이었다(평소 9초). 입출력이 느릴 때 드러나는 경합일 수 있어 후속 조사 대상으로 남긴다.
 
+### 원격 병합(`27bdfaa`) 뒤
+
+병합이 바꾼 것은 `docs/service-v4/IMPLEMENTATION_STATUS.md` 1개와 발표 자료 38개다. `src`·`api.py`·`web`·`tests`·`scripts`·`Makefile`·`.github`·`requirements*`는 병합 전 HEAD(`50d705a`)와 바이트 단위로 같다(`git diff --quiet HEAD^1 HEAD -- …` 확인).
+
+| 단계 | 결과 |
+| --- | --- |
+| `ci-safety` | 0 fail · 81 warn (절대경로 76 · 루프백 DSN 5). 추적 대본 경고는 0이 됨 |
+| `ci-assets` | 통과 |
+| `ci-js` | 1회차 1 실패(`node_modules/fake-indexeddb/package.json`이 iCloud dataless) → 내려받은 뒤 221 통과 |
+| `ci-python` (SQLite) | 1302 통과 · 0 실패 · 25 skip · 220초 |
+| `ci-postgres` plugin | 281 통과 · 1 오류 · 3 skip. 오류는 `test_public_discovery.py::test_network_wait…`의 시작 단계 `ssl.SSLError: NO_CERTIFICATE_OR_CRL_FOUND` — certifi 인증서 파일이 dataless라 빈 내용으로 읽힘 |
+| `ci-postgres` 자체 schema · plugin 오류 1개 재실행 | **미완료** — 22분간 시험 수집 단계에서 iCloud 대기(CPU 0%)로 중단. 같은 코드로 병합 전 `make ci`에서 16 통과 |
+| `make e2e` | **미실행** — 같은 이유. 같은 코드·화면으로 병합 전(`1c9a75e`) 8 통과. 병합은 웹 자산을 바꾸지 않음 |
+
+> [!WARNING]
+> 병합 뒤 시험이 느리고 일부가 막힌 원인은 디스크다. 데이터 볼륨이 97~98% 차(여유 11~14GB) iCloud가 받은 파일을 곧바로 다시 내려놓았다. 일괄로 다시 받으면 내려간 파일 수가 5,677 → 13,822로 오히려 늘어 중단했다. 이 폴더에서 안정적으로 시험하려면 디스크 여유를 늘리거나 저장소를 iCloud 밖으로 옮겨야 한다.
+
 ### 이번 세션의 실행 이력
 
 중간 실패를 숨기지 않으려고 순서대로 남긴다.
@@ -290,13 +307,14 @@ TRAVEL_TEST_POSTGRES_DSN=postgresql://postgres@127.0.0.1:55432/postgres make ci 
 | GitHub Actions | 로컬에서 실행 불가. push는 사람 |
 | GitHub Actions `e2e` job (Linux) | push는 사람 |
 | `typescript` 검사 | 설치 승인 필요. 계획만 |
-| 원격과 병합 | 공개 범위 결정이 섞여 대표 결정 |
+| push | 사람이 한다 |
 | 동시 작업 시험 409 원인 조사 | 범위 밖. 느린 입출력에서만 재현 |
 | 실제 Render 메모리 · 운영 로그인 | 배포 금지 |
 
 ## 대표에게 넘길 일
 
-1. 원격 25커밋과의 병합 방식 결정 (발표 자료는 원격 유지 권장) → `make ci` → push
+1. push — 병합(`27bdfaa`)은 끝났고 원격이 조상이라 fast-forward다. push 직전 `git fetch`로 원격이 그대로인지 확인
 2. push 뒤 Actions 6개 job 결과 확인 (특히 Linux에서 처음 도는 `e2e`)
-3. 새로 올라갈 절대경로 13줄 처리, 추적 중인 발표 대본 처리(원격은 이미 삭제)
+3. 새로 올라갈 절대경로 13줄 처리 (추적 중인 발표 대본은 병합으로 0개)
+5. 디스크 여유 확보 뒤 `make ci`·`make e2e` 재실행 — 병합 뒤 PG 자체 시험과 E2E가 iCloud 대기로 미완료
 4. Render 수동 배포와 `/health/ready`·로그인 확인, 실측 메모리 기록
