@@ -165,10 +165,11 @@ def test_cloud_encrypted_backup_deletion_checkpoint_restore_and_import(cloud,tmp
     assert result['state']=='restored_closed_for_validation'
     local=Database(restored/'database.sqlite3')
     if source_schema==12:
-        # Recreate the immediately preceding production schema, not merely its
-        # version marker. Import must migrate a private clone and preserve source.
+        # Recreate schema 12, not merely its version marker: drop every table that
+        # migrations 13-15 add (15 = place_photo_cache). Import must migrate a
+        # private clone and preserve source.
         with local.connect() as con:
-            for table in ('review_run_dependencies','place_review_requests','place_external_links','review_provider_contracts','workspace_drafts','itinerary_generation_drafts','maintenance_status','storage_deletion_receipts'):
+            for table in ('place_photo_cache','review_run_dependencies','place_review_requests','place_external_links','review_provider_contracts','workspace_drafts','itinerary_generation_drafts','maintenance_status','storage_deletion_receipts'):
                 con.execute('DROP TABLE '+table)
             con.execute('PRAGMA user_version=12')
     assert len(Repository(local).list_bookings(owner,keep['id']))==8
