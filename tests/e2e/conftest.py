@@ -75,3 +75,48 @@ def oidc_login(server, who):
     assert session['authenticated'] and session['csrf_token'], json.dumps(session)
     client.headers['X-CSRF-Token'] = session['csrf_token']
     return client
+
+
+# --- Browser layer (Playwright, Chromium only) --------------------------------
+# Traces are written only for failed tests, to GOING_E2E_TRACE_DIR (default .e2e-traces/,
+# git-ignored). Screenshots are opt-in through GOING_E2E_SCREENSHOTS (make e2e-evidence).
+
+@pytest.fixture(scope='session')
+def browser():
+    sync_api = pytest.importorskip('playwright.sync_api', reason='Playwright not installed (install needs owner approval)')
+    with sync_api.sync_playwright() as playwright:
+        instance = playwright.chromium.launch()
+        yield instance
+        instance.close()
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    report = outcome.get_result()
+    setattr(item, 'rep_' + report.when, report)
+
+
+@pytest.fixture
+def new_page(browser, request):
+    contexts = []
+
+    def make(**options):
+        context = browser.new_context(**{'viewport': {'width': 1280, 'height': 900}, 'locale': 'ko-KR', **options})
+        context.tracing.start(screenshots=True, snapshots=True)
+        contexts.append(context)
+        page = context.new_page()
+        page.set_default_timeout(20000)
+        return page
+
+    yield make
+    report = getattr(request.node, 'rep_call', None)
+    failed = bool(report and report.failed)
+    trace_dir = Path(os.getenv('GOING_E2E_TRACE_DIR') or ROOT / '.e2e-traces')
+    for index, context in enumerate(contexts):
+        if failed:
+            trace_dir.mkdir(parents=True, exist_ok=True)
+            context.tracing.stop(path=str(trace_dir / f'{request.node.name}-{index}.zip'))
+        else:
+            context.tracing.stop()
+        context.close()

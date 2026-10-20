@@ -37,7 +37,7 @@ clean:
 # --- CI: .github/workflows/ci.yml runs these same targets with PYTHON=python ---
 # Local `make ci` uses .venv. PostgreSQL runs only when TRAVEL_TEST_POSTGRES_DSN
 # points at a disposable loopback database (tests/postgres_plugin.py enforces it).
-.PHONY: ci ci-python ci-js ci-assets ci-postgres ci-safety e2e
+.PHONY: ci ci-python ci-js ci-assets ci-postgres ci-safety e2e e2e-evidence
 PYTHON ?= .venv/bin/python
 # ZERO_SPEND is not set globally: tests drive metered fake providers and set ZERO_SPEND
 # themselves where they test it. CI holds no secrets, so no paid call can authenticate.
@@ -77,6 +77,11 @@ ci-postgres:
 	fi
 
 # Opt-in stage 1 E2E on the synthetic fixture (free ports, users a/b). Browser scenarios
-# additionally need Playwright + Chromium, which are installed only after owner approval.
+# need playwright (requirements-dev.txt) and: $(PYTHON) -m playwright install --only-shell chromium
+# Failed tests leave Playwright traces in .e2e-traces/ (git-ignored).
 e2e:
-	GOING_E2E=1 $(CI_ENV) $(PYTHON) -m pytest tests/e2e -q -rs -p no:cacheprovider
+	GOING_E2E=1 TRAVEL_TEST_POSTGRES_DSN= $(CI_ENV) $(PYTHON) -m pytest tests/e2e -q -rs -p no:cacheprovider
+
+# Same run, also saving synthetic-data screenshots as evidence in the stage 1 report folder.
+e2e-evidence:
+	GOING_E2E_SCREENSHOTS=docs/service-v6/reports/e2e $(MAKE) e2e

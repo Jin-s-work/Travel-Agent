@@ -48,3 +48,6 @@ deploy/render-supabase/.env.*
 
 # Private presenter scripts stay on the local machine
 docs/presentation/**/SCRIPT.md
+
+# Local Playwright traces from failed E2E runs (may contain synthetic page snapshots)
+.e2e-traces/
