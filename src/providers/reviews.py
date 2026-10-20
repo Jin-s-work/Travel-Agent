@@ -51,6 +51,7 @@ class CollectionRequest:
     website_locale: str = 'en'
     verified_place_url: str | None = None
     source: str = 'google_maps'
+    observation_profile: str = 'strict_source_v1'
 
     def __post_init__(self):
         for name in ('place_identity_id','external_place_id','provider','adapter_version',
@@ -67,6 +68,8 @@ class CollectionRequest:
         start, end = parse_timestamp(self.requested_start), parse_timestamp(self.requested_end)
         if not start or not end or start >= end or end-start > timedelta(days=self.lookback_days):
             raise ValueError('Invalid frozen observation window')
+        if self.observation_profile not in ('strict_source_v1','bounded_observation_v1'):
+            raise ValueError('Unknown observation profile')
         if self.collection_mode != 'observed_window' or self.sort != 'newest':
             raise ValueError('Only observed_window/newest collection is supported')
         if any(getattr(self,k) is not None for k in ('locale_filter','keyword_filter','rating_filter')):
@@ -85,7 +88,11 @@ class CollectionRequest:
 
     @property
     def request_hash(self):
-        return hashlib.sha256(json.dumps(self.to_dict(),sort_keys=True,separators=(',',':')).encode()).hexdigest()
+        payload=self.to_dict()
+        # Historical strict requests predate this additive field. Preserve their
+        # hashes so stored remote receipts/checkpoints remain replayable.
+        if self.observation_profile=='strict_source_v1':payload.pop('observation_profile',None)
+        return hashlib.sha256(json.dumps(payload,sort_keys=True,separators=(',',':')).encode()).hexdigest()
 
 
 @dataclass(frozen=True)

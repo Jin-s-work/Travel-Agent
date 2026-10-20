@@ -38,6 +38,7 @@ class Verify(Input):
 class Link(Input):
     place_id:str=Field(min_length=1,max_length=100)
 class Collection(Input):
+    observation_profile:Literal['strict_source_v1','bounded_observation_v1']='strict_source_v1'
     place_id:str=Field(max_length=100)
     policy_id:str=Field(max_length=100)
     max_review_records:int=Field(default=200,ge=1,le=200)
@@ -45,6 +46,7 @@ class Collection(Input):
     max_elapsed_seconds:int=Field(default=300,ge=1,le=900)
     max_total_charge_usd:str=Field(default='0',pattern=r'^(?:[0-2](?:\.\d{1,6})?|3(?:\.0{1,6})?)$')
 class Quality(Input):
+    observation_profile:Literal['strict_source_v1','bounded_observation_v1']='strict_source_v1'
     provider:Literal['apify','fake']|None=None
     provider_build:str|None=None
     adapter_version:str|None=None
@@ -140,6 +142,11 @@ class ExternalDecision(Input):
     confirm_coordinates:bool=False
     confirm_branch:bool=False
 class ProviderContract(Input):
+    observation_profile:Literal['strict_source_v1','bounded_observation_v1']='strict_source_v1'
+    unfiltered_observation_verified:bool=False
+    individual_publication_dates_verified:bool=False
+    remote_cost_cap_verified:bool=False
+    bounded_policy_approved:bool=False
     provider:Literal['apify','fake']
     build:str=Field(min_length=1,max_length=100)
     adapter_version:str=Field(min_length=1,max_length=100)

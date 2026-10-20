@@ -56,12 +56,13 @@ from src.research.contracts import ReviewContracts
 from src.research.profiles import city_profile, PROFILE_VERSION, QUALITY_POLICY_VERSION, quality_support
 
 class ReviewService(ReviewContracts):
-    def __init__(self, db, repo, jobs, gateway, *, provider=None, detector=None, fault_hook=None):
+    def __init__(self, db, repo, jobs, gateway, *, provider=None, detector=None, fault_hook=None, bounded_enabled=False):
         self.db,self.repo,self.jobs,self.gateway=db,repo,jobs,gateway
         self.jobs.admin_scopes=frozenset((*self.jobs.admin_scopes,SCOPE))
         if provider is None:
             from src.providers.apify_reviews import ApifyReviewCollectionProvider
             provider=ApifyReviewCollectionProvider(token=os.getenv('APIFY_TOKEN') or os.getenv('APIFY_API_TOKEN',''),build=os.getenv('APIFY_REVIEW_BUILD','0.0.527'))
+        self.bounded_enabled=bool(bounded_enabled)
         self.provider=provider
         self.detector=detector
         self.fault_hook=fault_hook
@@ -76,6 +77,7 @@ class ReviewService(ReviewContracts):
         with self.db.connect() as con:
             row=dict(con.execute('SELECT * FROM review_controls WHERE singleton=1').fetchone())
         return {**row,'research_enabled':bool(row['research_enabled']),'production_enabled':bool(row['production_enabled']),
+                'bounded_observation':{'research_enabled':self.bounded_enabled,'production_enabled':False,'status':'research_only','reason':'SEPARATE_POLICY_AND_REAL_QUALITY_APPROVAL_REQUIRED'},
                 'provider':self.provider.name,'adapter_version':self.provider.adapter_version,
                 'provider_configured':self.provider.name=='fake' or bool(getattr(self.provider,'configured',False)),
                 'pricing_configured':self.gateway.budget.policy.valid,'pricing_checked_at':self.gateway.budget.policy.config.get('confirmed_at'),'price_version':self.gateway.budget.policy.config.get('version'),
@@ -157,7 +159,7 @@ class ReviewService(ReviewContracts):
             if not con.execute('SELECT 1 FROM trips WHERE id=? AND owner_id=? AND deleted_at IS NULL',(trip_id,actor.id)).fetchone() or not con.execute("SELECT 1 FROM place_identities WHERE id=? AND identity_status='verified' AND deleted_at IS NULL",(place_id,)).fetchone(): deny('NOT_FOUND','자료를 찾을 수 없습니다.',404)
             con.execute('INSERT OR IGNORE INTO trip_places VALUES(?,?,?)',(trip_id,place_id,self.now().isoformat()))
         return {'place_id':place_id,'trip_id':trip_id}
-    def _eligible(self,con,place_id,policy_id):
+    def _eligible(self,con,place_id,policy_id,*,profile='strict_source_v1'):
         place=con.execute('SELECT * FROM place_identities WHERE id=? AND deleted_at IS NULL',(place_id,)).fetchone()
         if not place: deny('NOT_FOUND','자료를 찾을 수 없습니다.',404)
         if place['identity_status']!='verified': deny('PLACE_IDENTITY_UNCONFIRMED','지점·주소·외부 ID를 먼저 확인해 주세요.')
@@ -167,7 +169,8 @@ class ReviewService(ReviewContracts):
         link=self._resolve_external(con,place)
         place['_external_link']=link
         place['_external_id']=link['external_place_id'] if link else place['external_place_id']
-        place['_contract']=self._runtime_contract(con)
+        place['_contract']=self._runtime_contract(con,profile=profile)
+        place['_observation_profile']=profile
         place['_policy_version']=policy['version']
         category=con.execute('SELECT category FROM research_candidates WHERE place_id=? LIMIT 1',(place['id'],)).fetchone()
         place['_category']=category['category'] if category else None
@@ -187,10 +190,12 @@ class ReviewService(ReviewContracts):
         ident=new_id('review'); now=self.now()
         with self.db.connect() as con:
             con.execute('BEGIN IMMEDIATE'); self._admin(con,actor)
-            place,policy=self._eligible(con,body['place_id'],body['policy_id'])
+            place,policy=self._eligible(con,body['place_id'],body['policy_id'],profile=body.get('observation_profile','strict_source_v1'))
+            if body.get('observation_profile')=='bounded_observation_v1' and not self.bounded_enabled:
+                deny('BOUNDED_OBSERVATION_DISABLED','표본 관측 실험이 꺼져 있습니다.')
             job=self.jobs.enqueue(actor.id,actor.session_id,'admin_research',SCOPE,'review_collection',{'run_id':ident,'detector_version':self._detector_version()},place['version'],key,request_fingerprint=fingerprint,deadline_seconds=body['max_elapsed_seconds']+60,con=con)
             if con.execute('SELECT 1 FROM review_collection_runs WHERE job_id=?',(job['id'],)).fetchone(): return self._submission(job,con)
-            request=CollectionRequest(place_identity_id=place['id'],external_place_id=place['_external_id'],provider=self.provider.name,adapter_version=self.provider.adapter_version,
+            request=CollectionRequest(observation_profile=body.get('observation_profile','strict_source_v1'),place_identity_id=place['id'],external_place_id=place['_external_id'],provider=self.provider.name,adapter_version=self.provider.adapter_version,
                 requested_start=(now-timedelta(days=180)).isoformat(),requested_end=now.isoformat(),policy_version=policy['version'],actor_id=actor.id,job_id=job['id'],idempotency_key=hashlib.sha256(key.encode()).hexdigest(),verified_place_url=place['source_url'],max_review_records=body['max_review_records'],max_pages=body['max_pages'],max_elapsed_seconds=body['max_elapsed_seconds'],max_total_charge_usd=body['max_total_charge_usd'])
             expiry=min(now+timedelta(seconds=min(policy['id_ttl_seconds'],policy['aggregate_ttl_seconds'])),stamp(policy['expires_at']))
             con.execute('INSERT INTO review_collection_runs(id,job_id,actor_id,place_id,place_version,policy_id,provider,adapter_version,request_json,input_hash,created_at,expires_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)',
@@ -211,7 +216,7 @@ class ReviewService(ReviewContracts):
         current=con.execute('SELECT * FROM review_collection_runs WHERE id=? AND deleted_at IS NULL',(run['id'],)).fetchone()
         if not current: deny('NOT_FOUND','자료를 찾을 수 없습니다.',404)
         if current['expires_at']<=self.now().isoformat(): deny('REVIEW_RETENTION_EXPIRED','보관 기간이 만료되어 수집을 중지했습니다.')
-        place,policy=self._eligible(con,run['place_id'],run['policy_id'])
+        place,policy=self._eligible(con,run['place_id'],run['policy_id'],profile=json.loads(run['request_json']).get('observation_profile','strict_source_v1'))
         if place['version']!=run['place_version']: deny('VERSION_CONFLICT','지점 검증 정보가 바뀌었습니다.')
         self._run_dependency_guard(con,run)
         dependency=con.execute('SELECT contract_id FROM review_run_dependencies WHERE run_id=?',(run['id'],)).fetchone()
@@ -327,6 +332,14 @@ class ReviewService(ReviewContracts):
             evaluation.update(decision='unsupported',strict_pass=False,quality_pass=False)
             evaluation['reason_codes'].append('PROVIDER_CONTRACT_UNVERIFIED')
         evaluation['reason_codes']=list(dict.fromkeys(evaluation['reason_codes']+result.reason_codes))
+        if request.observation_profile=='bounded_observation_v1':
+            from .observation import evaluate_bounded
+            contract=self._contract_dto(place['_contract']) if place.get('_contract') else None
+            bounded=evaluate_bounded(stats,coverage,contract=contract,quality_verified=bool(quality),
+                rights_verified=bool(json.loads(policy['rights_json']).get('display')),synthetic=self.provider.name=='fake')
+            # Separate research output; never reuse strict eligibility or badges.
+            evaluation.update(decision='unsupported',strict_pass=False,quality_pass=False,bounded_observation=bounded)
+            evaluation['reason_codes']=list(dict.fromkeys(evaluation['reason_codes']+['BOUNDED_OBSERVATION_RESEARCH_ONLY']))
         ident=new_id('aggregate')
         summary={'coverage':coverage,**stats,'evaluation':evaluation,'detector_version':detector_version,'synthetic':self.provider.name=='fake'}
         with self.db.connect() as con:

@@ -39,6 +39,7 @@ def evaluate_dataset(payload,*,detector=None):
     eligible=bool(result['production_strict_gate_supported'] and disjoint and original_checks>=20 and not original_errors and payload.get('synthetic') is False)
     result.update(production_strict_gate_supported=eligible,classification_quality='passed' if eligible else 'CLASSIFICATION_QUALITY_UNVERIFIED',
         city=payload['city'],language_profile_version=PROFILE_VERSION,quality_policy_version=QUALITY_POLICY_VERSION,
+        observation_profile=payload.get('observation_profile','strict_source_v1'),
         original_checks=original_checks,original_translation_errors=original_errors,duplicate_text_count=duplicate_count,shared_place_count=shared_places,
         heldout_disjoint=disjoint,place_labels_complete=place_labels_complete,synthetic=payload.get('synthetic') is not False,
         model=detector_metadata(),detector_version=getattr(detector,'version','unknown'),

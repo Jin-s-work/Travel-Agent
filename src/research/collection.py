@@ -35,7 +35,7 @@ NORMAL_STOPS = {'record_cap','date_boundary','exhausted'}
 def _initial_state():
     return {'records':[], 'seen_ids':[], 'seen_cursors':[], 'page_fingerprints':[],
             'cursor':None,'received_count':0,'duplicate_count':0,'overshoot_count':0,
-            'out_of_window_count':0,'pages':0,'attempts':0,'sort_basis':None,
+            'out_of_window_count':0,'ambiguous_date_count':0,'considered_count':0,'pages':0,'attempts':0,'sort_basis':None,
             'continuity_verified':True,'last_timestamp':None,'observed_start':None,
             'observed_end':None,'reason_codes':[],'elapsed_seconds':0,'stop_reason':None}
 
@@ -52,6 +52,11 @@ def collect_reviews(request: CollectionRequest, fetch_page: Callable, *, transfo
     state = _initial_state()
     if initial:
         state.update(deepcopy(initial))
+    if initial and 'considered_count' not in initial:
+        state['considered_count']=len(state['records'])+state['out_of_window_count']
+    bounded=request.observation_profile=='bounded_observation_v1'
+    def at_cap():
+        return (state['considered_count'] if bounded else len(state['records']))>=request.max_review_records
     if len(state['records']) > request.max_review_records or state['pages'] > request.max_pages:
         raise ValueError('Checkpoint exceeds current request bounds')
     began = clock()
@@ -75,12 +80,19 @@ def collect_reviews(request: CollectionRequest, fetch_page: Callable, *, transfo
             reason('PARTIAL_COLLECTION')
         save()
         coverage = {k:state[k] for k in ('received_count','duplicate_count','overshoot_count',
-                    'out_of_window_count','pages','attempts','sort_basis','continuity_verified',
+                    'out_of_window_count','ambiguous_date_count','considered_count','pages','attempts','sort_basis','continuity_verified',
                     'observed_start','observed_end','stop_reason')}
         coverage.update(unique_count=len(state['records']), requested_count=request.max_review_records,
                         requested_start=request.requested_start,requested_end=request.requested_end,
                         partial=stop not in NORMAL_STOPS, collection_complete=stop in NORMAL_STOPS,
-                        platform_census=False, page_kind='provider_page',
+                        platform_census=False, page_kind='dataset_offset' if request.provider=='apify' else 'provider_page',
+                        observation_profile=request.observation_profile,
+                        source_coverage='provider_observation' if bounded else 'supplier_window',
+                        source_page_count=None if request.provider=='apify' else state['pages'],
+                        dataset_read_page_count=state['pages'] if request.provider=='apify' else None,
+                        source_page_limit=None if request.provider=='apify' else request.max_pages,
+                        source_attempt_limit=None if request.provider=='apify' else request.max_attempts_per_page,
+                        latest_records_claim=not bounded and state['continuity_verified'] and state['sort_basis'] in ('published_at','edited_at'),
                         exhaustion_scope='provider_returned_window' if stop=='exhausted' else None)
         return CollectionResult(deepcopy(state['records']),coverage,list(state['reason_codes']),
                                 'succeeded' if stop in NORMAL_STOPS else 'partial',deepcopy(state))
@@ -92,7 +104,7 @@ def collect_reviews(request: CollectionRequest, fetch_page: Callable, *, transfo
             guard()
         if prior_elapsed + clock()-began >= request.max_elapsed_seconds:
             return finish('time_cap')
-        if len(state['records']) >= request.max_review_records:
+        if at_cap():
             return finish('record_cap')
         if state['pages'] >= request.max_pages:
             return finish('page_cap')
@@ -172,9 +184,10 @@ def collect_reviews(request: CollectionRequest, fetch_page: Callable, *, transfo
                 reason('MISSING_STABLE_ID')
                 reason('DEDUPE_UNVERIFIED')
                 state['continuity_verified'] = False
-            if len(state['records']) >= request.max_review_records:
+            if at_cap():
                 state['overshoot_count'] += len(page.records)-index
                 break
+            state['considered_count']+=1
             sort_basis = state['sort_basis']
             timestamp = parse_timestamp(record.get(sort_basis)) if sort_basis in ('published_at','edited_at') else None
             precision = record.get(sort_basis+'_precision',record.get('edited_date_precision' if sort_basis=='edited_at' else 'date_precision',record.get('date_precision','unknown')))
@@ -182,6 +195,17 @@ def collect_reviews(request: CollectionRequest, fetch_page: Callable, *, transfo
             if sort_basis in ('published_at','edited_at') and not precise:
                 reason('AMBIGUOUS_DATE')
                 state['continuity_verified'] = False
+            if bounded:
+                # Publication membership is independent of provider ordering. An
+                # unobservable sort cannot be relabeled as newest or date-boundary.
+                publication=parse_timestamp(record.get('published_at'))
+                if publication is None or record.get('date_precision')!='exact':
+                    state['ambiguous_date_count']+=1;reason('AMBIGUOUS_DATE_EXCLUDED');continue
+                if not start<=publication<=end:
+                    state['out_of_window_count']+=1;continue
+                stamp=publication.isoformat()
+                state['observed_start']=min(state['observed_start'] or stamp,stamp)
+                state['observed_end']=max(state['observed_end'] or stamp,stamp)
             previous = parse_timestamp(state['last_timestamp'])
             if precise and previous and timestamp > previous:
                 reason('SORT_INVERSION')
@@ -189,11 +213,11 @@ def collect_reviews(request: CollectionRequest, fetch_page: Callable, *, transfo
                 return finish('parse_error')
             if precise:
                 state['last_timestamp'] = timestamp.isoformat()
-                if timestamp > end:
+                if not bounded and timestamp > end:
                     # Snapshot time is frozen; a later publication cannot enter it.
                     state['out_of_window_count'] += 1
                     continue
-                if timestamp < start:
+                if not bounded and timestamp < start:
                     if state['continuity_verified']:
                         boundary = True
                         state['out_of_window_count'] += len(page.records)-index
@@ -201,7 +225,7 @@ def collect_reviews(request: CollectionRequest, fetch_page: Callable, *, transfo
                     reason('DATE_BOUNDARY_UNVERIFIED')
                     state['out_of_window_count'] += 1
                     continue
-                stamp = timestamp.isoformat()
+                stamp = (publication if bounded else timestamp).isoformat()
                 if state['observed_start'] is None or stamp < state['observed_start']:
                     state['observed_start'] = stamp
                 if state['observed_end'] is None or stamp > state['observed_end']:
@@ -210,7 +234,7 @@ def collect_reviews(request: CollectionRequest, fetch_page: Callable, *, transfo
         state['cursor'] = page.next_cursor
         if boundary:
             return finish('date_boundary')
-        if len(state['records']) >= request.max_review_records:
+        if at_cap():
             return finish('record_cap')
         if page.exhausted and page.next_cursor is None:
             return finish('exhausted')

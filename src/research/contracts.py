@@ -28,11 +28,14 @@ def public_url(value):
 
 
 class ReviewContracts:
-    def _contract_on(self,con,*,ident=None):
+    def _contract_on(self,con,*,ident=None,profile='strict_source_v1'):
         build=getattr(self.provider,'build','synthetic-v1')
         sql="SELECT * FROM review_provider_contracts WHERE provider=? AND build=? AND adapter_version=? AND status='approved' AND expires_at>?"
         args=[self.provider.name,build,self.provider.adapter_version,self.now().isoformat()]
         if ident:sql+=' AND id=?';args.append(ident)
+        else:
+            sql+=" AND COALESCE(json_extract(evidence_json,'$.observation_profile'),'strict_source_v1')=?"
+            args.append(profile)
         row=con.execute(sql+' ORDER BY checked_at DESC,created_at DESC LIMIT 1',args).fetchone()
         if row:
             policy_id=json.loads(row['evidence_json']).get('rights_policy_id')
@@ -40,8 +43,8 @@ class ReviewContracts:
             if not policy:return None
         return row
 
-    def _runtime_contract(self,con,*,ident=None):
-        row=self._contract_on(con,ident=ident)
+    def _runtime_contract(self,con,*,ident=None,profile='strict_source_v1'):
+        row=self._contract_on(con,ident=ident,profile=profile)
         # Fake capabilities are synthetic protocol behavior, never production proof.
         if self.provider.name=='apify':
             body=json.loads(row['evidence_json']) if row else {}
@@ -72,6 +75,10 @@ class ReviewContracts:
             if not body.get(key):reasons.append(key.upper()+'_UNVERIFIED')
         if row['provider']=='apify' and row['adapter_version']=='apify-compass-v1':reasons.append('ADAPTER_SOURCE_PAGINATION_UNOBSERVABLE')
         if body.get('synthetic'):reasons.append('SYNTHETIC_EVIDENCE')
+        if body.get('observation_profile','strict_source_v1')!='strict_source_v1':reasons.append('SEPARATE_OBSERVATION_POLICY')
+        from .observation import contract_reasons
+        result['bounded_reason_codes']=contract_reasons(body,status=row['status'],expired=result['expired'])
+        result['bounded_contract_ready']=not result['bounded_reason_codes']
         result['strict_ready']=not reasons;result['reason_codes']=reasons
         return result
 
@@ -247,6 +254,9 @@ class ReviewContracts:
         from src.research.profiles import quality_support
         _,support=quality_support(body)
         contract=place.get('_contract')
+        profile=place.get('_observation_profile','strict_source_v1')
+        contract_ready=bool(contract and self._contract_dto(contract)[
+            'bounded_contract_ready' if profile=='bounded_observation_v1' else 'strict_ready'])
         return bool(row['detector_version']==self._detector_version() and row['expires_at']>self.now().isoformat() and support and body.get('quality_policy_version')==QUALITY_POLICY_VERSION
             and body.get('language_profile_version')==PROFILE_VERSION
             and body.get('provider')==self.provider.name
@@ -255,7 +265,7 @@ class ReviewContracts:
             and body.get('policy_version')==place.get('_policy_version')
             and body.get('category')==place.get('_category')
             and body.get('duplicate_text_count')==0 and body.get('shared_place_count')==0
-            and contract and self._contract_dto(contract)['strict_ready'])
+            and body.get('observation_profile','strict_source_v1')==profile and contract_ready)
 
     def quality_evaluations(self,actor):
         with self.db.connect() as con:
@@ -265,12 +275,16 @@ class ReviewContracts:
     def collection_preview(self,actor,body):
         with self.db.connect() as con:
             self._admin(con,actor)
-            place,policy=self._eligible(con,body['place_id'],body['policy_id'])
+            place,policy=self._eligible(con,body['place_id'],body['policy_id'],profile=body.get('observation_profile','strict_source_v1'))
             link=place['_external_link'];contract=place['_contract']
         return {'canonical_place_id':place['id'],'external_place_id':place['_external_id'],
             'external_link_id':link['id'] if link else None,'contract_id':contract['id'] if contract else None,
             'strict_contract_ready':bool(contract and self._contract_dto(contract)['strict_ready']),
             'provider':self.provider.name,'build':getattr(self.provider,'build','synthetic-v1'),
+            'observation_profile':body.get('observation_profile','strict_source_v1'),
+            'source_pagination_observable':getattr(self.provider,'source_pagination_observable',False),
+            'source_page_limit':None if self.provider.name=='apify' else body['max_pages'],
+            'source_attempt_limit':None if self.provider.name=='apify' else 2,
             'limits':{'max_review_records':body['max_review_records'],'max_pages':body['max_pages'],
                       'max_attempts_per_page':2,'max_elapsed_seconds':body['max_elapsed_seconds'],'lookback_days':180},
             'maximum_charge_usd':body['max_total_charge_usd'],'is_price_quote':False,

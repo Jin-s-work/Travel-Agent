@@ -140,6 +140,17 @@ class LocalLanguageDetector:
     __call__ = detect
 
 
+def wilson95(success,total):
+    """Wilson binomial interval; null when no support (not a sampling claim)."""
+    if type(success) is not int or type(total) is not int or not 0<=success<=total:
+        raise ValueError('INVALID_BINOMIAL_COUNT')
+    if not total:return None
+    z=1.959963984540054;p=success/total;d=1+z*z/total
+    midpoint=(p+z*z/(2*total))/d
+    radius=z*((p*(1-p)/total+z*z/(4*total*total))**.5)/d
+    return [max(0,midpoint-radius),min(1,midpoint+radius)]
+
+
 def evaluate_predictions(rows, *, local_languages=('ja',), domain='unverified', split='heldout'):
     """Explicit denominators, false negatives and abstentions for labeled rows.
 
@@ -158,7 +169,8 @@ def evaluate_predictions(rows, *, local_languages=('ja',), domain='unverified', 
         fn=sum(row['expected']==language and row.get('predicted')!=language for row in rows)
         unknown=sum(row['expected']==language and not row.get('predicted') for row in rows)
         per_language[language]={'tp':tp,'fp':fp,'fn':fn,'support':tp+fn,'unknown':unknown,
-            'precision':tp/(tp+fp) if tp+fp else None,'recall':tp/(tp+fn) if tp+fn else None}
+            'precision':tp/(tp+fp) if tp+fp else None,'recall':tp/(tp+fn) if tp+fn else None,
+            'precision_interval95':wilson95(tp,tp+fp),'recall_interval95':wilson95(tp,tp+fn)}
     ltp=sum(row['expected'] in local and row.get('predicted') in local for row in rows)
     lfp=sum(row['expected'] not in local and row.get('predicted') in local for row in rows)
     korean=per_language.get('ko',{'tp':0,'fp':0,'fn':0,'support':0,'unknown':0,'precision':None,'recall':None})
@@ -167,7 +179,10 @@ def evaluate_predictions(rows, *, local_languages=('ja',), domain='unverified', 
     support_sufficient=len(rows)>=100 and korean['support']>=50 and local_truth>=50 and ltp+lfp>=50
     numerical_pass=bool(support_sufficient and local_precision>=.95 and korean['recall']>=.95)
     review_valid=domain=='independently_labeled_restaurant_reviews' and split=='heldout'
-    return {'count':len(rows),'unknown_count':sum(not row.get('predicted') for row in rows),
+    return {'interval_method':'wilson95_binomial_not_provider_sampling_coverage',
+        'local_precision_interval95':wilson95(ltp,ltp+lfp),'korean_recall_interval95':wilson95(korean['tp'],korean['support']),
+        'unknown_interval95':wilson95(sum(not row.get('predicted') for row in rows),len(rows)),
+        'count':len(rows),'unknown_count':sum(not row.get('predicted') for row in rows),
         'unknown_ratio':sum(not row.get('predicted') for row in rows)/len(rows) if rows else None,
         'local_languages':sorted(local),'local_precision':local_precision,'local_tp':ltp,'local_fp':lfp,
         'korean_precision':korean['precision'],'korean_recall':korean['recall'],
