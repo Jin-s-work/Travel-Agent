@@ -2,6 +2,7 @@
 
 PYTHON_DOTENV_DISABLED=1 .venv/bin/python scripts/stage1_browser_fixture.py
 Application :8766 / synthetic IdP :8767. Never used by the deployed application.
+STAGE1_APP_PORT / STAGE1_IDP_PORT override the ports (the E2E suite uses free ports).
 """
 import os
 import sys
@@ -10,7 +11,8 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT));sys.path.insert(0,str(ROOT/'tests'))
 os.environ.update(PYTHON_DOTENV_DISABLED='1',STORAGE_BACKEND='local',ZERO_SPEND='true',MAIL_ANALYSIS_MODE='local',GOOGLE_MAPS_API_KEY='',APIFY_TOKEN='',DATABASE_URL='')
 import browser_fixture as base
-base.BASE='http://127.0.0.1:8766';base.PROVIDER='http://127.0.0.1:8767'
+APP_PORT=int(os.getenv('STAGE1_APP_PORT','8766'));IDP_PORT=int(os.getenv('STAGE1_IDP_PORT','8767'))
+base.BASE=f'http://127.0.0.1:{APP_PORT}';base.PROVIDER=f'http://127.0.0.1:{IDP_PORT}'
 import json
 import secrets
 import threading
@@ -53,5 +55,5 @@ for who in ('a','b'):
 if __name__=='__main__':
     import uvicorn
     print(json.dumps({'url':base.BASE,'fixture_dir':str(base.SANDBOX),'data':'synthetic only','external_provider_calls':0}),flush=True)
-    threading.Thread(target=lambda:uvicorn.run(base.idp,host='127.0.0.1',port=8767,log_level='warning',access_log=False),daemon=True).start()
-    uvicorn.run(app,host='127.0.0.1',port=8766,log_level='warning',access_log=False)
+    threading.Thread(target=lambda:uvicorn.run(base.idp,host='127.0.0.1',port=IDP_PORT,log_level='warning',access_log=False),daemon=True).start()
+    uvicorn.run(app,host='127.0.0.1',port=APP_PORT,log_level='warning',access_log=False)
