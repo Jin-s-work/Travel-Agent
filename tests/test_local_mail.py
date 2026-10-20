@@ -350,3 +350,9 @@ def test_unavailable_address_never_becomes_a_location(line):
 def test_explicit_japanese_address_is_preserved():
     row = parse_local_document('Hotel Example\nReference ABC123\nCheck-in: 2026-11-06 15:00\nCheck-out: 2026-11-08 11:00\n住所: 東京都新宿区歌舞伎町1-1-1')[0][0]
     assert row['location'] == '東京都新宿区歌舞伎町1-1-1'
+
+
+@pytest.mark.parametrize('case',__import__('json').loads((ROOT/'examples/mail-time-pack/expected-results.json').read_text()))
+def test_time_practice_pack_preserves_both_ends(case):
+    row=parse_local_document(read_email_file(ROOT/'examples/mail-time-pack'/case['file']))[0][0]
+    assert {key:row[key] for key in ('date','time','date_end','time_end')}=={key:case[key] for key in ('date','time','date_end','time_end')}

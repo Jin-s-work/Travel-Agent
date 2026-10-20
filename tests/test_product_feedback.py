@@ -222,7 +222,7 @@ def test_schema9_upgrade_preserves_trips_and_excludes_legacy_events(discovery):
     pack,trip,path,run=prepared(discovery)
     db=discovery.app.state.db
     with db.connect() as con:
-        for table in ('review_run_dependencies','place_review_requests','place_external_links','review_provider_contracts','workspace_drafts','itinerary_generation_drafts','maintenance_status','storage_deletion_receipts'):con.execute('DROP TABLE '+table)
+        for table in ('place_photo_cache','review_run_dependencies','place_review_requests','place_external_links','review_provider_contracts','workspace_drafts','itinerary_generation_drafts','maintenance_status','storage_deletion_receipts'):con.execute('DROP TABLE '+table)
         for table in ('accommodation_resolutions','trip_accommodations','discovery_intents','discovery_contexts','feedback_changes','fact_report_actions','visit_feedback','fact_reports','expense_overrides','product_run_metrics','product_preferences'):con.execute('DROP TABLE '+table)
         con.execute('DROP INDEX product_event_period')
         for column in ('schema_version','detail_json','client_at','exclusion_reason'):con.execute('ALTER TABLE discovery_events DROP COLUMN '+column)

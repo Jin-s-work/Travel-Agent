@@ -163,3 +163,16 @@ def test_route_shortlist_does_not_apply_local_language_gate_to_iconic():
     assert [p['place_id'] for p in route_candidates(s,[row],NOW,10)]==[row['place_id']]
     fact(row,'closed')['value']=True
     assert route_candidates(s,[row],NOW,10)==[]
+
+
+@pytest.mark.parametrize('local,korean,unknown,passes',[(200,0,0,True),(199,0,0,False),(199,0,1,False),(199,1,0,False)])
+def test_all_observed_local_reviews_never_accept_unknown_or_other_language(local,korean,unknown,passes):
+    row=valid_local(catalog()[0],local,korean,unknown)
+    s=request();s['review_language_filter']={'min_local_share':1,'max_korean_share':0}
+    out=recommend(s,[row],now=NOW)
+    assert bool(out['sections']['local_discovery']['items']) is passes
+
+
+def test_reference_without_positive_evidence_does_not_invent_a_reason():
+    from src.recommendations.explanations import render_general
+    assert render_general({'source_refs':[{'id':'source'}]})==[]

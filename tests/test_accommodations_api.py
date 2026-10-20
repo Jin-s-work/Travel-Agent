@@ -163,7 +163,7 @@ def test_schema11_to12_migration_and_readonly_inventory_preserve_stops(discovery
     with db.connect() as con:
         con.execute('UPDATE trip_stops SET base_location=? WHERE id=?',('Original label only',t['stops'][0]['id']))
         before=tuple(con.execute('SELECT id,base_location,start_date,end_date FROM trip_stops WHERE id=?',(t['stops'][0]['id'],)).fetchone())
-        for table in ('review_run_dependencies','place_review_requests','place_external_links','review_provider_contracts','workspace_drafts','itinerary_generation_drafts','maintenance_status','storage_deletion_receipts'):con.execute('DROP TABLE '+table)
+        for table in ('place_photo_cache','review_run_dependencies','place_review_requests','place_external_links','review_provider_contracts','workspace_drafts','itinerary_generation_drafts','maintenance_status','storage_deletion_receipts'):con.execute('DROP TABLE '+table)
         con.execute('DROP TABLE accommodation_resolutions');con.execute('DROP TABLE trip_accommodations');con.execute('PRAGMA user_version=11')
         snapshot=inventory(con);assert snapshot['eligible_legacy_labels']==1 and snapshot['writes']==0
     reopened=Database(db.path)

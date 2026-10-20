@@ -46,7 +46,7 @@ def select(value=None, **kwargs):
 
 def test_two_photos_have_plain_explicit_attribution_and_historical_capture_date():
     result=select()
-    assert result['photo_status']=={'state':'available','available_count':2,'reason_codes':[]}
+    assert result['photo_status']=={'state':'available','availability_state':'available','available_count':2,'reason_codes':[]}
     assert result['photos'][0]['taken_at']=='2018-06-21'
     assert result['photos'][0]['checked_at'] != result['photos'][0]['taken_at']
     assert 'identity_evidence' not in result['photos'][0] and 'enabled' not in result['photos'][0]
@@ -335,8 +335,10 @@ def test_only_one_exterior_is_selected_when_food_or_interior_exists():
 
 
 @pytest.mark.parametrize('place_id',['osm_node_123','osm_way_456','osm_relation_789'])
-def test_public_map_identity_never_runs_photo_sql_or_uses_curated_permissions(place_id):
-    class NoQueries:
-        def execute(self,*args):
-            pytest.fail('Unreviewed public map photo lookup must not run SQL')
-    assert photos.for_place(NoQueries(),place_id)['photos']==[]
+def test_public_map_identity_reads_only_public_cache_never_curated_manifest(place_id):
+    class CacheOnly:
+        def execute(self,sql,*args):
+            assert 'place_photo_cache' in sql
+            assert "source_group='OpenStreetMap'" in sql
+            return []
+    assert photos.for_place(CacheOnly(),place_id)['photos']==[]

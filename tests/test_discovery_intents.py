@@ -34,7 +34,8 @@ def test_first_request_inherits_and_persists_without_condition_save(discovery,ci
     data=response.json();resolved=data['resolved_context']
     assert resolved['conditions']['city']==city
     assert resolved['conditions']['party']['children_status']=='unknown'
-    assert resolved['provenance']['party.adults']['origin']=='trip_default'
+    assert resolved['provenance']['party.adults']['origin']=='unknown'
+    assert resolved['conditions']['party']['adults'] is None
     assert data['conditions_version']==1
     assert _job(discovery.client,data)['state']=='succeeded'
     replay=submit(discovery.client,trip)
@@ -134,7 +135,7 @@ def test_invalid_dates_rejected_without_job(discovery,invalid):
 
 def test_invalid_override_and_null_are_not_silently_removed(discovery):
     t=trip_for(discovery.client)
-    for overrides in [{'owner_id':'other'},{'visit':None},{'party':{'adults':None}},{'party':{'children_status':'none','children':[{'age':4}]}}]:
+    for overrides in [{'owner_id':'other'},{'visit':None},{'party':{'children_status':'none','children':[{'age':4}]}}]:
         assert submit(discovery.client,t,body(t,overrides=overrides)).status_code==422
 
 
@@ -170,7 +171,7 @@ def test_schema10_upgrade_and_readonly_inventory_preserve_data(discovery):
     db=discovery.app.state.db
     with db.connect() as con:
         saved=con.execute('SELECT conditions_json FROM discovery_conditions WHERE trip_id=?',(t['id'],)).fetchone()[0]
-        for table in ('review_run_dependencies','place_review_requests','place_external_links','review_provider_contracts','workspace_drafts','itinerary_generation_drafts','maintenance_status','storage_deletion_receipts'):con.execute('DROP TABLE '+table)
+        for table in ('place_photo_cache','review_run_dependencies','place_review_requests','place_external_links','review_provider_contracts','workspace_drafts','itinerary_generation_drafts','maintenance_status','storage_deletion_receipts'):con.execute('DROP TABLE '+table)
         con.execute('DROP TABLE accommodation_resolutions');con.execute('DROP TABLE trip_accommodations');con.execute('DROP TABLE discovery_intents');con.execute('DROP TABLE discovery_contexts')
         con.execute('UPDATE schema_version SET version=10' if db.backend=='postgres' else 'PRAGMA user_version=10')
     if db.backend=='sqlite':
@@ -178,7 +179,7 @@ def test_schema10_upgrade_and_readonly_inventory_preserve_data(discovery):
         with sqlite3.connect(db.path) as con:
             report=inventory(con);assert report['writes']==0 and report['database_schema']==10
     db._migrate()
-    assert db.schema_version()==14
+    assert db.schema_version()==15
     with db.connect() as con:
         assert con.execute('SELECT conditions_json FROM discovery_conditions WHERE trip_id=?',(t['id'],)).fetchone()[0]==saved
         assert con.execute('SELECT id FROM trip_stops WHERE trip_id=?',(t['id'],)).fetchone()[0]==t['stops'][0]['id']

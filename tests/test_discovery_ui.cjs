@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const source = fs.readFileSync('web/js/foundation.js', 'utf8');
 function load(names, globals={}) {
-  const context = vm.createContext(globals);
+  const context = vm.createContext({window:{},...globals});
   for (const name of names) {
     const pattern = new RegExp('^  (?:async )?function '+name+'\\(', 'm');
     const start = pattern.exec(source)?.index;
@@ -132,6 +132,16 @@ test('stale unknown travel hides retained identity claims while valid zero-minut
     assert.match(valid,/같은 장소에서 이어짐 · 별도 이동 없음/);
   }
   assert.equal(context.itinerarySamePlaceLeg({basis:'unknown',duration_minutes:0,reason_codes:['IDENTICAL_LOCATION']}),false);
+});
+  const flatten=node=>[node.text,...node.children.map(flatten)].join(' ');
+  const context=load(['itinerarySamePlaceLeg','itineraryLeg'],{
+    make,reviewDate:()=> '미확인',safeDiscoveryLink(){},
+    itineraryReasons:(host,codes)=>codes.forEach(code=>host.append(make('p','',code)))
+  });
+  const text=flatten(context.itineraryLeg({basis:'estimate',provider:null,duration_minutes:3,distance_meters:140,mode:'walking',reason_codes:['WALKING_ROUTE_UNVERIFIED']}));
+  assert.match(text,/이동 · 직선거리 기준 추정/);
+  assert.match(text,/추정값이며 실제 출입구·환승·대기 시간을 확인한 경로가 아닙니다/);
+  assert.doesNotMatch(text,/경로 공급자 근거/);
 });
 
 

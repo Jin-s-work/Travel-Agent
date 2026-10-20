@@ -95,3 +95,15 @@ def test_openai_policy_caps_are_small_and_reservation_can_fit():
     assert policy.config['limits']['USD']['global_monthly']==3_000_000
     assert policy.config['limits']['USD']['global_daily']==500_000
     assert set(policy.config['prices'])=={'openai/gpt-5-mini','openai/text-embedding-3-small'}
+
+
+def test_apify_credentials_are_explicit_without_enabling_collection():
+    data=config();data['APIFY_TOKEN']='fixture-apify'
+    assert module.render_values(data,'openai')['APIFY_TOKEN']==''
+    values=module.render_values(data,'openai',with_apify=True)
+    assert values['APIFY_TOKEN']=='fixture-apify'
+    assert values['PRICING_CONFIG'].endswith('pricing-openai.json')
+    assert 'REVIEW_PRODUCTION_ENABLED' not in values
+    with pytest.raises(ValueError):module.render_values(data,'free',with_apify=True)
+    data['APIFY_TOKEN']=''
+    with pytest.raises(ValueError,match='APIFY_TOKEN'):module.render_values(data,'openai',with_apify=True)

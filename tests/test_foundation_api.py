@@ -69,9 +69,8 @@ def service(tmp_path, monkeypatch):
 
     def login(name):
         email = name + "@example.test"
-        invitation = app.state.auth.invite(email)
         token = app.state.auth.complete_identity({"iss": "https://fixture.example.test", "sub": name,
-            "email": email, "email_verified": True, "name": name}, invitation)
+            "email": email, "email_verified": True, "name": name})
         client = TestClient(app)
         client.cookies.set(settings.cookie_name, token)
         session = client.get("/api/v2/session").json()
@@ -382,44 +381,36 @@ def test_two_parallel_http_answers_keep_corrected_facts_and_source_ids_separate(
     assert rb.json()["sources"][0]["document_id"] == br["accepted"][0]["document_id"]
 
 
-def test_invitation_requires_verified_target_and_can_expire_or_be_revoked(service):
+def test_registration_still_requires_verified_email_and_respects_revocation(service):
     from src.foundation.repository import DomainError
     from src.foundation.auth import digest
     auth = service.app.state.auth
-    claims = {"iss": "https://fixture.example.test", "sub": "invited", "email": "invite@example.test", "email_verified": True}
-    token = auth.invite(claims["email"])
+    claims = {"iss": "https://fixture.example.test", "sub": "new-user", "email": "new@example.test", "email_verified": True}
     with pytest.raises(DomainError):
-        auth.complete_identity({**claims, "email_verified": False}, token)
-    with pytest.raises(DomainError):
-        auth.complete_identity({**claims, "email": "other@example.test"}, token)
-    auth.revoke_invitation(token)
-    with pytest.raises(DomainError):
-        auth.complete_identity(claims, token)
-    expired = auth.invite(claims["email"])
+        auth.complete_identity({**claims, "email_verified": False})
+    token = auth.complete_identity(claims)
     with service.app.state.db.connect() as con:
-        con.execute("UPDATE invitations SET expires_at='2000-01-01T00:00:00+00:00' WHERE token_hash=?", (digest(expired),))
+        uid=con.execute('SELECT user_id FROM sessions WHERE token_hash=?',(digest(token),)).fetchone()[0]
+    auth.disable_user(uid)
     with pytest.raises(DomainError):
-        auth.complete_identity(claims, expired)
+        auth.complete_identity(claims)
 
 
-def test_same_invitation_simultaneous_use_can_create_only_one_account(service):
-    from src.foundation.repository import DomainError
+def test_concurrent_new_accounts_do_not_need_a_shared_invitation(service):
     auth = service.app.state.auth
-    token = auth.invite("shared@example.test")
     barrier = threading.Barrier(2)
 
-    def consume(subject):
+    def register(subject):
         barrier.wait(timeout=5)
-        try:
-            auth.complete_identity({"iss": "https://fixture.example.test", "sub": subject,
-                                    "email": "shared@example.test", "email_verified": True}, token)
-            return "accepted"
-        except DomainError:
-            return "denied"
+        return auth.complete_identity({"iss": "https://fixture.example.test", "sub": subject,
+                                      "email": "shared@example.test", "email_verified": True})
 
     with ThreadPoolExecutor(max_workers=2) as executor:
-        outcomes = list(executor.map(consume, ["first", "second"]))
-    assert sorted(outcomes) == ["accepted", "denied"]
+        tokens = list(executor.map(register, ["first", "second"]))
+    assert len(set(tokens))==2
+    with service.app.state.db.connect() as con:
+        assert con.execute('SELECT count(*) FROM users').fetchone()[0]==2
+        assert con.execute('SELECT count(*) FROM invitations').fetchone()[0]==0
 
 
 def test_anaphoric_followup_uses_latest_unique_booking_and_current_corrected_facts(service):

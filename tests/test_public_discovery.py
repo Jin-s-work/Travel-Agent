@@ -245,12 +245,13 @@ def test_expired_public_snapshot_is_not_servable_and_requests_fresh_data(public)
     assert refreshed['result']['public_discovery']['calls']==1 and public.calls_public==['paris','paris']
 
 
-def test_strict_filter_skips_fresh_public_call(public):
+def test_strict_language_gate_does_not_suppress_separate_reference_discovery(public):
     trip,base=prepare(public)
     out=run(public,trip,base,review_language_filter={'required':True,'apply_to':['local_discovery']})
-    assert public.calls_public==[]
-    assert out['result']['public_discovery']['reason']=='PUBLIC_REVIEW_FILTER_UNSUPPORTED'
-    assert out['result']['summary']['empty_state']['actions']==['edit_conditions','save_place']
+    assert public.calls_public==['paris']
+    assert out['result']['public_discovery']['state']=='ready'
+    assert not out['result']['sections']['local_discovery']['items']
+    assert out['result']['sections']['reference']['needs_confirmation']
 
 
 def test_insufficient_curated_city_supplements_with_public_call(public):
