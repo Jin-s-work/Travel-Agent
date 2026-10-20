@@ -58,7 +58,7 @@ force-push는 금지다. 거부되면 2절로 돌아간다.
 
 ## 4. Actions 확인 — 사람
 
-push 직후 GitHub Actions `ci` 워크플로의 5개 job(python · js · assets · postgres · safety)이 통과하는지 본다. 이 세션은 Actions를 실행할 수 없어 로컬 명령으로만 대조했다.
+push 직후 GitHub Actions `ci` 워크플로의 6개 job(python · js · assets · postgres · safety · e2e)이 통과하는지 본다. 이 세션은 Actions를 실행할 수 없어 로컬 명령으로만 대조했다. `e2e`가 실패하면 artifact `e2e-traces`의 trace를 `python -m playwright show-trace`로 연다.
 
 ## 5. Render 수동 배포 — 사람
 

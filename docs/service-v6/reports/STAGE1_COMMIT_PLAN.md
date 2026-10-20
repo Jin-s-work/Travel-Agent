@@ -41,11 +41,11 @@
 | 인수인계 (`CLAUDE.md`, `docs/handoff/`) | 4 | 커밋 C10 |
 | v6 기획 | 6 | 커밋 C11 |
 | 발표 자료 (`docs/presentation/**`) | 31 | 커밋하지 않음 |
-| 1단계 새 파일·수정 | 별도 | 커밋 S1~S7 |
+| 1단계 새 파일·수정 | 별도 | 커밋 S1~S10 |
 
 ## 커밋 순서
 
-v5 보존 11개, 1단계 작업 7개다. 메시지는 영어 명령형 한 줄이고 본문에 범위를 적는다.
+v5 보존 11개, 1단계 작업 10개다. 메시지는 영어 명령형 한 줄이고 본문에 범위를 적는다.
 
 | # | 메시지 요지 | 파일 | 범위 |
 | --- | --- | ---: | --- |
@@ -116,7 +116,7 @@ python3 scripts/check_publish_safety.py --ci --untracked
 
 ## 실행 결과
 
-`5da54dd` 위에 로컬 커밋 18개를 만들었다. 모두 작성자 `Jin-s-work <Jin-s-work@users.noreply.github.com>`이다. push하지 않았다.
+`5da54dd` 위에 로컬 커밋 21개를 만들었다. 모두 작성자 `Jin-s-work <Jin-s-work@users.noreply.github.com>`이다. push하지 않았다.
 
 | # | 커밋 | 메시지 |
 | --- | --- | --- |
@@ -137,9 +137,12 @@ python3 scripts/check_publish_safety.py --ci --untracked
 | S4 | `5b062fd` | Drop schema 15 tables when rebuilding schema 12 in the backup test |
 | S5 | `d4a4e8b` | Add stage 1 E2E fixtures and browserless isolation checks |
 | S6 | `b67afb4` | Add CI workflow and make ci targets |
-| S7 | 이 문서를 담은 커밋 | Record stage 1 baseline reports |
+| S7 | `8bf8add` | Record stage 1 baseline reports |
+| S8 | `1cec280` | Keep the tab a user picks while the trip workspace loads |
+| S9 | `1c9a75e` | Run stage 1 browser scenarios with Playwright in CI |
+| S10 | 이 문서를 담은 커밋 | Record stage 1 browser E2E results |
 
-전체 시험(`make ci`)은 S6 직전 작업 트리, 즉 S7의 문서·측정 스크립트를 뺀 상태에서 실행했다. 중간 커밋 각각은 실행하지 않았다.
+`make ci`는 S6 시점 작업 트리에서, E2E 8개는 S9 시점 작업 트리에서 실행했다. 중간 커밋 각각은 실행하지 않았다.
 
 커밋 범위의 추가 줄만 다시 검사했다.
 
