@@ -1,0 +1,360 @@
+{
+  "checked_on": "2026-10-08",
+  "contains_raw_personal_or_review_data": false,
+  "coverage": {
+    "checked_at": "2026-10-08T08:55:34.297971+00:00",
+    "writes": 0,
+    "provider_calls": 0,
+    "cities": {
+      "tokyo": {
+        "stored_canonical_places": 50,
+        "current_catalog_by_category": {
+          "restaurant": 50
+        },
+        "places_with_unexpired_facts": 50,
+        "active_real_review_aggregates": 0,
+        "approved_review_links": 0,
+        "photo_cache_states": {
+          "no_photo": 12
+        },
+        "currently_permitted_photo_places": 2,
+        "currently_permitted_photo_assets": 5,
+        "current_photo_availability": {
+          "no_photo": 48,
+          "available": 2
+        },
+        "actual_browser_img_load_success_rate": null
+      },
+      "barcelona": {
+        "stored_canonical_places": 3,
+        "current_catalog_by_category": {
+          "restaurant": 3
+        },
+        "places_with_unexpired_facts": 3,
+        "active_real_review_aggregates": 0,
+        "approved_review_links": 0,
+        "photo_cache_states": {},
+        "currently_permitted_photo_places": 2,
+        "currently_permitted_photo_assets": 6,
+        "current_photo_availability": {
+          "no_photo": 1,
+          "available": 2
+        },
+        "actual_browser_img_load_success_rate": null
+      }
+    },
+    "review_controls": {
+      "research_enabled": 0,
+      "production_enabled": 0
+    },
+    "active_apify_policies": 0,
+    "approved_provider_contracts": 0,
+    "actual_quality_evaluations": 0
+  },
+  "apify_read_only": {
+    "checked_at": "2026-10-08T08:46:32.225235+00:00",
+    "account_active_runs": 0,
+    "shared_account_check": true,
+    "connection": "ok",
+    "plan": "FREE",
+    "monthly_credits_usd": 5,
+    "monthly_limit_usd": 5,
+    "used_credits_usd": 3.5267323255538942e-06,
+    "actor": "compass/google-maps-reviews-scraper",
+    "latest_build": "0.0.528",
+    "pricing_model": "PAY_PER_EVENT",
+    "event_prices_usd": {
+      "review-scraped": 0.0006,
+      "apify-actor-start": 5e-05
+    },
+    "runs_started": 0,
+    "production_enabled": false,
+    "next_step": "Verify branches, provider fields, language quality and capped pilot before enabling recommendations"
+  },
+  "pilot_dry_run": {
+    "status": "blocked",
+    "reason_codes": [
+      "NO_EXISTING_APPROVED_CONFIGURED_BUDGET",
+      "DATA_RIGHTS_POLICY_MISSING",
+      "PROVIDER_CONTRACT_NOT_VERIFIED",
+      "VERIFIED_BRANCH_LINK_MISSING"
+    ],
+    "effective_batch_cap_usd": "0",
+    "stages": [
+      {
+        "stage": "contract_smoke",
+        "places": 1,
+        "records_per_place": 40,
+        "review_events_only_usd": "0.0240",
+        "not_total_quote": true,
+        "requires_previous_pass": false,
+        "reuse_valid_previous_runs": true,
+        "batch_cap_usd": "0",
+        "fits_review_events_only": false
+      },
+      {
+        "stage": "window_check",
+        "places": 3,
+        "records_per_place": 200,
+        "review_events_only_usd": "0.3600",
+        "not_total_quote": true,
+        "requires_previous_pass": true,
+        "reuse_valid_previous_runs": true,
+        "batch_cap_usd": "0",
+        "fits_review_events_only": false
+      },
+      {
+        "stage": "two_city_coverage",
+        "places": 10,
+        "records_per_place": 200,
+        "review_events_only_usd": "1.2000",
+        "not_total_quote": true,
+        "requires_previous_pass": true,
+        "reuse_valid_previous_runs": true,
+        "batch_cap_usd": "0",
+        "fits_review_events_only": false
+      }
+    ],
+    "runs_started": 0,
+    "production_enabled": false,
+    "restart": "Resume saved run ID/checkpoint; unknown start outcome must not create another remote run.",
+    "stop": "Cancel requests remote abort. Billing may continue; unknown costs stay reserved. Cleanup uses the existing remote deadline.",
+    "execution": "Existing admin review-collection-preview and review-collection-runs APIs; each stage rechecks current rights/budget. No direct Actor start CLI."
+  },
+  "synthetic_load": {
+    "environment": {
+      "os": "Darwin",
+      "machine": "arm64",
+      "python": "3.13.5",
+      "storage": "temporary SQLite",
+      "clients": "FastAPI TestClient / in process",
+      "dispatcher": 1
+    },
+    "synthetic_users": 5,
+    "overlapping_jobs": 10,
+    "elapsed_seconds": 4.175,
+    "submit_pair_ms": {
+      "samples": 5,
+      "p50": 152.47787500265986,
+      "p95": 255.32374999602325
+    },
+    "warm_result_get_ms": {
+      "samples": 25,
+      "p50": 513.5109999973793,
+      "p95": 614.3540409975685
+    },
+    "queue_wait_ms": {
+      "samples": 10,
+      "p50": 1943.2645,
+      "p95": 3378.734
+    },
+    "job_end_to_end_ms": {
+      "samples": 10,
+      "p50": 2457.6710000000003,
+      "p95": 3877.53
+    },
+    "memory_peak_bytes": 353058816,
+    "errors": 0,
+    "retries": 0,
+    "fake_provider_calls": {
+      "parse": 5,
+      "embed": 5,
+      "public_map": 4
+    },
+    "real_provider_calls": 0,
+    "real_external_cost_usd": "0",
+    "synthetic_cost_ledger": [
+      {
+        "provider": "fake",
+        "state": "settled",
+        "calls": 10,
+        "cost": 0
+      },
+      {
+        "provider": "openstreetmap",
+        "state": "settled",
+        "calls": 4,
+        "cost": 0
+      }
+    ],
+    "render_cold_start": "unmeasured",
+    "network_latency": "not simulated; free provider cooldown clock accelerated",
+    "provider_responses_reused": true
+  },
+  "synthetic_ranking": {
+    "label_source": "synthetic_rubric",
+    "dataset_hash": "2929637e9b1cb677fb35b8315330d75b9ca1f21a0148633e4335b5f44bc86e78",
+    "k": 5,
+    "query_count": 12,
+    "summary": {
+      "hybrid_v5": {
+        "by_split": {
+          "development": {
+            "queries": 12,
+            "ndcg": {
+              "value": 0.9955572450705721,
+              "measured_queries": 12
+            },
+            "precision": {
+              "value": 0.5333333333333333,
+              "measured_queries": 12
+            },
+            "recall": {
+              "value": 1.0,
+              "measured_queries": 12
+            },
+            "mrr": {
+              "value": 1.0,
+              "measured_queries": 12
+            }
+          },
+          "holdout": {
+            "queries": 0,
+            "ndcg": {
+              "value": null,
+              "measured_queries": 0
+            },
+            "precision": {
+              "value": null,
+              "measured_queries": 0
+            },
+            "recall": {
+              "value": null,
+              "measured_queries": 0
+            },
+            "mrr": {
+              "value": null,
+              "measured_queries": 0
+            }
+          }
+        },
+        "latency_ms": {
+          "median": 12.594000014360063,
+          "p95": 13.526666996767744,
+          "samples": 60
+        },
+        "hard_violations": 0,
+        "deterministic_queries": 12
+      },
+      "hybrid_v6": {
+        "by_split": {
+          "development": {
+            "queries": 12,
+            "ndcg": {
+              "value": 0.9955572450705721,
+              "measured_queries": 12
+            },
+            "precision": {
+              "value": 0.5333333333333333,
+              "measured_queries": 12
+            },
+            "recall": {
+              "value": 1.0,
+              "measured_queries": 12
+            },
+            "mrr": {
+              "value": 1.0,
+              "measured_queries": 12
+            }
+          },
+          "holdout": {
+            "queries": 0,
+            "ndcg": {
+              "value": null,
+              "measured_queries": 0
+            },
+            "precision": {
+              "value": null,
+              "measured_queries": 0
+            },
+            "recall": {
+              "value": null,
+              "measured_queries": 0
+            },
+            "mrr": {
+              "value": null,
+              "measured_queries": 0
+            }
+          }
+        },
+        "latency_ms": {
+          "median": 12.48874950397294,
+          "p95": 13.93445799476467,
+          "samples": 60
+        },
+        "hard_violations": 0,
+        "deterministic_queries": 12
+      }
+    },
+    "model_comparison": {
+      "baseline": "hybrid_v5",
+      "challenger": "hybrid_v6",
+      "holdout_ndcg_delta": {
+        "mean": null,
+        "interval95": null,
+        "paired_queries": 0
+      },
+      "city_mode_deltas": {
+        "barcelona/landmark": {
+          "mean": null,
+          "interval95": null,
+          "paired_queries": 0
+        },
+        "barcelona/local_discovery": {
+          "mean": null,
+          "interval95": null,
+          "paired_queries": 0
+        },
+        "tokyo/landmark": {
+          "mean": null,
+          "interval95": null,
+          "paired_queries": 0
+        },
+        "tokyo/local_discovery": {
+          "mean": null,
+          "interval95": null,
+          "paired_queries": 0
+        }
+      },
+      "warm_engine_p95_ratio": 1.0301471898505647,
+      "engine_only_not_render_latency": true,
+      "promotion_candidate": false,
+      "automatic_promotion": false,
+      "production_model": "hybrid_v5",
+      "reason_codes": [
+        "NO_INDEPENDENT_HUMAN_LABELS",
+        "HOLDOUT_SUPPORT_INSUFFICIENT",
+        "NDCG_GAIN_BELOW_0.03_OR_UNMEASURED",
+        "GAIN_INTERVAL_INCONCLUSIVE",
+        "CITY_MODE_REGRESSION_OR_UNMEASURED"
+      ],
+      "online_save_rate": null,
+      "visit_satisfaction": null
+    },
+    "actual_user_quality": "unmeasured",
+    "automatic_winner": null,
+    "provider_calls": 0
+  },
+  "actual_candidate_recall_at_200": null,
+  "actual_human_labels": 0,
+  "browser_after_login": "blocked_by_saved_access_preference",
+  "tests": {
+    "native_full_python": {
+      "passed": 1264,
+      "skipped": 17,
+      "seconds": 187.88,
+      "before_final_focused_amendments": true
+    },
+    "native_final_focused": 89,
+    "native_final_integration": 64,
+    "original_python": {
+      "passed": 138,
+      "seconds": 128.8
+    },
+    "native_js": 219,
+    "original_js": 219,
+    "public_asset_hash": "passed",
+    "scoped_git_diff_check": "passed",
+    "original_full_python_rerun": false
+  }
+}
