@@ -64,7 +64,7 @@ replay 모드는 임시 SQLite에 평가용 합성 사용자·여행을 만들�
      must_review도 이 필드(status 2건·party.adults 1건)는 null이라 공짜로 충족되므로 분자·분모에서 빼고 `must_review.unmeasurable`로 센다.
      **live의 "forbidden 0"은 이 4개 규칙을 보장하지 않는다.**
    - **local** — 규칙 파서(`parse_local_document`)는 `amount`·`currency`·`deposit` 키를 내지 않는다(`LOCAL_ABSENT_FIELDS`, 시험이 실제 출력 키와 대조한다).
-     그래서 `deposit_as_total` mtp-03·syn-17 2건이 측정 불가다. **local의 "forbidden 0"은 13개 규칙 중 측정 가능한 11개에 대한 값이다.**
+     그래서 `deposit_as_total` mtp-03·syn-17 2건이 측정 불가다. **local의 "forbidden 0"은 사례별 forbidden 항목 14개(규칙 7종) 중 측정 가능한 12개에 대한 값이다.**
      규칙 파서가 보증금을 총액으로 넣는 회귀는 금액 필드가 생기기 전까지 이 평가로 잡을 수 없다. local must_review에는 이 필드가 없어 측정 불가 0건이다.
 
 ## replay 기록 (손으로 만든 것만)
@@ -99,7 +99,7 @@ AI 스키마에 status·party·금액·식당 종류가 없으므로 replay에�
 - 개수 상한(`max`)은 보조 검사로 남겼다. 원칙은 0이고, 0이 아닌 값은 `max_reason`에 이유가 있다
   (local 추출기 포기 5건, replay의 심어 둔 forbidden 2건·오류 1건).
 - 2026-10-21 재측정: 다른 트랙이 작업 트리에서 고친 `src/foundation/local_mail.py`(취소 문구 정규식) 때문에 local의 `cancelled_as_active` 2건(syn-02·syn-14)이 사라졌다.
-  그래서 local forbidden 허용은 0(측정 가능한 11개 규칙 기준, 측정 불가 2건은 위 `forbidden_unmeasurable`), micro F1 기준선 0.8018이다.
+  그래서 local forbidden 허용은 0(측정 가능한 12개 항목 기준, 측정 불가 2건은 위 `forbidden_unmeasurable`), micro F1 기준선 0.8018이다.
   그 변경이 빠지면 local 게이트가 실패하는 것이 맞다.
 - **replay의 known gap 두 가지**(기준을 느슨하게 둔 것이 아니라 심어 둔 결함·구조적 한계를 그대로 적은 값이다):
   - `forbidden_violations` 2 — 심어 둔 결함 syn-01 `payment_date_as_visit`·syn-13 `change_as_new_confirmed`. `max` 2로 개수를, `expected_failures`(exact)로 사례·규칙을 양방향 고정한다.
