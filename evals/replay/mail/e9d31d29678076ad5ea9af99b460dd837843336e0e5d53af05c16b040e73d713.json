@@ -1,0 +1,23 @@
+{
+ "input_sha256": "fec9293dda8d56cc11346649466625ecf73cf16a5d066293cfe8fa40bc60d7ce",
+ "label": "mtp-05-madrid-multiple:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "e9d31d29678076ad5ea9af99b460dd837843336e0e5d53af05c16b040e73d713",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": null, \"provider\": \"Restaurante Demo Sol\", \"confirmation_number\": \"TEST-MEAL-005\", \"date\": \"2026-11-13\", \"date_end\": null, \"time\": \"13:30\", \"time_end\": null, \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"A) Restaurante Demo Sol, sucursal Centro. 13 noviembre 2026 13:30 Europe/Madrid. 2 adultos. TEST-MEAL-005. Precio por persona EUR 25–35, impuestos incluidos.\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-11-13T13:30\", \"end_local\": null, \"start_timezone\": \"Europe/Madrid\", \"end_timezone\": null, \"location\": null}]}, {\"kind\": \"투어\", \"provider\": \"Museo Demo Madrid\", \"confirmation_number\": \"TEST-MUSEUM-005\", \"date\": \"2026-11-14\", \"date_end\": \"2026-11-14\", \"time\": \"10:00\", \"time_end\": \"11:30\", \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"B) Museo Demo Madrid. 14 noviembre 2026 10:00–11:30 Europe/Madrid. 2 adultos. TEST-MUSEUM-005. Total EUR 30. No incluye comida ni transporte.\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-11-14T10:00\", \"end_local\": \"2026-11-14T11:30\", \"start_timezone\": \"Europe/Madrid\", \"end_timezone\": \"Europe/Madrid\", \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

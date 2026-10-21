@@ -1,0 +1,23 @@
+{
+ "input_sha256": "6b1ed0ed03817459d092e53d9dd4baae76865db6bb2f1e873724d970cdc6fe31",
+ "label": "b-ana-01:correct",
+ "prompt": {
+  "hash": "b63af1b90b7bd2c32f52f27e377c5d16cf6a97b266c2afd921b072b4b0d4b364",
+  "id": "trip_answer",
+  "version": 1
+ },
+ "request_key": "44398747934a69a3a5c9b441993a15fa384689381284cf76765fd5c30bde6407",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "Museo Demo Madrid 입장 시각은 2026-11-14 10:00입니다.\n출처: Museo Demo Madrid (예약번호 TEST-MUSEUM-005)",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "handmade",
+ "synthetic": true,
+ "version": 1
+}

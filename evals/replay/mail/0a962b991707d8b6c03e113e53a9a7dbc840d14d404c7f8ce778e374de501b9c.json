@@ -1,0 +1,23 @@
+{
+ "input_sha256": "af116ffbe40137ffe7060849193487933fc96bed060a3161e2d5e12ad57f4d6e",
+ "label": "mtp-10-dst-ambiguous-madrid:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "0a962b991707d8b6c03e113e53a9a7dbc840d14d404c7f8ce778e374de501b9c",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": \"투어\", \"provider\": \"Demo Madrid night visit\", \"confirmation_number\": \"TEST-DST-010\", \"date\": \"2026-10-25\", \"date_end\": null, \"time\": \"02:30\", \"time_end\": null, \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Demo Madrid night visit, fictional. 2026-10-25 02:30 Europe/Madrid. 2 adults. Offset and first/second occurrence are NOT supplied. TEST-DST-010.\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-10-25T02:30\", \"end_local\": null, \"start_timezone\": \"Europe/Madrid\", \"end_timezone\": null, \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

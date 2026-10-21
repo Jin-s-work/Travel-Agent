@@ -1,0 +1,23 @@
+{
+ "input_sha256": "4de90153ee0f3eb120a47f78fdf8c4c7847ec70ad8f83afa0df400fb71420f15",
+ "label": "b-det-04:correct_korean_paraphrase",
+ "prompt": {
+  "hash": "b63af1b90b7bd2c32f52f27e377c5d16cf6a97b266c2afd921b072b4b0d4b364",
+  "id": "trip_answer",
+  "version": 1
+ },
+ "request_key": "6d80624176ed5720519044cc54d20a75ce6cbbcd67449cdefb960d790353d994",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "도착 48시간 전까지 무료로 취소할 수 있고, 이후에는 첫 1박 요금 EUR 120이 부과됩니다.\n출처: Hotel Demo Madrid Centro (예약번호 TEST-MAD-004)",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "handmade",
+ "synthetic": true,
+ "version": 1
+}

@@ -1,0 +1,179 @@
+{
+  "case_id": "mtp-07-eight-bookings-one-day",
+  "file": "examples/mail-test-pack/07-eight-bookings-one-day.eml",
+  "language": "en",
+  "tags": [
+    "multi_booking",
+    "same_day",
+    "many_bookings",
+    "type_unknown"
+  ],
+  "synthetic": true,
+  "source": "converted:mail-test-pack",
+  "expected_bookings": [
+    {
+      "type": "tour",
+      "provider_name": "Tokyo Demo Stop 1",
+      "start_local": "2026-11-07T08:00",
+      "start_tz": "Asia/Tokyo",
+      "end_local": "2026-11-07T08:20",
+      "end_tz": "Asia/Tokyo",
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-EIGHT-01",
+      "status": "confirmed",
+      "unscored": [
+        "type"
+      ]
+    },
+    {
+      "type": "tour",
+      "provider_name": "Tokyo Demo Stop 2",
+      "start_local": "2026-11-07T09:00",
+      "start_tz": "Asia/Tokyo",
+      "end_local": "2026-11-07T09:20",
+      "end_tz": "Asia/Tokyo",
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-EIGHT-02",
+      "status": "confirmed",
+      "unscored": [
+        "type"
+      ]
+    },
+    {
+      "type": "tour",
+      "provider_name": "Tokyo Demo Stop 3",
+      "start_local": "2026-11-07T10:00",
+      "start_tz": "Asia/Tokyo",
+      "end_local": "2026-11-07T10:20",
+      "end_tz": "Asia/Tokyo",
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-EIGHT-03",
+      "status": "confirmed",
+      "unscored": [
+        "type"
+      ]
+    },
+    {
+      "type": "tour",
+      "provider_name": "Tokyo Demo Stop 4",
+      "start_local": "2026-11-07T11:00",
+      "start_tz": "Asia/Tokyo",
+      "end_local": "2026-11-07T11:20",
+      "end_tz": "Asia/Tokyo",
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-EIGHT-04",
+      "status": "confirmed",
+      "unscored": [
+        "type"
+      ]
+    },
+    {
+      "type": "tour",
+      "provider_name": "Tokyo Demo Stop 5",
+      "start_local": "2026-11-07T12:00",
+      "start_tz": "Asia/Tokyo",
+      "end_local": "2026-11-07T12:20",
+      "end_tz": "Asia/Tokyo",
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-EIGHT-05",
+      "status": "confirmed",
+      "unscored": [
+        "type"
+      ]
+    },
+    {
+      "type": "tour",
+      "provider_name": "Tokyo Demo Stop 6",
+      "start_local": "2026-11-07T13:00",
+      "start_tz": "Asia/Tokyo",
+      "end_local": "2026-11-07T13:20",
+      "end_tz": "Asia/Tokyo",
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-EIGHT-06",
+      "status": "confirmed",
+      "unscored": [
+        "type"
+      ]
+    },
+    {
+      "type": "tour",
+      "provider_name": "Tokyo Demo Stop 7",
+      "start_local": "2026-11-07T14:00",
+      "start_tz": "Asia/Tokyo",
+      "end_local": "2026-11-07T14:20",
+      "end_tz": "Asia/Tokyo",
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-EIGHT-07",
+      "status": "confirmed",
+      "unscored": [
+        "type"
+      ]
+    },
+    {
+      "type": "tour",
+      "provider_name": "Tokyo Demo Stop 8",
+      "start_local": "2026-11-07T15:00",
+      "start_tz": "Asia/Tokyo",
+      "end_local": "2026-11-07T15:20",
+      "end_tz": "Asia/Tokyo",
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-EIGHT-08",
+      "status": "confirmed",
+      "unscored": [
+        "type"
+      ]
+    }
+  ],
+  "must_review": [],
+  "forbidden": [],
+  "decoys": {},
+  "notes": "하루 8건 독립 예약(수동 1건 추가해 9건 조회는 앱 시나리오라 채점 밖). 원문에 업종 표기가 없어 type은 tour로 두되 unscored. 제공자명에서 수식어 Fictional은 제외(포함 매칭으로 어느 쪽도 일치). 업종 미확인이라 tags는 tour 대신 type_unknown(tour 집계에 섞이지 않게)."
+}

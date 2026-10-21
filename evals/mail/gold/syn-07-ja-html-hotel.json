@@ -1,0 +1,35 @@
+{
+  "case_id": "syn-07-ja-html-hotel",
+  "file": "evals/mail/cases/syn-07-ja-html-hotel.eml",
+  "language": "ja",
+  "tags": [
+    "stay",
+    "html_only"
+  ],
+  "synthetic": true,
+  "source": "synthetic:stage2",
+  "expected_bookings": [
+    {
+      "type": "stay",
+      "provider_name": "Demoホテル 札幌",
+      "start_local": "2026-12-10T15:00",
+      "start_tz": null,
+      "end_local": "2026-12-12T10:00",
+      "end_tz": null,
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": "64800",
+      "currency": "JPY",
+      "deposit": null,
+      "confirmation_code": "TEST-HTL-0710",
+      "status": "confirmed",
+      "unscored": []
+    }
+  ],
+  "must_review": [],
+  "forbidden": [],
+  "decoys": {},
+  "notes": "text/html 전용, 표(th/td) 안에 값이 있음. 64,800円은 2박 총액(현지 결제). IANA 이름 없음→tz null."
+}

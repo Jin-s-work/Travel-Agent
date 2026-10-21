@@ -1,0 +1,23 @@
+{
+ "input_sha256": "716c1f20051dfa210f5dfc662cd1f841f6fc50c38bf560929a4ec958b0c8494d",
+ "label": "c-det-01:correct",
+ "prompt": {
+  "hash": "b63af1b90b7bd2c32f52f27e377c5d16cf6a97b266c2afd921b072b4b0d4b364",
+  "id": "trip_answer",
+  "version": 1
+ },
+ "request_key": "9f48e9d44fef3a104600e5dbe70b69c4980cd1b7d5c27c649ce55b8f72c59723",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "Demo Osaka Bay Hotel 체크인은 2026-11-20 16:00입니다.\n출처: Demo Osaka Bay Hotel (예약번호 TEST-OSA-777)",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "handmade",
+ "synthetic": true,
+ "version": 1
+}

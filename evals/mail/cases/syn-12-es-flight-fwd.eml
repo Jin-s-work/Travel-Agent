@@ -1,0 +1,41 @@
+From: Demo Reservations <reservations@example.com>
+To: traveler@example.com
+Subject: [TEST ONLY] RV: Confirmación de tu vuelo Madrid - Lisboa
+Date: Tue, 20 Oct 2026 09:00:00 +0900
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+SYNTHETIC TEST DATA / 실제 예약이 아닙니다.
+
+Hola, Viajero Demo:
+
+Te reenviamos la confirmación que nos ha enviado la aerolínea. Revisa que tu
+nombre esté bien escrito. Cualquier duda, responde a este correo.
+
+Saludos,
+Agencia Demo Reservations
+
+-------- Mensaje reenviado --------
+De: Demo Air Sur <noreply@example.com>
+Fecha: lunes, 19 de octubre de 2026, 18:20
+Para: reservations@example.com
+Asunto: Confirmación de reserva TEST-ZZ-3001
+
+Gracias por volar con Demo Air Sur.
+
+Localizador:        TEST-ZZ-3001
+Fecha de emisión:   19/10/2026
+Pasajero:           VIAJERO DEMO (adulto)
+
+VUELO DE IDA (solo ida)
+  Vuelo:    ZZ 4821 (vuelo ficticio)
+  Salida:   jueves, 3 de diciembre de 2026, 07:45 - Madrid
+  Llegada:  jueves, 3 de diciembre de 2026, 08:10 - Lisboa
+  Las horas indicadas son locales de cada aeropuerto.
+
+Tarifa:     Básica, 1 artículo personal
+Importe total: 124 €
+
+Puedes cancelar sin coste en las 24 horas siguientes a la emisión del billete.
+Atención al cliente: soporte@example.com

@@ -1,0 +1,23 @@
+{
+ "input_sha256": "b218ec7b9a2aed16162d8b273de89af1932751f552bb7884c9bb8153f53c3b66",
+ "label": "a-cor-02:correct",
+ "prompt": {
+  "hash": "b63af1b90b7bd2c32f52f27e377c5d16cf6a97b266c2afd921b072b4b0d4b364",
+  "id": "trip_answer",
+  "version": 1
+ },
+ "request_key": "475d75932bac855d1f65f299fad090b5b355093d791e016995b46dbb7425004c",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "예약 시간은 2026-11-07 20:00입니다.\n출처: デモ食堂 東京東口店 (예약번호 TEST-DINNER-003)",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "handmade",
+ "synthetic": true,
+ "version": 1
+}

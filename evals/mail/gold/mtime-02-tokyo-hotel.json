@@ -1,0 +1,36 @@
+{
+  "case_id": "mtime-02-tokyo-hotel",
+  "file": "examples/mail-time-pack/02-tokyo-hotel.eml",
+  "language": "en",
+  "tags": [
+    "stay",
+    "check_in_out",
+    "multi_night"
+  ],
+  "synthetic": true,
+  "source": "converted:mail-time-pack",
+  "expected_bookings": [
+    {
+      "type": "stay",
+      "provider_name": "Going Demo Hotel",
+      "start_local": "2026-11-06T15:00",
+      "start_tz": "Asia/Tokyo",
+      "end_local": "2026-11-09T11:00",
+      "end_tz": "Asia/Tokyo",
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-TIME-002",
+      "status": "confirmed",
+      "unscored": []
+    }
+  ],
+  "must_review": [],
+  "forbidden": [],
+  "decoys": {},
+  "notes": "예약 정보 본문(라벨·값)은 영어이고 한국어는 제목·안내문·'(가상 장소)'뿐이라 en(language 기준: 제목·SYNTHETIC 안내문·가상 표시는 빼고 예약 정보 본문 언어로 판정). 체크인/체크아웃 시각 명시, 금액 없음. 발신자명 Going Demo가 제공자명의 접두라 provider 포함 매칭 규칙상 발신자명을 그대로 내도 일치하므로 이 사례로는 발신자 혼동을 판정할 수 없음(발신자 혼동 검출은 발신자 Travel Demo와 겹치지 않는 mtp-* 사례가 맡음)."
+}

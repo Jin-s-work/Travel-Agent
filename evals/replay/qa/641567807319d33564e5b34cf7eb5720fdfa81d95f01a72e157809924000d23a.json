@@ -1,0 +1,23 @@
+{
+ "input_sha256": "8a2f6cb8d9d064a27283933898e023efc91aad838c304cc51a58537ea202620d",
+ "label": "b-cor-01:correct",
+ "prompt": {
+  "hash": "b63af1b90b7bd2c32f52f27e377c5d16cf6a97b266c2afd921b072b4b0d4b364",
+  "id": "trip_answer",
+  "version": 1
+ },
+ "request_key": "641567807319d33564e5b34cf7eb5720fdfa81d95f01a72e157809924000d23a",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "Restaurante Demo Sol 점심 예약은 2026-11-13 14:00입니다.\n출처: Restaurante Demo Sol (예약번호 TEST-MEAL-005)",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "handmade",
+ "synthetic": true,
+ "version": 1
+}

@@ -1,0 +1,38 @@
+From: Demo Reservations <reservations@example.com>
+To: traveler@example.com
+Subject: [TEST ONLY] Your car rental is confirmed - TEST-CAR-EN-7001
+Date: Tue, 20 Oct 2026 09:00:00 +0900
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+SYNTHETIC TEST DATA / 실제 예약이 아닙니다.
+
+Hello Demo Traveler,
+
+Thanks for booking with Demo Reservations. Your rental car is reserved.
+
+RENTAL DETAILS
+------------------------------------------
+Rental company:    Demo Drive Rentals
+Confirmation:      TEST-CAR-EN-7001
+Car:               Compact (Demo Model C or similar), automatic
+
+Pick-up:           Tuesday, November 10, 2026 at 09:00
+Pick-up location:  Demo Drive Rentals - Downtown branch,
+                   100 Example Street, San Francisco, CA, USA
+
+Drop-off:          Thursday, November 12, 2026 at 18:00
+Drop-off location: Same as pick-up (San Francisco, CA, USA)
+
+Main driver:       Demo Traveler
+Total:             $214.50 (taxes and fees included)
+------------------------------------------
+
+Please bring a valid driver's license and the credit card used for the booking.
+Free cancellation up to 48 hours before pick-up.
+
+Questions? support@example.com
+
+Safe travels,
+Demo Reservations

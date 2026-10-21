@@ -1,0 +1,38 @@
+From: Demo Reservations <reservations@example.com>
+To: traveler@example.com
+Subject: [TEST ONLY] You're booked: Demo Night Lights Walking Tour (TEST-NYC-1203)
+Date: Tue, 20 Oct 2026 09:00:00 +0900
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+SYNTHETIC TEST DATA / 실제 예약이 아닙니다.
+(Synthetic test data. This is not a real booking.)
+
+Hi Test Traveler,
+
+Thanks for booking with Demo City Tours NYC! Your spots are confirmed.
+
+BOOKING DETAILS
+Booking reference: TEST-NYC-1203
+Tour: Demo Night Lights Walking Tour
+Operator: Demo City Tours NYC
+Date: Thursday, December 3, 2026
+Meeting time: 7:30 PM
+Ends around 10:00 PM back at the meeting point.
+Time zone: America/New_York
+Guests: 3 adults
+Total charged: USD 135
+
+MEETING POINT
+Demo Plaza, by the north fountain (fictional location).
+Look for the guide holding a yellow Demo City Tours sign.
+
+CANCELLATION POLICY
+Free cancellation up to 24 hours before the meeting time.
+No refunds for cancellations made less than 24 hours before the tour.
+
+Questions? Email us at support@example.com.
+
+See you soon,
+The Demo City Tours NYC team

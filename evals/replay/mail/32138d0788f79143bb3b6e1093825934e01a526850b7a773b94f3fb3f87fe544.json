@@ -1,0 +1,23 @@
+{
+ "input_sha256": "c13cd36eb35b4baf2e96d0127f8c21c77775d77b531ccec50a0e3bb9419eace3",
+ "label": "syn-16-en-car-rental-dollar:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "32138d0788f79143bb3b6e1093825934e01a526850b7a773b94f3fb3f87fe544",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": \"렌터카\", \"provider\": \"Demo Drive Rentals\", \"confirmation_number\": \"TEST-CAR-EN-7001\", \"date\": \"2026-11-10\", \"date_end\": \"2026-11-12\", \"time\": \"09:00\", \"time_end\": \"18:00\", \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Subject: [TEST ONLY] Your car rental is confirmed - TEST-CAR-EN-7001\", \"events\": [{\"event_type\": \"pickup\", \"start_local\": \"2026-11-10T09:00\", \"end_local\": \"2026-11-12T18:00\", \"start_timezone\": null, \"end_timezone\": null, \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

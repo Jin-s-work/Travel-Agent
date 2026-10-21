@@ -1,0 +1,48 @@
+From: Demo Reservations <reservations@example.com>
+To: traveler@example.com
+Subject: [TEST ONLY] Tus reservas en Valencia: cena y visita guiada
+Date: Tue, 20 Oct 2026 09:00:00 +0900
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+SYNTHETIC TEST DATA / 실제 예약이 아닙니다.
+
+Hola, Viajero Demo:
+
+Estas son las 2 reservas que has hecho en Demo Reservations para tu viaje a
+Valencia. Todas las horas se indican en hora local (Europe/Madrid).
+
+==========================================
+RESERVA 1 de 2 - RESTAURANTE
+==========================================
+Restaurante:        Demo Taberna del Puerto
+Dirección:          Avenida Ejemplo 8, Valencia
+Fecha:              viernes, 20 de noviembre de 2026
+Hora:               21:00
+Comensales:         4 adultos
+Código:             TEST-RES-ES-2001
+Pago:               se paga en el restaurante
+
+==========================================
+RESERVA 2 de 2 - VISITA GUIADA
+==========================================
+Actividad:          Paseo por el casco antiguo
+Organizador:        Demo Rutas Valencia
+Punto de encuentro: Plaza Ejemplo, junto a la fuente
+Fecha:              sábado, 21 de noviembre de 2026
+Horario:            10:30 - 13:00
+Participantes:      4 adultos
+Código:             TEST-TOUR-ES-2002
+Precio:             24 € por persona
+Total pagado:       96 €
+Fecha de pago:      19/10/2026
+
+------------------------------------------
+Cancelación: la visita guiada se puede cancelar gratis hasta 24 horas antes.
+Para la cena, avisa al restaurante si no vas a poder asistir.
+
+Dudas: ayuda@example.com
+
+Un saludo,
+Demo Reservations

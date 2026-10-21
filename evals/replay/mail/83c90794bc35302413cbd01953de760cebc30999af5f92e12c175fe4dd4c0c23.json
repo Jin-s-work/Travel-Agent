@@ -1,0 +1,23 @@
+{
+ "input_sha256": "41ddd47e493c77a2cc98d1dc922a2ccaebb418bb015e60a116bdec518915c6d2",
+ "label": "syn-07-ja-html-hotel:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "83c90794bc35302413cbd01953de760cebc30999af5f92e12c175fe4dd4c0c23",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": \"숙소\", \"provider\": \"Demoホテル 札幌\", \"confirmation_number\": \"TEST-HTL-0710\", \"date\": \"2026-12-10\", \"date_end\": \"2026-12-12\", \"time\": \"15:00\", \"time_end\": \"10:00\", \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Subject: [TEST ONLY] ご予約確認（Demoホテル 札幌）TEST-HTL-0710\", \"events\": [{\"event_type\": \"stay\", \"start_local\": \"2026-12-10T15:00\", \"end_local\": \"2026-12-12T10:00\", \"start_timezone\": null, \"end_timezone\": null, \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

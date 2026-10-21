@@ -1,0 +1,55 @@
+{
+  "case_id": "mtp-01-tokyo-roundtrip",
+  "file": "examples/mail-test-pack/01-tokyo-roundtrip.eml",
+  "language": "en",
+  "tags": [
+    "flight",
+    "round_trip",
+    "multi_event",
+    "timezone_cross"
+  ],
+  "synthetic": true,
+  "source": "converted:mail-test-pack",
+  "expected_bookings": [
+    {
+      "type": "flight",
+      "provider_name": "Demo Air",
+      "start_local": "2026-11-06T09:00",
+      "start_tz": "Asia/Seoul",
+      "end_local": "2026-11-06T11:30",
+      "end_tz": "Asia/Tokyo",
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-AIR-001",
+      "status": "confirmed",
+      "unscored": []
+    },
+    {
+      "type": "flight",
+      "provider_name": "Demo Air",
+      "start_local": "2026-11-09T20:00",
+      "start_tz": "Asia/Tokyo",
+      "end_local": "2026-11-09T22:40",
+      "end_tz": "Asia/Seoul",
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-AIR-001",
+      "status": "confirmed",
+      "unscored": []
+    }
+  ],
+  "must_review": [],
+  "forbidden": [],
+  "decoys": {},
+  "notes": "왕복 각각 유지(구간마다 예약 1개, 같은 예약번호 반복). 원문에 금액이 없으므로 금액·통화·보증금은 null 채점(만들면 FP). 아동 언급 없음 = null."
+}

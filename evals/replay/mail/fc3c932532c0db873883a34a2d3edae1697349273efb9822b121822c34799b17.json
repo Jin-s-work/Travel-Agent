@@ -1,0 +1,23 @@
+{
+ "input_sha256": "2ad8b4fbf77ef1e564e0a02050bf2d9f8965f233565f33979a833fa857052d2b",
+ "label": "syn-18-en-promo-not-booking:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "fc3c932532c0db873883a34a2d3edae1697349273efb9822b121822c34799b17",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": []}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

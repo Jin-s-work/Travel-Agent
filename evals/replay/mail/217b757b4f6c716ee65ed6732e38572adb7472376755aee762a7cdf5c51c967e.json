@@ -1,0 +1,23 @@
+{
+ "input_sha256": "4e5d80b9cb55cbf229b65c8fc7483a4c26280e85175231a2fa188dfad2b29c82",
+ "label": "mtp-06-date-only-unknown-party:fault:repair_failed:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "217b757b4f6c716ee65ed6732e38572adb7472376755aee762a7cdf5c51c967e",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": \"투어\", \"provid",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "handmade_fault",
+ "synthetic": true,
+ "version": 1
+}

@@ -1,0 +1,49 @@
+From: Demo Reservations <reservations@example.com>
+To: traveler@example.com
+Subject: [TEST ONLY] Your Lisbon reservations: dinner + walking tour
+Date: Tue, 20 Oct 2026 09:00:00 +0900
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+SYNTHETIC TEST DATA / 실제 예약이 아닙니다.
+(Synthetic test data. These are not real bookings.)
+
+Hello Test Traveler,
+
+Here is a summary of the two reservations we arranged for your Lisbon trip.
+Each booking has its own reference number. Please quote the right one when
+contacting the venue.
+
+------------------------------
+1) DINNER RESERVATION
+------------------------------
+Restaurant: Demo Taberna Alfama
+Reference: TEST-LIS-DIN-1211
+Date: Friday, 11 December 2026
+Time: 20:00
+Party: 2 adults
+Set menu: €45 per person, paid at the restaurant
+Please arrive a few minutes early. Tables are held for 15 minutes.
+
+------------------------------
+2) WALKING TOUR (the next day)
+------------------------------
+Tour: Demo Old Town Walking Tour
+Operator: Demo Lisbon Walks
+Reference: TEST-LIS-WLK-1212
+Date: Saturday, 12 December 2026
+Start: 10:00
+End: 12:30
+Party: 2 adults
+Total paid: €50
+Meeting point: Demo Square, next to the tram stop (fictional location)
+
+CANCELLATION
+- Dinner: free cancellation up to 24 hours before the reservation time.
+- Walking tour: full refund if cancelled at least 48 hours before the start.
+
+Need help? Contact help@example.com.
+
+Enjoy your trip,
+Demo Reservations

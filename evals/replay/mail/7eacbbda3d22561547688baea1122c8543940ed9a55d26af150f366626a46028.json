@@ -1,0 +1,23 @@
+{
+ "input_sha256": "a8e6b6628c6e2769fc74d22c081e2521a045894e5f167655c17db7a8de602e2d",
+ "label": "syn-08-en-ampm-tour:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "7eacbbda3d22561547688baea1122c8543940ed9a55d26af150f366626a46028",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": \"투어\", \"provider\": \"Demo City Tours NYC\", \"confirmation_number\": \"TEST-NYC-1203\", \"date\": \"2026-12-03\", \"date_end\": \"2026-12-03\", \"time\": \"19:30\", \"time_end\": \"22:00\", \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Subject: [TEST ONLY] You're booked: Demo Night Lights Walking Tour (TEST-NYC-1203)\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-12-03T19:30\", \"end_local\": \"2026-12-03T22:00\", \"start_timezone\": \"America/New_York\", \"end_timezone\": \"America/New_York\", \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

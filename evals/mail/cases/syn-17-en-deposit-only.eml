@@ -1,0 +1,35 @@
+From: Demo Reservations <reservations@example.com>
+To: traveler@example.com
+Subject: [TEST ONLY] Table confirmed at Demo Bistro Lumiere - TEST-RES-EN-8001
+Date: Tue, 20 Oct 2026 09:00:00 +0900
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+SYNTHETIC TEST DATA / 실제 예약이 아닙니다.
+
+Dear Demo Traveler,
+
+Your table is confirmed. We look forward to welcoming you.
+
+RESERVATION
+------------------------------------------
+Restaurant:        Demo Bistro Lumiere
+Address:           22 Example Avenue, Paris, France
+Date:              Saturday, 5 December 2026
+Time:              20:00
+Guests:            2 adults
+Reservation code:  TEST-RES-EN-8001
+------------------------------------------
+
+PAYMENT
+A deposit of €50 has been charged; the final bill is paid at the restaurant.
+The deposit will be deducted from your bill on the night.
+
+Cancellation: cancel at least 48 hours in advance to get the deposit back.
+Late cancellations and no-shows forfeit the deposit.
+
+To change your reservation, contact support@example.com.
+
+Kind regards,
+Demo Reservations

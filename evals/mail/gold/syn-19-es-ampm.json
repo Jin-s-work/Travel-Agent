@@ -1,0 +1,35 @@
+{
+  "case_id": "syn-19-es-ampm",
+  "file": "evals/mail/cases/syn-19-es-ampm.eml",
+  "language": "es",
+  "tags": [
+    "am_pm",
+    "restaurant"
+  ],
+  "synthetic": true,
+  "source": "synthetic:stage2",
+  "expected_bookings": [
+    {
+      "type": "restaurant",
+      "provider_name": "Demo Cantina Reforma",
+      "start_local": "2026-11-28T21:15",
+      "start_tz": "America/Mexico_City",
+      "end_local": null,
+      "end_tz": null,
+      "party": {
+        "adults": 4,
+        "children": 2
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-RES-ES-9001",
+      "status": "confirmed",
+      "unscored": []
+    }
+  ],
+  "must_review": [],
+  "forbidden": [],
+  "decoys": {},
+  "notes": "\"9:15 p. m.\" = 21:15. 알림 메일 10:00 a. m.은 방문 시각 아님. 원문에 America/Mexico_City 명시. 아동 2명."
+}

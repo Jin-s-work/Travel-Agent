@@ -1,0 +1,39 @@
+From: Demo Reservations <reservations@example.com>
+To: traveler@example.com
+Subject: [TEST ONLY] Confirmación de reserva TEST-HTL-ES-1001 - Demo Hotel Alameda
+Date: Tue, 20 Oct 2026 09:00:00 +0900
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+SYNTHETIC TEST DATA / 실제 예약이 아닙니다.
+
+Hola, Viajero Demo:
+
+Gracias por reservar con Demo Reservations. Tu estancia en Demo Hotel Alameda
+(Sevilla) está confirmada.
+
+DATOS DE LA RESERVA
+------------------------------------------
+Alojamiento:        Demo Hotel Alameda
+Dirección:          Calle Ejemplo 12, Sevilla, España
+Código de reserva:  TEST-HTL-ES-1001
+Entrada:            jueves, 12 de noviembre de 2026
+Salida:             domingo, 15 de noviembre de 2026
+Duración:           3 noches
+Habitación:         1 x Doble estándar
+Huéspedes:          2 adultos
+Importe total:      320 € (impuestos incluidos)
+Pago:               en el alojamiento
+------------------------------------------
+
+POLÍTICA DE CANCELACIÓN
+Cancelación gratuita hasta el 5 de noviembre de 2026. A partir de esa fecha,
+el alojamiento cobrará el importe de la primera noche.
+
+¿Necesitas cambiar algo? Escríbenos a ayuda@example.com indicando tu código
+de reserva.
+
+Un saludo,
+El equipo de Demo Reservations
+https://www.example.com/ayuda

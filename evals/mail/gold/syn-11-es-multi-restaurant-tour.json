@@ -1,0 +1,64 @@
+{
+  "case_id": "syn-11-es-multi-restaurant-tour",
+  "file": "evals/mail/cases/syn-11-es-multi-restaurant-tour.eml",
+  "language": "es",
+  "tags": [
+    "multi_booking",
+    "restaurant",
+    "tour",
+    "payment_date"
+  ],
+  "synthetic": true,
+  "source": "synthetic:stage2",
+  "expected_bookings": [
+    {
+      "type": "restaurant",
+      "provider_name": "Demo Taberna del Puerto",
+      "start_local": "2026-11-20T21:00",
+      "start_tz": "Europe/Madrid",
+      "end_local": null,
+      "end_tz": null,
+      "party": {
+        "adults": 4,
+        "children": null
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-RES-ES-2001",
+      "status": "confirmed",
+      "unscored": []
+    },
+    {
+      "type": "tour",
+      "provider_name": "Demo Rutas Valencia",
+      "start_local": "2026-11-21T10:30",
+      "start_tz": "Europe/Madrid",
+      "end_local": "2026-11-21T13:00",
+      "end_tz": "Europe/Madrid",
+      "party": {
+        "adults": 4,
+        "children": null
+      },
+      "amount": "96",
+      "currency": "EUR",
+      "deposit": null,
+      "confirmation_code": "TEST-TOUR-ES-2002",
+      "status": "confirmed",
+      "unscored": []
+    }
+  ],
+  "must_review": [],
+  "forbidden": [
+    "payment_date_as_visit"
+  ],
+  "decoys": {
+    "payment_date_as_visit": {
+      "field": "start_local",
+      "values": [
+        "2026-10-19"
+      ]
+    }
+  },
+  "notes": "한 메일에 2건. 원문에 Europe/Madrid 명시. 투어 총액은 96(인당 24는 총액 아님), 식당은 금액 없음. 결제일 19/10/2026은 방문일이 아니다. 발신 플랫폼(Demo Reservations)은 provider 아님."
+}

@@ -1,0 +1,46 @@
+From: Demo Companion <companion@example.com>
+To: traveler@example.com
+Subject: [TEST ONLY] Fwd: [Demo 투어즈 제주] 예약 확정 안내 (TEST-JEJU-1121)
+Date: Tue, 20 Oct 2026 09:00:00 +0900
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+SYNTHETIC TEST DATA / 실제 예약이 아닙니다.
+
+여행 때 갈 우도 투어 예약 메일 전달해요. 결제는 제 카드로 걸어 뒀어요.
+
+---------- 전달된 메일 ----------
+보낸사람: Demo Reservations <reservations@example.com>
+날짜: 2026년 10월 19일 (월) 오후 3:12
+제목: [Demo 투어즈 제주] 예약 확정 안내 (TEST-JEJU-1121)
+받는사람: companion@example.com
+
+안녕하세요, 테스트 고객님.
+Demo 투어즈 제주를 이용해 주셔서 감사합니다.
+아래와 같이 예약이 확정되었습니다.
+
+[예약 정보]
+예약번호: TEST-JEJU-1121
+상품명: Demo 우도 반나절 투어
+진행 업체: Demo 투어즈 제주
+이용일: 2026-11-21 (토)
+집합 시간: 09:00
+종료 예정: 13:00
+인원: 성인 2명, 아동 0명
+
+[결제 정보]
+결제 금액: 총 136,000원
+결제 수단: 신용카드 (등록 카드 자동 결제)
+결제일: 2026-10-30
+
+[취소 및 환불 규정]
+- 이용일 3일 전까지 취소: 전액 환불
+- 이용일 2일 전 ~ 전날 취소: 결제 금액의 50% 환불
+- 이용일 당일 취소 및 노쇼: 환불 불가
+
+[문의]
+Demo 투어즈 제주 고객센터
+이메일: jeju-tours@example.com
+
+즐거운 여행 되세요!

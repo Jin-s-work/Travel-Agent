@@ -1,0 +1,45 @@
+{
+  "case_id": "syn-10-es-hotel-cancel-deadline",
+  "file": "evals/mail/cases/syn-10-es-hotel-cancel-deadline.eml",
+  "language": "es",
+  "tags": [
+    "stay",
+    "cancel_deadline",
+    "currency_symbol_only"
+  ],
+  "synthetic": true,
+  "source": "synthetic:stage2",
+  "expected_bookings": [
+    {
+      "type": "stay",
+      "provider_name": "Demo Hotel Alameda",
+      "start_local": "2026-11-12",
+      "start_tz": null,
+      "end_local": "2026-11-15",
+      "end_tz": null,
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": "320",
+      "currency": "EUR",
+      "deposit": null,
+      "confirmation_code": "TEST-HTL-ES-1001",
+      "status": "confirmed",
+      "unscored": []
+    }
+  ],
+  "must_review": [],
+  "forbidden": [
+    "deadline_as_visit"
+  ],
+  "decoys": {
+    "deadline_as_visit": {
+      "field": "start_local",
+      "values": [
+        "2026-11-05"
+      ]
+    }
+  },
+  "notes": "체크인·체크아웃은 날짜만(시각 없음), IANA 이름 없음 → tz null. 무료 취소 기한 11-05는 방문일이 아니다. \"320 €\" 기호만 → EUR."
+}

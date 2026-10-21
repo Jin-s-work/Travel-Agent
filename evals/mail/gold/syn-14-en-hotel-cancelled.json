@@ -1,0 +1,47 @@
+{
+  "case_id": "syn-14-en-hotel-cancelled",
+  "file": "evals/mail/cases/syn-14-en-hotel-cancelled.eml",
+  "language": "en",
+  "tags": [
+    "cancellation",
+    "stay"
+  ],
+  "synthetic": true,
+  "source": "synthetic:stage2",
+  "expected_bookings": [
+    {
+      "type": "stay",
+      "provider_name": "Demo Harbour Hotel",
+      "start_local": "2026-12-10",
+      "start_tz": null,
+      "end_local": "2026-12-13",
+      "end_tz": null,
+      "party": {
+        "adults": 2,
+        "children": 1
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-HTL-EN-5001",
+      "status": "cancelled",
+      "unscored": [
+        "amount",
+        "currency"
+      ]
+    }
+  ],
+  "must_review": [],
+  "forbidden": [
+    "cancelled_as_active"
+  ],
+  "decoys": {
+    "cancelled_as_active": {
+      "field": "status",
+      "values": [
+        "confirmed"
+      ]
+    }
+  },
+  "notes": "취소 확인 메일. 날짜만, IANA 이름 없음 → tz null. 환불액 £450을 총액으로 볼지 애매해 amount·currency는 unscored."
+}

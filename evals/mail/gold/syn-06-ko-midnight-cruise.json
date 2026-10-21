@@ -1,0 +1,35 @@
+{
+  "case_id": "syn-06-ko-midnight-cruise",
+  "file": "evals/mail/cases/syn-06-ko-midnight-cruise.eml",
+  "language": "ko",
+  "tags": [
+    "tour",
+    "crosses_midnight"
+  ],
+  "synthetic": true,
+  "source": "synthetic:stage2",
+  "expected_bookings": [
+    {
+      "type": "tour",
+      "provider_name": "Demo 크루즈 부산",
+      "start_local": "2026-11-21T22:30",
+      "start_tz": "Asia/Seoul",
+      "end_local": "2026-11-22T01:00",
+      "end_tz": "Asia/Seoul",
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": "70000",
+      "currency": "KRW",
+      "deposit": null,
+      "confirmation_code": "TEST-CRZ-2230",
+      "status": "confirmed",
+      "unscored": []
+    }
+  ],
+  "must_review": [],
+  "forbidden": [],
+  "decoys": {},
+  "notes": "자정을 넘겨 다음 날 01:00 하선. 종료 날짜를 시작일(2026-11-21)로 두면 오답. 원문에 Asia/Seoul 명시. 아동 언급 없음=null."
+}

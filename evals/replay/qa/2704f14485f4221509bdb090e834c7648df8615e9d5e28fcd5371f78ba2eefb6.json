@@ -1,0 +1,23 @@
+{
+ "input_sha256": "c1ee1e65410f48a05ef6bf7bd0e19022e4ad70ab837654e2644a72716f46e252",
+ "label": "b-det-03:ungrounded_amount",
+ "prompt": {
+  "hash": "b63af1b90b7bd2c32f52f27e377c5d16cf6a97b266c2afd921b072b4b0d4b364",
+  "id": "trip_answer",
+  "version": 1
+ },
+ "request_key": "2704f14485f4221509bdb090e834c7648df8615e9d5e28fcd5371f78ba2eefb6",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "Tablao Demo Flamenco 공연은 2026-11-15 21:00에 시작하고 입장료는 EUR 45입니다.\n출처: Tablao Demo Flamenco",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "handmade_fault",
+ "synthetic": true,
+ "version": 1
+}

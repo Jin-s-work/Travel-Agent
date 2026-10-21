@@ -1,0 +1,23 @@
+{
+ "input_sha256": "ec14952b811b576de1ace0fd8cb5218607b38cac620d2771ffca8dec68be4449",
+ "label": "mtp-same-name-a:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "fc7a0cd7c074b6eabe1b5e9e088f6be126aba7d9d3a1e30913830e86e392162f",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": null, \"provider\": \"Demo Tokyo Cafe East\", \"confirmation_number\": \"TEST-SAME-A\", \"date\": \"2026-11-08\", \"date_end\": null, \"time\": \"10:00\", \"time_end\": null, \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Demo Tokyo Cafe East (fictional). 2026-11-08 10:00 Asia/Tokyo, 2 adults. Reference TEST-SAME-A.\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-11-08T10:00\", \"end_local\": null, \"start_timezone\": \"Asia/Tokyo\", \"end_timezone\": null, \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

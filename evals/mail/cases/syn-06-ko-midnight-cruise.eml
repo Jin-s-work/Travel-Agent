@@ -1,0 +1,39 @@
+From: Demo Reservations <reservations@example.com>
+To: traveler@example.com
+Subject: [TEST ONLY] [Demo 크루즈 부산] 심야 야경 크루즈 예약 확정 (TEST-CRZ-2230)
+Date: Tue, 20 Oct 2026 09:00:00 +0900
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+SYNTHETIC TEST DATA / 실제 예약이 아닙니다.
+
+안녕하세요, 테스트 고객님.
+Demo 크루즈 부산 심야 야경 크루즈를 예약해 주셔서 감사합니다.
+예약이 아래와 같이 확정되었습니다.
+
+[예약 정보]
+예약번호: TEST-CRZ-2230
+상품명: Demo 부산 야경 크루즈 (심야 편)
+운항사: Demo 크루즈 부산
+출항 일시: 2026-11-21 (토) 22:30
+하선 예정: 2026-11-22 (일) 01:00
+시간대: Asia/Seoul
+인원: 성인 2명
+결제 금액: 총 70,000원 (결제 완료)
+
+[탑승 안내]
+- 출항 20분 전까지 Demo 선착장 매표소에서 승선권으로 교환해 주세요. (가상 장소)
+- 하선 후에는 대중교통이 끊길 수 있으니 귀가 수단을 미리 확인해 주세요.
+
+[취소 규정]
+- 출항 2일 전까지: 전액 환불
+- 출항 1일 전: 50% 환불
+- 출항 당일 및 노쇼: 환불 불가
+- 기상 악화로 결항 시 전액 환불
+
+[문의]
+Demo 크루즈 부산 예약센터
+이메일: busan-cruise@example.com
+
+즐거운 밤바다 여행 되세요.

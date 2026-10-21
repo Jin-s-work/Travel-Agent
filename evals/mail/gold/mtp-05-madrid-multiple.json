@@ -1,0 +1,59 @@
+{
+  "case_id": "mtp-05-madrid-multiple",
+  "file": "examples/mail-test-pack/05-madrid-multiple.eml",
+  "language": "es",
+  "tags": [
+    "multi_booking",
+    "restaurant",
+    "tour",
+    "per_person_price",
+    "total_price"
+  ],
+  "synthetic": true,
+  "source": "converted:mail-test-pack",
+  "expected_bookings": [
+    {
+      "type": "restaurant",
+      "provider_name": "Restaurante Demo Sol",
+      "start_local": "2026-11-13T13:30",
+      "start_tz": "Europe/Madrid",
+      "end_local": null,
+      "end_tz": null,
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": null,
+      "currency": "EUR",
+      "deposit": null,
+      "confirmation_code": "TEST-MEAL-005",
+      "status": "confirmed",
+      "unscored": [
+        "amount",
+        "currency"
+      ]
+    },
+    {
+      "type": "tour",
+      "provider_name": "Museo Demo Madrid",
+      "start_local": "2026-11-14T10:00",
+      "start_tz": "Europe/Madrid",
+      "end_local": "2026-11-14T11:30",
+      "end_tz": "Europe/Madrid",
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": "30",
+      "currency": "EUR",
+      "deposit": null,
+      "confirmation_code": "TEST-MUSEUM-005",
+      "status": "confirmed",
+      "unscored": []
+    }
+  ],
+  "must_review": [],
+  "forbidden": [],
+  "decoys": {},
+  "notes": "한 메일의 독립 예약 2개. 식당은 인당 EUR 25–35라 총액이 아니고 보증금도 없으므로 amount=null·amount/currency unscored. 박물관은 Total EUR 30이 총액. 식당 지점명 sucursal Centro는 제공자명 포함 매칭으로 허용."
+}

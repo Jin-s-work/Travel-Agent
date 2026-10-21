@@ -1,0 +1,39 @@
+{
+  "case_id": "syn-03-ja-restaurant-change-confirmed",
+  "file": "evals/mail/cases/syn-03-ja-restaurant-change-confirmed.eml",
+  "language": "ja",
+  "tags": [
+    "restaurant",
+    "change",
+    "per_person_price"
+  ],
+  "synthetic": true,
+  "source": "synthetic:stage2",
+  "expected_bookings": [
+    {
+      "type": "restaurant",
+      "provider_name": "Demoダイニング 銀座",
+      "start_local": "2026-11-27T19:30",
+      "start_tz": "Asia/Tokyo",
+      "end_local": "2026-11-27T21:30",
+      "end_tz": "Asia/Tokyo",
+      "party": {
+        "adults": 4,
+        "children": null
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-DIN-0315",
+      "status": "changed",
+      "unscored": [
+        "amount",
+        "currency"
+      ]
+    }
+  ],
+  "must_review": [],
+  "forbidden": [],
+  "decoys": {},
+  "notes": "식당이 18:00→19:30 변경을 확정(※確定)했으므로 status changed, 시각은 새 값. 이전 시각 18:00〜20:00이 원문에 남아 있음(해당 forbidden 규칙 없음→필드 불일치로 채점). ¥12,000은 1인 가격이라 amount unscored. 통화(JPY)는 명확하나 금액이 인당이라 함께 제외(총액을 비워 둔 추출기에 통화만 내라고 강제하지 않기 위해)."
+}

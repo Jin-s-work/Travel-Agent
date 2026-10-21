@@ -1,0 +1,37 @@
+{
+  "case_id": "syn-16-en-car-rental-dollar",
+  "file": "evals/mail/cases/syn-16-en-car-rental-dollar.eml",
+  "language": "en",
+  "tags": [
+    "car_rental",
+    "currency_symbol_only"
+  ],
+  "synthetic": true,
+  "source": "synthetic:stage2",
+  "expected_bookings": [
+    {
+      "type": "car_rental",
+      "provider_name": "Demo Drive Rentals",
+      "start_local": "2026-11-10T09:00",
+      "start_tz": null,
+      "end_local": "2026-11-12T18:00",
+      "end_tz": null,
+      "party": {
+        "adults": null,
+        "children": null
+      },
+      "amount": "214.50",
+      "currency": "USD",
+      "deposit": null,
+      "confirmation_code": "TEST-CAR-EN-7001",
+      "status": "confirmed",
+      "unscored": [
+        "party.adults"
+      ]
+    }
+  ],
+  "must_review": [],
+  "forbidden": [],
+  "decoys": {},
+  "notes": "\"$\"만 있으나 지점이 San Francisco, CA, USA라 USD. IANA 이름 없음 → tz null. 운전자 1명 이름만 있어 인원수로 볼지 애매해 party.adults는 unscored. amount는 원문 표기 $214.50의 소수 자릿수를 그대로 유지한 \"214.50\"(정답셋 유일한 소수 금액); 평가기가 Decimal 정규화를 하지 않으면 \"214.5\" 예측은 불일치로 잡힌다."
+}

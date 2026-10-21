@@ -1,0 +1,37 @@
+{
+  "case_id": "mtp-02-tokyo-hotel",
+  "file": "examples/mail-test-pack/02-tokyo-hotel.eml",
+  "language": "ja",
+  "tags": [
+    "stay",
+    "check_in_out",
+    "multi_night",
+    "total_price"
+  ],
+  "synthetic": true,
+  "source": "converted:mail-test-pack",
+  "expected_bookings": [
+    {
+      "type": "stay",
+      "provider_name": "デモ東京ホテル 本館",
+      "start_local": "2026-11-06T15:00",
+      "start_tz": "Asia/Tokyo",
+      "end_local": "2026-11-09T11:00",
+      "end_tz": "Asia/Tokyo",
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": "60000",
+      "currency": "JPY",
+      "deposit": null,
+      "confirmation_code": "TEST-HOTEL-002",
+      "status": "confirmed",
+      "unscored": []
+    }
+  ],
+  "must_review": [],
+  "forbidden": [],
+  "decoys": {},
+  "notes": "3박 숙박, 체크인/아웃 시각을 구분. 合計 JPY 60000(税込, 事前払い済)이 총액이며 보증금 표기는 없음. 괄호 안 (架空施設)은 시설명에서 제외."
+}

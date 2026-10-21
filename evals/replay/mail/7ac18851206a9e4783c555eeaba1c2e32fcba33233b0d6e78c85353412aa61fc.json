@@ -1,0 +1,23 @@
+{
+ "input_sha256": "6dd52ce2c3214b4e171560ce4edcced7368f4f1177711b6c638596e936b07726",
+ "label": "syn-03-ja-restaurant-change-confirmed:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "7ac18851206a9e4783c555eeaba1c2e32fcba33233b0d6e78c85353412aa61fc",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": null, \"provider\": \"Demoダイニング 銀座\", \"confirmation_number\": \"TEST-DIN-0315\", \"date\": \"2026-11-27\", \"date_end\": \"2026-11-27\", \"time\": \"19:30\", \"time_end\": \"21:30\", \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Subject: [TEST ONLY] ご予約時間変更のお知らせ（Demoダイニング 銀座）TEST-DIN-0315\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-11-27T19:30\", \"end_local\": \"2026-11-27T21:30\", \"start_timezone\": \"Asia/Tokyo\", \"end_timezone\": \"Asia/Tokyo\", \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

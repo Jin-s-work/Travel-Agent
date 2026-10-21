@@ -1,0 +1,23 @@
+{
+ "input_sha256": "a26aad68841a4d4ff47248d6d22b0742912b1c723fddba498e927fe6e12357e6",
+ "label": "mtime-03-barcelona-tour:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "0d56d19af988e8c481269c87f20cd5f542d6283a0c63705a49198464c346711f",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": \"투어\", \"provider\": \"Going Demo City Walk\", \"confirmation_number\": \"TEST-TIME-003\", \"date\": \"2026-11-12\", \"date_end\": \"2026-11-12\", \"time\": \"10:00\", \"time_end\": \"12:30\", \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Reservation: TEST-TIME-003\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-11-12T10:00\", \"end_local\": \"2026-11-12T12:30\", \"start_timezone\": \"Europe/Madrid\", \"end_timezone\": \"Europe/Madrid\", \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

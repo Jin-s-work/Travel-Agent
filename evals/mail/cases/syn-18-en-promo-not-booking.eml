@@ -1,0 +1,31 @@
+From: Demo Reservations <reservations@example.com>
+To: traveler@example.com
+Subject: [TEST ONLY] Your next getaway is waiting - 20% off seaside stays
+Date: Tue, 20 Oct 2026 09:00:00 +0900
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+SYNTHETIC TEST DATA / 실제 예약이 아닙니다.
+
+Hi Demo Traveler,
+
+Winter is coming - and so is our biggest sale of the season.
+
+Book your next stay at Demo Seaside Resort and save 20% on stays between
+2026-11-15 and 2026-12-20. Use code TESTPROMO20 at checkout.
+
+Offer valid until 2026-11-30. Subject to availability.
+
+  * Sea-view double rooms from €89 per night
+  * Free breakfast for 2
+  * Free cancellation on most rooms
+
+This is a marketing email. You have not made a reservation, and nothing has
+been booked or charged.
+
+Browse rooms: https://www.example.com/deals
+
+Don't want these emails? Unsubscribe at https://www.example.com/unsubscribe
+
+Demo Reservations

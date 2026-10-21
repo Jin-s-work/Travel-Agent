@@ -1,0 +1,16 @@
+{
+  "case_id": "syn-18-en-promo-not-booking",
+  "file": "evals/mail/cases/syn-18-en-promo-not-booking.eml",
+  "language": "en",
+  "tags": [
+    "no_booking",
+    "promo"
+  ],
+  "synthetic": true,
+  "source": "synthetic:stage2",
+  "expected_bookings": [],
+  "must_review": [],
+  "forbidden": [],
+  "decoys": {},
+  "notes": "홍보 메일, 예약 없음. 프로모션 기간·숙박 가능 기간 날짜가 있지만 어떤 예측 예약도 false positive."
+}

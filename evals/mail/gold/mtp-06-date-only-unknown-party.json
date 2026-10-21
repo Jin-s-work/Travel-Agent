@@ -1,0 +1,52 @@
+{
+  "case_id": "mtp-06-date-only-unknown-party",
+  "file": "examples/mail-test-pack/06-date-only-unknown-party.eml",
+  "language": "en",
+  "tags": [
+    "tour",
+    "date_only",
+    "party_unknown",
+    "price_unknown"
+  ],
+  "synthetic": true,
+  "source": "converted:mail-test-pack",
+  "expected_bookings": [
+    {
+      "type": "tour",
+      "provider_name": "Demo Madrid Gallery",
+      "start_local": "2026-11-15",
+      "start_tz": "Europe/Madrid",
+      "end_local": null,
+      "end_tz": null,
+      "party": {
+        "adults": null,
+        "children": null
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-UNKNOWN-006",
+      "status": "confirmed",
+      "unscored": []
+    }
+  ],
+  "must_review": [
+    {
+      "booking": 0,
+      "field": "party.adults",
+      "reason": "방문 인원 pending"
+    }
+  ],
+  "forbidden": [
+    "midnight_invented"
+  ],
+  "decoys": {
+    "midnight_invented": {
+      "field": "start_local",
+      "values": [
+        "2026-11-15T00:00"
+      ]
+    }
+  },
+  "notes": "입장 시각 미배정이라 날짜만. 인원(pending)·가격(not yet quoted)은 null 채점(1명·무료로 채우면 FP). 인원 pending은 must_review(party.adults)로 확인 필요 유지 — 예측 null이면 충족이라 올바른 추출은 감점되지 않음. start_local은 날짜만이 정답이라 must_review에 넣지 않음(날짜만 낸 올바른 예측이 놓침으로 잡히는 것 방지). midnight_invented decoy '2026-11-15T00:00'은 원문 날짜에 00:00을 붙인 생성값으로, 원문에 없는 값을 decoy로 쓰는 유일한 예외 규칙(명세 예시와 같은 형태). 값 전체로 prefix 판정하므로 Date 헤더 시각과는 무관."
+}

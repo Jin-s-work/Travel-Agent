@@ -1,0 +1,23 @@
+{
+ "input_sha256": "cb6a73be9a014969ede6c6680f031f9da31642d29aefed31f7e6e8a59df0466d",
+ "label": "mtp-03-tokyo-dinner:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "4b5a43db271634df039af485bce1d87a6d29c25bd1c38d05a1267b8fd0554feb",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": null, \"provider\": \"デモ食堂 東京東口店\", \"confirmation_number\": \"TEST-DINNER-003\", \"date\": \"2026-11-07\", \"date_end\": null, \"time\": \"19:30\", \"time_end\": null, \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"2026年11月7日 19:30 Asia/Tokyo. 大人2名、子ども1名（年齢不明）。予約 TEST-DINNER-003。\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-11-07T19:30\", \"end_local\": null, \"start_timezone\": \"Asia/Tokyo\", \"end_timezone\": null, \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

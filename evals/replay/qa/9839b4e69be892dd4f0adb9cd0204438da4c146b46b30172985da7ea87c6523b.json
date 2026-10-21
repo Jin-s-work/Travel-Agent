@@ -1,0 +1,23 @@
+{
+ "input_sha256": "4648c55113f263aa8f0b1621f93b285b29f65bf2c8178ad213de53eab6824768",
+ "label": "a-cor-03:correct",
+ "prompt": {
+  "hash": "b63af1b90b7bd2c32f52f27e377c5d16cf6a97b266c2afd921b072b4b0d4b364",
+  "id": "trip_answer",
+  "version": 1
+ },
+ "request_key": "9839b4e69be892dd4f0adb9cd0204438da4c146b46b30172985da7ea87c6523b",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "호텔 주소는 東京都デモ区 4-5-6 (가상 주소)입니다.\n출처: デモ東京ホテル 本館 (예약번호 TEST-HOTEL-002)",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "handmade",
+ "synthetic": true,
+ "version": 1
+}

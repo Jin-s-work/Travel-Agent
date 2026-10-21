@@ -1,0 +1,37 @@
+From: Demo Reservations <reservations@example.com>
+To: traveler@example.com
+Subject: [TEST ONLY] Your booking TEST-HTL-EN-5001 has been cancelled
+Date: Tue, 20 Oct 2026 09:00:00 +0900
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+SYNTHETIC TEST DATA / 실제 예약이 아닙니다.
+
+Hi Demo Traveler,
+
+As requested, your reservation below has been CANCELLED. You do not need to
+do anything else. This booking is no longer active.
+
+CANCELLED RESERVATION
+------------------------------------------
+Property:          Demo Harbour Hotel
+Address:           1 Example Road, Brighton, United Kingdom
+Booking number:    TEST-HTL-EN-5001
+Check-in:          Thursday, 10 December 2026
+Check-out:         Sunday, 13 December 2026
+Room:              1 x Family room
+Guests:            2 adults, 1 child
+Status:            Cancelled
+------------------------------------------
+
+Refund: £450 will be returned to your original payment method within
+5-7 business days. No cancellation fee was charged.
+
+Changed your mind? Cancelled bookings cannot be reinstated. Please make a new
+booking at https://www.example.com.
+
+Questions? Contact support@example.com.
+
+Best regards,
+Demo Reservations

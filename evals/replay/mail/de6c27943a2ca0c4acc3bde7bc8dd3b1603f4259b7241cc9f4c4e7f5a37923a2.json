@@ -1,0 +1,23 @@
+{
+ "input_sha256": "7001cf2a08342b6b26596906ae6022770ba8ad9eca94aa21c7422480dc9eaff2",
+ "label": "syn-19-es-ampm:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "de6c27943a2ca0c4acc3bde7bc8dd3b1603f4259b7241cc9f4c4e7f5a37923a2",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": null, \"provider\": \"Demo Cantina Reforma\", \"confirmation_number\": \"TEST-RES-ES-9001\", \"date\": \"2026-11-28\", \"date_end\": null, \"time\": \"21:15\", \"time_end\": null, \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Folio:         TEST-RES-ES-9001\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-11-28T21:15\", \"end_local\": null, \"start_timezone\": \"America/Mexico_City\", \"end_timezone\": null, \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

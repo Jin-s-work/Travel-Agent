@@ -1,0 +1,23 @@
+{
+ "input_sha256": "231c2755070de27fd2af3e202fa232b9bce5f79d463d746e808b8344c7bb626d",
+ "label": "syn-13-es-change-request-pending:fault:change_as_new_confirmed:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "cc30ef9dbdf381f6e1250ed2649f2a7306112c0b14af0fcc55224a0eda14049e",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": null, \"provider\": \"Demo Asador Norte\", \"confirmation_number\": \"TEST-RES-ES-4001\", \"date\": \"2026-11-18\", \"date_end\": null, \"time\": \"15:00\", \"time_end\": null, \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Subject: [TEST ONLY] Hemos recibido tu solicitud de cambio - TEST-RES-ES-4001\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-11-18T15:00\", \"end_local\": null, \"start_timezone\": null, \"end_timezone\": null, \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "handmade_fault",
+ "synthetic": true,
+ "version": 1
+}

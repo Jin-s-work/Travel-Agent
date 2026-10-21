@@ -1,0 +1,35 @@
+{
+  "case_id": "mtp-same-name-a",
+  "file": "examples/mail-test-pack/same-name-a/reservation.eml",
+  "language": "en",
+  "tags": [
+    "restaurant",
+    "same_filename"
+  ],
+  "synthetic": true,
+  "source": "converted:mail-test-pack",
+  "expected_bookings": [
+    {
+      "type": "restaurant",
+      "provider_name": "Demo Tokyo Cafe East",
+      "start_local": "2026-11-08T10:00",
+      "start_tz": "Asia/Tokyo",
+      "end_local": null,
+      "end_tz": null,
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-SAME-A",
+      "status": "confirmed",
+      "unscored": []
+    }
+  ],
+  "must_review": [],
+  "forbidden": [],
+  "decoys": {},
+  "notes": "same-name-b와 파일명이 같지만 내용이 다른 메일(파일명 기본키 금지). 카페는 restaurant."
+}

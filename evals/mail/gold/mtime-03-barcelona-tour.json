@@ -1,0 +1,35 @@
+{
+  "case_id": "mtime-03-barcelona-tour",
+  "file": "examples/mail-time-pack/03-barcelona-tour.eml",
+  "language": "en",
+  "tags": [
+    "tour",
+    "start_end_time"
+  ],
+  "synthetic": true,
+  "source": "converted:mail-time-pack",
+  "expected_bookings": [
+    {
+      "type": "tour",
+      "provider_name": "Going Demo City Walk",
+      "start_local": "2026-11-12T10:00",
+      "start_tz": "Europe/Madrid",
+      "end_local": "2026-11-12T12:30",
+      "end_tz": "Europe/Madrid",
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-TIME-003",
+      "status": "confirmed",
+      "unscored": []
+    }
+  ],
+  "must_review": [],
+  "forbidden": [],
+  "decoys": {},
+  "notes": "바르셀로나 투어지만 원문 시간대 표기는 Europe/Madrid(바르셀로나의 IANA 시간대)이므로 그대로. 예약 정보 본문은 영어이고 한국어는 제목·안내문·'(가상 장소)'뿐이라 en(language 기준: 제목·SYNTHETIC 안내문·가상 표시는 빼고 예약 정보 본문 언어로 판정). 발신자명 Going Demo가 제공자명의 접두라 provider 포함 매칭 규칙상 발신자명을 그대로 내도 일치하므로 이 사례로는 발신자 혼동을 판정할 수 없음(발신자 혼동 검출은 발신자 Travel Demo와 겹치지 않는 mtp-* 사례가 맡음)."
+}

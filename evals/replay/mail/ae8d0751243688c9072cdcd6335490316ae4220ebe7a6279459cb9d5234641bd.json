@@ -1,0 +1,23 @@
+{
+ "input_sha256": "c86ab022151cd6937ecad7b8222aa10a32d80e814e0dd26f64b04a19fa6e6f9d",
+ "label": "syn-09-en-multi-restaurant-tour:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "ae8d0751243688c9072cdcd6335490316ae4220ebe7a6279459cb9d5234641bd",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": null, \"provider\": \"Demo Taberna Alfama\", \"confirmation_number\": \"TEST-LIS-DIN-1211\", \"date\": \"2026-12-11\", \"date_end\": null, \"time\": \"20:00\", \"time_end\": null, \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Reference: TEST-LIS-DIN-1211\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-12-11T20:00\", \"end_local\": null, \"start_timezone\": null, \"end_timezone\": null, \"location\": null}]}, {\"kind\": \"투어\", \"provider\": \"Demo Lisbon Walks\", \"confirmation_number\": \"TEST-LIS-WLK-1212\", \"date\": \"2026-12-12\", \"date_end\": \"2026-12-12\", \"time\": \"10:00\", \"time_end\": \"12:30\", \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Reference: TEST-LIS-WLK-1212\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-12-12T10:00\", \"end_local\": \"2026-12-12T12:30\", \"start_timezone\": null, \"end_timezone\": null, \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

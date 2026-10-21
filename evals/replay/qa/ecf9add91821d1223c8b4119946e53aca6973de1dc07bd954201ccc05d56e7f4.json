@@ -1,0 +1,23 @@
+{
+ "input_sha256": "0783b6cee345016b2cf02a04b5077e2698f8091ab4929d926f9fe6d820d6b176",
+ "label": "b-det-02:correct",
+ "prompt": {
+  "hash": "b63af1b90b7bd2c32f52f27e377c5d16cf6a97b266c2afd921b072b4b0d4b364",
+  "id": "trip_answer",
+  "version": 1
+ },
+ "request_key": "ecf9add91821d1223c8b4119946e53aca6973de1dc07bd954201ccc05d56e7f4",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "Museo Demo Madrid 입장권은 환불되지 않습니다(Entradas no reembolsables.).\n출처: Museo Demo Madrid (예약번호 TEST-MUSEUM-005)",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "handmade",
+ "synthetic": true,
+ "version": 1
+}

@@ -1,0 +1,35 @@
+{
+  "case_id": "mtime-01-tokyo-dinner",
+  "file": "examples/mail-time-pack/01-tokyo-dinner.eml",
+  "language": "mixed",
+  "tags": [
+    "restaurant",
+    "start_end_time"
+  ],
+  "synthetic": true,
+  "source": "converted:mail-time-pack",
+  "expected_bookings": [
+    {
+      "type": "restaurant",
+      "provider_name": "Going Demo Kitchen",
+      "start_local": "2026-11-07T18:30",
+      "start_tz": "Asia/Tokyo",
+      "end_local": "2026-11-07T20:00",
+      "end_tz": "Asia/Tokyo",
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-TIME-001",
+      "status": "confirmed",
+      "unscored": []
+    }
+  ],
+  "must_review": [],
+  "forbidden": [],
+  "decoys": {},
+  "notes": "한국어 라벨(시작 시간/종료 시간)과 영문 값 혼합. 시작·종료 현지 시각과 시간대 명시. language 기준: 제목·SYNTHETIC 안내문·가상 표시는 빼고 예약 정보 본문 언어로 판정 → 본문에 한국어 라벨이 있어 mixed. 발신자명 Going Demo가 제공자명의 접두라 provider 포함 매칭 규칙상 발신자명을 그대로 내도 일치하므로 이 사례로는 발신자 혼동을 판정할 수 없음(발신자 혼동 검출은 발신자 Travel Demo와 겹치지 않는 mtp-* 사례가 맡음)."
+}

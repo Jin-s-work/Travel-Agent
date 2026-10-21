@@ -1,0 +1,38 @@
+{
+  "case_id": "syn-08-en-ampm-tour",
+  "file": "evals/mail/cases/syn-08-en-ampm-tour.eml",
+  "language": "en",
+  "tags": [
+    "tour",
+    "am_pm"
+  ],
+  "synthetic": true,
+  "source": "synthetic:stage2",
+  "expected_bookings": [
+    {
+      "type": "tour",
+      "provider_name": "Demo City Tours NYC",
+      "start_local": "2026-12-03T19:30",
+      "start_tz": "America/New_York",
+      "end_local": "2026-12-03T22:00",
+      "end_tz": "America/New_York",
+      "party": {
+        "adults": 3,
+        "children": null
+      },
+      "amount": "135",
+      "currency": "USD",
+      "deposit": null,
+      "confirmation_code": "TEST-NYC-1203",
+      "status": "confirmed",
+      "unscored": [
+        "end_local",
+        "end_tz"
+      ]
+    }
+  ],
+  "must_review": [],
+  "forbidden": [],
+  "decoys": {},
+  "notes": "7:30 PM→19:30(AM/PM 함정은 시작 시각으로 채점). \"Ends around 10:00 PM\"은 근사 종료라 end_local=22:00 값은 기록만 하고 end_local·end_tz unscored(around=근사 종료, 비워 둔 추출기를 FN으로 깎지 않음). 07:30으로 읽으면 오답. America/New_York 명시."
+}

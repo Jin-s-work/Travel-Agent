@@ -1,0 +1,46 @@
+{
+  "case_id": "syn-05-ko-fwd-payment",
+  "file": "evals/mail/cases/syn-05-ko-fwd-payment.eml",
+  "language": "ko",
+  "tags": [
+    "tour",
+    "forwarded",
+    "payment_date"
+  ],
+  "synthetic": true,
+  "source": "synthetic:stage2",
+  "expected_bookings": [
+    {
+      "type": "tour",
+      "provider_name": "Demo 투어즈 제주",
+      "start_local": "2026-11-21T09:00",
+      "start_tz": null,
+      "end_local": "2026-11-21T13:00",
+      "end_tz": null,
+      "party": {
+        "adults": 2,
+        "children": 0
+      },
+      "amount": "136000",
+      "currency": "KRW",
+      "deposit": null,
+      "confirmation_code": "TEST-JEJU-1121",
+      "status": "confirmed",
+      "unscored": []
+    }
+  ],
+  "must_review": [],
+  "forbidden": [
+    "payment_date_as_visit"
+  ],
+  "decoys": {
+    "payment_date_as_visit": {
+      "field": "start_local",
+      "values": [
+        "2026-10-30",
+        "2026-10-19"
+      ]
+    }
+  },
+  "notes": "전달 메일. 제공자는 인용된 원 메일의 Demo 투어즈 제주(전달자 아님). 결제일 2026-10-30과 인용부 원 메일 발송일(발급일) 2026년 10월 19일은 이용일 아님→둘 다 decoy. 아동 0명 명시=0. 136,000원→KRW. IANA 이름 없음→tz null."
+}

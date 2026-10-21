@@ -1,0 +1,23 @@
+{
+ "input_sha256": "dfb7ceec676523c7de94a2400e42d67f1a10609df806d5ed87ed15c6e5754401",
+ "label": "a-ana-02:correct",
+ "prompt": {
+  "hash": "b63af1b90b7bd2c32f52f27e377c5d16cf6a97b266c2afd921b072b4b0d4b364",
+  "id": "trip_answer",
+  "version": 1
+ },
+ "request_key": "3f3761ab20493306a2b5e1fe35ff577dd205247048387b60be9fc3833e7eb137",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "Going Demo Night Walk 투어는 2026-11-08 00:30에 끝납니다.\n출처: Going Demo Night Walk (예약번호 TEST-TIME-004)",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "handmade",
+ "synthetic": true,
+ "version": 1
+}

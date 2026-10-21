@@ -1,0 +1,23 @@
+{
+ "input_sha256": "12dd43ea48e7c0e912ddd62498e51c0fd23bfeeb4465e366741dee35682fb9de",
+ "label": "syn-10-es-hotel-cancel-deadline:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "74b4c702b25193c0e0d0c77f245a38ed97a9eba3877f53642fc674b230686f26",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": \"숙소\", \"provider\": \"Demo Hotel Alameda\", \"confirmation_number\": \"TEST-HTL-ES-1001\", \"date\": \"2026-11-12\", \"date_end\": \"2026-11-15\", \"time\": null, \"time_end\": null, \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Subject: [TEST ONLY] Confirmación de reserva TEST-HTL-ES-1001 - Demo Hotel Alameda\", \"events\": [{\"event_type\": \"stay\", \"start_local\": \"2026-11-12\", \"end_local\": \"2026-11-15\", \"start_timezone\": null, \"end_timezone\": null, \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

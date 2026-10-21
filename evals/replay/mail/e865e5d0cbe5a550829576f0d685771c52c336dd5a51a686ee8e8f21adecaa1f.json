@@ -1,0 +1,23 @@
+{
+ "input_sha256": "613089d00c8ad505b34eff35e8c38b834a14511dd461416de626d9c5787a2fbb",
+ "label": "syn-02-ja-tour-cancelled:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "e865e5d0cbe5a550829576f0d685771c52c336dd5a51a686ee8e8f21adecaa1f",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": \"투어\", \"provider\": \"Demo Tours 京都\", \"confirmation_number\": \"TEST-TOUR-2207\", \"date\": \"2026-11-22\", \"date_end\": \"2026-11-22\", \"time\": \"07:30\", \"time_end\": \"10:00\", \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Subject: [TEST ONLY] 【キャンセル完了】Demo 嵐山 早朝散策ツアー TEST-TOUR-2207\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-11-22T07:30\", \"end_local\": \"2026-11-22T10:00\", \"start_timezone\": null, \"end_timezone\": null, \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

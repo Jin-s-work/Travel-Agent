@@ -1,0 +1,23 @@
+{
+ "input_sha256": "0dd19707259a69e1f00b3bee514cd713bab439f11b47608f53fad31b920fc6a9",
+ "label": "mtime-04-tokyo-night-tour:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "ef52b1d3b4d27d09c821bcc8999722c0c4b2f0f1d5a61d3d10e617bdb1833bd5",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": \"투어\", \"provider\": \"Going Demo Night Walk\", \"confirmation_number\": \"TEST-TIME-004\", \"date\": \"2026-11-07\", \"date_end\": \"2026-11-08\", \"time\": \"23:00\", \"time_end\": \"00:30\", \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Reservation: TEST-TIME-004\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-11-07T23:00\", \"end_local\": \"2026-11-08T00:30\", \"start_timezone\": \"Asia/Tokyo\", \"end_timezone\": \"Asia/Tokyo\", \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

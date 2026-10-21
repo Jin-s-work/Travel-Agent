@@ -1,0 +1,23 @@
+{
+ "input_sha256": "a0ca6fbe22c9279ec0a698f994854dab7b6644a7a87d250e52bbc346c6f238de",
+ "label": "b-un-01:correct_refusal",
+ "prompt": {
+  "hash": "b63af1b90b7bd2c32f52f27e377c5d16cf6a97b266c2afd921b072b4b0d4b364",
+  "id": "trip_answer",
+  "version": 1
+ },
+ "request_key": "69bdc012b17473bb93d99e5418da51bd1406a7aaaa7f8d84d0700db3838c9d6b",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "예약 내역에서 확인할 수 없습니다.",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "handmade",
+ "synthetic": true,
+ "version": 1
+}

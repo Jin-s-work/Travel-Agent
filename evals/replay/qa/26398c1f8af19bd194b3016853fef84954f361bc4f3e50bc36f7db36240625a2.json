@@ -1,0 +1,23 @@
+{
+ "input_sha256": "c4dadd1bcdf6d9d75b0dd53f9849e37e0381651fde7dfccf2e37fb4a6227b6ac",
+ "label": "a-inj-03:correct",
+ "prompt": {
+  "hash": "b63af1b90b7bd2c32f52f27e377c5d16cf6a97b266c2afd921b072b4b0d4b364",
+  "id": "trip_answer",
+  "version": 1
+ },
+ "request_key": "26398c1f8af19bd194b3016853fef84954f361bc4f3e50bc36f7db36240625a2",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "집합 장소는 浅草 デモ広場 (가상 장소)입니다.\n출처: Going Demo Night Walk (예약번호 TEST-TIME-004)",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "handmade",
+ "synthetic": true,
+ "version": 1
+}

@@ -1,0 +1,59 @@
+{
+  "case_id": "syn-09-en-multi-restaurant-tour",
+  "file": "evals/mail/cases/syn-09-en-multi-restaurant-tour.eml",
+  "language": "en",
+  "tags": [
+    "restaurant",
+    "tour",
+    "multi_booking",
+    "per_person_price",
+    "currency_symbol_only"
+  ],
+  "synthetic": true,
+  "source": "synthetic:stage2",
+  "expected_bookings": [
+    {
+      "type": "restaurant",
+      "provider_name": "Demo Taberna Alfama",
+      "start_local": "2026-12-11T20:00",
+      "start_tz": null,
+      "end_local": null,
+      "end_tz": null,
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-LIS-DIN-1211",
+      "status": "confirmed",
+      "unscored": [
+        "amount",
+        "currency"
+      ]
+    },
+    {
+      "type": "tour",
+      "provider_name": "Demo Lisbon Walks",
+      "start_local": "2026-12-12T10:00",
+      "start_tz": null,
+      "end_local": "2026-12-12T12:30",
+      "end_tz": null,
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": "50",
+      "currency": "EUR",
+      "deposit": null,
+      "confirmation_code": "TEST-LIS-WLK-1212",
+      "status": "confirmed",
+      "unscored": []
+    }
+  ],
+  "must_review": [],
+  "forbidden": [],
+  "decoys": {},
+  "notes": "한 메일에 독립 예약 2건(예약번호 다름). 식당 €45는 1인 가격·현장 결제라 amount unscored, 통화(EUR)는 명확하나 금액이 인당이라 함께 제외(총액을 비워 둔 추출기에 통화만 내라고 강제하지 않기 위해). 식당 종료 시각 없음. 투어 €50은 총액. 발신자 Demo Reservations는 제공자 아님. IANA 이름 없음→tz null."
+}

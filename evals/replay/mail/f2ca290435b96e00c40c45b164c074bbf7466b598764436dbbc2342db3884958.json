@@ -1,0 +1,23 @@
+{
+ "input_sha256": "54e1c8e2dc7a8a1c4b79c5adc6829eaa900d22706701eb7eb17990ed10c9e15a",
+ "label": "mtime-01-tokyo-dinner:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "f2ca290435b96e00c40c45b164c074bbf7466b598764436dbbc2342db3884958",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": null, \"provider\": \"Going Demo Kitchen\", \"confirmation_number\": \"TEST-TIME-001\", \"date\": \"2026-11-07\", \"date_end\": \"2026-11-07\", \"time\": \"18:30\", \"time_end\": \"20:00\", \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Reservation: TEST-TIME-001\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-11-07T18:30\", \"end_local\": \"2026-11-07T20:00\", \"start_timezone\": \"Asia/Tokyo\", \"end_timezone\": \"Asia/Tokyo\", \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

@@ -1,0 +1,23 @@
+{
+ "input_sha256": "b56bd8df1a8bc5b356fb89ad1875fa6df6b8c935751a84a854043086db2fd107",
+ "label": "a-det-06:correct",
+ "prompt": {
+  "hash": "b63af1b90b7bd2c32f52f27e377c5d16cf6a97b266c2afd921b072b4b0d4b364",
+  "id": "trip_answer",
+  "version": 1
+ },
+ "request_key": "7b92d39ce23c95d91a47d26c8ee1e7504b43073f9d4107607660fd1302de4ee2",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "예약금 JPY 3,000은 전날 18:00까지 취소하면 환불받을 수 있습니다.\n출처: デモ食堂 東京東口店 (예약번호 TEST-DINNER-003)",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "handmade",
+ "synthetic": true,
+ "version": 1
+}

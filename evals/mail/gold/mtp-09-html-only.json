@@ -1,0 +1,36 @@
+{
+  "case_id": "mtp-09-html-only",
+  "file": "examples/mail-test-pack/09-html-only.eml",
+  "language": "en",
+  "tags": [
+    "tour",
+    "html_only",
+    "link_placeholder"
+  ],
+  "synthetic": true,
+  "source": "converted:mail-test-pack",
+  "expected_bookings": [
+    {
+      "type": "tour",
+      "provider_name": "Demo Tokyo Gallery",
+      "start_local": "2026-11-08T14:00",
+      "start_tz": "Asia/Tokyo",
+      "end_local": null,
+      "end_tz": null,
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-HTML-009",
+      "status": "confirmed",
+      "unscored": []
+    }
+  ],
+  "must_review": [],
+  "forbidden": [],
+  "decoys": {},
+  "notes": "text/html 본문만 있는 메일(base64). 링크는 자리표시자이며 fetch 대상 아님. 종료 시각·금액 없음."
+}

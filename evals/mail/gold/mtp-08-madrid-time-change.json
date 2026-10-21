@@ -1,0 +1,56 @@
+{
+  "case_id": "mtp-08-madrid-time-change",
+  "file": "examples/mail-test-pack/08-madrid-time-change.eml",
+  "language": "en",
+  "tags": [
+    "restaurant",
+    "change_request",
+    "unconfirmed"
+  ],
+  "synthetic": true,
+  "source": "converted:mail-test-pack",
+  "expected_bookings": [
+    {
+      "type": "restaurant",
+      "provider_name": "Restaurante Demo Sol Centro",
+      "start_local": "2026-11-13T13:30",
+      "start_tz": "Europe/Madrid",
+      "end_local": null,
+      "end_tz": null,
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-MEAL-005",
+      "status": "changed",
+      "unscored": []
+    }
+  ],
+  "must_review": [
+    {
+      "booking": 0,
+      "field": "start_local",
+      "reason": "변경 요청 미확정(기존 13:30, 요청 14:00)"
+    },
+    {
+      "booking": 0,
+      "field": "status",
+      "reason": "식당 확정이 아닌 변경 요청"
+    }
+  ],
+  "forbidden": [
+    "change_as_new_confirmed"
+  ],
+  "decoys": {
+    "change_as_new_confirmed": {
+      "field": "start_local",
+      "values": [
+        "2026-11-13T14:00"
+      ]
+    }
+  },
+  "notes": "식당이 확정하지 않은 변경 요청. 기존 13:30을 유지하고 요청 시각 14:00을 확정으로 쓰면 위반. README의 사용자 교정 13:45는 앱 상태라 원문에 없어 채점 밖. 본문 영어, 제목만 스페인어 → en(language 기준: 제목·SYNTHETIC 안내문·가상 표시는 빼고 예약 정보 본문 언어로 판정)."
+}

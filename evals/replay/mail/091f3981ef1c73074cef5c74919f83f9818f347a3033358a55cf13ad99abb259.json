@@ -1,0 +1,23 @@
+{
+ "input_sha256": "3edaceb0cf6237e9ada0fff58e57aaaef52fbd076158c8af056674873adb78f4",
+ "label": "mtp-02-tokyo-hotel:fault:schema_violation_repaired:repair",
+ "prompt": {
+  "hash": "78705da6d4c1cd486ef36b88ba0c26724520089ab7a35b5f517a50293497c4e9",
+  "id": "mail_extraction_repair",
+  "version": 1
+ },
+ "request_key": "091f3981ef1c73074cef5c74919f83f9818f347a3033358a55cf13ad99abb259",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": \"숙소\", \"provider\": \"デモ東京ホテル 本館\", \"confirmation_number\": \"TEST-HOTEL-002\", \"date\": \"2026-11-06\", \"date_end\": \"2026-11-09\", \"time\": \"15:00\", \"time_end\": \"11:00\", \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"施設: デモ東京ホテル 本館 (架空施設). 予約番号 TEST-HOTEL-002.\", \"events\": [{\"event_type\": \"stay\", \"start_local\": \"2026-11-06T15:00\", \"end_local\": \"2026-11-09T11:00\", \"start_timezone\": \"Asia/Tokyo\", \"end_timezone\": \"Asia/Tokyo\", \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "handmade_fault",
+ "synthetic": true,
+ "version": 1
+}

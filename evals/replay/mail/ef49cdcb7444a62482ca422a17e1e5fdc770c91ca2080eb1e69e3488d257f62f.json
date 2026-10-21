@@ -1,0 +1,23 @@
+{
+ "input_sha256": "8b917002193c272c75fedb93a74e536c675df6b1448fede43f71bac2a2e0bc7b",
+ "label": "mtp-same-name-b:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "ef49cdcb7444a62482ca422a17e1e5fdc770c91ca2080eb1e69e3488d257f62f",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": null, \"provider\": \"Demo Madrid Cafe West\", \"confirmation_number\": \"TEST-SAME-B\", \"date\": \"2026-11-15\", \"date_end\": null, \"time\": \"10:00\", \"time_end\": null, \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Demo Madrid Cafe West (fictional). 2026-11-15 10:00 Europe/Madrid, 2 adults. Reference TEST-SAME-B.\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-11-15T10:00\", \"end_local\": null, \"start_timezone\": \"Europe/Madrid\", \"end_timezone\": null, \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

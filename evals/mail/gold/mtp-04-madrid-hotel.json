@@ -1,0 +1,38 @@
+{
+  "case_id": "mtp-04-madrid-hotel",
+  "file": "examples/mail-test-pack/04-madrid-hotel.eml",
+  "language": "es",
+  "tags": [
+    "stay",
+    "check_in_out",
+    "multi_night",
+    "total_price",
+    "city_confusion"
+  ],
+  "synthetic": true,
+  "source": "converted:mail-test-pack",
+  "expected_bookings": [
+    {
+      "type": "stay",
+      "provider_name": "Hotel Demo Madrid Centro",
+      "start_local": "2026-11-12T15:00",
+      "start_tz": "Europe/Madrid",
+      "end_local": "2026-11-16T11:00",
+      "end_tz": "Europe/Madrid",
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": "480",
+      "currency": "EUR",
+      "deposit": null,
+      "confirmation_code": "TEST-MAD-004",
+      "status": "confirmed",
+      "unscored": []
+    }
+  ],
+  "must_review": [],
+  "forbidden": [],
+  "decoys": {},
+  "notes": "Madrid를 Barcelona로 치환하면 안 되지만 둘 다 Europe/Madrid라 시간대 decoy로 판정할 수 없어 forbidden에 넣지 않음(사람 확인용 메모). Precio total EUR 480이 총액."
+}

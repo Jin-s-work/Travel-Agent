@@ -1,0 +1,33 @@
+From: Demo Reservations <reservations@example.com>
+To: traveler@example.com
+Subject: [TEST ONLY] Hemos recibido tu solicitud de cambio - TEST-RES-ES-4001
+Date: Tue, 20 Oct 2026 09:00:00 +0900
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+SYNTHETIC TEST DATA / 실제 예약이 아닙니다.
+
+Hola, Viajero Demo:
+
+Hemos recibido tu solicitud para cambiar la hora de tu reserva en
+Demo Asador Norte. El restaurante todavía NO ha confirmado el cambio.
+
+RESERVA ACTUAL (confirmada)
+  Restaurante:  Demo Asador Norte, Calle Ejemplo 30, Bilbao
+  Código:       TEST-RES-ES-4001
+  Fecha:        miércoles, 18 de noviembre de 2026
+  Hora:         13:00
+  Comensales:   2 adultos
+
+CAMBIO SOLICITADO (pendiente)
+  Nueva hora solicitada: 15:00 (mismo día)
+
+Mientras el restaurante no responda, tu reserva sigue siendo a las 13:00.
+Te enviaremos otro correo cuando acepten o rechacen el cambio.
+
+Si quieres cancelar, hazlo desde https://www.example.com/reservas o escribe
+a ayuda@example.com.
+
+Un saludo,
+Demo Reservations

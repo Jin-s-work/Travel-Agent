@@ -1,0 +1,23 @@
+{
+ "input_sha256": "66670f7acebc28aae6c3dcb19e2e180e34d84c66902d86272f7c03e990287136",
+ "label": "syn-14-en-hotel-cancelled:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "bda3c1b930b4b6d47710d7dd56da7d3e5c1c55955ec1fce17dbb190b187611c9",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": \"숙소\", \"provider\": \"Demo Harbour Hotel\", \"confirmation_number\": \"TEST-HTL-EN-5001\", \"date\": \"2026-12-10\", \"date_end\": \"2026-12-13\", \"time\": null, \"time_end\": null, \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Subject: [TEST ONLY] Your booking TEST-HTL-EN-5001 has been cancelled\", \"events\": [{\"event_type\": \"stay\", \"start_local\": \"2026-12-10\", \"end_local\": \"2026-12-13\", \"start_timezone\": null, \"end_timezone\": null, \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

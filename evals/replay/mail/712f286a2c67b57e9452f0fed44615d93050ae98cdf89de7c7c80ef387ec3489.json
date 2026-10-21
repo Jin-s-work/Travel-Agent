@@ -1,0 +1,23 @@
+{
+ "input_sha256": "e7551c0118cbfa75797a393c5c4c246dc41e73a3c07347925fb428e40ecae2b0",
+ "label": "syn-01-ja-ryokan-payment-date:fault:payment_date_as_visit:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "712f286a2c67b57e9452f0fed44615d93050ae98cdf89de7c7c80ef387ec3489",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": \"숙소\", \"provider\": \"Demo旅館 山水閣\", \"confirmation_number\": \"TEST-RYO-0128\", \"date\": \"2026-10-28\", \"date_end\": \"2026-11-21\", \"time\": \"15:00\", \"time_end\": \"10:00\", \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Subject: [TEST ONLY] ご予約確定のお知らせ（Demo旅館 山水閣）TEST-RYO-0128\", \"events\": [{\"event_type\": \"stay\", \"start_local\": \"2026-10-28T15:00\", \"end_local\": \"2026-11-21T10:00\", \"start_timezone\": null, \"end_timezone\": null, \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "handmade_fault",
+ "synthetic": true,
+ "version": 1
+}

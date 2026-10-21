@@ -1,0 +1,23 @@
+{
+ "input_sha256": "38b2e5e2069fe9da1d8967bf690db3a28c14ecd37b55469c66adaa5f9f745ecd",
+ "label": "mtime-02-tokyo-hotel:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "126e92c52fa41ea45c4f61fe2c27b80c47804b170b65df68f8a138a21467bde2",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": \"숙소\", \"provider\": \"Going Demo Hotel\", \"confirmation_number\": \"TEST-TIME-002\", \"date\": \"2026-11-06\", \"date_end\": \"2026-11-09\", \"time\": \"15:00\", \"time_end\": \"11:00\", \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Reservation: TEST-TIME-002\", \"events\": [{\"event_type\": \"stay\", \"start_local\": \"2026-11-06T15:00\", \"end_local\": \"2026-11-09T11:00\", \"start_timezone\": \"Asia/Tokyo\", \"end_timezone\": \"Asia/Tokyo\", \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

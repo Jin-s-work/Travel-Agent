@@ -1,0 +1,23 @@
+{
+ "input_sha256": "bc73c6800543837b8232e2bdd521fba31f3811a79a1aa48896e644dca2e16482",
+ "label": "syn-12-es-flight-fwd:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "c2ad43ccf7907c35ef8bdded21b2891b829a1f98785ff1d284fc4b6383a884e3",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": \"항공\", \"provider\": \"Demo Air Sur\", \"confirmation_number\": \"TEST-ZZ-3001\", \"date\": \"2026-12-03\", \"date_end\": \"2026-12-03\", \"time\": \"07:45\", \"time_end\": \"08:10\", \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Asunto: Confirmación de reserva TEST-ZZ-3001\", \"events\": [{\"event_type\": \"flight\", \"start_local\": \"2026-12-03T07:45\", \"end_local\": \"2026-12-03T08:10\", \"start_timezone\": null, \"end_timezone\": null, \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

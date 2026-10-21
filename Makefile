@@ -52,7 +52,7 @@ PG_PLUGIN_TESTS = tests/test_foundation_auth.py tests/test_foundation_api.py tes
 # These build their own PostgreSQL schema and must run without the plugin.
 PG_SELF_TESTS = tests/test_cloud_storage.py tests/test_postgres_migration_concurrency.py
 
-ci: ci-safety ci-assets ci-js ci-python ci-postgres
+ci: ci-safety ci-assets ci-js ci-python ci-postgres ci-eval
 
 # The SQLite suite never sees the DSN; PostgreSQL suites run only in ci-postgres.
 ci-python:
@@ -85,3 +85,24 @@ e2e:
 # Same run, also saving synthetic-data screenshots as evidence in the stage 1 report folder.
 e2e-evidence:
 	GOING_E2E_SCREENSHOTS=docs/service-v6/reports/e2e $(MAKE) e2e
+
+# --- v6 evaluation gate (synthetic gold set; no key, no paid call, no network) ---
+# local = rule parser, replay = real parser path on hand-made records (pipeline test, not
+# model quality). Results go to git-ignored data/eval_runs/ci, then src.evals.gate compares
+# them with evals/thresholds.json. Live evaluation is never run here (see evals/mail/README.md).
+.PHONY: ci-eval
+EVAL_OUT ?= data/eval_runs/ci
+EVAL_ENV = TRAVEL_TEST_POSTGRES_DSN= $(CI_ENV)
+ci-eval:
+	@mkdir -p $(EVAL_OUT)
+	$(EVAL_ENV) $(PYTHON) -m src.evals.mail --mode local --out $(EVAL_OUT)/mail-local.json
+	$(EVAL_ENV) $(PYTHON) -m src.evals.mail --mode replay --out $(EVAL_OUT)/mail-replay.json
+	@# Trip agent safety: scripted replay (scenario+step, source handmade) on a temporary synthetic world.
+	$(EVAL_ENV) $(PYTHON) -m src.evals.agent --mode replay --out $(EVAL_OUT)/agent-replay.json
+	@# Question set (qa_v1): required by the gate (thresholds qa_local/qa_replay required: true).
+	$(EVAL_ENV) $(PYTHON) -m src.evals.qa --mode local --out $(EVAL_OUT)/qa-local.json
+	$(EVAL_ENV) $(PYTHON) -m src.evals.qa --mode replay --out $(EVAL_OUT)/qa-replay.json
+	$(EVAL_ENV) $(PYTHON) -m src.evals.gate --thresholds evals/thresholds.json \
+		--mail-local $(EVAL_OUT)/mail-local.json --mail-replay $(EVAL_OUT)/mail-replay.json \
+		--qa-local $(EVAL_OUT)/qa-local.json --qa-replay $(EVAL_OUT)/qa-replay.json \
+		--agent-replay $(EVAL_OUT)/agent-replay.json

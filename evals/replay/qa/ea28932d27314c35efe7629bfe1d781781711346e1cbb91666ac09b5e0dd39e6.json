@@ -1,0 +1,23 @@
+{
+ "input_sha256": "be146af4ee81757380473250987baf134953a080065a4a852c8f45a664c5d5ca",
+ "label": "a-cor-01:superseded_original_time",
+ "prompt": {
+  "hash": "b63af1b90b7bd2c32f52f27e377c5d16cf6a97b266c2afd921b072b4b0d4b364",
+  "id": "trip_answer",
+  "version": 1
+ },
+ "request_key": "ea28932d27314c35efe7629bfe1d781781711346e1cbb91666ac09b5e0dd39e6",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "デモ食堂 東京東口店 저녁 예약은 2026-11-07 19:30입니다.\n출처: デモ食堂 東京東口店 (예약번호 TEST-DINNER-003)",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "handmade_fault",
+ "synthetic": true,
+ "version": 1
+}

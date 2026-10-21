@@ -1,0 +1,44 @@
+{
+  "case_id": "syn-17-en-deposit-only",
+  "file": "evals/mail/cases/syn-17-en-deposit-only.eml",
+  "language": "en",
+  "tags": [
+    "restaurant",
+    "deposit"
+  ],
+  "synthetic": true,
+  "source": "synthetic:stage2",
+  "expected_bookings": [
+    {
+      "type": "restaurant",
+      "provider_name": "Demo Bistro Lumiere",
+      "start_local": "2026-12-05T20:00",
+      "start_tz": null,
+      "end_local": null,
+      "end_tz": null,
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": null,
+      "currency": "EUR",
+      "deposit": "50",
+      "confirmation_code": "TEST-RES-EN-8001",
+      "status": "confirmed",
+      "unscored": []
+    }
+  ],
+  "must_review": [],
+  "forbidden": [
+    "deposit_as_total"
+  ],
+  "decoys": {
+    "deposit_as_total": {
+      "field": "amount",
+      "values": [
+        "50"
+      ]
+    }
+  },
+  "notes": "€50은 보증금이고 최종 금액은 현장 결제라 총액 없음(amount null). currency는 보증금 통화. IANA 이름 없음 → tz null."
+}

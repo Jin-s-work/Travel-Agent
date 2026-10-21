@@ -1,0 +1,23 @@
+{
+ "input_sha256": "ec8db45d4a9925a1a392b1dd46435b7d5ace6fe9eb202b3c6b6385da9d88f909",
+ "label": "syn-17-en-deposit-only:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "e63c9f4a52d3168b90325c9d949af83d1666f0f87e886212f3ada36f0e1015c5",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": null, \"provider\": \"Demo Bistro Lumiere\", \"confirmation_number\": \"TEST-RES-EN-8001\", \"date\": \"2026-12-05\", \"date_end\": null, \"time\": \"20:00\", \"time_end\": null, \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Subject: [TEST ONLY] Table confirmed at Demo Bistro Lumiere - TEST-RES-EN-8001\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-12-05T20:00\", \"end_local\": null, \"start_timezone\": null, \"end_timezone\": null, \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

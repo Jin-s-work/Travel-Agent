@@ -1,0 +1,23 @@
+{
+ "input_sha256": "ad7e5a6cc194aeea1ddd4d1f7ce1953bd2cd5b5c3ea01186372277c9938c99a9",
+ "label": "mtp-09-html-only:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "490ab91a4f934133baf1c0d28b0a2d530113c6ad0aeee56141f9bc08b6b3255f",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": \"투어\", \"provider\": \"Demo Tokyo Gallery\", \"confirmation_number\": \"TEST-HTML-009\", \"date\": \"2026-11-08\", \"date_end\": null, \"time\": \"14:00\", \"time_end\": null, \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Demo Tokyo Gallery. 2026-11-08 14:00 Asia/Tokyo. 2 adults. Reference TEST-HTML-009. Link is a placeholder and must not be fetched automatically.\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-11-08T14:00\", \"end_local\": null, \"start_timezone\": \"Asia/Tokyo\", \"end_timezone\": null, \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

@@ -1,0 +1,44 @@
+{
+  "case_id": "mtp-10-dst-ambiguous-madrid",
+  "file": "examples/mail-test-pack/10-dst-ambiguous-madrid.eml",
+  "language": "en",
+  "tags": [
+    "tour",
+    "dst_ambiguous",
+    "timezone"
+  ],
+  "synthetic": true,
+  "source": "converted:mail-test-pack",
+  "expected_bookings": [
+    {
+      "type": "tour",
+      "provider_name": "Demo Madrid night visit",
+      "start_local": "2026-10-25T02:30",
+      "start_tz": "Europe/Madrid",
+      "end_local": null,
+      "end_tz": null,
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-DST-010",
+      "status": "confirmed",
+      "unscored": [
+        "provider_name"
+      ]
+    }
+  ],
+  "must_review": [
+    {
+      "booking": 0,
+      "field": "start_local",
+      "reason": "DST 중복 시각, offset 미제공"
+    }
+  ],
+  "forbidden": [],
+  "decoys": {},
+  "notes": "Europe/Madrid 2026-10-25 02:30은 서머타임 종료로 두 번 존재하는 시각이며 원문에 offset·회차 없음. 현지 시각은 원문대로, UTC 확정 금지라 확인 필요로 남아야 함. 원문에 업체명 없이 활동명(Demo Madrid night visit)만 있어 provider_name은 참고값으로 두고 unscored. 본문 영어, 제목만 스페인어 → en(language 기준: 제목·SYNTHETIC 안내문·가상 표시는 빼고 예약 정보 본문 언어로 판정)."
+}

@@ -1,0 +1,23 @@
+{
+ "input_sha256": "7ddb3b6df0d5b264f48a74ffb2d3d5303a0c77a277b5b40eaad690c830e84e3d",
+ "label": "a-ana-01:correct",
+ "prompt": {
+  "hash": "b63af1b90b7bd2c32f52f27e377c5d16cf6a97b266c2afd921b072b4b0d4b364",
+  "id": "trip_answer",
+  "version": 1
+ },
+ "request_key": "67d52995b111e8440a517cd7e2aca06b02c6420f22da3264ed039dd7ed40a544",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "デモ東京ホテル 本館 체크아웃은 2026-11-09 11:00입니다.\n출처: デモ東京ホテル 本館 (예약번호 TEST-HOTEL-002)",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "handmade",
+ "synthetic": true,
+ "version": 1
+}

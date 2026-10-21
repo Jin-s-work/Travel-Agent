@@ -1,0 +1,44 @@
+{
+  "case_id": "syn-02-ja-tour-cancelled",
+  "file": "evals/mail/cases/syn-02-ja-tour-cancelled.eml",
+  "language": "ja",
+  "tags": [
+    "tour",
+    "cancellation"
+  ],
+  "synthetic": true,
+  "source": "synthetic:stage2",
+  "expected_bookings": [
+    {
+      "type": "tour",
+      "provider_name": "Demo Tours 京都",
+      "start_local": "2026-11-22T07:30",
+      "start_tz": null,
+      "end_local": "2026-11-22T10:00",
+      "end_tz": null,
+      "party": {
+        "adults": 2,
+        "children": 1
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-TOUR-2207",
+      "status": "cancelled",
+      "unscored": []
+    }
+  ],
+  "must_review": [],
+  "forbidden": [
+    "cancelled_as_active"
+  ],
+  "decoys": {
+    "cancelled_as_active": {
+      "field": "status",
+      "values": [
+        "confirmed"
+      ]
+    }
+  },
+  "notes": "キャンセル完了 메일. 원문의 \"変更前：予約確定\"이 함정. キャンセル料 없음·사전결제 없음이라 금액 필드는 null. IANA 이름 없음→tz null."
+}

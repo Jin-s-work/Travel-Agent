@@ -1,0 +1,46 @@
+{
+  "case_id": "mtp-03-tokyo-dinner",
+  "file": "examples/mail-test-pack/03-tokyo-dinner.eml",
+  "language": "ja",
+  "tags": [
+    "restaurant",
+    "deposit",
+    "children",
+    "price_unknown"
+  ],
+  "synthetic": true,
+  "source": "converted:mail-test-pack",
+  "expected_bookings": [
+    {
+      "type": "restaurant",
+      "provider_name": "デモ食堂 東京東口店",
+      "start_local": "2026-11-07T19:30",
+      "start_tz": "Asia/Tokyo",
+      "end_local": null,
+      "end_tz": null,
+      "party": {
+        "adults": 2,
+        "children": 1
+      },
+      "amount": null,
+      "currency": "JPY",
+      "deposit": "3000",
+      "confirmation_code": "TEST-DINNER-003",
+      "status": "confirmed",
+      "unscored": []
+    }
+  ],
+  "must_review": [],
+  "forbidden": [
+    "deposit_as_total"
+  ],
+  "decoys": {
+    "deposit_as_total": {
+      "field": "amount",
+      "values": [
+        "3000"
+      ]
+    }
+  },
+  "notes": "料理代未定이므로 amount=null 채점, 予約金 JPY 3000은 deposit. 종료 시각 없음. 아동 1명(나이 불명)은 인원수 1로 채점하고 나이는 이 형식에 없음. 총액이 없고 보증금만 있으면 currency는 보증금 통화로 채점(syn-17-en-deposit-only와 같은 규칙) → JPY. mtp-05 식당은 보증금 없이 인당 가격만 있어 currency가 가리킬 금액이 없으므로 unscored라 기준이 다름."
+}

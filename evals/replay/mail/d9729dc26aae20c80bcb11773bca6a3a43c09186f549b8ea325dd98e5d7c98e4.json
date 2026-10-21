@@ -1,0 +1,23 @@
+{
+ "input_sha256": "c576122e6378396e0e28c7558617ec22bcc03111315d67311c7aeb58166c09b5",
+ "label": "mtp-06-date-only-unknown-party:fault:repair_failed:repair",
+ "prompt": {
+  "hash": "78705da6d4c1cd486ef36b88ba0c26724520089ab7a35b5f517a50293497c4e9",
+  "id": "mail_extraction_repair",
+  "version": 1
+ },
+ "request_key": "d9729dc26aae20c80bcb11773bca6a3a43c09186f549b8ea325dd98e5d7c98e4",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": \"투어\", \"provider\": \"Demo Madrid Gallery\", \"confirmation_number\": \"TEST-UNKNOWN-006\", \"date\": \"2026-11-15\", \"date_end\": null, \"time\": null, \"time_end\": null, \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"summary: synthetic tour booking (not in the mail)\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-11-15\", \"end_local\": null, \"start_timezone\": \"Europe/Madrid\", \"end_timezone\": null, \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "handmade_fault",
+ "synthetic": true,
+ "version": 1
+}

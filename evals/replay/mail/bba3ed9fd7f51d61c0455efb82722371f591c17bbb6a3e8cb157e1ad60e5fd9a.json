@@ -1,0 +1,23 @@
+{
+ "input_sha256": "e25cd0c5e0c3d77533bbe995db12133281877756b98bef24084efa10ab069e00",
+ "label": "syn-11-es-multi-restaurant-tour:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "bba3ed9fd7f51d61c0455efb82722371f591c17bbb6a3e8cb157e1ad60e5fd9a",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": null, \"provider\": \"Demo Taberna del Puerto\", \"confirmation_number\": \"TEST-RES-ES-2001\", \"date\": \"2026-11-20\", \"date_end\": null, \"time\": \"21:00\", \"time_end\": null, \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Código:             TEST-RES-ES-2001\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-11-20T21:00\", \"end_local\": null, \"start_timezone\": \"Europe/Madrid\", \"end_timezone\": null, \"location\": null}]}, {\"kind\": \"투어\", \"provider\": \"Demo Rutas Valencia\", \"confirmation_number\": \"TEST-TOUR-ES-2002\", \"date\": \"2026-11-21\", \"date_end\": \"2026-11-21\", \"time\": \"10:30\", \"time_end\": \"13:00\", \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Código:             TEST-TOUR-ES-2002\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-11-21T10:30\", \"end_local\": \"2026-11-21T13:00\", \"start_timezone\": \"Europe/Madrid\", \"end_timezone\": \"Europe/Madrid\", \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

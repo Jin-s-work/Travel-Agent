@@ -1,0 +1,32 @@
+From: Demo Reservations <reservations@example.com>
+To: traveler@example.com
+Subject: [TEST ONLY] Reservación confirmada en Demo Cantina Reforma
+Date: Tue, 20 Oct 2026 09:00:00 +0900
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+SYNTHETIC TEST DATA / 실제 예약이 아닙니다.
+
+¡Hola, Viajero Demo!
+
+Tu reservación quedó confirmada. Te esperamos el sábado 28 de noviembre de 2026
+a las 9:15 p. m. en Demo Cantina Reforma.
+
+DETALLES DE TU RESERVACIÓN
+------------------------------------------
+Restaurante:   Demo Cantina Reforma
+Dirección:     Avenida Ejemplo 400, Ciudad de México
+Fecha:         sábado, 28 de noviembre de 2026
+Hora:          9:15 p. m. (hora del centro, America/Mexico_City)
+Personas:      6 (4 adultos y 2 niños)
+Folio:         TEST-RES-ES-9001
+------------------------------------------
+
+Te enviaremos un recordatorio por correo a las 10:00 a. m. del día de tu
+reservación. Tenemos una tolerancia de 15 minutos; después, la mesa se libera.
+
+Para cancelar o modificar, escríbenos a ayuda@example.com.
+
+¡Buen provecho!
+Demo Reservations

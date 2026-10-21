@@ -1,0 +1,23 @@
+{
+ "input_sha256": "28a84aa1ffa097a809ffd0c7c380d250cf76ba479d1966c6415535e4dee832f7",
+ "label": "syn-06-ko-midnight-cruise:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "86bfacc047402da41454b94d721b879564af380572c4838dce05ec83661062de",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": \"투어\", \"provider\": \"Demo 크루즈 부산\", \"confirmation_number\": \"TEST-CRZ-2230\", \"date\": \"2026-11-21\", \"date_end\": \"2026-11-22\", \"time\": \"22:30\", \"time_end\": \"01:00\", \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Subject: [TEST ONLY] [Demo 크루즈 부산] 심야 야경 크루즈 예약 확정 (TEST-CRZ-2230)\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-11-21T22:30\", \"end_local\": \"2026-11-22T01:00\", \"start_timezone\": \"Asia/Seoul\", \"end_timezone\": \"Asia/Seoul\", \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

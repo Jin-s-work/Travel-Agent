@@ -1,0 +1,23 @@
+{
+ "input_sha256": "4e39c437bcba149ccccef01407d76aae76768a39c3bc46128280ad7f3ae0ac7a",
+ "label": "syn-05-ko-fwd-payment:oracle:first",
+ "prompt": {
+  "hash": "c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba",
+  "id": "mail_document_extraction",
+  "version": 1
+ },
+ "request_key": "0378b9b13e9fef90e58c38f8de9192cea77690a8d8f9bd82651e062e17cf5013",
+ "response": {
+  "finish": "stop",
+  "refusal": null,
+  "text": "{\"reservations\": [{\"kind\": \"투어\", \"provider\": \"Demo 투어즈 제주\", \"confirmation_number\": \"TEST-JEJU-1121\", \"date\": \"2026-11-21\", \"date_end\": \"2026-11-21\", \"time\": \"09:00\", \"time_end\": \"13:00\", \"location\": null, \"refund_policy\": null, \"raw_snippet\": \"Subject: [TEST ONLY] Fwd: [Demo 투어즈 제주] 예약 확정 안내 (TEST-JEJU-1121)\", \"events\": [{\"event_type\": \"activity\", \"start_local\": \"2026-11-21T09:00\", \"end_local\": \"2026-11-21T13:00\", \"start_timezone\": null, \"end_timezone\": null, \"location\": null}]}]}",
+  "tool_calls": [],
+  "usage": {
+   "input_tokens": 0,
+   "output_tokens": 0
+  }
+ },
+ "source": "gold_oracle",
+ "synthetic": true,
+ "version": 1
+}

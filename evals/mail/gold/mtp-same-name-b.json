@@ -1,0 +1,35 @@
+{
+  "case_id": "mtp-same-name-b",
+  "file": "examples/mail-test-pack/same-name-b/reservation.eml",
+  "language": "en",
+  "tags": [
+    "restaurant",
+    "same_filename"
+  ],
+  "synthetic": true,
+  "source": "converted:mail-test-pack",
+  "expected_bookings": [
+    {
+      "type": "restaurant",
+      "provider_name": "Demo Madrid Cafe West",
+      "start_local": "2026-11-15T10:00",
+      "start_tz": "Europe/Madrid",
+      "end_local": null,
+      "end_tz": null,
+      "party": {
+        "adults": 2,
+        "children": null
+      },
+      "amount": null,
+      "currency": null,
+      "deposit": null,
+      "confirmation_code": "TEST-SAME-B",
+      "status": "confirmed",
+      "unscored": []
+    }
+  ],
+  "must_review": [],
+  "forbidden": [],
+  "decoys": {},
+  "notes": "same-name-a와 파일명이 같지만 내용이 다른 메일(동시 보존). 카페는 restaurant."
+}
