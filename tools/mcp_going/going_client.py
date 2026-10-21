@@ -20,10 +20,10 @@ DEFAULT_TIMEOUT = 30.0
 # POST /ask can run the paid trip agent: a step may start just before its 25 s
 # deadline and the provider call itself may take up to 45 s (openai_adapter),
 # plus the router, tools and grounding. 120 s covers that chat path so a slow
-# answer is not reported as "app not running" while it is still billed. It is
-# not a hard upper bound of the server: search_mail's embedding runs in its own
-# provider scope without the agent deadline (45 s per attempt, up to 3 attempts
-# on 429), so an answer can still outlast it — hence ASK_TIMEOUT, not NETWORK_ERROR.
+# answer is not reported as "app not running" while it is still billed.
+# search_mail's embedding now inherits the agent deadline (no new send or retry
+# after 25 s), so the worst case is one call started just before it. 120 s is
+# still not enforced by the server — hence ASK_TIMEOUT, not NETWORK_ERROR.
 ASK_TIMEOUT = 120.0
 API_PREFIX = '/api/v2'
 

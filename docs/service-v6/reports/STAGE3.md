@@ -307,7 +307,7 @@ E06 fixture(`scripts/stage3_agent_fixture.py`)는 가짜 모델을 쓰고, 서�
 | 경계 | 내용 | 지금 상태 |
 | --- | --- | --- |
 | 비용 상한 장부 초과 (B3 뒤) | 429 재시도가 있으면 `pending_reconciliation` 행의 예상비용까지 장부에 잡혀 장부상 합계가 상한을 넘을 수 있다 | 합성 재현: 상한 25000, 장부 31020, 실제 확정 10340 |
-| `search_mail` 과 deadline | 임베딩은 에이전트 deadline(25초)에 묶이지 않는다(시도당 45초, 429면 최대 3회) | MCP `ask` 120초도 엄밀한 상한이 아니다 |
+| `search_mail` 과 deadline | 임베딩은 에이전트 deadline(25초)에 묶이지 않는다(시도당 45초, 429면 최대 3회) | MCP `ask` 120초도 엄밀한 상한이 아니다 (후속: 임베딩이 deadline 을 이어받도록 수정 — `IMPLEMENTATION_STATUS.md`) |
 | `provider_stopped` 평가 | B1 뒤 1단계 이후 chat 공급자 오류가 HTTP 오류에서 200 부분 답변으로 바뀌었다 | `evals/agent/scenarios.json` 에 시나리오 0개, 단위 시험만 (후속: `ps-01~03` 추가로 해소) |
 | 전송·정산 뒤 오류 | `parse_embed` 실패처럼 과금이 확정된 뒤의 오류 | 루프를 멈추지 않고 도구 오류로 남는다 |
 
@@ -320,7 +320,7 @@ E06 fixture(`scripts/stage3_agent_fixture.py`)는 가짜 모델을 쓰고, 서�
 - 하노이 기준 좌표 데이터(`public_places.CENTERS`)의 시간대가 `Asia/Bangkok`이다. 날씨는 여행 도시 시간대를 먼저 써서 영향이 없지만, 데이터 수정은 4단계 소관이다.
 - 200% 글자 크기에서 하단 메뉴 글자가 겹친다(기존 레이아웃, 카드와 무관).
 - 질문당 비용 상한은 장부 기준으로 넘을 수 있다. 429 재시도가 있으면 `pending_reconciliation` 행의 예상비용까지 합산되기 때문이다(합성 재현: 상한 25000, 장부 31020, 실제 확정 10340).
-- `search_mail` 임베딩은 에이전트 deadline(25초)에 묶이지 않는다(시도당 45초, 429면 최대 3회). 그래서 MCP `ask` 120초도 엄밀한 상한이 아니다.
+- `search_mail` 임베딩은 에이전트 deadline(25초)에 묶이지 않는다(시도당 45초, 429면 최대 3회). 그래서 MCP `ask` 120초도 엄밀한 상한이 아니다(후속: 같은 날 임베딩이 바깥 deadline 을 이어받도록 고쳐, 25초 뒤 새 전송·재시도는 없다).
 - 1단계 이후 chat 공급자 오류는 HTTP 오류가 아니라 200 부분 답변(`provider_stopped`)이다. `evals/agent/scenarios.json` 에 이 종료 사유 시나리오는 0개이고 단위 시험만 있다(후속: 같은 날 `ps-01~03` 추가로 해소).
 - 전송·정산이 끝난 뒤의 오류(`parse_embed` 실패 등)는 과금이 확정된 것이라 루프를 멈추지 않고 도구 오류로 모델에 돌아간다.
 

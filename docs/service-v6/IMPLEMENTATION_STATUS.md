@@ -7,7 +7,7 @@
 **세 줄 요약**
 
 - 1단계(보존·CI·E2E·결함)는 로컬 커밋까지 끝났다. 2단계는 합성 정답셋 35건·벤더 중립 어댑터(OpenAI 바이트 동일·Replay·Anthropic 가짜 시험)·수리 1회와 폴백·근거 검증 답변·`llm_calls` 계측·`make ci-eval` 게이트를 만들었다.
-- 3단계는 읽기·미리보기·초안만 쓰는 tool-calling 에이전트(도구 10개, 상한 5단계·8호출·25초 — search_mail 임베딩은 25초 밖, 「다음 실행 조건」)·날씨·Plan B 개선·질문 화면 카드·E06·개인 토큰·로컬 MCP를 만들었다. 운영 기본값은 에이전트·날씨·토큰 모두 OFF다.
+- 3단계는 읽기·미리보기·초안만 쓰는 tool-calling 에이전트(도구 10개, 상한 5단계·8호출·25초 — search_mail 임베딩도 25초 deadline을 이어받음(후속))·날씨·Plan B 개선·질문 화면 카드·E06·개인 토큰·로컬 MCP를 만들었다. 운영 기본값은 에이전트·날씨·토큰 모두 OFF다.
 - 4단계는 영업시간 파서·볼거리·블라인드 라벨 CLI·pooled 평가·피드백 루프·리뷰 파일럿 준비까지 했고 **사람 라벨을 기다린다.** 모든 평가 숫자는 synthetic이며 live 평가·운영 DB 읽기·라벨은 대표가 실행한다. 최종 리뷰 지적 23건을 처리한 뒤 전체 시험은 실패 0이고, PostgreSQL 시험은 미실행이다.
 
 ## 단일 최신 상태
@@ -38,7 +38,7 @@
 | 3-C·F 미리보기 카드 | 질문 화면 카드 · 확인 범위 줄 | JS 시험 · 질문 전후 일정 불변 | E06·E06b·E06c·E06d 통과(합성) | 해당 없음 | 미배포 |
 | 3-D 날씨 · Plan B | Open-Meteo(도시 공개 좌표) · 점수·거리 정렬 · `indoor_likely` | 가짜 fetcher 시험 · Plan B 회귀 · 날씨 32 · Plan B 11 | CC BY 4.0 링크 | Open-Meteo 실호출 0 | 미배포, 운영 `WEATHER_ENABLED=0` |
 | 3-E 안전 평가 | `evals/agent/` 53 시나리오(후속 `ps-01~03` 포함) · `ci-eval` 게이트 | 금지 도구 실행(시도 12)·무단 적용·노출·주입(텍스트·링크 포함)·근거 없는 원자·단언 실패 0, 평균 2.708단계 (replay, 손으로 쓴 스크립트) · 시험 36 | 해당 없음 | live 미실행 | 해당 없음 |
-| 3-G 개인 토큰 · MCP | hash 저장 토큰 · Bearer 허용 목록 · `tools/mcp_going/` · ask 120초(엄밀한 상한 아님 — 「다음 실행 조건」) · get_itinerary 좌표 미노출 | 토큰 22 · MCP 10 시험 | 해당 없음 | 실제 MCP 클라이언트 연결 미실행 | 미배포, 운영 `PERSONAL_TOKENS_ENABLED=0` |
+| 3-G 개인 토큰 · MCP | hash 저장 토큰 · Bearer 허용 목록 · `tools/mcp_going/` · ask 120초(서버가 강제하는 상한은 아님) · get_itinerary 좌표 미노출 | 토큰 22 · MCP 10 시험 | 해당 없음 | 실제 MCP 클라이언트 연결 미실행 | 미배포, 운영 `PERSONAL_TOKENS_ENABLED=0` |
 | 4-A 무료 후보 보강 | 영업시간 파서 · 볼거리(reference) · 범위 보고 스크립트 | 파서 95 · 볼거리 16 · 범위 5 시험 (2026-10-21 `pytest --collect-only`) | 해당 없음 | 실제 Photon·운영 DB 미실행(과거 값만) | 미배포 |
 | 4-B 라벨 도구 | 블라인드 CLI · pooled · `judged@5` | 라벨 시험 21(collect-only 확인) · 합성 smoke | 해당 없음 | **사람 라벨 0건(라벨 대기)** | 해당 없음 |
 | 4-C 평가·결정 | — | 라벨 전 미측정 | 해당 없음 | 라벨 후 | 기본 모델 hybrid_v5 그대로 |
@@ -103,7 +103,7 @@
 | 사람 라벨 | 0건, 4단계 라벨 대기 | 3 |
 | `provider_stopped` | 최종 리뷰 B1 뒤 에이전트 루프 첫 단계 이후 chat 공급자 오류가 HTTP 오류 대신 200 부분 답변으로 바뀜. 후속으로 평가 시나리오 `ps-01~03`(응답 유실·429·첫 단계 실패)을 추가해 게이트가 지킨다(replay) | 4 |
 | B3 장부 초과 | 429 재시도가 있으면 정산 대기 행의 예상비용까지 장부에 잡혀 장부상 합계가 질문당 상한을 넘을 수 있음(합성 재현: 상한 25000, 장부 31020, 실제 확정 10340) | 4 |
-| 시간 상한 비엄밀 | search_mail 임베딩은 에이전트 deadline 25초에 묶이지 않음(시도당 45초, 429면 최대 3회). MCP ask 120초도 엄밀한 상한 아님 | 4 |
+| 시간 상한 | 후속 커밋으로 search_mail 임베딩도 에이전트 deadline 25초를 이어받음 — 25초 뒤 새 전송·재시도 없음(회귀 시험 `test_search_mail_embedding_keeps_the_agent_deadline`). 남은 것: 그 직전에 나간 호출 하나는 최대 45초까지 기다림. MCP ask 120초는 서버 강제 상한 아님 | 4 |
 | 정산 뒤 오류 | 전송·정산 뒤 오류(parse_embed 실패)는 과금 확정이라 `provider_stopped`가 아닌 도구 오류로 남음 | 4 |
 
 1. 대표: push → Actions 6+1 job(`eval` 추가) 확인 ([출시 체크리스트](reports/RELEASE_CHECKLIST.md))
@@ -125,13 +125,18 @@
 | `db11516` | 평가 하네스: mail·qa·agent 평가셋, 게이트, `make ci-eval`, CI eval job | pytest 1705 passed · 30 skipped · node 227/227 · ci-eval pass |
 | `c3d752d` | 4단계: 영업시간 파서·볼거리·라벨 도구·피드백 루프(라벨 대기) | pytest 1887 passed · 30 skipped · node 233/233 · ci-eval pass |
 | `0fcc038` | 보고서·운영 문서·E06 캡처 + 보고서 대조에서 찾은 숫자·문구 정정 3곳(`evals/thresholds.json` note, `evals/mail/README.md`, `evals/agent/README.md`, `src/evals/agent.py` 보고서 문장) | 작업 트리 전체: 「최종 전체 시험」 절 |
-| 이 커밋(후속) | `provider_stopped` 평가 시나리오 `ps-01~03`(스크립트 단계 `provider_error`) · 간헐 409 시험 순서 수정 · 이 표·README 갱신 | 작업 트리 전체: 아래 「후속 시험」 |
+| `cf66ee3` | 후속: `provider_stopped` 평가 시나리오 `ps-01~03`(스크립트 단계 `provider_error`) · 간헐 409 시험 순서 수정 · 이 표·README 갱신 | 작업 트리 전체: 아래 「후속 시험」 |
+| 이 커밋(후속 2) | `search_mail` 임베딩이 에이전트 deadline 을 이어받음(`handlers.embed`·`fake_call`) + 회귀 시험 · 문서·MCP 주석 갱신 | 아래 「후속 시험 2」 |
 
 한 커밋에 두 단계가 섞인 덩어리 3개(`src/foundation/db.py`·`src/storage/postgres.py`의 스키마 줄, `src/foundation/search.py`의 hook 줄)는 줄 단위로 나눴다. 평가 하네스는 2·3단계에 걸쳐 있어(agent 평가가 3단계 코드를 부른다) 3단계 뒤 별도 커밋으로 묶었다.
 
 ### 후속 시험 (2026-10-21, 후속 커밋 직전 작업 트리)
 
 `make ci-python` 1893 passed · 30 skipped · 0 failed(6분 53초, 1890 + 검증기 시험 3) · `make ci-js` 233/233 · `make ci-eval` gate pass(agent_replay 53 시나리오, 단언 실패 0, synthetic). `test_v5_concurrent_workload` 는 수정 전 3개 병렬 × 15회 반복에서 0회 실패(자연 재현 안 됨) → 메일 작업 완료를 강제한 합성 재현으로 원인 확인, 수정 뒤 단독 5회 통과. PostgreSQL 미실행.
+
+### 후속 시험 2 (2026-10-21, 후속 2 커밋 직전 작업 트리)
+
+`make ci-python` 1894 passed · 30 skipped · 0 failed(6분 59초, 회귀 시험 1 추가) · `make ci-eval` gate pass(synthetic) · `GOING_E2E=1 make e2e` 12 passed. 새 시험은 옛 `handlers.py` 로 되돌리면 실패함을 확인. PostgreSQL 미실행.
 
 ## 산출물
 

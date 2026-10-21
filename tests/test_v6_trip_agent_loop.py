@@ -331,3 +331,22 @@ def test_agent_answer_strips_scheme_less_domains_but_keeps_tool_provider_names()
     # Dates, times, decimals, versions and e-mail addresses are not domains.
     plain = '2026.11.07 10:00, 3.5km, v6.1, e.g. 예약, hotel@example.com 문의'
     assert strip_links(plain) == (plain, 0)
+
+
+def test_search_mail_embedding_keeps_the_agent_deadline(world):
+    """search_mail 의 임베딩은 바깥(에이전트) 범위의 deadline 을 이어받는다: 지난 뒤에는 보내지 않고
+    DEADLINE_EXCEEDED 로 멈춘다(루프는 'deadline' 부분 답). 예전에는 중첩 범위가 deadline 을 가렸다."""
+    import time
+    from types import SimpleNamespace
+    from src.reliability.handlers import Operations
+    db, gateway, ctx, call_ctx = world
+    sent = []
+    ops = SimpleNamespace(gateway=gateway, documents=SimpleNamespace(embedder=lambda texts: sent.append(list(texts)) or [[0.0]]))
+    ops.fake_call = lambda *args, **kwargs: Operations.fake_call(ops, *args, **kwargs)
+    with metered_context(gateway, call_ctx, 'req9:agent', deadline=time.time() - 1):
+        with pytest.raises(DomainError) as caught:
+            Operations.embed(ops, call_ctx, 'req9:agent-search:0', ['호텔'], None, query=True)
+    assert caught.value.code == 'DEADLINE_EXCEEDED' and sent == []
+    with metered_context(gateway, call_ctx, 'req10:agent'):  # no outer deadline: sent as before
+        Operations.embed(ops, call_ctx, 'req10:agent-search:0', ['호텔'], None, query=True)
+    assert sent == [['호텔']]

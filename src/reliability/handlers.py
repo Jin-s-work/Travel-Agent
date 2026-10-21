@@ -73,10 +73,10 @@ class Operations:
     def context(self, user, trip, job_id=None):
         return CallContext(owner_id=user,scope_id=trip,trip_id=trip,job_id=job_id,actor_id=user)
 
-    def fake_call(self, context, operation, key, value, fn, guard):
+    def fake_call(self, context, operation, key, value, fn, guard, *, deadline=None):
         return self.gateway.run(context,operation,key,{'calls':1},
             lambda: ProviderResult(fn(),{'calls':1}),request_hash=stable_hash(value),guard=guard,
-            provider='fake',sku=operation)
+            provider='fake',sku=operation,deadline=deadline)
 
     def mail_capabilities(self):
         """Availability is descriptive; the paid gateway still checks every call."""
@@ -189,10 +189,17 @@ class Operations:
             con.execute("UPDATE source_documents SET status='needs_review',updated_at=? WHERE id=?",(utcnow(),document_id))
 
     def embed(self, call_context, key, texts, guard, *, query=False):
+        # A nested scope (e.g. the trip agent's search_mail) keeps the outer
+        # deadline: no new send or retry after it. Without this the embedding
+        # escaped the agent's 25 s bound (attempt timeout 45 s, up to 3 tries).
+        from src.reliability.providers import _active
+        outer = _active.get()
+        deadline = outer.deadline if outer is not None else None
         if self.documents.embedder:
-            return self.fake_call(call_context,'query_embed' if query else 'embed',key,texts,lambda:self.documents.embedder(texts),guard)
+            return self.fake_call(call_context,'query_embed' if query else 'embed',key,texts,lambda:self.documents.embedder(texts),guard,
+                                  deadline=deadline)
         from src.embedder import embed_texts
-        with provider_scope(self.gateway,call_context,guard=guard,call_prefix=key):
+        with provider_scope(self.gateway,call_context,guard=guard,call_prefix=key,deadline=deadline):
             return embed_texts(texts,show_progress=False)
 
     def generate(self, user, trip, request_id, question, hits, guard):
