@@ -51,3 +51,6 @@ docs/presentation/**/SCRIPT.md
 
 # Local Playwright traces from failed E2E runs (may contain synthetic page snapshots)
 .e2e-traces/
+
+# v6 stage 4: frozen label pools contain OpenStreetMap (ODbL) place data; not published by default.
+evals/recommendation/pools/*.json

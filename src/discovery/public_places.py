@@ -32,6 +32,11 @@ USER_DAILY = 5
 COOLDOWN = timedelta(seconds=15)
 ERROR_TTL = timedelta(minutes=2)
 PROVIDER_ERROR_TTL = timedelta(minutes=15)
+# Sights are requested only when a recommendation explicitly includes the
+# attraction category. They are stored for the reference section only.
+FOOD_CATEGORIES = ('restaurant', 'cafe')
+SIGHT_VALUES = ('attraction', 'gallery', 'museum', 'viewpoint')
+CATEGORIES = frozenset(FOOD_CATEGORIES + ('attraction',))
 ATTRIBUTION = {'text': '© OpenStreetMap contributors', 'url': 'https://www.openstreetmap.org/copyright',
                'license': 'ODbL 1.0', 'license_url': 'https://opendatacommons.org/licenses/odbl/1-0/'}
 FATAL = {'NOT_FOUND','LEASE_LOST','JOB_CANCELLED','JOB_DEADLINE','VERSION_CONFLICT','TRIP_DELETED','ACCESS_REVOKED'}
@@ -54,9 +59,16 @@ def query(city,*,categories=None,area=None):
     if not c:
         raise DomainError('CITY_UNSUPPORTED', '등록된 도시를 선택해 주세요.', 422)
     # No user text, private location, date or address leaves the server.
+    tags = ['amenity:'+category for category in (['restaurant','cafe'] if categories is None else sorted(set(categories)&{'restaurant','cafe'}))]
+    if categories is not None and 'attraction' in categories:
+        # Same request and limit as food places, never a separate call. The
+        # request hash (and pack) differs from the food-only pack, so the first
+        # such request uses one quota call even if the food pack is cached, and
+        # sights share the 60-record limit with food places.
+        tags += ['tourism:'+value for value in SIGHT_VALUES]
     return urlencode({'lat': c['latitude'], 'lon': c['longitude'],
                       'radius': c['radius_m']/1000, 'limit': min(MAX_CANDIDATES, c.get('record_limit',MAX_CANDIDATES)),
-                      'osm_tag': ['amenity:'+category for category in (['restaurant','cafe'] if categories is None else sorted(set(categories)&{'restaurant','cafe'}))]}, doseq=True)
+                      'osm_tag': tags}, doseq=True)
 
 
 
@@ -72,8 +84,17 @@ def _distance(a, b, c, d):
     return 6371000 * 2 * math.asin(min(1, math.sqrt(hav)))
 
 
-def normalize(payload, city, *, area=None):
+def _category(tags, sights):
+    if tags.get('amenity') in FOOD_CATEGORIES:
+        return tags['amenity']
+    if sights and tags.get('tourism') in SIGHT_VALUES:
+        return 'attraction'
+    return None
+
+
+def normalize(payload, city, *, area=None, categories=None):
     c = area or center(city)
+    sights = categories is not None and 'attraction' in categories
     if not isinstance(payload, dict) or payload.get('remark') or not isinstance(payload.get('elements'), list):
         raise DomainError('PUBLIC_DISCOVERY_INCOMPLETE', '공개지도 응답이 불완전해요. 잠시 후 다시 찾아 주세요.', 503)
     if len(payload['elements']) > MAX_CANDIDATES:
@@ -83,7 +104,7 @@ def normalize(payload, city, *, area=None):
         if not isinstance(raw, dict):
             continue
         tags = raw.get('tags') or {}
-        if not isinstance(tags, dict) or tags.get('amenity') not in {'restaurant', 'cafe'}:
+        if not isinstance(tags, dict) or not _category(tags, sights):
             continue
         name = _text(tags.get('name'))
         kind, ident = raw.get('type'), raw.get('id')
@@ -117,8 +138,8 @@ def normalize(payload, city, *, area=None):
             observed['website'] = website
         result.append({'external_id': external, 'name': name, 'native_name': _text(tags.get('name:en')) or None,
                        'address': address or '상세 주소 미등록 · 공개지도 위치 확인', 'address_status': 'observed' if address else 'missing',
-                       'latitude': float(lat), 'longitude': float(lon), 'category': tags['amenity'],
-                       'tags': [x.strip()[:80] for x in _text(tags.get('cuisine')).split(';') if x.strip()][:10],
+                       'latitude': float(lat), 'longitude': float(lon), 'category': _category(tags, sights),
+                       'tags': [x.strip()[:80] for x in _text(tags.get('cuisine')).split(';') if x.strip()][:10] if tags.get('amenity') in FOOD_CATEGORIES else [tags['tourism']],
                        'neighborhood': _text(tags.get('addr:suburb')) or None, 'source_url': source_url,
                        'observed_tags': observed, 'center_distance_m': round(_distance(c['latitude'], c['longitude'], lat, lon))})
     output=FetchedPlaces(sorted(result,key=lambda p:(p['center_distance_m'],p['external_id'])))
@@ -127,7 +148,7 @@ def normalize(payload, city, *, area=None):
     return output
 
 
-def normalize_photon(payload, city, *, area=None):
+def normalize_photon(payload, city, *, area=None, categories=None):
     """Adapt documented GeoJSON only; reuse branch, radius and tag validation."""
     features = payload.get('features') if isinstance(payload, dict) else None
     if not isinstance(features, list):
@@ -142,11 +163,12 @@ def normalize_photon(payload, city, *, area=None):
         if not isinstance(props, dict) or not isinstance(geom, dict) or geom.get('type') != 'Point':
             continue
         coords = geom.get('coordinates')
-        if not isinstance(coords, list) or len(coords) != 2 or props.get('osm_key') != 'amenity':
+        sight = categories is not None and 'attraction' in categories and props.get('osm_key') == 'tourism'
+        if not isinstance(coords, list) or len(coords) != 2 or (props.get('osm_key') != 'amenity' and not sight):
             continue
         if props.get('countrycode') and str(props['countrycode']).upper() != center(city)['country_code']:
             continue
-        tags = {'name': props.get('name'), 'amenity': props.get('osm_value')}
+        tags = {'name': props.get('name'), ('tourism' if sight else 'amenity'): props.get('osm_value')}
         for source, target in [('street','addr:street'), ('housenumber','addr:housenumber'),
                                ('postcode','addr:postcode'), ('city','addr:city'), ('district','addr:suburb')]:
             if props.get(source):
@@ -159,7 +181,7 @@ def normalize_photon(payload, city, *, area=None):
         point = {'lat': coords[1], 'lon': coords[0]}
         kind = {'N':'node','W':'way','R':'relation'}.get(props.get('osm_type'))
         elements.append({'type':kind, 'id':props.get('osm_id'), **point, 'center':point, 'tags':tags})
-    result=normalize({'elements':elements},city,area=area)
+    result=normalize({'elements':elements},city,area=area,categories=categories)
     result.rejected_count+=len(features)-len(elements)
     result.raw_count=len(features)
     return result
@@ -180,7 +202,7 @@ def fetch(city,*,categories=None,area=None):
         payload = json.loads(page.content)
     except (ValueError, UnicodeError):
         raise DomainError('PUBLIC_DISCOVERY_INVALID', '공개지도 응답을 읽을 수 없어요. 잠시 후 다시 찾아 주세요.', 503) from None
-    return normalize_photon(payload, city, area=area), len(page.content)
+    return normalize_photon(payload, city, area=area, categories=categories), len(page.content)
 
 
 def is_public_candidate(candidate):
@@ -222,7 +244,7 @@ class PublicDiscovery:
         import inspect
         try:inspect.signature(self.fetcher).bind(city,categories=[]);category_support=True
         except (TypeError,ValueError):category_support=False
-        selected=sorted(set(categories or ['restaurant','cafe'])&{'restaurant','cafe'}) if category_support else None
+        selected=sorted(set(categories or ['restaurant','cafe'])&CATEGORIES) if category_support else None
         now = self.clock().astimezone(timezone.utc)
         request_hash = hashlib.sha256((POLICY + ':' + QUERY_VERSION + ':' + ENDPOINT + ':' + query(city,categories=selected,area=_area)).encode()).hexdigest()
         pack_id = 'osm_pack_' + city + ('_'+request_hash[:20] if _area is not None or selected is not None and set(selected)!={'restaurant','cafe'} else '')
@@ -317,7 +339,12 @@ class PublicDiscovery:
         con.execute("UPDATE research_candidates SET status='expired' WHERE pack_id=?", (pack_id,))
         old_places={r['id']:r for r in con.execute("SELECT id,city,identity_status,deleted_at FROM place_identities WHERE provider='openstreetmap'")}
         withdrawn={r[0] for r in con.execute("SELECT target_id FROM discovery_tombstones WHERE kind='source'")}
-        places,candidates,sources,facts=[],[],[],[]
+        from .opening_hours import parse as parse_hours, fact_value as hours_fact
+        # The trip/itinerary timezone (destination catalog), not the GeoNames
+        # source zone: they differ for e.g. Hanoi, and constraints compare them.
+        from src.destinations import CITIES as DESTINATIONS
+        zone = (DESTINATIONS.get(city) or {}).get('timezone')
+        places,candidates,sources,facts,stale_hours=[],[],[],[],[]
         for i, item in enumerate(items):
             place_id = 'osm_' + item['external_id'].replace('/', '_')
             source_id = 'osm_source_' + item['external_id'].replace('/', '_')
@@ -326,14 +353,29 @@ class PublicDiscovery:
             if source_id in withdrawn or old and (old['deleted_at'] or old['city']!=city or old['identity_status']!='needs_confirmation'):
                 continue
             places.append((place_id, PROVIDER, item['external_id'], city, item['name'], item['address'], item['source_url'], 'needs_confirmation', 'Public OSM record; not independently verified', date, date))
-            candidates.append((candidate_id, pack_id, place_id, 'public_data', item['category'], encode(['local_discovery']), encode(item['tags']), item['native_name'], item['source_url'], None, item['neighborhood'], item['latitude'], item['longitude'], date, date, i))
+            # Sights carry no local/landmark qualification; general.recommend
+            # still lists every public candidate in the reference section.
+            kinds = ['local_discovery'] if item['category'] in FOOD_CATEGORIES else []
+            candidates.append((candidate_id, pack_id, place_id, 'public_data', item['category'], encode(kinds), encode(item['tags']), item['native_name'], item['source_url'], None, item['neighborhood'], item['latitude'], item['longitude'], date, date, i))
             sources.append((source_id, place_id, 'osm_public_record', item['source_url'], 'provider', 'OpenStreetMap', date, None, 1, 1, 'active', '© OpenStreetMap contributors · ODbL 1.0. Public map record observed; branch, hours and business details are unverified.', POLICY, actor.id, 1, date, date))
             facts.append(('osm_fact_' + item['external_id'].replace('/', '_'), place_id, 'public_map_tags', encode({'tags':item['observed_tags'],'address_status':item['address_status']}), 'provisional', source_id, date, None, None, None, (now+TTL).isoformat(), POLICY, actor.id, date))
+            # Map hours stay provisional with the pack TTL: usable for tentative
+            # plans and 'check before visiting', never for strict verification.
+            hours_id = 'osm_hours_' + item['external_id'].replace('/', '_')
+            hours = hours_fact(parse_hours((item.get('observed_tags') or {}).get('opening_hours')), zone)
+            if hours is None:
+                stale_hours.append((date, hours_id, date))
+            else:
+                facts.append((hours_id, place_id, 'opening_hours', encode(hours), 'provisional', source_id, date, None, None, None, (now+TTL).isoformat(), POLICY, actor.id, date))
         # executemany uses psycopg's pipeline; no remote SQL round trip per tag/place.
         con.executemany('INSERT INTO place_identities(id,provider,external_place_id,city,name,address,source_url,identity_status,identity_evidence,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET name=excluded.name,address=excluded.address,updated_at=excluded.updated_at', places)
         con.executemany('INSERT INTO research_candidates(id,pack_id,place_id,status,category,recommendation_types_json,tags_json,native_name,canonical_url,chain_id,neighborhood,latitude,longitude,created_at,updated_at,sort_order) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET status=excluded.status,category=excluded.category,tags_json=excluded.tags_json,native_name=excluded.native_name,neighborhood=excluded.neighborhood,latitude=excluded.latitude,longitude=excluded.longitude,updated_at=excluded.updated_at,sort_order=excluded.sort_order', candidates)
         con.executemany('INSERT INTO evidence_sources VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET checked_at=excluded.checked_at,updated_at=excluded.updated_at,evidence_note=excluded.evidence_note', sources)
         con.executemany('INSERT INTO place_facts VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET value_json=excluded.value_json,checked_at=excluded.checked_at,expires_at=excluded.expires_at,created_at=excluded.created_at', facts)
+        if stale_hours:
+            # The map no longer has readable hours: expire (never delete, since a
+            # user fact report may reference the row) so it is not used again.
+            con.executemany("UPDATE place_facts SET expires_at=? WHERE id=? AND field='opening_hours' AND expires_at>?", stale_hours)
 
 
 def empty_state(status):

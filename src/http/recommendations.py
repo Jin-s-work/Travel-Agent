@@ -6,7 +6,8 @@ router=APIRouter(prefix='/api/v2')
 
 @router.post('/trips/{trip_id}/recommendations',status_code=202)
 def submit(trip_id:str,body:RecommendationInput,request:Request,actor=Depends(require_actor)):
-    return request.app.state.recommendations.submit(actor,trip_id,body.model_dump(mode='json'),request.headers.get('idempotency-key'))
+    # saved_taste is excluded from model_dump (default OFF); pass the explicit opt-in through.
+    return request.app.state.recommendations.submit(actor,trip_id,{**body.model_dump(mode='json'),**({'saved_taste':True} if body.saved_taste else {})},request.headers.get('idempotency-key'))
 
 @router.get('/trips/{trip_id}/recommendations')
 def runs(trip_id:str,request:Request,actor=Depends(require_actor),limit:int=Query(20,ge=1,le=50),cursor:int=Query(0,ge=0)):

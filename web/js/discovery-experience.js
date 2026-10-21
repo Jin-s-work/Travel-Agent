@@ -76,8 +76,23 @@
     for(const key of Object.keys(result))for(const name of ['landmark','local_discovery','reference'])for(const item of sections?.[name]?.[key]||[]){if(seen.has(item.place_id))continue;seen.add(item.place_id);result[key].push(item);}
     return result;
   }
+  function appliedFeedback(snapshot,match){
+    // Shows only explicit choices frozen into this run: less/exclude feedback and the opt-in saved-place taste.
+    // When the run reports feedback_match, only choices that meet this run's candidates count as applied.
+    const f=snapshot?.feedback_inputs,t=snapshot?.saved_taste,parts=[];let less=0,out=0,other=0;
+    if(match&&Number.isInteger(match.soft_avoid_in_candidates)&&Number.isInteger(match.excluded_in_candidates)){less=match.soft_avoid_in_candidates;out=match.excluded_in_candidates;other=Math.max(0,(match.soft_avoid_total||0)+(match.excluded_total||0)-less-out);}
+    else if(f){less=f.soft_avoid_places||0;out=f.excluded_places||0;}
+    else if(snapshot?.soft_avoid_place_ids?.length)less=snapshot.soft_avoid_place_ids.length;
+    if(less)parts.push(`덜 보기 ${less}곳`);if(out)parts.push(`제외 ${out}곳`);
+    const carried=f?.carried_from_other_trips||0;if((less||out)&&carried)parts.push(`다른 여행에서 ‘다음 여행에도’로 고른 ${carried}건 포함`);
+    if(t?.applied&&t.added_tags?.length)parts.push('저장한 곳 기반 취향 '+t.added_tags.join(' · '));
+    if(!parts.length)return null;
+    const rest=other?` 이번 후보에 없는 선택 ${other}곳은 영향이 없어요.`:'';
+    return '적용 중: '+parts.join(' · ')+'.'+rest+' 직접 선택한 것만 반영했어요. 기록·지출의 나의 기록에서 수정하거나 철회할 수 있어요.';
+  }
   function renderSections(host,run){if(!initialModeChosen&&!explicitMode&&run.result){selected=['local_discovery','landmark','reference'].find(k=>['items','needs_confirmation'].some(g=>run.result.sections?.[k]?.[g]?.length))||'local_discovery';initialModeChosen=true;renderMode();}const section=run.result?.sections?.[selected]||{},meta=run.result?.section_status?.[selected]||{};
     const block=ui.make('section','recommendation-section stage2-section');block.append(ui.make('h2','',modes[selected].title));
+    const applied=appliedFeedback(run.snapshot,run.result?.feedback_match);if(applied)block.append(ui.make('p','hint feedback-applied',applied));
     if(selected==='local_discovery'){const applied=run.result?.applied_constraints||{},language=applied.review_language_filter||{},rating=applied.rating_filter||{};block.append(ui.make('p','hint',`이 요청의 기준: 현지어 하한 ${percent(language.min_local_share??0.6)} · 한국어 상한 ${percent(language.max_korean_share??0.1)} · 평점 ${rating.min_rating??4.2}/5 · 전체 평가 ${rating.min_count??200}건. 판별 100건·미판별 10% 이하 등 품질 조건 유지.`));}
     const groups=sectionGroups(section),visible=groups.filter(g=>g.key!=='excluded');if(!visible.length){const empty=ui.make('div','panel empty');const copy=sectionStateCopy(selected,meta);empty.append(ui.make('h3','',copy.title),ui.make('p','hint',copy.note));const actions=ui.make('div','actions');if(selected==='local_discovery')actions.append(ui.button('유명한 곳 살펴보기',()=>selectMode('landmark'),'secondary'));actions.append(ui.button('장소 직접 저장',()=>ui.bookmarkForm(),'text-button'));empty.append(actions);block.append(empty);}
     for(const group of groups){const render=container=>{if(group.key!=='items'||group.custom)container.append(ui.make('h3','',group.title+' · '+group.items.length+'곳'));if(group.note)container.append(ui.make('p','hint',group.note));const cards=ui.make('div','recommendation-grid');let previous=null;for(const item of group.items){const type=item.iconic_kind||item.iconic_evidence_type||item.evidence_group;if(selected==='landmark'&&type&&type!==previous){const tag=ui.make('h4','iconic-group-label',iconicTypes[type]||'출처 유형별 근거');cards.append(tag);previous=type;}const card=ui.recommendationCard(item,run,null,group.key!=='excluded');card.dataset.criteriaGroup=group.custom?'custom_criteria':'default';cards.append(card);}container.append(cards);};if(group.key==='excluded')block.append(ui.button('제외한 '+group.items.length+'곳과 이유',()=>ui.openDialog('이번 조건에서 제외한 곳',render),'text-button'));else{const container=ui.make('section','recommendation-evidence-group');render(container);block.append(container);}}
@@ -95,7 +110,7 @@
     if(data.matched_tags?.length)host.append(ui.make('p','hint','일치하는 장소 태그: '+data.matched_tags.join(' · ')));
     if(data.rating){const r=data.rating;host.append(ui.make('p','hint',`평점 ${r.raw_rating}/5 · 전체 평가 ${r.count}건. 같은 플랫폼·도시·분류의 ${r.cohort_places}곳을 비교하며 평가 수가 적은 평점의 영향을 줄입니다.`));}
     if(data.missing_components?.length)host.append(ui.make('p','hint','미확인 성분은 점수를 채우거나 다른 항목으로 비중을 옮기지 않았어요.'));
-    if(data.soft_avoid_multiplier===0.5)host.append(ui.make('p','hint','반영하도록 선택한 피드백으로 우선순위를 낮췄어요.'));
+    if(data.soft_avoid_multiplier===0.5)host.append(ui.make('p','hint','반영하도록 선택한 피드백(덜 보기)으로 우선순위를 낮췄어요.'));
     host.append(ui.make('p','hint','직선거리는 도보시간이 아닙니다. 영업·인원·언어 자료 자격은 점수와 별도로 검사합니다.'),ui.make('p','hint',`모델 ${data.version} · ${data.profile} · 사용자 행동 학습 없음`));
   }
   function compactEvidence(card,item){if(item.recommendation_type!=='local_discovery')return;const data=evidenceData(item.review_evidence);if(!data)return;card.append(ui.make('p','review-sample',`관측 본문 ${data.T}건 · 판별 ${data.C}건 · 미판별 ${data.U}건`),ui.make('p','hint',`현지어 ${data.L}/${data.C} · 한국어 ${data.K}/${data.C}`));ui.reviewScope(card,item.review_evidence.coverage,item.review_evidence.checked_at,item.review_evidence.expires_at);}
@@ -107,5 +122,5 @@
     ui.reasonList(section,ui.reviewReasons(evidence||{}));ui.reviewScope(section,evidence?.coverage,evidence?.checked_at,evidence?.expires_at);ui.reviewAttribution(section,evidence?.attribution);const provenance=evidence?.provenance||{};const model=evidence?.detector_version||provenance.detector_version||evidence?.evaluation?.detector_version,policy=evidence?.policy_version||provenance.policy_version||evidence?.dependencies?.policy_version;section.append(ui.make('p','hint',`현지어 범위: ${(evidence?.local_languages||evidence?.evaluation?.local_languages||[]).join(' · ')||'도시 프로필 확인 필요'} · 추천 모델 ${run?.result?.section_models?.local_discovery||place.ranker_version||'저장된 실행에서 확인'}`));if(model||policy)section.append(ui.make('p','hint',`언어 판별기 ${model||'미확인'} · 정책 ${policy||'미확인'}`));section.append(ui.make('p','form-note','리뷰 원문의 언어를 관측한 결과입니다. 작성자의 거주지·국적·맛의 보장이 아니며, 공급자 자료 종료는 Google 전체 리뷰 확보를 뜻하지 않습니다.'));
     if(!data&&(place?.id||place?.place_id)){const request=ui.button('이 장소의 리뷰 검토 요청',async()=>{request.disabled=true;const epoch=ui.state.epoch;try{const result=await ui.api(ui.tripPath()+'/places/'+encodeURIComponent(place.place_id||place.id)+'/review-request',{method:'POST',body:{}});if(epoch!==ui.state.epoch)return;request.textContent=result.duplicate?'이미 검토 요청한 장소예요':'검토 요청을 접수했어요';}catch(error){if(epoch===ui.state.epoch){request.disabled=false;section.append(ui.make('p','error',error.message));}}},'secondary');section.append(request,ui.make('p','hint','검토 대기열에만 추가합니다. 유료 수집이나 알림 발송은 자동 실행하지 않아요.'));}host.append(section);
   }
-  return {languagePreset,applyLanguagePreset,init,clear,filters,restoreFilters,restoreMode,requestFilters,restoreRequest,filterSummary,selectMode,renderMode,loadCapabilities,quickFilters,qualityFields,readQuality,renderSections,compactEvidence,cardEvidence,modelDetail,evidenceDetail,evidenceData,evidenceLines,sectionGroups,browseSection,sectionStateCopy,capabilityFor,capabilityState};
+  return {appliedFeedback,languagePreset,applyLanguagePreset,init,clear,filters,restoreFilters,restoreMode,requestFilters,restoreRequest,filterSummary,selectMode,renderMode,loadCapabilities,quickFilters,qualityFields,readQuality,renderSections,compactEvidence,cardEvidence,modelDetail,evidenceDetail,evidenceData,evidenceLines,sectionGroups,browseSection,sectionStateCopy,capabilityFor,capabilityState};
 });

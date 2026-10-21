@@ -42,6 +42,13 @@ def _dated(rows, day):
                row.get('valid_from') and row.get('valid_until') and row['valid_from'] <= day.isoformat() <= row['valid_until'] for row in rows)
 
 
+def _public_map_hours(facts, row):
+    from src.discovery.public_places import POLICY
+    source = facts.sources.get(row.get('source_id')) or {}
+    return (row.get('status') == 'provisional' and source.get('source_group') == 'OpenStreetMap'
+            and source.get('policy_version') == POLICY)
+
+
 def opening_windows(candidate, day, zone, now):
     """Intervals may be tentative; certainty is returned independently of geometry."""
     day = date.fromisoformat(day) if isinstance(day, str) else day
@@ -70,6 +77,11 @@ def opening_windows(candidate, day, zone, now):
             result['reason_codes'].append('UNKNOWN_CLOSURE_RULE'); state = 'unknown'
     if not isinstance(hours, dict) or hours.get('timezone') != zone or not isinstance(hours.get('weekly'), dict):
         return {**result, 'reason_codes': result['reason_codes'] + ['UNKNOWN_OPENING_HOURS']}
+    if rows and all(_public_map_hours(facts, row) for row in rows):
+        # Tentative plans may use map hours, labelled as such; never 'satisfied'.
+        state = opening_state = 'unknown'
+        result['opening_basis'] = 'public_map'
+        result['reason_codes'].append('PUBLIC_MAP_OPENING_HOURS')
     exact_day = _dated(rows, day)
     if not exact_day and day != utc(now).astimezone(ZoneInfo(zone)).date():
         state = opening_state = 'unknown'
@@ -90,13 +102,13 @@ def opening_windows(candidate, day, zone, now):
             else:
                 result['reason_codes'].append('UNKNOWN_CLOSURE_RULE'); state = 'unknown'
     intervals, cutoffs = [], []
-    today_known = False
+    today_known, today_raw = False, None
     try:
         for offset in (-1, 0):
             base = day+timedelta(days=offset)
             raw = overrides.get(base.isoformat(), hours['weekly'].get(DAYS[base.weekday()], hours['weekly'].get(str(base.weekday()))))
             if offset == 0:
-                today_known = raw is not None
+                today_known, today_raw = raw is not None, raw
             if raw is None:
                 continue
             for entry in raw:
@@ -120,6 +132,11 @@ def opening_windows(candidate, day, zone, now):
                             cutoffs.append({'field': field, 'instant': instant, 'interval': interval, 'state': opening_state})
         if not today_known and not intervals:
             state = opening_state = 'unknown'; result['reason_codes'].append('UNKNOWN_WEEKDAY_HOURS')
+        elif result.get('opening_basis') == 'public_map' and today_raw == [] and not intervals:
+            # The map lists this weekday as closed (explicitly or because the
+            # expression leaves it out). Unverified, so never a violation, but
+            # kept distinct from 'no hours at all'.
+            result['reason_codes'].append('PUBLIC_MAP_CLOSED_DAY')
     except (TypeError, ValueError, KeyError):
         return {**result, 'state': 'unknown', 'reason_codes': result['reason_codes'] + ['INVALID_OPENING_HOURS']}
     # Preserve the certainty and geometry of the opening fact before combining

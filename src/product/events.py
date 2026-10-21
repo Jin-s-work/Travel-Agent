@@ -45,6 +45,11 @@ def record(con,owner,trip,name,event_id,*,place=None,run=None,detail=None,client
         (event_id,owner,trip,name,place,run,utcnow(),safe,client_at,excluded))
     return {'recorded':True,'duplicate':False}
 
+def _feedback_applied(snapshot,result):
+    match=result.get('feedback_match')
+    if match is None:return bool(snapshot.get('soft_avoid_place_ids') or snapshot.get('feedback_excluded_place_ids'))
+    return bool(match.get('soft_avoid_in_candidates') or match.get('excluded_in_candidates'))
+
 def capture_run(con,owner,trip,run,snapshot,candidates,result):
     if not consented(con,owner) or not snapshot.get('analytics_opt_in'):return
     kinds=snapshot['conditions']['recommendation_types'];limit=snapshot['limit']
@@ -54,5 +59,9 @@ def capture_run(con,owner,trip,run,snapshot,candidates,result):
         'language_unsupported':any('REVIEW' in x or 'LANGUAGE' in x or 'OBSERVATION' in x for x in unsupported),
         'target_per_section':limit,'shortage':any(len(result['sections'][k]['items'])<limit for k in kinds),
         'candidate_count':len(candidates),'selected_count':sum(len(result['sections'][k]['items']) for k in kinds),
-        'synthetic':any(p.get('synthetic') for p in candidates),'reasons':result.get('reason_codes',[])}
+        'synthetic':any(p.get('synthetic') for p in candidates),'reasons':result.get('reason_codes',[]),
+        # Stage 4 D4 arms: booleans only, no place ids or tags.
+        'saved_taste_applied':bool((snapshot.get('saved_taste') or {}).get('applied')),
+        # Matched against this run's candidates (a choice for another city's place has no effect here).
+        'feedback_applied':_feedback_applied(snapshot,result)}
     con.execute('INSERT OR IGNORE INTO product_run_metrics VALUES(?,?,?,?,?)',(run,owner,trip,dump(summary),utcnow()))

@@ -11,6 +11,12 @@ from .prices import estimate
 
 def fail(code,message,status=422):raise DomainError(code,message,status)
 
+# Fields added in stage 4 (D1). Their defaults are dropped before hashing so an
+# idempotent retry of a pre-existing request keeps the same input hash.
+FEEDBACK_DEFAULTS={'preference_action':'less','preference_scope':'this_trip'}
+def feedback_hash_body(body):
+    return {k:v for k,v in body.items() if not (k in FEEDBACK_DEFAULTS and v==FEEDBACK_DEFAULTS[k])}
+
 class Product:
     def __init__(self,db,repo,discovery,recommendations,itineraries):
         self.db,self.repo,self.discovery,self.recommendations,self.itineraries=db,repo,discovery,recommendations,itineraries
@@ -59,7 +65,9 @@ class Product:
         return dict(row)
     @staticmethod
     def dto(row):
-        return {**json.loads(row['payload_json']),**{k:row[k] for k in ('id','place_id','run_id','itinerary_id','item_id','version','created_at','updated_at','withdrawn_at')},'private_note':row['private_note'],'source':'explicit_user_report'}
+        payload=json.loads(row['payload_json'])
+        if payload:payload={**FEEDBACK_DEFAULTS,**payload}  # rows written before stage 4 keep the legacy meaning
+        return {**payload,**{k:row[k] for k in ('id','place_id','run_id','itinerary_id','item_id','version','created_at','updated_at','withdrawn_at')},'private_note':row['private_note'],'source':'explicit_user_report'}
     def feedback_list(self,actor,trip):
         with self.db.connect() as con:
             self.scope(con,actor,trip)
@@ -67,7 +75,16 @@ class Product:
             for row in con.execute('SELECT * FROM visit_feedback WHERE trip_id=? AND owner_id=? AND withdrawn_at IS NULL ORDER BY updated_at DESC',(trip,actor.id)):
                 place=self.discovery._visible_place(con,row['place_id'])
                 items.append({**self.dto(row),'place_name':place['name'] if place else '현재 제공되지 않는 장소'})
-            return {'items':items}
+            # 'Future'-scoped choices recorded on the owner's other trips also apply here.
+            # Listed so they can be seen and withdrawn (on the trip that holds them).
+            # Same row set as feedback_loop.feedback_inputs (no separate LIMIT), newest first.
+            from src.recommendations.feedback_loop import carried_rows
+            carried=[]
+            for row in sorted(carried_rows(con,actor.id,trip),key=lambda r:(r['updated_at'],r['id']),reverse=True):
+                value=self.dto(row)
+                place=self.discovery._visible_place(con,row['place_id'])
+                carried.append({k:value[k] for k in ('id','place_id','version','preference_action','preference_scope','reason_codes','updated_at')}|{'trip_id':row['trip_id'],'place_name':place['name'] if place else '현재 제공되지 않는 장소'})
+            return {'items':items,'carried_from_other_trips':carried}
     def get_feedback(self,actor,trip,ident):
         with self.db.connect() as con:return self.dto(self._feedback(con,actor,trip,ident))
     def create_feedback(self,actor,trip,place,body,key):
@@ -75,7 +92,7 @@ class Product:
         with self.db.connect() as con:
             con.execute('BEGIN IMMEDIATE');self.scope(con,actor,trip)
             old=con.execute('SELECT * FROM visit_feedback WHERE owner_id=? AND trip_id=? AND idempotency_key=?',(actor.id,trip,key)).fetchone()
-            hashed=digest({'place':place,'body':body})
+            hashed=digest({'place':place,'body':feedback_hash_body(body)})
             if old:
                 if old['input_hash']!=hashed:fail('IDEMPOTENCY_CONFLICT','같은 요청의 내용이 다릅니다.',409)
                 return self.dto(old)

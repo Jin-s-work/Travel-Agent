@@ -42,7 +42,10 @@ def cost_update(trip:str,body:Expense,r:Request,actor=Depends(require_actor)):re
 def product_report(r:Request,start:datetime|None=None,end:datetime|None=None,city:CityId|None=None,ranker:str|None=Query(None,max_length=100),synthetic:bool=False,recommendation_type:str|None=Query(None,pattern='^(local_discovery|landmark)$'),language_required:bool|None=None,actor=Depends(require_actor)):
     with r.app.state.db.connect() as con:r.app.state.discovery._admin(con,actor)
     end=end or datetime.now(timezone.utc);start=start or end-timedelta(days=30)
-    return report(r.app.state.db,start=start.isoformat(),end=end.isoformat(),city=city,ranker=ranker,synthetic=synthetic,recommendation_type=recommendation_type,language_required=language_required)
+    value=report(r.app.state.db,start=start.isoformat(),end=end.isoformat(),city=city,ranker=ranker,synthetic=synthetic,recommendation_type=recommendation_type,language_required=language_required)
+    from .feedback_effect import online_effect
+    value['feedback_loop_effect']=online_effect(r.app.state.db,start=start.isoformat(),end=end.isoformat(),synthetic=synthetic)
+    return value
 @router.post('/trips/{trip}/recommendations/{ident}/evaluation')
 def evaluation(trip:str,ident:str,body:Evaluation,r:Request,actor=Depends(require_actor)):
     run=r.app.state.recommendations.get(actor,trip,ident)
@@ -51,4 +54,5 @@ def evaluation(trip:str,ident:str,body:Evaluation,r:Request,actor=Depends(requir
         row=r.app.state.recommendations._get(con,actor,trip,ident)
         candidates=json.loads(row['candidates_json'] or '[]');snapshot=json.loads(row['snapshot_json'])
         r.app.state.recommendations._guard_catalog(con,actor,trip,snapshot['conditions']['city'],candidates)
-        return compare(snapshot,candidates,body.candidate_version)
+        from src.recommendations.feedback_loop import with_feedback_exclusions
+        return compare(snapshot,with_feedback_exclusions(snapshot,candidates),body.candidate_version)

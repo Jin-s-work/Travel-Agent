@@ -1,0 +1,1997 @@
+{
+  "schema_version": 1,
+  "kind": "recommendation_label_queries",
+  "source_plan": "docs/service-v5/fixtures/blind-evaluation-plan.json",
+  "status": "draft_needs_human_confirmation",
+  "actual_human_labels": 0,
+  "rules": [
+    "조건은 대표가 확인하고 human_confirmed=true 로 바꾼 것만 고정된다.",
+    "모든 항목은 human_query(대표가 모델 순위를 보지 않고 쓴 한 줄 요청)가 있어야 확정된다. 날짜·시각·출발점 초안은 기계적 기본값이므로 human_query 를 쓰며 함께 고친다.",
+    "origin 은 null 또는 {\"public_area\": center|north|east|south|west|northeast|southwest} 만 허용. 좌표 직접 입력 금지(개인 숙소 좌표 차단). conditions 안의 origin·origin_selection 은 거부된다.",
+    "합성 숙소가 필요하면 {\"public_area\": \"...\", \"synthetic_hotel\": true} 로 공개 지점을 숙소로 간주한다.",
+    "food 는 preferred.tags, price 는 budget.amount_max 를 사람이 채워야 확인할 수 있다.",
+    "같은 조건을 development 와 holdout 에 동시에 두면 동결 단계에서 거부된다."
+  ],
+  "items": [
+    {
+      "id": "tokyo-01",
+      "city": "tokyo",
+      "split": "development",
+      "scenario": "origin",
+      "query_group": "tokyo-query-01",
+      "travel_group": "tokyo-development-0",
+      "section": "reference",
+      "origin": {
+        "public_area": "center"
+      },
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-02",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-02",
+      "city": "tokyo",
+      "split": "development",
+      "scenario": "food",
+      "query_group": "tokyo-query-02",
+      "travel_group": "tokyo-development-0",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-03",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": null,
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-03",
+      "city": "tokyo",
+      "split": "development",
+      "scenario": "price",
+      "query_group": "tokyo-query-03",
+      "travel_group": "tokyo-development-0",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-04",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": {
+          "amount_max": null,
+          "basis": "per_person",
+          "period": "meal"
+        }
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-04",
+      "city": "tokyo",
+      "split": "development",
+      "scenario": "unspecified",
+      "query_group": "tokyo-query-04",
+      "travel_group": "tokyo-development-0",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-05",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-05",
+      "city": "tokyo",
+      "split": "development",
+      "scenario": "local_language",
+      "query_group": "tokyo-query-05",
+      "travel_group": "tokyo-development-0",
+      "section": "local_discovery",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-06",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-06",
+      "city": "tokyo",
+      "split": "development",
+      "scenario": "famous",
+      "query_group": "tokyo-query-06",
+      "travel_group": "tokyo-development-0",
+      "section": "landmark",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-07",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-07",
+      "city": "tokyo",
+      "split": "development",
+      "scenario": "origin",
+      "query_group": "tokyo-query-07",
+      "travel_group": "tokyo-development-1",
+      "section": "reference",
+      "origin": {
+        "public_area": "southwest"
+      },
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-08",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-08",
+      "city": "tokyo",
+      "split": "development",
+      "scenario": "food",
+      "query_group": "tokyo-query-08",
+      "travel_group": "tokyo-development-1",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-09",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": null,
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-09",
+      "city": "tokyo",
+      "split": "development",
+      "scenario": "price",
+      "query_group": "tokyo-query-09",
+      "travel_group": "tokyo-development-1",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-10",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": {
+          "amount_max": null,
+          "basis": "per_person",
+          "period": "meal"
+        }
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-10",
+      "city": "tokyo",
+      "split": "development",
+      "scenario": "unspecified",
+      "query_group": "tokyo-query-10",
+      "travel_group": "tokyo-development-1",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-11",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-11",
+      "city": "tokyo",
+      "split": "holdout",
+      "scenario": "local_language",
+      "query_group": "tokyo-query-11",
+      "travel_group": "tokyo-holdout-1",
+      "section": "local_discovery",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-12",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-12",
+      "city": "tokyo",
+      "split": "holdout",
+      "scenario": "famous",
+      "query_group": "tokyo-query-12",
+      "travel_group": "tokyo-holdout-1",
+      "section": "landmark",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-13",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-13",
+      "city": "tokyo",
+      "split": "holdout",
+      "scenario": "origin",
+      "query_group": "tokyo-query-13",
+      "travel_group": "tokyo-holdout-2",
+      "section": "reference",
+      "origin": {
+        "public_area": "northeast"
+      },
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-14",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-14",
+      "city": "tokyo",
+      "split": "holdout",
+      "scenario": "food",
+      "query_group": "tokyo-query-14",
+      "travel_group": "tokyo-holdout-2",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-15",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": null,
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-15",
+      "city": "tokyo",
+      "split": "holdout",
+      "scenario": "price",
+      "query_group": "tokyo-query-15",
+      "travel_group": "tokyo-holdout-2",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-16",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": {
+          "amount_max": null,
+          "basis": "per_person",
+          "period": "meal"
+        }
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-16",
+      "city": "tokyo",
+      "split": "holdout",
+      "scenario": "unspecified",
+      "query_group": "tokyo-query-16",
+      "travel_group": "tokyo-holdout-2",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-17",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-17",
+      "city": "tokyo",
+      "split": "holdout",
+      "scenario": "local_language",
+      "query_group": "tokyo-query-17",
+      "travel_group": "tokyo-holdout-2",
+      "section": "local_discovery",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-18",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-18",
+      "city": "tokyo",
+      "split": "holdout",
+      "scenario": "famous",
+      "query_group": "tokyo-query-18",
+      "travel_group": "tokyo-holdout-2",
+      "section": "landmark",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-19",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-19",
+      "city": "tokyo",
+      "split": "holdout",
+      "scenario": "origin",
+      "query_group": "tokyo-query-19",
+      "travel_group": "tokyo-holdout-3",
+      "section": "reference",
+      "origin": {
+        "public_area": "west"
+      },
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-20",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-20",
+      "city": "tokyo",
+      "split": "holdout",
+      "scenario": "food",
+      "query_group": "tokyo-query-20",
+      "travel_group": "tokyo-holdout-3",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-21",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": null,
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-21",
+      "city": "tokyo",
+      "split": "holdout",
+      "scenario": "price",
+      "query_group": "tokyo-query-21",
+      "travel_group": "tokyo-holdout-3",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-22",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": {
+          "amount_max": null,
+          "basis": "per_person",
+          "period": "meal"
+        }
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-22",
+      "city": "tokyo",
+      "split": "holdout",
+      "scenario": "unspecified",
+      "query_group": "tokyo-query-22",
+      "travel_group": "tokyo-holdout-3",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-23",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-23",
+      "city": "tokyo",
+      "split": "holdout",
+      "scenario": "local_language",
+      "query_group": "tokyo-query-23",
+      "travel_group": "tokyo-holdout-3",
+      "section": "local_discovery",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-24",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-24",
+      "city": "tokyo",
+      "split": "holdout",
+      "scenario": "famous",
+      "query_group": "tokyo-query-24",
+      "travel_group": "tokyo-holdout-3",
+      "section": "landmark",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-25",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-25",
+      "city": "tokyo",
+      "split": "holdout",
+      "scenario": "origin",
+      "query_group": "tokyo-query-25",
+      "travel_group": "tokyo-holdout-4",
+      "section": "reference",
+      "origin": {
+        "public_area": "south"
+      },
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-26",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-26",
+      "city": "tokyo",
+      "split": "holdout",
+      "scenario": "food",
+      "query_group": "tokyo-query-26",
+      "travel_group": "tokyo-holdout-4",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-27",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": null,
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-27",
+      "city": "tokyo",
+      "split": "holdout",
+      "scenario": "price",
+      "query_group": "tokyo-query-27",
+      "travel_group": "tokyo-holdout-4",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-28",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": {
+          "amount_max": null,
+          "basis": "per_person",
+          "period": "meal"
+        }
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-28",
+      "city": "tokyo",
+      "split": "holdout",
+      "scenario": "unspecified",
+      "query_group": "tokyo-query-28",
+      "travel_group": "tokyo-holdout-4",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-29",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-29",
+      "city": "tokyo",
+      "split": "holdout",
+      "scenario": "local_language",
+      "query_group": "tokyo-query-29",
+      "travel_group": "tokyo-holdout-4",
+      "section": "local_discovery",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-02",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "tokyo-30",
+      "city": "tokyo",
+      "split": "holdout",
+      "scenario": "famous",
+      "query_group": "tokyo-query-30",
+      "travel_group": "tokyo-holdout-4",
+      "section": "landmark",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-03",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-01",
+      "city": "barcelona",
+      "split": "development",
+      "scenario": "origin",
+      "query_group": "barcelona-query-01",
+      "travel_group": "barcelona-development-0",
+      "section": "reference",
+      "origin": {
+        "public_area": "east"
+      },
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-04",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-02",
+      "city": "barcelona",
+      "split": "development",
+      "scenario": "food",
+      "query_group": "barcelona-query-02",
+      "travel_group": "barcelona-development-0",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-05",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": null,
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-03",
+      "city": "barcelona",
+      "split": "development",
+      "scenario": "price",
+      "query_group": "barcelona-query-03",
+      "travel_group": "barcelona-development-0",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-06",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": {
+          "amount_max": null,
+          "basis": "per_person",
+          "period": "meal"
+        }
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-04",
+      "city": "barcelona",
+      "split": "development",
+      "scenario": "unspecified",
+      "query_group": "barcelona-query-04",
+      "travel_group": "barcelona-development-0",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-07",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-05",
+      "city": "barcelona",
+      "split": "development",
+      "scenario": "local_language",
+      "query_group": "barcelona-query-05",
+      "travel_group": "barcelona-development-0",
+      "section": "local_discovery",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-08",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-06",
+      "city": "barcelona",
+      "split": "development",
+      "scenario": "famous",
+      "query_group": "barcelona-query-06",
+      "travel_group": "barcelona-development-0",
+      "section": "landmark",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-09",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-07",
+      "city": "barcelona",
+      "split": "development",
+      "scenario": "origin",
+      "query_group": "barcelona-query-07",
+      "travel_group": "barcelona-development-1",
+      "section": "reference",
+      "origin": {
+        "public_area": "north"
+      },
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-10",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-08",
+      "city": "barcelona",
+      "split": "development",
+      "scenario": "food",
+      "query_group": "barcelona-query-08",
+      "travel_group": "barcelona-development-1",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-11",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": null,
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-09",
+      "city": "barcelona",
+      "split": "development",
+      "scenario": "price",
+      "query_group": "barcelona-query-09",
+      "travel_group": "barcelona-development-1",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-12",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": {
+          "amount_max": null,
+          "basis": "per_person",
+          "period": "meal"
+        }
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-10",
+      "city": "barcelona",
+      "split": "development",
+      "scenario": "unspecified",
+      "query_group": "barcelona-query-10",
+      "travel_group": "barcelona-development-1",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-13",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-11",
+      "city": "barcelona",
+      "split": "holdout",
+      "scenario": "local_language",
+      "query_group": "barcelona-query-11",
+      "travel_group": "barcelona-holdout-1",
+      "section": "local_discovery",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-14",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-12",
+      "city": "barcelona",
+      "split": "holdout",
+      "scenario": "famous",
+      "query_group": "barcelona-query-12",
+      "travel_group": "barcelona-holdout-1",
+      "section": "landmark",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-15",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-13",
+      "city": "barcelona",
+      "split": "holdout",
+      "scenario": "origin",
+      "query_group": "barcelona-query-13",
+      "travel_group": "barcelona-holdout-2",
+      "section": "reference",
+      "origin": {
+        "public_area": "center"
+      },
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-16",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-14",
+      "city": "barcelona",
+      "split": "holdout",
+      "scenario": "food",
+      "query_group": "barcelona-query-14",
+      "travel_group": "barcelona-holdout-2",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-17",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": null,
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-15",
+      "city": "barcelona",
+      "split": "holdout",
+      "scenario": "price",
+      "query_group": "barcelona-query-15",
+      "travel_group": "barcelona-holdout-2",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-18",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": {
+          "amount_max": null,
+          "basis": "per_person",
+          "period": "meal"
+        }
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-16",
+      "city": "barcelona",
+      "split": "holdout",
+      "scenario": "unspecified",
+      "query_group": "barcelona-query-16",
+      "travel_group": "barcelona-holdout-2",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-19",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-17",
+      "city": "barcelona",
+      "split": "holdout",
+      "scenario": "local_language",
+      "query_group": "barcelona-query-17",
+      "travel_group": "barcelona-holdout-2",
+      "section": "local_discovery",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-20",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-18",
+      "city": "barcelona",
+      "split": "holdout",
+      "scenario": "famous",
+      "query_group": "barcelona-query-18",
+      "travel_group": "barcelona-holdout-2",
+      "section": "landmark",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-21",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-19",
+      "city": "barcelona",
+      "split": "holdout",
+      "scenario": "origin",
+      "query_group": "barcelona-query-19",
+      "travel_group": "barcelona-holdout-3",
+      "section": "reference",
+      "origin": {
+        "public_area": "southwest"
+      },
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-22",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-20",
+      "city": "barcelona",
+      "split": "holdout",
+      "scenario": "food",
+      "query_group": "barcelona-query-20",
+      "travel_group": "barcelona-holdout-3",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-23",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": null,
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-21",
+      "city": "barcelona",
+      "split": "holdout",
+      "scenario": "price",
+      "query_group": "barcelona-query-21",
+      "travel_group": "barcelona-holdout-3",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-24",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": {
+          "amount_max": null,
+          "basis": "per_person",
+          "period": "meal"
+        }
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-22",
+      "city": "barcelona",
+      "split": "holdout",
+      "scenario": "unspecified",
+      "query_group": "barcelona-query-22",
+      "travel_group": "barcelona-holdout-3",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-25",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-23",
+      "city": "barcelona",
+      "split": "holdout",
+      "scenario": "local_language",
+      "query_group": "barcelona-query-23",
+      "travel_group": "barcelona-holdout-3",
+      "section": "local_discovery",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-26",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-24",
+      "city": "barcelona",
+      "split": "holdout",
+      "scenario": "famous",
+      "query_group": "barcelona-query-24",
+      "travel_group": "barcelona-holdout-3",
+      "section": "landmark",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-27",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-25",
+      "city": "barcelona",
+      "split": "holdout",
+      "scenario": "origin",
+      "query_group": "barcelona-query-25",
+      "travel_group": "barcelona-holdout-4",
+      "section": "reference",
+      "origin": {
+        "public_area": "northeast"
+      },
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-28",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-26",
+      "city": "barcelona",
+      "split": "holdout",
+      "scenario": "food",
+      "query_group": "barcelona-query-26",
+      "travel_group": "barcelona-holdout-4",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-29",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": null,
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-27",
+      "city": "barcelona",
+      "split": "holdout",
+      "scenario": "price",
+      "query_group": "barcelona-query-27",
+      "travel_group": "barcelona-holdout-4",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-02",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": {
+          "amount_max": null,
+          "basis": "per_person",
+          "period": "meal"
+        }
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-28",
+      "city": "barcelona",
+      "split": "holdout",
+      "scenario": "unspecified",
+      "query_group": "barcelona-query-28",
+      "travel_group": "barcelona-holdout-4",
+      "section": "reference",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-03",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-29",
+      "city": "barcelona",
+      "split": "holdout",
+      "scenario": "local_language",
+      "query_group": "barcelona-query-29",
+      "travel_group": "barcelona-holdout-4",
+      "section": "local_discovery",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-04",
+          "local_time": "12:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    },
+    {
+      "id": "barcelona-30",
+      "city": "barcelona",
+      "split": "holdout",
+      "scenario": "famous",
+      "query_group": "barcelona-query-30",
+      "travel_group": "barcelona-holdout-4",
+      "section": "landmark",
+      "origin": null,
+      "ordering_profile": "evidence",
+      "conditions": {
+        "visit": {
+          "date": "2026-11-05",
+          "local_time": "19:00"
+        },
+        "party": {
+          "adults": 2,
+          "children": [],
+          "children_status": "none"
+        },
+        "categories": [
+          "restaurant"
+        ],
+        "preferred": {
+          "tags": [],
+          "dietary": []
+        },
+        "budget": null
+      },
+      "human_query": null,
+      "human_confirmed": false
+    }
+  ]
+}

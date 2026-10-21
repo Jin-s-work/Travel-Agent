@@ -29,6 +29,10 @@ class RecommendationInput(Input):
     review_language_filter: LanguageFilter = Field(default_factory=LanguageFilter)
     rating_filter: RatingFilter = Field(default_factory=RatingFilter)
     limit: int = Field(default=6,ge=1,le=12)
+    # Stage 4 D2: explicit opt-in, default OFF. Excluded from model_dump so the
+    # request body, idempotency fingerprint and frozen label snapshots of
+    # existing requests stay byte-identical; read it from the model instead.
+    saved_taste: bool = Field(default=False, exclude=True)
 
 
 class ComparisonInput(Input):

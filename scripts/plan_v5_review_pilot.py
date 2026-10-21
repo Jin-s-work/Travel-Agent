@@ -4,10 +4,13 @@
 Execution remains the existing authenticated admin preview -> submit jobs flow.
 A plan is not rights approval or a replacement for atomic per-call reservations.
 """
-import argparse,json
+import argparse,json,sys
 from datetime import datetime,timezone,timedelta
 from decimal import Decimal,InvalidOperation
 from pathlib import Path
+
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+from src.research.profiles import QUALITY_POLICY  # noqa: E402
 
 
 def plan(account,coverage,approved_cap,configured_cap):
@@ -40,7 +43,54 @@ def plan(account,coverage,approved_cap,configured_cap):
         'effective_batch_cap_usd':str(cap),'stages':stages,'runs_started':0,'production_enabled':False,
         'restart':'Resume saved run ID/checkpoint; unknown start outcome must not create another remote run.',
         'stop':'Cancel requests remote abort. Billing may continue; unknown costs stay reserved. Cleanup uses the existing remote deadline.',
-        'execution':'Existing admin review-collection-preview and review-collection-runs APIs; each stage rechecks current rights/budget. No direct Actor start CLI.'}
+        'execution':'Existing admin review-collection-preview and review-collection-runs APIs; each stage rechecks current rights/budget. No direct Actor start CLI.',
+        'language_labeling':language_label_plan(stages)}
+
+
+# Minimum number of cities a stage's places span (two_city_coverage spans both pilot cities).
+# How the places are actually split between cities is decided at preview time [미확인].
+STAGE_MIN_CITIES={'contract_smoke':1,'window_check':1,'two_city_coverage':2}
+HELDOUT_SHARE=0.7  # label tool default (src.research.language_labels.DEFAULT_HELDOUT_SHARE)
+# [추정] seconds per typed answer; kept equal to language_labels.SECONDS_PER_ROW by a test,
+# not imported, so this tracked script does not depend on the labeling modules.
+SECONDS_PER_ROW_ASSUMED=[4,8]
+
+
+def language_label_plan(stages):
+    """What a capped pilot can supply to the human language labels (offline arithmetic only).
+
+    Label sets are frozen per city and split by place, so the comparison with the policy
+    minimums uses one city's heldout places: max(1, round(places_in_city * 0.7)) * records.
+    places_in_city is at most places - (min_cities - 1) (all other places in the other city).
+    These are review-record upper bounds: rating-only records and duplicates reduce them, and
+    the Korean share of real reviews is unmeasured. For the sentence unit the number of rows
+    per review is unknown, so no sentence-count bound is given (null).
+    """
+    need=QUALITY_POLICY
+    rows=[]
+    for stage in stages:
+        records=stage['places']*stage['records_per_place']
+        city_places=stage['places']-(STAGE_MIN_CITIES[stage['stage']]-1)
+        heldout_places=max(1,round(city_places*HELDOUT_SHARE))
+        heldout_reviews=heldout_places*stage['records_per_place']
+        rows.append({'stage':stage['stage'],'max_review_records_total':records,
+            'min_cities':STAGE_MIN_CITIES[stage['stage']],
+            'max_places_one_city':city_places,'max_heldout_places_one_city':heldout_places,
+            'max_heldout_review_records_one_city':heldout_reviews,
+            'could_reach_min_labels_review_unit_upper_bound':heldout_reviews>=need['min_labels'],
+            'could_reach_min_original_checks_upper_bound':heldout_reviews>=need['min_original_checks'],
+            'max_heldout_rows_sentence_unit':None,
+            'expected_korean_truth':None,'expected_local_truth':None})
+    return {'tool':'scripts/label_review_language.py (prepare -> label -> evaluate)','unit_default':'sentence',
+        'bound_unit':'review records, one city, heldout split; sentence-unit bounds unknown [미확인]',
+        'quality_gate_unit':'review (sentence-unit evaluations are diagnostics; gate blocked by SENTENCE_UNIT_NOT_PRODUCTION_UNIT)',
+        'answers_by':'human only; detector output is never shown or used as an answer',
+        'raw_text_location':'data/ (gitignored); never committed or copied into reports',
+        'policy_minimums':{k:need[k] for k in ('min_labels','min_korean_truth','min_local_truth','min_local_predictions','min_original_checks')},
+        'stages':rows,'korean_share':'unmeasured [미확인]; korean recall stays null until >=1 Korean truth row',
+        'interval':'Wilson 95% (src.research.language.wilson95) for local precision and Korean recall',
+        'heldout_share_assumed':HELDOUT_SHARE,'seconds_per_row_assumed':SECONDS_PER_ROW_ASSUMED,'labels_started':0,
+        'labeling_time_budget':'separate from PRD decision 5 (2.5~4 h, bundle B); needs its own approval'}
 
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--preflight',type=Path,required=True);p.add_argument('--coverage',type=Path,required=True)

@@ -17,6 +17,10 @@ class Feedback(Input):
     revisit:bool|None=None
     private_note:str=Field(default='',max_length=1000)
     reflect_preference:bool=False
+    # Stage 4 D1: how an explicitly reflected preference applies. Both keep the
+    # legacy meaning by default ('less' = soft avoid x0.5, this trip only).
+    preference_action:Literal['less','exclude']='less'
+    preference_scope:Literal['this_trip','future']='this_trip'
     run_id:str|None=Field(default=None,max_length=100)
     itinerary_id:str|None=Field(default=None,max_length=100)
     item_id:str|None=Field(default=None,max_length=100)
@@ -26,6 +30,9 @@ class Feedback(Input):
         if self.visit_status!='visited' and any(v is not None for v in (self.satisfaction,self.price_feeling,self.wait_feeling,self.revisit)):raise ValueError('방문한 경우에만 현장 경험을 평가할 수 있습니다.')
         if bool(self.itinerary_id)!=bool(self.item_id):raise ValueError('일정과 항목을 함께 선택해 주세요.')
         if self.reflect_preference and self.feedback_kind!='preference':raise ValueError('다음 추천 반영은 별도 관심 없음 입력에서 선택해 주세요.')
+        if (self.preference_action!='less' or self.preference_scope!='this_trip') and not self.reflect_preference:
+            # A click alone never widens the effect: exclusion and the 'future' scope need the explicit opt-in.
+            raise ValueError('제외나 다음 여행 적용은 추천 반영을 직접 선택한 경우에만 쓸 수 있습니다.')
         return self
 class FeedbackPatch(Input):
     expected_version:int=Field(ge=1)

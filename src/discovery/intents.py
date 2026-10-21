@@ -16,6 +16,8 @@ class Filters(Input):
     review_language_filter: LanguageFilter = Field(default_factory=LanguageFilter)
     rating_filter: RatingFilter = Field(default_factory=RatingFilter)
     limit: int = Field(default=6, ge=1, le=12)
+    # Stage 4 D2 opt-in (default OFF), excluded from dumps like RecommendationInput.saved_taste.
+    saved_taste: bool = Field(default=False, exclude=True)
 
 
 class DiscoveryIntent(Input):
@@ -54,10 +56,11 @@ def get(service, actor, trip_id, ident):
 
 
 def submit(service, actor, trip_id, body, key):
-    body=DiscoveryIntent.model_validate(body).model_dump(mode='json')
+    request=DiscoveryIntent.model_validate(body)
+    body=request.model_dump(mode='json');saved_taste=request.filters.saved_taste
     if not isinstance(key,str) or not 8 <= len(key) <= 200:
         raise DomainError('IDEMPOTENCY_REQUIRED','8~200자의 Idempotency-Key가 필요합니다.',400)
-    key_hash=hashlib.sha256(key.encode()).hexdigest(); fingerprint=digest(body)
+    key_hash=hashlib.sha256(key.encode()).hexdigest(); fingerprint=digest({**body,'saved_taste':True} if saved_taste else body)
     with service.db.connect() as con:
         con.execute('BEGIN IMMEDIATE')
         current=service.jobs._scope(con,actor.id,actor.session_id,'personal_trip',trip_id)
@@ -96,8 +99,10 @@ def submit(service, actor, trip_id, body, key):
         snapshot={**body['filters'],'trip_version':trip['version'],'conditions_version':cv,'conditions':conditions,
             'trip':{k:trip[k] for k in ('id','version','start_date','end_date','stops')},'resolved_context':resolved,'intent_id':ident,
             'result_contract':'discovery_result_v1','candidate_pool_limit':200,'pipeline_version':'discovery_pipeline_v2','movement_version':'v2','origin_context':resolved['origin_context'],'ranker_versions':VERSIONS,'explanation_version':'server_templates_v1','evaluation_at':stamp,
-            'analytics_opt_in':consented(con,actor.id),'feedback_policy_version':'soft_avoid_half_v1',
-            'soft_avoid_place_ids':[r['place_id'] for r in con.execute('SELECT place_id,payload_json FROM visit_feedback WHERE owner_id=? AND trip_id=? AND withdrawn_at IS NULL',(actor.id,trip_id)) if json.loads(r['payload_json']).get('reflect_preference')]}
+            'analytics_opt_in':consented(con,actor.id),'feedback_policy_version':'soft_avoid_half_v1'}
+        # Same builder as Recommendations.submit: explicit feedback scope and opt-in saved taste.
+        from src.recommendations.feedback_loop import apply_to_snapshot
+        apply_to_snapshot(con,service.discovery,actor.id,trip_id,snapshot,saved_taste=saved_taste)
         from src.recommendations.registry import model_snapshot
         snapshot.update(model_snapshot(snapshot))
         from src.discovery.candidate_pool import snapshot_limits

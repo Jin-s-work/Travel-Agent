@@ -221,6 +221,16 @@ def _hours(facts, visit):
         return "unknown", "HOURS_INVALID", refs
 
 
+def _public_map_hours(facts):
+    """Permitted provisional OpenStreetMap hours; never used for strict judgement."""
+    from src.discovery.public_places import POLICY
+    return any(row.get("field") == "opening_hours" and row.get("status") == "provisional"
+               and row.get("value") is not None and facts.permitted(row)
+               and facts.sources[row["source_id"]].get("source_group") == "OpenStreetMap"
+               and facts.sources[row["source_id"]].get("policy_version") == POLICY
+               for row in facts.rows)
+
+
 def _special_hours(facts, visit):
     """Separately stored closure/break/cutoff facts never disappear into hours."""
     checks = []
@@ -601,6 +611,10 @@ def _candidate(snapshot, candidate, kind, current, config):
     refs = [deepcopy(facts.sources[ident]) for ident in sorted(used) if ident in facts.sources]
     reason_codes = _unique(reasons + [code for item in components.values() for code in item["reason_codes"]])
     important = _unique([item["reason_code"] for item in checks if item["state"] == "unknown"])
+    if "HOURS_UNKNOWN" in important and _public_map_hours(facts):
+        # Display only: the strict check above stays HOURS_UNKNOWN; this tells
+        # 'check before visiting' that map-listed hours exist (provisional).
+        important.insert(important.index("HOURS_UNKNOWN") + 1, "PUBLIC_MAP_OPENING_HOURS")
     important.append("LIVE_AVAILABILITY_NOT_CONFIRMED")
     output = {key: deepcopy(candidate.get(key)) for key in ("place_id", "name", "native_name", "address", "city", "category", "synthetic", "canonical_url", "chain_id", "neighborhood", "source_kind", "provider", "identity_status", "attribution", "latitude", "longitude", "tags")}
     output.update(recommendation_type=kind, eligibility=eligibility, reason_codes=reason_codes,

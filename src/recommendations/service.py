@@ -63,8 +63,9 @@ class Recommendations:
         return row
 
     def submit(self, actor, trip_id, body, key):
-        body=RecommendationInput.model_validate(body).model_dump(mode='json')
-        fingerprint=digest(body)
+        request=RecommendationInput.model_validate(body)
+        body=request.model_dump(mode='json');saved_taste=request.saved_taste
+        fingerprint=digest({**body,'saved_taste':True} if saved_taste else body)
         existing=self.jobs.lookup(actor.id,actor.session_id,'personal_trip',trip_id,'recommendations',key,fingerprint)
         if existing:
             with self.db.connect() as con:
@@ -102,7 +103,10 @@ class Recommendations:
             from src.product.events import consented
             snapshot['analytics_opt_in']=consented(con,actor.id)
             snapshot['feedback_policy_version']='soft_avoid_half_v1'
-            snapshot['soft_avoid_place_ids']=[r['place_id'] for r in con.execute('SELECT place_id,payload_json FROM visit_feedback WHERE owner_id=? AND trip_id=? AND withdrawn_at IS NULL',(actor.id,trip_id)) if json.loads(r['payload_json']).get('reflect_preference')]
+            # Same builder as discovery intents: explicit feedback scope and opt-in saved taste.
+            from .feedback_loop import apply_to_snapshot
+            apply_to_snapshot(con,self.discovery,actor.id,trip_id,snapshot,saved_taste=saved_taste)
+            snapshot.update(model_snapshot(snapshot))
             ident=new_id('rec')
             job=self.jobs.enqueue(actor.id,actor.session_id,'personal_trip',trip_id,'recommendations',{'run_id':ident},
                 current['version'],key,request_fingerprint=fingerprint,con=con)
@@ -208,13 +212,18 @@ class Recommendations:
         ctx.checkpoint({'candidate_snapshot':ident},stage='candidate_snapshot',done=1,total=1)
         snapshot=self._routes(actor,trip_id,ident,snapshot,candidates,ctx)
         ctx.progress('constraints_and_scoring',done=0,total=len(candidates))
-        result=recommend(snapshot,candidates,now=datetime.fromisoformat(snapshot['evaluation_at']))
+        from .feedback_loop import with_feedback_exclusions
+        # Explicit 'exclude' feedback is applied to scoring copies only; captured candidates stay as guarded.
+        scored=with_feedback_exclusions(snapshot,candidates)
+        result=recommend(snapshot,scored,now=datetime.fromisoformat(snapshot['evaluation_at']))
         if snapshot.get('shadow_model_version')=='hybrid_v6':
             from .comparison import shadow_compare
-            result['shadow_comparison']=shadow_compare(snapshot,candidates,result)
+            result['shadow_comparison']=shadow_compare(snapshot,scored,result)
         ctx.progress('constraints_and_scoring',done=len(candidates),total=len(candidates))
         from .presentation import summarize
         result['summary']=summarize(snapshot,candidates,result)
+        from .feedback_loop import feedback_match
+        result['feedback_match']=feedback_match(snapshot,candidates)
         result['route_status']=snapshot.get('route_stats',{'provider_calls':0,'reason':'ROUTE_PROVIDER_DISABLED'})
         result['origin_context']=deepcopy(snapshot.get('origin_context'))
         result['external_discovery']=snapshot.get('public_discovery',{'state':'unavailable','reason':'EXTERNAL_DISCOVERY_NOT_CONFIGURED','calls':0,'cost':None})

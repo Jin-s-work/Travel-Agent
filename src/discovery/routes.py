@@ -1,5 +1,6 @@
 """Trip-owned bookmark/conditions endpoints and separate administrator reviews."""
-from fastapi import APIRouter,Depends,Request
+from typing import Literal
+from fastapi import APIRouter,Depends,Request,Query
 from src.foundation.auth import require_actor
 from .models import ConditionsPatch,BookmarkInput,BookmarkPatch,VersionInput,Selection,PackInput,Approval,SourceReview,FactInput,ContextPreview
 
@@ -10,7 +11,9 @@ router=APIRouter(prefix='/api/v2')
 @router.post('/trips/{trip_id}/discovery-intents',status_code=202)
 def discovery_intent(trip_id:str,body:DiscoveryIntent,request:Request,actor=Depends(require_actor)):
     from .intents import submit
-    return submit(request.app.state.recommendations,actor,trip_id,body.model_dump(mode='json'),request.headers.get('Idempotency-Key'))
+    data=body.model_dump(mode='json')
+    if body.filters.saved_taste:data['filters']['saved_taste']=True  # explicit opt-in survives the dump
+    return submit(request.app.state.recommendations,actor,trip_id,data,request.headers.get('Idempotency-Key'))
 
 @router.get('/trips/{trip_id}/discovery-intents/{ident}')
 def discovery_intent_get(trip_id:str,ident:str,request:Request,actor=Depends(require_actor)):
@@ -36,8 +39,17 @@ def context_preview(trip_id:str,body:ContextPreview,request:Request,actor=Depend
 def conditions_save(trip_id:str,body:ConditionsPatch,request:Request,actor=Depends(require_actor)):
     return service(request).save_conditions(actor,trip_id,body.model_dump(mode='json'))
 @router.get('/trips/{trip_id}/bookmarks')
-def bookmarks(trip_id:str,request:Request,actor=Depends(require_actor)):
-    return {'items':service(request).list_bookmarks(actor,trip_id)}
+def bookmarks(trip_id:str,request:Request,order:Literal['recent','nearest']='recent',anchor:str|None=Query(None,max_length=100),actor=Depends(require_actor)):
+    items=service(request).list_bookmarks(actor,trip_id)
+    if order=='recent':return {'items':items}
+    # Stage 4 D3: straight-line nearest order from stored coordinates, no provider call.
+    from .saved_order import nearest,resolved_origin
+    # Current resolved origin (same invalidation/deletion/expiry rules as recommendations).
+    origin=None if anchor else resolved_origin(service(request).get_conditions(actor,trip_id))
+    with request.app.state.db.connect() as con:
+        service(request)._owner(con,actor,trip_id)
+        ordered,meta=nearest(con,service(request),trip_id,items,anchor,origin)
+    return {'items':ordered,'order':meta}
 @router.post('/trips/{trip_id}/bookmarks',status_code=201)
 def bookmark_create(trip_id:str,body:BookmarkInput,request:Request,actor=Depends(require_actor)):
     return service(request).create_bookmark(actor,trip_id,body.model_dump())
