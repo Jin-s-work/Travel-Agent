@@ -787,3 +787,9 @@ button.primary,button.secondary { font-weight:500; }
 @media(max-width:360px){.discovery-modes{gap:8px}.discovery-mode strong{font-size:calc(15px * var(--text-scale,1))}.category-chip{padding:9px 12px}}
 :root[data-text-size="large"] .discovery-modes,:root[data-text-size="large"] .review-lab-steps{grid-template-columns:1fr}
 @media(prefers-reduced-motion:reduce){.discovery-mode,.category-chip{transition:none}.discovery-mode:active,.category-chip:active{transform:none}}
+.agent-scope{margin:10px 0 0;color:var(--muted);font-size:calc(12px * var(--text-scale,1));line-height:1.5;white-space:normal}
+.agent-attribution{margin:8px 0 0;font-size:calc(12px * var(--text-scale,1));white-space:normal}
+.agent-cards{display:flex;flex-direction:column;gap:12px;align-self:stretch;min-width:0;max-width:100%}
+.agent-card{min-width:0;overflow-wrap:anywhere}.agent-card h3{margin:0 0 6px}.agent-card .itinerary-diff{display:grid;gap:8px;margin:12px 0}
+.agent-draft-text{white-space:pre-wrap;background:var(--surface-2);border-radius:10px;padding:12px;margin:10px 0}
+.agent-status:empty{display:none}

@@ -202,12 +202,14 @@ def _structured_answer(question, rows):
     return '\n'.join(lines)
 
 
-def answer(repo, documents, context, question, history, generator=None):
+def answer(repo, documents, context, question, history, generator=None, agent=None):
+    """`agent(question, history)` (v6 stage 3) replaces only the semantic
+    generation branch; every SQL fast path above it is unchanged."""
     with ExitStack() as readers:
-        return _answer(repo,documents,context,question,history,generator,readers)
+        return _answer(repo,documents,context,question,history,generator,readers,agent)
 
 
-def _answer(repo, documents, context, question, history, generator, readers):
+def _answer(repo, documents, context, question, history, generator, readers, agent=None):
     trip = repo.get_trip(context.user_id,context.trip_id)
     operations = getattr(documents, 'operations', None)
     basic = operations is not None and generator is None and operations.structured_only()
@@ -253,6 +255,13 @@ def _answer(repo, documents, context, question, history, generator, readers):
             return _tag({'answer':'기본 분석에서는 날짜별 예약, 예약 시간·번호·주소와 원문 취소 규정을 확인할 수 있습니다. 필요한 예약 이름과 항목을 알려주세요.', 'sources':[], 'tools_used':['structured_bookings'], 'answer_mode':'structured'}, 'refused', 'refusal')
         rows = eligible
     else:
+        # The agent replaces only paid generation. A head-count question and a
+        # booking with time_conflicts keep their LLM-free structured answer, so
+        # they skip the agent; conflicts are judged on the rows the semantic
+        # search below picks, exactly as the agent-off path does.
+        agent_ok = agent is not None and not basic and not _PARTY_REQUEST.search(question)
+        if agent_ok and not any(b.get('time_conflicts') for b in eligible):
+            return agent(question, history)
         docs = repo.list_documents(context.user_id,context.trip_id)
         active = [d['active_generation_id'] for d in docs if d.get('active_generation_id')]
         document_ids = set()
@@ -284,6 +293,8 @@ def _answer(repo, documents, context, question, history, generator, readers):
             floor_rejected = bool(hits) and not kept
             document_ids = {hit['metadata']['document_id'] for hit in kept}
         rows = [b for b in eligible if b.get('document_id') in document_ids or b.get('document_id') is None]
+        if agent_ok and not any(b.get('time_conflicts') for b in rows):
+            return agent(question, history)
         if not rows and floor_rejected:
             # Manual rows stay eligible regardless of similarity (prior contract);
             # only when nothing is left do weak semantic hits end in a refusal.

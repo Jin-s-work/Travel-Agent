@@ -41,13 +41,19 @@ def test_plan_b_cannot_change_booking_lock_past_or_claim_provider(planning):
     assert planning.client.post(path+'/alternatives',json={**payload,'expected_version':2,'item_id':item['item_id']}).status_code==409
 
 
-def test_rain_without_indoor_evidence_returns_empty(planning):
+def test_rain_restaurants_pass_only_as_unverified_indoor_likely(planning):
+    # G12: restaurants/cafes are no longer dropped for lacking an 'indoor' tag,
+    # but they are marked as a category default, never as confirmed indoor.
+    # Places without any indoor evidence still fail (tests/test_v6_plan_b.py).
     trip,pack,pid,reserved=prepare(planning)
     result,path=done(planning,trip,submit(planning,trip,pid,allow_provisional=True))
     item=next(i for i in result['items'] if i.get('place_id'))
     r=planning.client.post(path+'/alternatives',json={'expected_version':1,'item_id':item['item_id'],'reason':'rain'})
     assert r.status_code==200,r.text
-    assert not r.json()['alternatives'] and r.json()['rejected']
+    assert r.json()['alternatives'] and r.json()['situation']['live_weather'] is None
+    assert all(a['comparison']['indoor']=={'status':'indoor_likely','basis':'category_default'} for a in r.json()['alternatives'])
+    assert not any('INDOOR_UNCONFIRMED' in x['reason_codes'] for x in r.json()['rejected'])
+    assert planning.client.get(path).json()['items']==result['items']
 
 
 def test_apply_after_start_and_trip_deletion_preserves_original(planning,monkeypatch):

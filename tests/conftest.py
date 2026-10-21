@@ -28,6 +28,8 @@ os.environ["OPENAI_API_KEY"] = "test-placeholder"
 os.environ["TAVILY_API_KEY"] = ""
 os.environ["SEED_ON_EMPTY"] = "0"
 os.environ["PUBLIC_DISCOVERY_ENABLED"] = "0"  # No live network from production-shaped test apps.
+os.environ["PERSONAL_TOKENS_ENABLED"] = "0"  # Bearer tokens stay off unless a test opts in.
+os.environ["WEATHER_ENABLED"] = "0"  # No live Open-Meteo call from development-shaped test apps.
 
 import pytest  # noqa: E402  (환경변수 설정 뒤에 와야 한다)
 

@@ -178,6 +178,9 @@ def create_app(settings=None, *, parser=None, embedder=None, vector_factory=None
     app.state.product=Product(app.state.db,app.state.repo,app.state.discovery,app.state.recommendations,app.state.itineraries)
     from src.travel_tools.today import Today
     app.state.today=Today(app.state.db,app.state.repo,app.state.itineraries,app.state.discovery,app.state.preparation)
+    from src.travel_tools import weather as weather_module
+    # Open-Meteo city-centre forecast; None when off (agent tool then answers "unknown").
+    app.state.weather=weather_module.Weather(app.state.db,app.state.repo,app.state.discovery) if weather_module.enabled(settings) else None
     def dispatch(job,ctx):
         if job['operation']=='place_photos':
             return app.state.place_photos.execute(job,ctx)
@@ -227,7 +230,7 @@ def create_app(settings=None, *, parser=None, embedder=None, vector_factory=None
         response.headers['X-Frame-Options']='DENY'
         if request.url.path.startswith('/api/'):
             response.headers['Cache-Control']='private, no-store'
-            response.headers['Vary']='Cookie'
+            response.headers['Vary']='Cookie, Authorization'
         return response
 
     @app.exception_handler(DomainError)

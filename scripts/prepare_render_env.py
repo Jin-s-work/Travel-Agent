@@ -30,6 +30,8 @@ RUNTIME_DEFAULTS = {
     'JOB_HEARTBEAT_SECONDS': '20', 'JOB_SHUTDOWN_SECONDS': '5',
     'JOB_MAX_ATTEMPTS': '3', 'JOB_DEADLINE_SECONDS': '900',
     'BACKUP_ENABLED': '0', 'ZERO_SPEND': '1',
+    'PERSONAL_TOKENS_ENABLED': '0',  # PRD decision 3 = A: MCP tokens are local-only.
+    'WEATHER_ENABLED': '0',  # PRD decision 4 = A: production starts off.
     'PRICING_CONFIG': '/app/deploy/render-supabase/pricing-zero.json',
     'OPENAI_API_KEY': '', 'TAVILY_API_KEY': '', 'APIFY_TOKEN': '',
 }

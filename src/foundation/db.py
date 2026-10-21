@@ -211,6 +211,8 @@ COMMIT;''')
             # Additive diagnostics table, idempotent on every start (no version bump).
             from src.reliability.llm_schema import TELEMETRY_SCHEMA
             connection.executescript('BEGIN IMMEDIATE;\n' + TELEMETRY_SCHEMA + '\nCOMMIT;')
+            from src.foundation.tokens import SCHEMA as TOKENS_SCHEMA  # same idempotent pattern
+            connection.executescript('BEGIN IMMEDIATE;\n' + TOKENS_SCHEMA + '\nCOMMIT;')
 
     @contextmanager
     def connect(self):

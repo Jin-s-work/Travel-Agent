@@ -233,6 +233,8 @@ class PostgresDatabase:
                 con.execute(CLOUD_SCHEMA, prepare=False)
                 from src.reliability.llm_schema import TELEMETRY_SCHEMA
                 con.execute(TELEMETRY_SCHEMA, prepare=False)
+                from src.foundation.tokens import SCHEMA as TOKENS_SCHEMA
+                con.execute(TOKENS_SCHEMA, prepare=False)
                 # Private schema is not exposed by PostgREST. Defense in depth:
                 # no browser roles may read even if someone exposes the schema.
                 con.execute(sql.SQL('REVOKE ALL ON SCHEMA {} FROM PUBLIC').format(sql.Identifier(self.schema)))

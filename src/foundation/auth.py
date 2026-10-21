@@ -8,6 +8,7 @@ import uuid
 from fastapi import Request
 from authlib.integrations.starlette_client import OAuth
 from .repository import DomainError
+from .tokens import PersonalTokens, bearer_value, enabled as tokens_enabled
 
 
 def now():
@@ -27,11 +28,16 @@ class Actor:
     session_id: str
     csrf_token: str
     expires_at: str
+    # 'cookie' (browser session) or 'token' (personal access token, read/ask only).
+    auth_kind: str = 'cookie'
+    token_id: str | None = None
+    scopes: tuple = ()
 
 
 class Auth:
     def __init__(self, db, settings):
         self.db, self.settings = db, settings
+        self.tokens = PersonalTokens(db)
         self.oauth = OAuth()
         if settings.auth_configured:
             self.oauth.register('identity', client_id=settings.oidc_client_id,
@@ -93,15 +99,43 @@ class Auth:
             raise DomainError('AUTH_REQUIRED','세션이 만료되었거나 회수되었습니다. 다시 로그인해 주세요.',401)
         return Actor(**dict(row))
 
+    def token_actor(self, request, raw):
+        # OFF (production default): a Bearer request is treated like a missing session.
+        if not tokens_enabled(self.settings) or not self.settings.auth_configured:
+            raise DomainError('AUTH_REQUIRED','로그인이 필요합니다.',401)
+        return self.tokens.authenticate(raw, Actor)
+
+    def revalidate(self, request, actor):
+        """Re-check the caller with the same credential kind that admitted it."""
+        if actor.auth_kind == 'token':
+            if not tokens_enabled(self.settings):
+                raise DomainError('AUTH_REQUIRED','로그인이 필요합니다.',401)
+            self.tokens.revalidate(actor)
+            return actor
+        return self.actor(request)
+
     def write_guard(self, request, actor):
+        # Writes are cookie + CSRF + Origin only. Token actors never reach the
+        # comparison, and an empty CSRF value never matches (compare_digest('','')).
+        if actor.auth_kind != 'cookie':
+            raise DomainError('TOKEN_SCOPE_REJECTED','개인 접근 토큰으로는 변경할 수 없습니다. 앱 화면에서 해 주세요.',403)
         if request.headers.get('origin') != self.settings.public_base_url:
             raise DomainError('ORIGIN_REJECTED','요청 출처를 확인할 수 없습니다.',403)
-        if not secrets.compare_digest(request.headers.get('x-csrf-token',''), actor.csrf_token):
+        supplied = request.headers.get('x-csrf-token','')
+        if not actor.csrf_token or not supplied or not secrets.compare_digest(supplied, actor.csrf_token):
             raise DomainError('CSRF_REJECTED','화면을 새로고침한 뒤 다시 시도해 주세요.',403)
 
 
 def require_actor(request: Request):
-    actor = request.app.state.auth.actor(request)
+    auth = request.app.state.auth
+    raw = bearer_value(request)
+    if raw is not None:
+        # Bearer never falls back to the cookie and never passes write_guard:
+        # only the allowlisted read GETs and POST ask are reachable.
+        actor = auth.token_actor(request, raw)
+        auth.tokens.authorize(request, actor)
+        return actor
+    actor = auth.actor(request)
     if request.method not in {'GET','HEAD','OPTIONS'}:
-        request.app.state.auth.write_guard(request,actor)
+        auth.write_guard(request,actor)
     return actor

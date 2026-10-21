@@ -1,9 +1,9 @@
 """Bounded replacement of one optional visit; all other reservations and times survive."""
 from copy import deepcopy,copy
 from datetime import timedelta
-import json
 import time
-from src.foundation.repository import new_id
+from math import isfinite
+from src.foundation.repository import new_id,DomainError
 from src.itineraries.service import clock,digest
 from src.itineraries.intervals import utc,bounds
 from src.itineraries.edits import preview
@@ -13,6 +13,69 @@ from .preparation import fail
 
 MAX_CANDIDATES=12
 MAX_SECONDS=15
+# Category default for rain: a restaurant/cafe is usually indoors, but this is
+# not verified evidence. It is surfaced as its own status, never as confirmed.
+# Known limit: no current data source writes 'indoor'/'outdoor' (OSM food tags
+# are cuisine values, OSM sights carry the tourism value). Outdoor exclusion
+# therefore only fires once curated tags or verified 'tags' facts carry it; a
+# restaurant/cafe with outdoor-only seating still passes as indoor_likely.
+INDOOR_LIKELY_CATEGORIES=frozenset({'restaurant','cafe'})
+
+
+def _labels(value):
+    if isinstance(value,str):value=[value]
+    if isinstance(value,dict):value=[k for k,v in value.items() if v is True]
+    if not isinstance(value,(list,tuple,set)):return set()
+    return {str(x).strip().lower() for x in value if isinstance(x,str)}
+
+
+def indoor_status(candidate,visit,now):
+    """Rain suitability from stored evidence only; no live weather is read."""
+    tags=_labels(candidate.get('tags'))
+    verified,_,_=Facts(candidate,visit,now).get('tags')
+    if 'outdoor' in tags:return {'status':'outdoor_confirmed','basis':'tag'}
+    if 'outdoor' in _labels(verified):return {'status':'outdoor_confirmed','basis':'verified_fact'}
+    if 'indoor' in tags:return {'status':'indoor_confirmed','basis':'tag'}
+    if 'indoor' in _labels(verified):return {'status':'indoor_confirmed','basis':'verified_fact'}
+    if candidate.get('category') in INDOOR_LIKELY_CATEGORIES:return {'status':'indoor_likely','basis':'category_default'}
+    return {'status':'unconfirmed','basis':None}
+
+
+def run_scores(recommendations,actor,trip,snapshot,replaced_place_id):
+    """score_lower per place from the linked recommendation run, if it is still valid.
+
+    Reads through Recommendations.get (owner-scoped, read-only), the same path
+    itinerary creation uses, so stale/withheld handling is shared. Scores are
+    dropped entirely when the run is no longer current: changed source data
+    invalidates every derived score of the cohort, and score_lower carries a
+    proximity term measured from the run's origin (ORIGIN_CHANGED). Only the
+    section that ranked the replaced place is used, because sections are scored
+    with different weights and their numbers are not on one scale."""
+    run_id=snapshot.get('recommendation_run_id')
+    if not run_id or recommendations is None or not replaced_place_id:return {}
+    try:run=recommendations.get(actor,trip,run_id)
+    except DomainError:return {}
+    result=run.get('result')
+    if not isinstance(result,dict) or run.get('data_status')!='current' or run.get('origin_status')!='current' or result.get('ranking_status')=='stale':return {}
+    def ranked(groups):return [item for name in ('items','needs_confirmation') for item in (groups.get(name) or ()) if isinstance(item,dict)]
+    section=next((ranked(groups) for groups in (result.get('sections') or {}).values() if isinstance(groups,dict) and any(item.get('place_id')==replaced_place_id for item in ranked(groups))),None)
+    scores={}
+    for item in section or ():
+        value=(item.get('ranking_diagnostics') or {}).get('score_lower')
+        if type(value) in (int,float) and isfinite(value) and item.get('place_id'):
+            scores[item['place_id']]=max(value,scores.get(item['place_id'],value))
+    return scores
+
+
+def order_pool(pool,origin,scores):
+    """(candidate, distance) pairs: score_lower desc (only when a run is linked) -> straight-line distance asc (unknown last) -> place_id.
+    Distances are computed for the whole pool before any cap is applied."""
+    rows=[(p,movement(p,{'origin':origin})['distance_m']) for p in pool]
+    def key(row):
+        p,distance=row;head=()
+        if scores:score=scores.get(p['place_id']);head=(score is None,-(score or 0))
+        return (*head,distance is None,distance or 0,p['place_id'])
+    return sorted(rows,key=key)
 
 
 def check_apply(result,current,now):
@@ -56,14 +119,21 @@ class Alternatives:
         before=sorted([i for i in current['items'] if bounds(i) and utc(i['end_instant'])<=utc(old['start_instant'])],key=lambda i:i['end_instant'])
         if body.get('origin') and before and utc(before[-1]['end_instant'])>now:fail('ORIGIN_CONFLICT','앞 일정이 끝나기 전에는 현재 위치로 이동 출발점을 덮어쓸 수 없습니다.')
         origin={**origin,'coordinate_permitted':True,'id':'plan_b_origin','place_id':None}
-        catalog=self.discovery.catalog(actor,trip,snapshot['city']);used={i.get('place_id') for i in current['items']}
+        # origin makes the stored-row LIMIT use the local spatial ordering, so the
+        # nearest candidates are not cut by place_id before order_pool ranks them.
+        category=old.get('category')
+        catalog=self.discovery.catalog(actor,trip,snapshot['city'],categories=[category] if category else None,origin=origin);used={i.get('place_id') for i in current['items']}
         pool=[p for p in catalog if p['place_id'] not in used and not p['excluded'] and p['category']==old.get('category')]
         alternatives=[];rejected=[];processed=0;route_totals={'requests':0,'provider_calls':0};route_costs=[];stop='exhausted'
-        for candidate in sorted(pool,key=lambda p:p['place_id'])[:MAX_CANDIDATES]:
+        scores=run_scores(getattr(engine,'recommendations',None),actor,trip,snapshot,old.get('place_id'))
+        visit={'date':str(old.get('local_start',''))[:10],'timezone':snapshot['timezone']}
+        for candidate,distance in order_pool(pool,origin,scores)[:MAX_CANDIDATES]:
             if time.monotonic()-started>=MAX_SECONDS:stop='time_cap';break
             processed+=1;pid=candidate['place_id'];reasons=[]
-            if body['reason']=='rain' and 'indoor' not in candidate['tags']: reasons.append('INDOOR_UNCONFIRMED')
-            distance=movement(candidate,{'origin':origin})['distance_m']
+            indoor=indoor_status(candidate,visit,now)
+            if body['reason']=='rain':
+                if indoor['status']=='outdoor_confirmed':reasons.append('OUTDOOR_CONFIRMED')
+                elif indoor['status']=='unconfirmed':reasons.append('INDOOR_UNCONFIRMED')
             limit=radius or saved_radius
             if limit and (distance is None or distance>limit):reasons.append('RADIUS_UNCONFIRMED' if distance is None else 'RADIUS_EXCEEDED')
             if reasons:rejected.append({'place_id':pid,'reason_codes':reasons});continue
@@ -113,11 +183,11 @@ class Alternatives:
             original_candidate=next((c for c in data['candidates'] if c['place_id']==old.get('place_id')),None)
             original_price=Facts(original_candidate or {},{'date':old['local_start'][:10],'timezone':snapshot['timezone']},now).get('price')[0]
             next_fixed=next(iter(sorted((i for i in current['items'] if i.get('booking_id') and i.get('start_instant') and utc(i['start_instant'])>=utc(old['end_instant'])),key=lambda i:i['start_instant'])),None)
-            result['comparison']={'preserved_fixed_item_ids':[i['item_id'] for i in current['items'] if i.get('booking_id')],'next_fixed_start':next_fixed.get('local_start') if next_fixed else None,'price_before':original_price,'before':old,'after':next(i for i in result['items'] if i['item_id']==new_id_item),'price':price,'price_source_refs':facts.refs(refs),'cost_delta':None,'cost_delta_reason':'Same-basis total cost not confirmed','distance_from_origin_m':distance}
+            result['comparison']={'preserved_fixed_item_ids':[i['item_id'] for i in current['items'] if i.get('booking_id')],'next_fixed_start':next_fixed.get('local_start') if next_fixed else None,'price_before':original_price,'before':old,'after':next(i for i in result['items'] if i['item_id']==new_id_item),'price':price,'price_source_refs':facts.refs(refs),'cost_delta':None,'cost_delta_reason':'Same-basis total cost not confirmed','distance_from_origin_m':distance,'indoor':indoor}
             result['route_usage']=deepcopy(route.stats)
             alternatives.append(engine._store_preview(actor,trip,row,snapshot,data,result,commands,preview_id,'plan_b',tv,cv))
             if len(alternatives)==3:stop='result_cap';break
         if processed>=MAX_CANDIDATES and len(pool)>MAX_CANDIDATES:stop='candidate_cap'
         return {'alternatives':alternatives,'rejected':rejected,'reason_codes':[] if alternatives else ['NO_FEASIBLE_REPLACEMENT'],
             'situation':{'reason':body['reason'],'basis':body['basis'],'live_weather':None,'live_queue_minutes':None,'live_seats':None},
-            'limits':{'max_candidates':MAX_CANDIDATES,'max_seconds':MAX_SECONDS,'examined':processed,'termination':stop,'elapsed_seconds':round(time.monotonic()-started,3)},'route_usage':{**route_totals,'attempt_costs':route_costs},'external_action':'none'}
+            'limits':{'max_candidates':MAX_CANDIDATES,'max_seconds':MAX_SECONDS,'ordering':(['score_lower'] if scores else [])+['straight_line_distance','place_id'],'examined':processed,'termination':stop,'elapsed_seconds':round(time.monotonic()-started,3)},'route_usage':{**route_totals,'attempt_costs':route_costs},'external_action':'none'}

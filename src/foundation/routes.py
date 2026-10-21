@@ -69,6 +69,28 @@ def mail_capabilities(request:Request,actor:Actor=Depends(require_actor)):
     return request.app.state.operations.mail_capabilities()
 
 
+class PersonalTokenCreate(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    name: str = Field(min_length=1,max_length=60)
+    expires_in_days: int = Field(30,ge=1,le=30)
+    scopes: list[Literal['read','ask']] = Field(default_factory=lambda:['read','ask'],min_length=1,max_length=2)
+
+
+# Token management is cookie + CSRF only (not in the Bearer allowlist).
+@router.get('/personal-tokens')
+def personal_tokens(request:Request,actor:Actor=Depends(require_actor)):
+    return request.app.state.auth.tokens.listing(actor,is_enabled=request.app.state.settings.personal_tokens_enabled)
+
+@router.post('/personal-tokens',status_code=201)
+def create_personal_token(body:PersonalTokenCreate,request:Request,actor:Actor=Depends(require_actor)):
+    return request.app.state.auth.tokens.create(actor,name=body.name,days=body.expires_in_days,scopes=body.scopes,
+        is_enabled=request.app.state.settings.personal_tokens_enabled)
+
+@router.delete('/personal-tokens/{token_id}')
+def revoke_personal_token(token_id:str,request:Request,actor:Actor=Depends(require_actor)):
+    return request.app.state.auth.tokens.revoke(actor,token_id)
+
+
 @router.get('/auth/login')
 async def login(request:Request):
     return await start_login(request)
@@ -409,22 +431,37 @@ def delete_document(trip_id:str,document_id:str,request:Request,actor:Actor=Depe
     return {'state':'deletion_requested','job_id':queued['job_id']}
 
 
+def _itinerary_state(db,user_id,trip_id):
+    with db.connect() as con:
+        # By column name: the PostgreSQL Row is a dict, so tuple(row) would be the column names.
+        return [(row['id'],row['version'],row['active_revision_id']) for row in con.execute('SELECT id,version,active_revision_id FROM itineraries WHERE trip_id=? AND owner_id=? ORDER BY id',(trip_id,user_id))]
+
+
 def perform_ask(trip_id,body,request,actor):
     trip=request.app.state.repo.get_trip(actor.id,trip_id)
     before={b['id']:b['version'] for b in request.app.state.repo.list_bookings(actor.id,trip_id)}
+    plans=_itinerary_state(request.app.state.db,actor.id,trip_id)
     context=SearchContext(actor.id,trip_id,trip['version'],request.state.request_id,actor.session_id)
+    agent=None
+    from src.trip_agent.service import answer_with_agent, enabled
+    if request.app.state.answer_generator is None and enabled(request.app.state.settings):
+        # Reads, previews and drafts only; applying stays a user click on PATCH.
+        agent=lambda question,history:answer_with_agent(request.app.state,actor,context,question,history)
     try:
-        result=answer(request.app.state.repo,request.app.state.documents,context,body.question,[m.model_dump() for m in body.history],request.app.state.answer_generator)
+        result=answer(request.app.state.repo,request.app.state.documents,context,body.question,[m.model_dump() for m in body.history],request.app.state.answer_generator,agent=agent)
     except DomainError:
-        request.app.state.auth.actor(request)
+        request.app.state.auth.revalidate(request,actor)
         raise
     except Exception as exc:
         raise DomainError('ANSWER_UNAVAILABLE','답변 서비스를 사용할 수 없습니다. 잠시 후 다시 시도해 주세요.',503) from exc
-    request.app.state.auth.actor(request)
+    # Same credential kind as admission: cookie session, or the personal token row.
+    request.app.state.auth.revalidate(request,actor)
     current=request.app.state.repo.get_trip(actor.id,trip_id)
     after={b['id']:b['version'] for b in request.app.state.repo.list_bookings(actor.id,trip_id)}
     if current['version'] != context.trip_version or before != after:
         raise DomainError('VERSION_CONFLICT','답변 중 예약이 변경되었습니다. 다시 질문해 주세요.',409)
+    if _itinerary_state(request.app.state.db,actor.id,trip_id) != plans:
+        raise DomainError('VERSION_CONFLICT','답변 중 일정이 변경되었습니다. 다시 질문해 주세요.',409)
     return result
 
 @router.post('/trips/{trip_id}/ask')

@@ -20,6 +20,10 @@ class Settings:
     preparation_enabled: bool = field(default_factory=lambda: os.getenv('PREPARATION_ENABLED', 'true').lower() == 'true')
     plan_b_enabled: bool = field(default_factory=lambda: os.getenv('PLAN_B_ENABLED', 'true').lower() == 'true')
     offline_enabled: bool = field(default_factory=lambda: os.getenv('OFFLINE_ENABLED', 'false').lower() == 'true')
+    # Personal access tokens (local MCP bridge). OFF unless explicitly '1'/'true'.
+    personal_tokens_enabled: bool = field(default_factory=lambda: os.getenv('PERSONAL_TOKENS_ENABLED', '0').strip().lower() in {'1', 'true'})
+    # Open-Meteo forecast: unset -> on only for APP_ENV=development; set but empty -> off.
+    weather_enabled: bool | None = field(default_factory=lambda: None if 'WEATHER_ENABLED' not in os.environ else os.getenv('WEATHER_ENABLED', '').strip().lower() in {'true', '1'})
     storage_backend: str = field(default_factory=lambda: os.getenv('STORAGE_BACKEND', 'local'))
     database_url: str = field(default_factory=lambda: os.getenv('DATABASE_URL', ''))
     supabase_url: str = field(default_factory=lambda: os.getenv('SUPABASE_URL', ''))

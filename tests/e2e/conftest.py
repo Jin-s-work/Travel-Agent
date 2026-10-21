@@ -120,3 +120,38 @@ def new_page(browser, request):
         else:
             context.tracing.stop()
         context.close()
+
+
+@pytest.fixture(scope='session')
+def stage3_agent_server(tmp_path_factory):
+    """E06 only: scripts/stage3_agent_fixture.py (AI mode + scripted trip agent), its own free ports and data."""
+    app_port, idp_port = free_port(), free_port()
+    fixture_dir = tmp_path_factory.mktemp('stage3-agent-browser')
+    env = {**os.environ, 'PYTHON_DOTENV_DISABLED': '1', 'STAGE3_APP_PORT': str(app_port),
+           'STAGE3_IDP_PORT': str(idp_port), 'BROWSER_FIXTURE_DIR': str(fixture_dir)}
+    log = (fixture_dir / 'server.log').open('w')
+    process = subprocess.Popen([sys.executable, str(ROOT / 'scripts/stage3_agent_fixture.py')],
+                               cwd=ROOT, env=env, stdout=log, stderr=subprocess.STDOUT)
+    base, idp = f'http://127.0.0.1:{app_port}', f'http://127.0.0.1:{idp_port}'
+    deadline = time.monotonic() + 120
+    try:
+        while True:
+            if process.poll() is not None:
+                raise RuntimeError('stage3 agent fixture exited early; see ' + str(fixture_dir / 'server.log'))
+            try:
+                if httpx.get(base + '/health/ready', timeout=2).status_code == 200 and \
+                        httpx.get(idp + '/.well-known/openid-configuration', timeout=2).status_code == 200:
+                    break
+            except httpx.TransportError:
+                pass
+            if time.monotonic() > deadline:
+                raise RuntimeError('stage3 agent fixture did not become ready in 120s')
+            time.sleep(0.5)
+        yield {'base': base, 'idp': idp, 'dir': fixture_dir}
+    finally:
+        process.terminate()
+        try:
+            process.wait(10)
+        except subprocess.TimeoutExpired:
+            process.kill()
+        log.close()
