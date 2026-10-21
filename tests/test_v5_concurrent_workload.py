@@ -25,10 +25,14 @@ def test_five_users_overlap_documents_and_recommendations(public):
         inputs.append((u,trip,base))
     def submit(row):
         u,trip,base=row;started=time.perf_counter()
-        document=u.client.post(base+'/documents',files=[('files',('synthetic.txt',b'Synthetic reservation only','text/plain'))],headers={'Idempotency-Key':'load-mail'})
-        assert document.status_code==202
+        # Recommendation first: a finished document job bumps trips.version, so a
+        # recommendation sent after it with the earlier trip_version is a correct
+        # 409 VERSION_CONFLICT (the old intermittent failure). Running jobs do not
+        # re-check the version, so the two jobs still overlap in the queue.
         recommendation=u.client.post(base+'/recommendations',json={'trip_version':trip['version'],'conditions_version':1},headers={'Idempotency-Key':'load-recommend'})
-        assert recommendation.status_code==202
+        assert recommendation.status_code==202,recommendation.text
+        document=u.client.post(base+'/documents',files=[('files',('synthetic.txt',b'Synthetic reservation only','text/plain'))],headers={'Idempotency-Key':'load-mail'})
+        assert document.status_code==202,document.text
         return row,document.json(),recommendation.json(),(time.perf_counter()-started)*1000
     start=time.perf_counter()
     with ThreadPoolExecutor(max_workers=5) as pool:receipts=list(pool.map(submit,inputs))

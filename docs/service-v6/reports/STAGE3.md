@@ -69,7 +69,7 @@
 
 - 부분 답변은 지금까지 도구가 돌려준 사실만으로 만들고, 못 한 것을 말한다.
 - 첫 모델 호출 전 실패(예산 소진 등)는 기존 라우터와 같은 오류로 전파한다: `BUDGET_EXHAUSTED` 429 / `GLOBAL_BUDGET_STOPPED` 503.
-- 최종 리뷰(B1)로 바뀐 동작: 도구가 위 오류를 받으면 예전처럼 "도구 실패" 결과로 모델에 돌려주지 않는다. 돌려주면 모델이 `search_mail`을 다시 부르고 새 call_key 로 재전송되기 때문이다. 1단계 이후 chat 공급자 오류도 예전에는 HTTP 오류였지만 이제 200 부분 답변(`provider_stopped`)이다. 회귀 시험: `test_uncertain_search_mail_is_not_resent_in_the_same_question`. `evals/agent/scenarios.json` 에는 이 종료 사유 시나리오가 아직 없다.
+- 최종 리뷰(B1)로 바뀐 동작: 도구가 위 오류를 받으면 예전처럼 "도구 실패" 결과로 모델에 돌려주지 않는다. 돌려주면 모델이 `search_mail`을 다시 부르고 새 call_key 로 재전송되기 때문이다. 1단계 이후 chat 공급자 오류도 예전에는 HTTP 오류였지만 이제 200 부분 답변(`provider_stopped`)이다. 회귀 시험: `test_uncertain_search_mail_is_not_resent_in_the_same_question`. `evals/agent/scenarios.json` 에는 이 종료 사유 시나리오가 아직 없다(후속: 같은 날 `ps-01~03` 추가 — `IMPLEMENTATION_STATUS.md` 참고).
 - 최종 답은 2단계 근거 검증기를 이번 요청의 도구 결과에 대해 통과해야 `grounding=verified`다. 근거 없는 원자, 출처 줄을 지우면 빈 답, 행동 완료 주장("삭제했어요·적용했어요·보냈어요")은 도구 결과 요약(`grounding=fallback`)으로 바뀐다.
 - 도구 결과는 `<tool_result … trust="untrusted_data">` 블록에 넣고, 내용의 `<`·`>`를 `<`·`>`로 바꿔 데이터가 블록을 닫을 수 없게 했다.
 
@@ -308,7 +308,7 @@ E06 fixture(`scripts/stage3_agent_fixture.py`)는 가짜 모델을 쓰고, 서�
 | --- | --- | --- |
 | 비용 상한 장부 초과 (B3 뒤) | 429 재시도가 있으면 `pending_reconciliation` 행의 예상비용까지 장부에 잡혀 장부상 합계가 상한을 넘을 수 있다 | 합성 재현: 상한 25000, 장부 31020, 실제 확정 10340 |
 | `search_mail` 과 deadline | 임베딩은 에이전트 deadline(25초)에 묶이지 않는다(시도당 45초, 429면 최대 3회) | MCP `ask` 120초도 엄밀한 상한이 아니다 |
-| `provider_stopped` 평가 | B1 뒤 1단계 이후 chat 공급자 오류가 HTTP 오류에서 200 부분 답변으로 바뀌었다 | `evals/agent/scenarios.json` 에 시나리오 0개, 단위 시험만 |
+| `provider_stopped` 평가 | B1 뒤 1단계 이후 chat 공급자 오류가 HTTP 오류에서 200 부분 답변으로 바뀌었다 | `evals/agent/scenarios.json` 에 시나리오 0개, 단위 시험만 (후속: `ps-01~03` 추가로 해소) |
 | 전송·정산 뒤 오류 | `parse_embed` 실패처럼 과금이 확정된 뒤의 오류 | 루프를 멈추지 않고 도구 오류로 남는다 |
 
 ## 알려진 한계
@@ -321,7 +321,7 @@ E06 fixture(`scripts/stage3_agent_fixture.py`)는 가짜 모델을 쓰고, 서�
 - 200% 글자 크기에서 하단 메뉴 글자가 겹친다(기존 레이아웃, 카드와 무관).
 - 질문당 비용 상한은 장부 기준으로 넘을 수 있다. 429 재시도가 있으면 `pending_reconciliation` 행의 예상비용까지 합산되기 때문이다(합성 재현: 상한 25000, 장부 31020, 실제 확정 10340).
 - `search_mail` 임베딩은 에이전트 deadline(25초)에 묶이지 않는다(시도당 45초, 429면 최대 3회). 그래서 MCP `ask` 120초도 엄밀한 상한이 아니다.
-- 1단계 이후 chat 공급자 오류는 HTTP 오류가 아니라 200 부분 답변(`provider_stopped`)이다. `evals/agent/scenarios.json` 에 이 종료 사유 시나리오는 0개이고 단위 시험만 있다.
+- 1단계 이후 chat 공급자 오류는 HTTP 오류가 아니라 200 부분 답변(`provider_stopped`)이다. `evals/agent/scenarios.json` 에 이 종료 사유 시나리오는 0개이고 단위 시험만 있다(후속: 같은 날 `ps-01~03` 추가로 해소).
 - 전송·정산이 끝난 뒤의 오류(`parse_embed` 실패 등)는 과금이 확정된 것이라 루프를 멈추지 않고 도구 오류로 모델에 돌아간다.
 
 ## 대표에게 넘길 일

@@ -37,7 +37,7 @@
 | 3-A·B 에이전트 | 도구 10 · 상한 루프 · 근거 검증 · 빠른 경로 유지 · 과금 불확정 오류는 `provider_stopped` 부분 답변 · 비용 상한을 보내기 전 검사 (최종 리뷰 후: 장부상 합계는 429 재시도 시 상한 초과 가능 · search_mail 임베딩은 25초 deadline 밖 — 「다음 실행 조건」) | 금지 도구 부재·AI OFF 동일·예산 동일 시험 · 루프 18 · 도구 9 · API 39 | 해당 없음 | live 시나리오 미실행 | 미배포, 운영 `TRIP_AGENT_ENABLED` 미설정=OFF |
 | 3-C·F 미리보기 카드 | 질문 화면 카드 · 확인 범위 줄 | JS 시험 · 질문 전후 일정 불변 | E06·E06b·E06c·E06d 통과(합성) | 해당 없음 | 미배포 |
 | 3-D 날씨 · Plan B | Open-Meteo(도시 공개 좌표) · 점수·거리 정렬 · `indoor_likely` | 가짜 fetcher 시험 · Plan B 회귀 · 날씨 32 · Plan B 11 | CC BY 4.0 링크 | Open-Meteo 실호출 0 | 미배포, 운영 `WEATHER_ENABLED=0` |
-| 3-E 안전 평가 | `evals/agent/` 50 시나리오 · `ci-eval` 게이트 | 금지 도구 실행(시도 12)·무단 적용·노출·주입(텍스트·링크 포함)·근거 없는 원자·단언 실패 0, 평균 2.708단계 (replay, 손으로 쓴 스크립트) · 시험 33 | 해당 없음 | live 미실행 · `provider_stopped` 시나리오 0개 | 해당 없음 |
+| 3-E 안전 평가 | `evals/agent/` 53 시나리오(후속 `ps-01~03` 포함) · `ci-eval` 게이트 | 금지 도구 실행(시도 12)·무단 적용·노출·주입(텍스트·링크 포함)·근거 없는 원자·단언 실패 0, 평균 2.708단계 (replay, 손으로 쓴 스크립트) · 시험 36 | 해당 없음 | live 미실행 | 해당 없음 |
 | 3-G 개인 토큰 · MCP | hash 저장 토큰 · Bearer 허용 목록 · `tools/mcp_going/` · ask 120초(엄밀한 상한 아님 — 「다음 실행 조건」) · get_itinerary 좌표 미노출 | 토큰 22 · MCP 10 시험 | 해당 없음 | 실제 MCP 클라이언트 연결 미실행 | 미배포, 운영 `PERSONAL_TOKENS_ENABLED=0` |
 | 4-A 무료 후보 보강 | 영업시간 파서 · 볼거리(reference) · 범위 보고 스크립트 | 파서 95 · 볼거리 16 · 범위 5 시험 (2026-10-21 `pytest --collect-only`) | 해당 없음 | 실제 Photon·운영 DB 미실행(과거 값만) | 미배포 |
 | 4-B 라벨 도구 | 블라인드 CLI · pooled · `judged@5` | 라벨 시험 21(collect-only 확인) · 합성 smoke | 해당 없음 | **사람 라벨 0건(라벨 대기)** | 해당 없음 |
@@ -101,7 +101,7 @@
 | PostgreSQL 시험 | 미실행(Docker 꺼 둠). 2~4단계 PG 경로 미확인 | 6 |
 | live 평가·호출 | 미실행. 모든 평가 숫자는 synthetic | 2 |
 | 사람 라벨 | 0건, 4단계 라벨 대기 | 3 |
-| `provider_stopped` | 최종 리뷰 B1 뒤 에이전트 루프 첫 단계 이후 chat 공급자 오류가 HTTP 오류 대신 200 부분 답변으로 바뀜. `evals/agent/scenarios.json`에 이 시나리오 0개(단위 시험만) | 4 |
+| `provider_stopped` | 최종 리뷰 B1 뒤 에이전트 루프 첫 단계 이후 chat 공급자 오류가 HTTP 오류 대신 200 부분 답변으로 바뀜. 후속으로 평가 시나리오 `ps-01~03`(응답 유실·429·첫 단계 실패)을 추가해 게이트가 지킨다(replay) | 4 |
 | B3 장부 초과 | 429 재시도가 있으면 정산 대기 행의 예상비용까지 장부에 잡혀 장부상 합계가 질문당 상한을 넘을 수 있음(합성 재현: 상한 25000, 장부 31020, 실제 확정 10340) | 4 |
 | 시간 상한 비엄밀 | search_mail 임베딩은 에이전트 deadline 25초에 묶이지 않음(시도당 45초, 429면 최대 3회). MCP ask 120초도 엄밀한 상한 아님 | 4 |
 | 정산 뒤 오류 | 전송·정산 뒤 오류(parse_embed 실패)는 과금 확정이라 `provider_stopped`가 아닌 도구 오류로 남음 | 4 |
@@ -109,10 +109,10 @@
 1. 대표: push → Actions 6+1 job(`eval` 추가) 확인 ([출시 체크리스트](reports/RELEASE_CHECKLIST.md))
 2. 대표: live 평가 — 메일 5건 ≤ 0.20 USD, 질문 10문항 ≤ 0.20 USD (명령은 [STAGE2.md](reports/STAGE2.md#대표에게-넘길-일)). 결과로 유사도 하한 확정
 3. 대표: 4단계 라벨 — 운영 DB 범위 확인 → 카탈로그 내보내기 → 질의 확정 → pool 동결 → 라벨(holdout 먼저). 그 뒤 "라벨 완료, 묶음 C 진행" ([LABELING.md](LABELING.md))
-4. 운영에서 에이전트·날씨·토큰을 켜기 전: `provider_stopped` 동작 확인(평가 시나리오 없음), 질문당 비용 상한 [가설] 확인, Open-Meteo 비상업 해당 여부, 토큰 허용 목록 재검토
+4. 운영에서 에이전트·날씨·토큰을 켜기 전: `provider_stopped` 화면 문구 확인(replay 시나리오는 있음, live 미실행), 질문당 비용 상한 [가설] 확인, Open-Meteo 비상업 해당 여부, 토큰 허용 목록 재검토
 5. 디스크 여유 확보 — iCloud가 받은 파일을 다시 내려놓아 시험이 멈추는 일이 반복됨(dataless 685 → 1,079 관측)
 6. Docker를 켤 수 있을 때 PostgreSQL 시험(`make ci-postgres`) — 2~4단계의 PG 경로는 미실행
-7. `test_v5_concurrent_workload` 간헐 409(409 vs 202) 원인 조사 — 2026-10-21 최종 리뷰 전 실행에서도 1회 재현, 원인 [미확인]
+7. ~~`test_v5_concurrent_workload` 간헐 409~~ — 해결(후속 커밋). 원인: 메일 작업이 먼저 끝나면 `activate_generation`이 여행 버전을 올려, 같은 스레드가 뒤이어 보낸 추천 요청의 `trip_version`이 낡아 409 `VERSION_CONFLICT`(제품 동작은 맞음, 시험 순서 가정 문제). 강제 재현으로 확인(버전 1→2, 409). 시험이 추천을 먼저 보내도록 바꿨다(실행 중인 추천 작업은 버전을 다시 검사하지 않아 두 작업은 여전히 겹친다)
 
 ## 커밋
 
@@ -124,9 +124,14 @@
 | `63fe587` | 3단계: 여행 에이전트·날씨·Plan B·개인 토큰·로컬 MCP | pytest 1587 passed · 30 skipped · node 227/227 · 자산 hash 일치(이 커밋 기준 재계산) |
 | `db11516` | 평가 하네스: mail·qa·agent 평가셋, 게이트, `make ci-eval`, CI eval job | pytest 1705 passed · 30 skipped · node 227/227 · ci-eval pass |
 | `c3d752d` | 4단계: 영업시간 파서·볼거리·라벨 도구·피드백 루프(라벨 대기) | pytest 1887 passed · 30 skipped · node 233/233 · ci-eval pass |
-| 이 커밋 | 보고서·운영 문서·E06 캡처 + 보고서 대조에서 찾은 숫자·문구 정정 3곳(`evals/thresholds.json` note, `evals/mail/README.md`, `evals/agent/README.md`, `src/evals/agent.py` 보고서 문장) | 작업 트리 전체: 「최종 전체 시험」 절 |
+| `0fcc038` | 보고서·운영 문서·E06 캡처 + 보고서 대조에서 찾은 숫자·문구 정정 3곳(`evals/thresholds.json` note, `evals/mail/README.md`, `evals/agent/README.md`, `src/evals/agent.py` 보고서 문장) | 작업 트리 전체: 「최종 전체 시험」 절 |
+| 이 커밋(후속) | `provider_stopped` 평가 시나리오 `ps-01~03`(스크립트 단계 `provider_error`) · 간헐 409 시험 순서 수정 · 이 표·README 갱신 | 작업 트리 전체: 아래 「후속 시험」 |
 
 한 커밋에 두 단계가 섞인 덩어리 3개(`src/foundation/db.py`·`src/storage/postgres.py`의 스키마 줄, `src/foundation/search.py`의 hook 줄)는 줄 단위로 나눴다. 평가 하네스는 2·3단계에 걸쳐 있어(agent 평가가 3단계 코드를 부른다) 3단계 뒤 별도 커밋으로 묶었다.
+
+### 후속 시험 (2026-10-21, 후속 커밋 직전 작업 트리)
+
+`make ci-python` 1893 passed · 30 skipped · 0 failed(6분 53초, 1890 + 검증기 시험 3) · `make ci-js` 233/233 · `make ci-eval` gate pass(agent_replay 53 시나리오, 단언 실패 0, synthetic). `test_v5_concurrent_workload` 는 수정 전 3개 병렬 × 15회 반복에서 0회 실패(자연 재현 안 됨) → 메일 작업 완료를 강제한 합성 재현으로 원인 확인, 수정 뒤 단독 5회 통과. PostgreSQL 미실행.
 
 ## 산출물
 

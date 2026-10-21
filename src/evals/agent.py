@@ -59,7 +59,11 @@ EXPECTED_KEYS = {'tools', 'forbidden_tools', 'must_include', 'must_not_include',
                  'stop_reason', 'error_code', 'tool_errors', 'injection_markers', 'known_gap'}
 SCENARIO_KEYS = {'id', 'category', 'question', 'history', 'actor', 'trip', 'script', 'expected', 'setup', 'limits',
                  'fail_services', 'note', 'live'}
-STEP_KEYS = {'tool_calls', 'final', 'finish', 'delay_ms'}
+STEP_KEYS = {'tool_calls', 'final', 'finish', 'provider_error', 'delay_ms'}
+# A scripted step that fails at the provider instead of answering. The gateway
+# turns a lost response into PROVIDER_OUTCOME_UNKNOWN and a definitive 429 into
+# PROVIDER_RATE_LIMITED; after a step the loop stops with `provider_stopped`.
+PROVIDER_ERRORS = ('outcome_unknown', 'rate_limited')
 PLACEHOLDER = re.compile(r'\{\{\s*([^{}]+?)\s*\}\}')
 _RESULT = re.compile(r'<tool_result name="([^"]+)" trust="untrusted_data">\n(.*)\n</tool_result>', re.S)
 # Unauthorized change = any row of any table inserted, updated or deleted
@@ -138,9 +142,11 @@ def validate_scenarios(scenarios, fixture, tool_names=None):
             if not isinstance(step, dict) or set(step) - STEP_KEYS:
                 problems.append(f'{spot} 키는 {sorted(STEP_KEYS)} 만')
                 continue
-            kinds = [key for key in ('tool_calls', 'final', 'finish') if key in step]
+            kinds = [key for key in ('tool_calls', 'final', 'finish', 'provider_error') if key in step]
             if len(kinds) != 1:
-                problems.append(f'{spot} tool_calls / final / finish 중 정확히 하나')
+                problems.append(f'{spot} tool_calls / final / finish / provider_error 중 정확히 하나')
+            if 'provider_error' in step and step['provider_error'] not in PROVIDER_ERRORS:
+                problems.append(f'{spot} provider_error 는 {PROVIDER_ERRORS}')
             for call in step.get('tool_calls') or []:
                 if not isinstance(call, dict) or not isinstance(call.get('name'), str):
                     problems.append(f'{spot} 도구 호출에는 name 필요')
@@ -165,8 +171,9 @@ def validate_scenarios(scenarios, fixture, tool_names=None):
             problems.append(f'{where} grounding 은 {GROUNDING_STATES}')
         if expected.get('stop_reason') not in (None, *STOP_REASONS):
             problems.append(f'{where} stop_reason 은 {STOP_REASONS}')
-        if expects_error and script:
-            problems.append(f'{where} error_code 기대 시나리오는 모델 호출 전에 끝나므로 script 가 비어야 함')
+        if expects_error and script and not (len(script) == 1 and 'provider_error' in script[0]):
+            problems.append(f'{where} error_code 기대 시나리오는 script 가 비거나(모델 호출 전 실패) '
+                            f'첫 단계 provider_error 하나뿐이어야 함')
         if not expects_error:
             for key in ('preview', 'grounding', 'stop_reason'):
                 if key not in expected:
@@ -359,6 +366,11 @@ class ScriptAdapter:
             step = self.script[number]
             if step.get('delay_ms'):
                 time.sleep(step['delay_ms'] / 1000)
+            if step.get('provider_error') == 'outcome_unknown':
+                raise TimeoutError('synthetic lost response (agent eval)')
+            if step.get('provider_error') == 'rate_limited':
+                from src.reliability.providers import ProviderRejected
+                raise ProviderRejected('PROVIDER_RATE_LIMITED', retryable=False, status=429)
             results = tool_results(kwargs['messages'])
             try:
                 turn = self._turn(number, step, results)

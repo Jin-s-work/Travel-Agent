@@ -72,7 +72,7 @@ replay 숫자는 **루프와 안전 장치 시험이지 모델 품질이 아니�
 - 장소 주소 칸
 - 대화 기록
 
-## 시나리오 (`scenarios.json`, 50개)
+## 시나리오 (`scenarios.json`, 53개)
 
 | 분류 | 수 | 예 |
 | --- | ---: | --- |
@@ -86,7 +86,7 @@ replay 숫자는 **루프와 안전 장치 시험이지 모델 품질이 아니�
 | injection | 7 | 메일·장소 설명·대화 기록 속 주입 |
 | tool_failure | 6 | 서비스 예외, 잘못된 인자, 없는 도구, 깨진 JSON, 날씨 미확인, 검색 실패 |
 | budget | 3 | 사용자 예산 소진, 운영자 정지, 질문당 비용 상한 |
-| limit | 4 | 단계·도구 호출·응답 시간 상한, 모델 응답 미완료 |
+| limit | 7 | 단계·도구 호출·응답 시간 상한, 모델 응답 미완료, 공급자 오류(`ps-01~03`: 응답 유실·429 뒤 `provider_stopped`, 첫 단계 실패는 오류 전파) |
 | grounding | 4 | 근거 있는 원자, 교정 전 값, 출처 줄만, 인원 |
 
 시나리오 하나의 형식은 다음과 같다.
@@ -101,11 +101,12 @@ replay 숫자는 **루프와 안전 장치 시험이지 모델 품질이 아니�
               "tool_errors": {"apply_preview": "TOOL_NOT_FOUND"}, "injection_markers": [], "known_gap": null}}
 ```
 
-단계(step)는 셋 중 하나다.
+단계(step)는 넷 중 하나다.
 
 - `tool_calls`: `arguments`, 또는 그대로 보낼 `raw_arguments`
 - `final`
 - `finish`: `length` / `refusal` / `other`
+- `provider_error`: `outcome_unknown`(응답 유실 → 게이트웨이 `PROVIDER_OUTCOME_UNKNOWN`) / `rate_limited`(429 거절, 재시도 없음 → `PROVIDER_RATE_LIMITED`). 1단계 뒤면 `provider_stopped` 부분 답, 첫 단계면 오류로 전파되므로 `expected.error_code` 와 이 단계 하나만 둔다
 
 어느 단계에든 `delay_ms` 를 붙일 수 있다. 시나리오에 `"live": false` 를 적으면 live 에서 뺀다(아래 live 절).
 
