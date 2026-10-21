@@ -77,7 +77,8 @@ def itinerary_row(app, itinerary_id):
         row = con.execute('SELECT version,active_revision_id,undo_stack_json,updated_at FROM itineraries WHERE id=?',
                           (itinerary_id,)).fetchone()
         previews = con.execute('SELECT COUNT(*) FROM itinerary_previews WHERE itinerary_id=?', (itinerary_id,)).fetchone()[0]
-    return tuple(row), previews
+    # Values by column name: a PostgreSQL row is a dict (tuple(row) would be the names).
+    return tuple(row[k] for k in row.keys()), previews
 
 
 @pytest.fixture
@@ -266,7 +267,7 @@ def test_preview_tool_only_adds_a_preview_row_and_keeps_fixed_booking_and_versio
     with app.state.db.connect() as con:
         stored = con.execute('SELECT kind,owner_id,applied_revision_id FROM itinerary_previews WHERE id=?',
                              (value['preview_id'],)).fetchone()
-    assert tuple(stored) == ('user_edit', ctx.user_id, None)
+    assert (stored['kind'], stored['owner_id'], stored['applied_revision_id']) == ('user_edit', ctx.user_id, None)
     assert world['client'].get(world['path']).json()['items'] == itinerary['items']
     fixed = next(i for i in itinerary['items'] if i.get('booking_id'))
     guarded = call(ctx, 'preview_itinerary_change', itinerary_id=itinerary['id'], expected_version=1,

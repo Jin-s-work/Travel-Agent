@@ -19,7 +19,7 @@
 | A 작업 보존 | 로컬 커밋 11 + 1단계 커밋 + 원격 병합 `27bdfaa` | 해당 없음 | 해당 없음 | 해당 없음 | push 안 함 · fast-forward 가능 |
 | A 게시 안전 점검 | `check_publish_safety.py` | 시험 22개 통과 · 저장소 비밀 0 | 해당 없음 | 해당 없음 | 해당 없음 |
 | B CI | `ci.yml` 7 job(1단계 6 + 2단계 `eval`) · `make ci` | `make ci` 로컬 통과: Python 1302 통과 · 20 skip, JS 220, 자산·게시 점검 (1단계 당시. 최종: Python 1890 통과 · 30 skip, JS 233 — 「최종 전체 시험」) | 해당 없음 | Actions 미실행 | 해당 없음 |
-| B PostgreSQL | 기존 plugin + CI job | 일회용 pgvector 0.8.7/PG17: plugin 282 통과 · 자체 schema 16 통과 (1단계 당시. 최종 리뷰 후 PG 미실행 — 「최종 전체 시험」) | 해당 없음 | 운영 DB 미사용 | 해당 없음 |
+| B PostgreSQL | 기존 plugin + CI job | 일회용 pgvector 0.8.7/PG17: plugin 282 통과 · 자체 schema 16 통과 (1단계 당시, 후속 3에서 같은 숫자로 재확인 — 「PostgreSQL 시험」) | 해당 없음 | 운영 DB 미사용 | 해당 없음 |
 | C E2E 서버·로그인 | 빈 포트 fixture · 합성 OIDC | HTTP 2개 통과 | Chromium에서 A·B 로그인 | 해당 없음 | 해당 없음 |
 | C E2E 브라우저 E01~E05 | Playwright 1.63.0 · CI `e2e` job | 합성 fixture | E01~E05 + E01b 6개 통과, 스크린샷 10장 (최종 `make e2e` 12개 통과 = HTTP 2 + E01~E05·E01b 6 + E06 4) | 해당 없음 | Actions 미실행 |
 | D 이동시간(G4) | 비활성 제공자 → 같은 도시 3km 이하 도보 추정 | 단위 1 · API 1 · JS 1 통과 | E01에서 "직선거리 기준 추정" 표시 확인 | 경로 공급자 호출 0 | 미배포 |
@@ -98,7 +98,7 @@
 
 | 경계 | 지금 상태 | 아래 항목 |
 | --- | --- | --- |
-| PostgreSQL 시험 | 미실행(Docker 꺼 둠). 2~4단계 PG 경로 미확인 | 6 |
+| PostgreSQL 시험 | 후속 3에서 실행(대표 승인으로 Colima 잠시 켬, 끝나고 끔). `make ci-postgres` 통과, v6 PG 경로는 「PostgreSQL 시험」 | 6 |
 | live 평가·호출 | 미실행. 모든 평가 숫자는 synthetic | 2 |
 | 사람 라벨 | 0건, 4단계 라벨 대기 | 3 |
 | `provider_stopped` | 최종 리뷰 B1 뒤 에이전트 루프 첫 단계 이후 chat 공급자 오류가 HTTP 오류 대신 200 부분 답변으로 바뀜. 후속으로 평가 시나리오 `ps-01~03`(응답 유실·429·첫 단계 실패)을 추가해 게이트가 지킨다(replay) | 4 |
@@ -111,7 +111,7 @@
 3. 대표: 4단계 라벨 — 운영 DB 범위 확인 → 카탈로그 내보내기 → 질의 확정 → pool 동결 → 라벨(holdout 먼저). 그 뒤 "라벨 완료, 묶음 C 진행" ([LABELING.md](LABELING.md))
 4. 운영에서 에이전트·날씨·토큰을 켜기 전: `provider_stopped` 화면 문구 확인(replay 시나리오는 있음, live 미실행), 질문당 비용 상한 [가설] 확인, Open-Meteo 비상업 해당 여부, 토큰 허용 목록 재검토
 5. 디스크 여유 확보 — iCloud가 받은 파일을 다시 내려놓아 시험이 멈추는 일이 반복됨(dataless 685 → 1,079 관측)
-6. Docker를 켤 수 있을 때 PostgreSQL 시험(`make ci-postgres`) — 2~4단계의 PG 경로는 미실행
+6. ~~PostgreSQL 시험~~ — 후속 3에서 실행. 남은 것: 평가 하네스(`src/evals/*`)와 일부 단위 시험(직접 SQLite schema 를 만드는 `test_v6_llm_gateway`·`test_v6_extraction_repair`)은 설계상 SQLite 전용이라 PG 로 돌리지 않는다
 7. ~~`test_v5_concurrent_workload` 간헐 409~~ — 해결(후속 커밋). 원인: 메일 작업이 먼저 끝나면 `activate_generation`이 여행 버전을 올려, 같은 스레드가 뒤이어 보낸 추천 요청의 `trip_version`이 낡아 409 `VERSION_CONFLICT`(제품 동작은 맞음, 시험 순서 가정 문제). 강제 재현으로 확인(버전 1→2, 409). 시험이 추천을 먼저 보내도록 바꿨다(실행 중인 추천 작업은 버전을 다시 검사하지 않아 두 작업은 여전히 겹친다)
 
 ## 커밋
@@ -126,7 +126,8 @@
 | `c3d752d` | 4단계: 영업시간 파서·볼거리·라벨 도구·피드백 루프(라벨 대기) | pytest 1887 passed · 30 skipped · node 233/233 · ci-eval pass |
 | `0fcc038` | 보고서·운영 문서·E06 캡처 + 보고서 대조에서 찾은 숫자·문구 정정 3곳(`evals/thresholds.json` note, `evals/mail/README.md`, `evals/agent/README.md`, `src/evals/agent.py` 보고서 문장) | 작업 트리 전체: 「최종 전체 시험」 절 |
 | `cf66ee3` | 후속: `provider_stopped` 평가 시나리오 `ps-01~03`(스크립트 단계 `provider_error`) · 간헐 409 시험 순서 수정 · 이 표·README 갱신 | 작업 트리 전체: 아래 「후속 시험」 |
-| 이 커밋(후속 2) | `search_mail` 임베딩이 에이전트 deadline 을 이어받음(`handlers.embed`·`fake_call`) + 회귀 시험 · 문서·MCP 주석 갱신 | 아래 「후속 시험 2」 |
+| `80b3903` | `search_mail` 임베딩이 에이전트 deadline 을 이어받음(`handlers.embed`·`fake_call`) + 회귀 시험 · 문서·MCP 주석 갱신 | 아래 「후속 시험 2」 |
+| 이 커밋(후속 3) | PostgreSQL 시험 실행 · `v6_data_coverage` 행 형식 수정 · v6 시험의 `tuple(row)`·SQLite 전용 보조 함수 정리 | 「PostgreSQL 시험」 + SQLite `make ci-python` 1894 passed · 30 skipped · 0 failed |
 
 한 커밋에 두 단계가 섞인 덩어리 3개(`src/foundation/db.py`·`src/storage/postgres.py`의 스키마 줄, `src/foundation/search.py`의 hook 줄)는 줄 단위로 나눴다. 평가 하네스는 2·3단계에 걸쳐 있어(agent 평가가 3단계 코드를 부른다) 3단계 뒤 별도 커밋으로 묶었다.
 
@@ -137,6 +138,21 @@
 ### 후속 시험 2 (2026-10-21, 후속 2 커밋 직전 작업 트리)
 
 `make ci-python` 1894 passed · 30 skipped · 0 failed(6분 59초, 회귀 시험 1 추가) · `make ci-eval` gate pass(synthetic) · `GOING_E2E=1 make e2e` 12 passed. 새 시험은 옛 `handlers.py` 로 되돌리면 실패함을 확인. PostgreSQL 미실행.
+
+### PostgreSQL 시험 (2026-10-21, 후속 3)
+
+대표 승인으로 Colima 를 잠시 켜고, CI 와 같은 고정 이미지(pgvector 0.8.7-pg17, loopback 일회용 컨테이너)로 돌린 뒤 컨테이너를 지우고 Colima 를 껐다.
+
+| 실행 | 결과 |
+| --- | --- |
+| `make ci-postgres` | plugin 282 passed · 3 skipped · 자체 schema 16 passed · 0 failed |
+| `test_v6_admin_llm_ops.py` (DSN 지정, 그동안 skip 이던 PG 1건 포함) | 11 passed |
+| v6 시험 전체를 PG plugin 으로(설계상 PG 대상이 아닌 것 포함) | 처음 541 passed · 41 failed · 11 errors → 고친 뒤 실패는 SQLite 전용 하네스만 남음 |
+
+PG 로 돌려서 찾은 것:
+- **제품 코드 1건:** `scripts/v6_data_coverage.py` 가 행을 위치로 풀어(`for a, b, n in rows`) 앱의 PostgreSQL Row(dict)를 받으면 열 이름이 풀렸다(운영 `read()` 경로는 psycopg tuple 이라 영향 없었음). 행 형식과 무관한 `_values()` 로 고침 — PG·SQLite 모두 5 passed.
+- **시험 코드:** `tuple(row)` 비교 4곳(`plan_state`·`itinerary_row`·미리보기 행·실행 행). PG 에서는 열 이름끼리 비교돼 "질문 전후 일정 그대로" 같은 단언이 늘 참이었다(최종 리뷰 C1 과 같은 패턴). 열 이름 기준 값 비교로 고쳤다. `sqlite_master` 를 읽던 표 스냅숏 2곳은 백엔드별 표 목록으로, `ORDER BY rowid` 1곳은 API 가 준 generation id 로 바꿨다. 해당 시험은 SQLite·PG 모두 통과.
+- **남은 PG 실패 48건(설계상 SQLite 전용, 고친 뒤 재실행 49건에서 extraction_fallback 1건을 더 고친 값):** 평가 하네스 `src/evals/mail.py`·`agent.py`(임시 SQLite 세계, `rowid`·`sqlite_master`)를 쓰는 `test_v6_eval_*` 와, 예산 schema 를 `executescript` 로 직접 만드는 `test_v6_llm_gateway`·`test_v6_extraction_repair`. 앱 경로가 아니라 고치지 않았다.
 
 ## 산출물
 

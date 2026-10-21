@@ -358,9 +358,15 @@ def test_scope_read_only_token_cannot_ask(service):
 # personal_access_tokens: last_used_at. dispatcher_leases: the background job
 # dispatcher's own heartbeat, which ticks with or without requests.
 def _table_snapshot(service, skip=("personal_access_tokens", "dispatcher_leases")):
-    with service.app.state.db.connect() as con:
-        names = [row[0] for row in con.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name")]
-        return {name: sorted(map(tuple, con.execute(f'SELECT * FROM "{name}"').fetchall()), key=repr)
+    from src.storage.postgres import PostgresDatabase
+    db = service.app.state.db
+    listing = ("SELECT table_name AS name FROM information_schema.tables WHERE table_schema=current_schema() "
+               "AND table_type='BASE TABLE' ORDER BY table_name" if isinstance(db, PostgresDatabase) else
+               "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name")
+    with db.connect() as con:
+        names = [row['name'] for row in con.execute(listing)]
+        # Values by column name (tuple(row) of a PostgreSQL dict row would be the names).
+        return {name: sorted((tuple(row[k] for k in row.keys()) for row in con.execute(f'SELECT * FROM "{name}"').fetchall()), key=repr)
                 for name in names if name not in skip}
 
 

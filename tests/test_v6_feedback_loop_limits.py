@@ -61,14 +61,16 @@ def test_future_place_id_stays_in_other_trip_snapshot_until_that_trip_is_deleted
     copied = run(discovery, path2, trip2, 'limit-run-3')
     assert copied['snapshot']['feedback_excluded_place_ids'] == [place]
     assert discovery.client.delete(path).status_code == 202
-    assert tuple(_wait_deleted(discovery, origin_run['run_id'])) == ('deleted', '{}')
+    deleted = _wait_deleted(discovery, origin_run['run_id'])
+    assert (deleted['data_status'], deleted['snapshot_json']) == ('deleted', '{}')
     still = discovery.client.get(path2 + '/recommendations/' + copied['run_id']).json()
     assert still['snapshot']['feedback_excluded_place_ids'] == [place]
 
     # 그 다른 여행을 지우면 그쪽 스냅숏도 함께 지워진다.
     assert discovery.client.delete(path2).status_code == 202
     for run_id in (before['run_id'], copied['run_id']):
-        assert tuple(_wait_deleted(discovery, run_id)) == ('deleted', '{}')
+        deleted = _wait_deleted(discovery, run_id)
+        assert (deleted['data_status'], deleted['snapshot_json']) == ('deleted', '{}')
 
 
 def test_feedback_loop_docs_state_the_snapshot_limit():

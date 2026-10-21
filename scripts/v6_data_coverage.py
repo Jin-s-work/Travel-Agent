@@ -48,6 +48,14 @@ class ReadOnly:
         return cursor.execute(sql.replace('?', '%s'), params)
 
 
+def _values(rows):
+    """Row values in column order for any row shape: psycopg tuples (read()),
+    sqlite3.Row, or the app's PostgreSQL Row, which is a dict (unpacking a dict
+    would give the column names)."""
+    for row in rows:
+        yield tuple(row.values()) if isinstance(row, dict) else tuple(row)
+
+
 _ACTIVE_SOURCE = ("s.status='active' AND s.read_confirmed=1 AND s.display_permitted=1 "
                   "AND s.policy_version=f.policy_version")
 
@@ -61,7 +69,7 @@ def _catalog(con, city):
         "AND k.status IN ('approved','public_data') AND k.synthetic=0 "
         "AND EXISTS(SELECT 1 FROM evidence_sources s WHERE s.place_id=p.id AND s.status='active' "
         "AND s.read_confirmed=1 AND s.display_permitted=1) GROUP BY c.category, p.provider", (city,))
-    for category, provider, n in rows:
+    for category, provider, n in _values(rows):
         group = 'public_map' if provider == 'openstreetmap' else 'reviewed'
         if category in CATEGORIES:
             counts[group][category] += n
@@ -79,11 +87,11 @@ def _hours(con, city, now):
         "WHERE p.city=? AND p.provider='openstreetmap' AND p.deleted_at IS NULL AND c.status='public_data' "
         "ORDER BY c.updated_at", (city,))}
     latest = {}
-    for place_id, value, checked in con.execute(
+    for place_id, value, checked in _values(con.execute(
             "SELECT f.place_id, f.value_json, f.checked_at FROM place_facts f "
             "JOIN place_identities p ON p.id=f.place_id JOIN evidence_sources s ON s.id=f.source_id "
             "WHERE p.city=? AND p.provider='openstreetmap' AND p.deleted_at IS NULL "
-            "AND f.field='public_map_tags' AND f.expires_at>? AND " + _ACTIVE_SOURCE, (city, now)):
+            "AND f.field='public_map_tags' AND f.expires_at>? AND " + _ACTIVE_SOURCE, (city, now))):
         if place_id not in latest or checked > latest[place_id][1]:
             latest[place_id] = (value, checked)
     states, by_category, reasons = Counter(), {}, Counter()
@@ -110,16 +118,16 @@ def _hours(con, city, now):
             'raw_hours_presence_rate': round(with_raw / len(latest), 4) if latest else None,
             'reason_codes': dict(sorted(reasons.items())),
             'by_category': {k: dict(v) for k, v in sorted(by_category.items())},
-            'stored_opening_hours_facts_by_status': {status: n for status, n in stored},
+            'stored_opening_hours_facts_by_status': {status: n for status, n in _values(stored)},
             'success_definition': 'parsed 또는 partial(공휴일 표기만 미해석) / opening_hours 원문이 있는 공개지도 장소'}
 
 
 def _photos(con, dict_con, city, now):
     from src.discovery.photos import photo_availability, for_places
     cache = Counter()
-    for payload, expiry in con.execute(
+    for payload, expiry in _values(con.execute(
             "SELECT x.payload_json, x.expires_at FROM place_photo_cache x JOIN place_identities p ON p.id=x.place_id "
-            "WHERE p.city=? AND p.deleted_at IS NULL", (city,)):
+            "WHERE p.city=? AND p.deleted_at IS NULL", (city,))):
         data = json.loads(payload or '{}')
         cache['expired' if expiry <= now else 'available' if data.get('photos') else
               photo_availability(data.get('photo_status', {}).get('reason_codes', []))] += 1
@@ -136,9 +144,9 @@ def _photos(con, dict_con, city, now):
 def _map_calls(con, now, since):
     from src.discovery.public_places import PROVIDER, GLOBAL_DAILY, USER_DAILY, COOLDOWN
     days, owners, errors = {}, {}, Counter()
-    for day, owner, code in con.execute(
+    for day, owner, code in _values(con.execute(
             "SELECT period_day, owner_id, error_code FROM usage_reservations WHERE provider=? AND period_day>=? "
-            "ORDER BY period_day", (PROVIDER, since)):
+            "ORDER BY period_day", (PROVIDER, since))):
         row = days.setdefault(day, {'requests_recorded': 0, 'quota_consuming': 0, 'unsent_connection_failures': 0})
         row['requests_recorded'] += 1
         if code in UNSENT:

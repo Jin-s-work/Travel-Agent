@@ -120,7 +120,8 @@ def ask(client, trip, question, history=None):
 
 def plan_state(app, trip_id):
     with app.state.db.connect() as con:
-        return [tuple(row) for row in con.execute(
+        # By column name: on PostgreSQL a row is a dict and tuple(row) would be the column names.
+        return [tuple(row[k] for k in row.keys()) for row in con.execute(
             'SELECT id,version,active_revision_id,undo_stack_json,updated_at FROM itineraries WHERE trip_id=? ORDER BY id', (trip_id,))]
 
 

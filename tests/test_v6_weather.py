@@ -237,9 +237,14 @@ def test_other_users_trip_is_not_found_and_disabled_is_unknown(wx):
 def _snapshot(db):
     """Every table except the zero-cost usage records the call is meant to write
     and the background job dispatcher's own heartbeat."""
+    from src.storage.postgres import PostgresDatabase
+    listing = ("SELECT table_name AS name FROM information_schema.tables WHERE table_schema=current_schema() "
+               "AND table_type='BASE TABLE' ORDER BY table_name" if isinstance(db, PostgresDatabase) else
+               "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
     with db.connect() as con:
-        tables = [r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")]
-        return {name: sorted(map(tuple, con.execute(f'SELECT * FROM "{name}"')), key=repr)
+        tables = [r['name'] for r in con.execute(listing)]
+        # Values by column name (tuple(row) of a PostgreSQL dict row would be the names).
+        return {name: sorted((tuple(r[k] for k in r.keys()) for r in con.execute(f'SELECT * FROM "{name}"')), key=repr)
                 for name in tables if name not in {'usage_reservations', 'usage_ledger', 'dispatcher_leases'}}
 
 

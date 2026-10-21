@@ -226,8 +226,9 @@ def test_failed_ai_reprocess_never_replaces_active_bookings_with_the_local_resul
     assert document_after['latest_generation']['status'] == 'needs_review'
     assert env.local_calls == [1]
     with service.app.state.db.connect() as con:
-        staged = con.execute('SELECT status,extracted_json FROM document_generations WHERE document_id=? ORDER BY rowid DESC LIMIT 1',
-                             (document_before['id'],)).fetchone()
+        # The newest generation by the id the API reports (rowid is SQLite-only).
+        staged = con.execute('SELECT status,extracted_json FROM document_generations WHERE id=? AND document_id=?',
+                             (document_after['latest_generation']['id'], document_before['id'])).fetchone()
     facts = json.loads(staged['extracted_json'])
     assert staged['status'] == 'needs_review' and [f['confirmation_number'] for f in facts] == ['TEST-HOTEL-002']
     assert facts[0]['refund_policy'] is None  # the basic parser's result, kept for review only
