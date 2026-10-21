@@ -36,15 +36,11 @@ def embed_texts(
 
     for batch_index, start in enumerate(range(0, len(texts), batch_size), start=1):
         batch = texts[start : start + batch_size]
-        from src.reliability.providers import has_metering, embeddings_create
-        client = _client()
-        if has_metering():
-            response = embeddings_create(client, model=model, input=batch)
-        else:
-            # Legacy CLI only; service execution always binds metered_context.
-            response = client.embeddings.create(model=model, input=batch)
-        # API가 순서를 보장하지만, index로 다시 정렬해 확실히 맞춘다.
-        vectors.extend(item.embedding for item in sorted(response.data, key=lambda d: d.index))
+        from src.llm.gateway import embed
+        # Service execution binds metered_context; the unmetered branch inside
+        # the gateway is the legacy CLI. Adapters sort results by index.
+        result = embed("embed", model=model, texts=batch, client_factory=_client, operation="embed")
+        vectors.extend(result.vectors)
 
         if show_progress:
             done = min(start + batch_size, len(texts))

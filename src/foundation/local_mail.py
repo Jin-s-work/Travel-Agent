@@ -334,7 +334,12 @@ def parse_local_document(raw):
             events.append(_safe_event('activity', start, end, _zone(block), _zone(block), location, reasons))
         context = block + '\n' + subject
         pending = re.search(r'change request|new requested time|변경\s*요청|変更リクエスト|pending\s*confirmation|awaiting\s*confirmation|not\s+(?:a\s+)?confirmed\s+reservation|confirmed\s+later|확정\s*(?:전|대기)|확인\s*대기', context, re.I)
-        cancelled = re.search(r'(?:reservation|booking)\s+(?:has\s+been|was|is)\s+cancelled|cancellation\s+confirmation|예약(?:이|은)?\s*취소(?:되었|되었습니다)|ご予約.{0,10}キャンセル(?:され|済)', context, re.I)
+        # Explicit cancellation statements or a status label only; a mere
+        # "cancellation policy" or "free cancellation until" never matches.
+        cancelled = re.search(r'(?:reservation|booking)(?:\s+(?!(?:has|was|is)\b)[a-z]+){0,2}\s+(?:has\s+been|was|is)\s+cancell?ed|cancellation\s+confirmation'
+                              r'|^[ \t]*(?:booking\s+|reservation\s+)?status[ \t]*[:：][ \t]*cancell?ed\b'
+                              r'|예약(?:이|은)?\s*취소(?:되었|됐|처리되었)|^[ \t]*(?:예약\s*)?상태[ \t]*[:：][ \t]*취소'
+                              r'|ご予約.{0,10}キャンセル(?:され|済|いたしました|しました)|^[ \t]*ステータス[ \t]*[:：　][ \t　]*キャンセル済', context, re.I | re.M)
         if pending or cancelled:
             reasons.add('RESERVATION_CANCELLED_REVIEW' if cancelled else 'REQUEST_NOT_CONFIRMATION')
             # This applies to stays/flights as well as activities. Keep the

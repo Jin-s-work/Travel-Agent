@@ -208,6 +208,9 @@ COMMIT;''')
             if version == 14:
                 from src.discovery.photo_schema import SCHEMA as photo_schema
                 connection.executescript('BEGIN IMMEDIATE;\n' + photo_schema + '\nPRAGMA user_version=15;\nCOMMIT;')
+            # Additive diagnostics table, idempotent on every start (no version bump).
+            from src.reliability.llm_schema import TELEMETRY_SCHEMA
+            connection.executescript('BEGIN IMMEDIATE;\n' + TELEMETRY_SCHEMA + '\nCOMMIT;')
 
     @contextmanager
     def connect(self):

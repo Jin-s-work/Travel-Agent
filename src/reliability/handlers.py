@@ -19,6 +19,43 @@ def stable_hash(value):
     return hashlib.sha256(json.dumps(value,sort_keys=True,ensure_ascii=False,separators=(',',':')).encode()).hexdigest()
 
 
+# The document prompt's hash when it lived in src/parser.py (pre-registry).
+# A v1 checkpoint (signature without prompt identity) may resume only while the
+# registry still serves exactly these bytes; any later prompt edit makes it a
+# new pipeline, as it should.
+LEGACY_EXTRACTION_PROMPT_SHA256 = 'c3cb4036dc53f745197244634ff070a9230634c4b7245eded91ba4f2cea0adba'
+# Local parser outcomes that mean "the basic parser could not read this mail".
+_LOCAL_UNSUPPORTED = {'LOCAL_EXTRACTION_UNSUPPORTED', 'MAIL_BODY_EMPTY'}
+
+
+def document_signatures(mode):
+    """(current, legacy-compatible) pipeline signatures for a documents job.
+
+    Local mode has no prompt and keeps the original signature. AI mode adds the
+    prompt registry identity under signature_version 2; the pre-registry v1
+    value is still accepted for resume while the prompt bytes are unchanged.
+    """
+    parse_version = 'local-mail-v1' if mode == 'local' else 'foundation-v2'
+    base = {'parser':parse_version,'chunker':'v1','extraction_model':EXTRACTION_MODEL if mode == 'ai' else None,
+            'embedding_model':EMBEDDING_MODEL if mode == 'ai' else None}
+    v1 = stable_hash(base)
+    if mode != 'ai':
+        return v1, {v1}
+    from src.prompts import load_prompt
+    from src.llm import chain
+    import os
+    extraction = load_prompt('mail_document_extraction').meta()
+    chain_value = list(chain(os.getenv('MAIL_EXTRACTION_CHAIN')))
+    current = stable_hash({**base, 'signature_version': 2,
+        'prompts': [extraction, load_prompt('mail_extraction_repair').meta()],
+        'extraction_chain': chain_value})
+    # Pre-registry (v1) jobs always ran the single OpenAI extractor, so v1 stays
+    # resumable only for that same chain and the same prompt bytes.
+    legacy = extraction['hash'] == LEGACY_EXTRACTION_PROMPT_SHA256 and chain_value == ['openai']
+    compatible = {current, v1} if legacy else {current}
+    return current, compatible
+
+
 class Operations:
     def __init__(self, repo, documents, jobs, generations, gateway, *, answer_generator=None, fault_hook=None):
         self.repo, self.documents, self.jobs = repo, documents, jobs
@@ -49,12 +86,27 @@ class Operations:
             requested = 'local'  # Invalid configuration must never enable billing.
         available, reason = True, None
         if not self.documents.parser:
-            if not OPENAI_API_KEY:
+            import os
+            from src.llm import chain, supports_embeddings
+            try:
+                # Defaults are all 'openai' — exactly the pre-adapter checks.
+                embedding_provider = chain(os.getenv('EMBEDDING_PROVIDER'))[0]
+                providers = {(chain(os.getenv('MAIL_EXTRACTION_CHAIN'))[0], EXTRACTION_MODEL),
+                             (embedding_provider, EMBEDDING_MODEL),
+                             (chain(os.getenv('ANSWER_PROVIDER'))[0], ANSWER_MODEL)}
+                if not supports_embeddings(embedding_provider):
+                    # AI mode always embeds; fail closed before any extraction is paid for.
+                    raise DomainError('PROVIDER_CAPABILITY_MISSING', '이 공급자는 임베딩을 지원하지 않습니다.', 503)
+            except DomainError as error:
+                providers, available, reason = set(), False, error.code
+            if not available:
+                pass
+            elif any(provider == 'openai' for provider, _ in providers) and not OPENAI_API_KEY:
                 available, reason = False, 'AI_KEY_NOT_CONFIGURED'
             else:
                 try:
                     policy = self.gateway.budget.policy
-                    prices = [policy.price('openai', model) for model in {EXTRACTION_MODEL, EMBEDDING_MODEL, ANSWER_MODEL}]
+                    prices = [policy.price(provider, model) for provider, model in providers]
                     with self.repo.db.connect() as con:
                         currencies = {price['currency'] for price in prices}
                         controls = con.execute('SELECT currency,halted FROM cost_controls').fetchall()
@@ -63,7 +115,8 @@ class Operations:
                     elif any(any(policy.config['limits'][currency][key] <= 0 for key in ('user_daily','user_monthly','global_daily','global_monthly')) for currency in currencies):
                         available, reason = False, 'AI_BUDGET_NOT_CONFIGURED'
                     from src.operations.controls import external_guard
-                    external_guard(self.repo.db, 'openai')
+                    for provider in sorted({provider for provider, _ in providers if provider != 'replay'}):
+                        external_guard(self.repo.db, provider)
                 except DomainError as error:
                     available, reason = False, error.code
         mode = 'ai' if requested != 'local' and available else 'local'
@@ -101,11 +154,39 @@ class Operations:
             con.execute('UPDATE trips SET active_index_id=NULL WHERE id=?', (trip,))
 
     def extract(self, call_context, key, raw, guard):
+        return self.extract_with_meta(call_context, key, raw, guard)[0]
+
+    def extract_with_meta(self, call_context, key, raw, guard):
+        """Bookings plus what the result and telemetry record (no mail text).
+
+        An injected parser is a test/offline adapter and is never repaired.
+        The real path repairs at most once inside the parser (own call key
+        '<key>:repair:chat:0', own output cap and reservation).
+        """
         if self.documents.parser:
-            return self.fake_call(call_context,'extract',key,raw,lambda:self.documents.parser(raw),guard)
-        from src.parser import parse_document_reservations
+            return self.fake_call(call_context,'extract',key,raw,lambda:self.documents.parser(raw),guard), {
+                'repair_attempts': 0, 'fallback_path': ['injected'], 'prompt': None}
+        from src.parser import extract_document_reservations
         with provider_scope(self.gateway,call_context,guard=guard,call_prefix=key):
-            return parse_document_reservations(raw)
+            result = extract_document_reservations(raw)
+        return result['bookings'], {'repair_attempts': result['repair_attempts'],
+            'fallback_path': ['ai', 'repair'] if result['repair_attempts'] else ['ai'], 'prompt': result['prompt']}
+
+    @staticmethod
+    def failed_extraction(repair_attempts, kind):
+        """Result metadata for a real AI extraction that did not produce bookings."""
+        from src.prompts import load_prompt
+        return {'repair_attempts': repair_attempts, 'error_kind': kind,
+                'fallback_path': ['ai', 'repair'] if repair_attempts else ['ai'],
+                'prompt': load_prompt('mail_document_extraction').meta()}
+
+    def mark_review(self, job, ctx, document_id):
+        """An AI→local fallback result is usable but must be checked by the user."""
+        with self.repo.db.connect() as con:
+            con.execute('BEGIN IMMEDIATE')
+            self.jobs.guard(job['id'],job['fencing_token'],con=con)
+            self.document_guard(ctx,job['actor_id'],job['trip_id'],document_id)(con=con)
+            con.execute("UPDATE source_documents SET status='needs_review',updated_at=? WHERE id=?",(utcnow(),document_id))
 
     def embed(self, call_context, key, texts, guard, *, query=False):
         if self.documents.embedder:
@@ -184,12 +265,19 @@ class Operations:
     def process_documents(self, job, ctx):
         user,trip=job['actor_id'],job['trip_id']
         payload=job['payload']; cp=dict(job['checkpoint']); units=dict(cp.get('documents',{}))
-        mode = cp.get('analysis_mode') or self.mail_capabilities()['analysis_mode']
+        if cp.get('analysis_mode'):
+            mode, requested = cp['analysis_mode'], cp.get('requested_mode', cp['analysis_mode'])
+        else:
+            capabilities = self.mail_capabilities()
+            mode, requested = capabilities['analysis_mode'], capabilities['requested_mode']
         parse_version = 'local-mail-v1' if mode == 'local' else 'foundation-v2'
-        signature=stable_hash({'parser':parse_version,'chunker':'v1','extraction_model':EXTRACTION_MODEL if mode == 'ai' else None,'embedding_model':EMBEDDING_MODEL if mode == 'ai' else None})
-        if cp.get('pipeline_signature') and cp['pipeline_signature']!=signature:
-            raise DomainError('CHECKPOINT_INCOMPATIBLE','모델·추출 규칙이 변경되었습니다. 새 분석 작업으로 실행해 주세요.',409)
-        ctx.checkpoint({'pipeline_signature':signature, 'analysis_mode':mode})
+        signature, compatible = document_signatures(mode)
+        if cp.get('pipeline_signature'):
+            if cp['pipeline_signature'] not in compatible:
+                raise DomainError('CHECKPOINT_INCOMPATIBLE','모델·추출 규칙이 변경되었습니다. 새 분석 작업으로 실행해 주세요.',409)
+            # A resumed pre-registry job keeps its own (compatible) signature.
+            signature = cp['pipeline_signature']
+        ctx.checkpoint({'pipeline_signature':signature, 'analysis_mode':mode, 'requested_mode':requested})
         accepted=payload.get('accepted',[])
         if not units and payload.get('resume_from'):
             previous=self.jobs.get(payload['resume_from'],user,job['session_id'])
@@ -197,12 +285,12 @@ class Operations:
             with self.repo.db.connect() as con:
                 old=con.execute('SELECT checkpoint_json FROM jobs WHERE id=?',(payload['resume_from'],)).fetchone()
             previous_cp=json.loads(old['checkpoint_json'])
-            previous_units=previous_cp.get('documents',{}) if previous_cp.get('pipeline_signature')==signature else {}
+            previous_units=previous_cp.get('documents',{}) if previous_cp.get('pipeline_signature') in compatible else {}
             for entry in accepted:
                 old_unit=previous_units.get(entry['document_id'],{})
-                units[entry['document_id']]={key:old_unit[key] for key in ('extracted_ref','vectors_ref','review_reasons') if key in old_unit}
+                units[entry['document_id']]={key:old_unit[key] for key in ('extracted_ref','vectors_ref','review_reasons','extraction') if key in old_unit}
             inherited = {'documents': units}
-            if previous_cp.get('pipeline_signature') == signature:
+            if previous_cp.get('pipeline_signature') in compatible:
                 inherited['index_repair_refs'] = previous_cp.get('index_repair_refs', {})
             ctx.checkpoint(inherited,stage='resuming_files',done=0,total=len(accepted))
         results=[]
@@ -220,11 +308,22 @@ class Operations:
                 ctx.checkpoint({'documents':units,'files':results},stage='document_complete',done=index+1,total=len(accepted))
                 continue
             if saved.get('generation_id') and doc['active_generation_id']==saved['generation_id']:
+                fallback = 'local' in (saved.get('extraction') or {}).get('fallback_path', [])
+                if fallback and saved.get('state') is None and doc['status']!='needs_review':
+                    # Crashed between activation and mark_review (two transactions):
+                    # a local fallback result must still be flagged for review.
+                    self.mark_review(job,ctx,did)
+                    doc=doc_guard()
                 item.update(state='needs_review' if doc['status']=='needs_review' else 'succeeded',bookings_count=len([b for b in self.repo.list_bookings(user,trip) if b['document_id']==did]))
+                if fallback:
+                    item['review_reasons'] = saved.get('review_reasons', [])
+                if saved.get('extraction'):
+                    item['extraction'] = saved['extraction']
                 saved['state']=item['state']
             elif saved.get('state') in {'failed','succeeded','needs_review','cancelled'}:
                 item.update(saved.get('result',{'state':saved['state']}))
             else:
+                keep_active, staged_facts = False, None
                 try:
                     if not saved.get('generation_id'):
                         with self.repo.db.connect() as con:
@@ -241,7 +340,36 @@ class Operations:
                             parsed, reasons = parse_local_document(raw)
                             saved['review_reasons'] = reasons
                         else:
-                            parsed=self.extract(self.context(user,trip,job['id']),did+':extract',raw,doc_guard)
+                            from src.parser import ExtractionFailed
+                            try:
+                                parsed, saved['extraction'] = self.extract_with_meta(self.context(user,trip,job['id']),did+':extract',raw,doc_guard)
+                            except DomainError as provider_error:
+                                # Billing/transport outcomes (first or repair call) keep their
+                                # retry-blocking contract; only the metadata is recorded.
+                                if not self.documents.parser:
+                                    saved['extraction'] = self.failed_extraction(getattr(provider_error, 'repair_attempts', 0), 'provider')
+                                raise
+                            except ExtractionFailed as failed:
+                                # Format failures only.
+                                saved['extraction'] = self.failed_extraction(failed.repair_attempts, failed.kind)
+                                if requested != 'auto':
+                                    raise DomainError('EXTRACTION_INVALID','예약 정보를 확인할 수 없습니다.') from None
+                                from src.foundation.local_mail import parse_local_document
+                                doc_guard()
+                                try:
+                                    parsed, reasons = parse_local_document(raw)
+                                except DomainError as local_error:
+                                    if local_error.code not in _LOCAL_UNSUPPORTED:
+                                        raise
+                                    saved['extraction']['fallback_path'].append('needs_review')
+                                    units[did]=saved
+                                    raise DomainError('EXTRACTION_NEEDS_REVIEW','AI 분석과 기본 분석 모두 예약을 확인하지 못했습니다. 원문을 확인해 직접 예약을 추가해 주세요.',422) from None
+                                saved['extraction']['fallback_path'].append('local')
+                                saved['review_reasons'] = sorted(set(reasons) | {'AI_EXTRACTION_FALLBACK'})
+                                # Reprocess of a mail that already has active bookings: a failed
+                                # AI re-extraction must not replace them (AI-only fields such as
+                                # refund_policy would be lost). The basic result is staged only.
+                                keep_active = bool(doc['active_generation_id'])
                         if not isinstance(parsed,list) or not parsed:
                             raise DomainError('EXTRACTION_INVALID','예약 정보를 확인할 수 없습니다.')
                         cleaned=[]
@@ -250,6 +378,11 @@ class Operations:
                             if 'type' in value:
                                 value.setdefault('kind',value.pop('type'))
                             cleaned.append(BookingCreate.model_validate(value).model_dump())
+                        if keep_active:
+                            staged_facts = cleaned
+                            saved['extraction']['fallback_path'].append('needs_review')
+                            units[did]=saved
+                            raise DomainError('EXTRACTION_NEEDS_REVIEW','AI 재분석에 실패해 기존 예약을 그대로 두었습니다. 기본 분석 결과는 검토용으로만 저장했습니다.',422)
                         saved['extracted_ref']=self.artifact(job,did+'-facts',cleaned,ctx,document_id=did)
                         units[did]=saved; ctx.checkpoint({'documents':units},stage='reviewing_facts' if mode == 'local' else 'embedding',done=index,total=len(accepted))
                         self.fault('after_extraction',job)
@@ -292,9 +425,15 @@ class Operations:
                         self.fault('after_ready',job)
                         self.generations.activate(user,trip,generation['id'],job['id'],job['fencing_token'],staged_documents=[
                             {'document_id':did,'generation_id':saved['generation_id'],'bookings':cleaned}],session_id=job['session_id'])
+                        if 'local' in saved.get('extraction', {}).get('fallback_path', []):
+                            self.fault('before_mark_review',job)
+                            self.mark_review(job,ctx,did)
+                            item['review_reasons'] = saved.get('review_reasons', [])
                     self.fault('after_activation',job)
                     doc=doc_guard()
                     item.update(state='needs_review' if doc['status']=='needs_review' else 'succeeded',bookings_count=len(cleaned))
+                    if saved.get('extraction'):
+                        item['extraction'] = saved['extraction']
                 except Exception as exc:
                     code=exc.code if isinstance(exc,DomainError) else 'PROCESSING_FAILED'
                     if code=='NOT_FOUND':
@@ -306,8 +445,21 @@ class Operations:
                         raise
                     item.update(state='cancelled' if code=='DOCUMENT_DELETED' else 'failed',error_code=code)
                     if code=='DOCUMENT_DELETED': item['activated']=False
+                    if saved.get('extraction'):
+                        item['extraction'] = saved['extraction']
                     if saved.get('generation_id') and code!='DOCUMENT_DELETED':
-                        if code=='AMBIGUOUS_MATCH':
+                        if code=='EXTRACTION_NEEDS_REVIEW':
+                            # Keep any active generation, bookings and corrections;
+                            # this attempt only asks the user to look at the mail.
+                            with self.repo.db.connect() as con:
+                                con.execute('BEGIN IMMEDIATE'); self.jobs.guard(job['id'],job['fencing_token'],con=con)
+                                con.execute('UPDATE document_generations SET status=?,extracted_json=?,error_code=?,completed_at=? WHERE id=?',
+                                    ('needs_review',json.dumps(staged_facts or [],ensure_ascii=False),code,utcnow(),saved['generation_id']))
+                                con.execute('UPDATE source_documents SET status=?,updated_at=? WHERE id=?',('needs_review',utcnow(),did))
+                            item.update(state='needs_review',activated=False,bookings_count=0,extraction=saved.get('extraction'))
+                            if staged_facts:
+                                item['review_reasons'] = saved.get('review_reasons', [])
+                        elif code=='AMBIGUOUS_MATCH':
                             with self.repo.db.connect() as con:
                                 con.execute('BEGIN IMMEDIATE'); self.jobs.guard(job['id'],job['fencing_token'],con=con)
                                 con.execute('UPDATE document_generations SET status=?,extracted_json=?,error_code=?,completed_at=? WHERE id=?',

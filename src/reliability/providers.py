@@ -138,12 +138,14 @@ class ProviderGateway:
 
     def run(self, context: CallContext, operation: str, call_key: str, estimated_units: dict,
             fn, *, request_hash=None, provider='openai', sku=None, guard=None,
-            attempt=1, max_attempts=1, deadline=None):
+            attempt=1, max_attempts=1, deadline=None, observer=None):
         """Run tracked attempts; only proven unsent or rejected calls may retry.
 
         caller supplies a stable stage key, input hash, and lease/session/tombstone
         guard. Guards run both before sending and after cost settlement. Losing
         ownership never discards a real charge, only the product result.
+        `observer(event, record)` is told about 'reserve' and 'replay' only for
+        telemetry; it never influences reservation, settlement or retries.
         """
         if not request_hash:
             raise DomainError('CALL_INPUT_HASH_REQUIRED','공급자 입력 해시가 필요합니다.',422)
@@ -152,8 +154,12 @@ class ProviderGateway:
             guard()
         record = self.budget.reserve(context,provider=provider,sku=sku or operation,operation=operation,
             call_key=call_key,estimated_units=estimated_units,request_hash=request_hash,attempt=attempt)
+        if observer:
+            observer('reserve',record)
         replay = self._replay(record)
         if replay is not None:
+            if observer:
+                observer('replay',record)
             if guard:
                 guard()
             return replay.value
@@ -222,7 +228,7 @@ class ProviderGateway:
             if attempt < max_attempts and (deadline is None or time.time()+delay < deadline):
                 self.sleeper(delay)
                 return self.run(context,operation,call_key,estimated_units,fn,request_hash=request_hash,
-                    provider=provider,sku=sku,guard=guard,attempt=attempt+1,max_attempts=max_attempts,deadline=deadline)
+                    provider=provider,sku=sku,guard=guard,attempt=attempt+1,max_attempts=max_attempts,deadline=deadline,observer=observer)
             raise DomainError('PROVIDER_UNAVAILABLE','공급자에 요청을 전송하지 못했습니다.',503) from None
         except ProviderRejected as exc:
             self.budget.uncertain(record['call_id'],pending=True,error_code=exc.code)
@@ -230,7 +236,7 @@ class ProviderGateway:
             if exc.retryable and attempt < max_attempts and (deadline is None or time.time()+delay < deadline):
                 self.sleeper(delay)
                 return self.run(context,operation,call_key,estimated_units,fn,request_hash=request_hash,
-                    provider=provider,sku=sku,guard=guard,attempt=attempt+1,max_attempts=max_attempts,deadline=deadline)
+                    provider=provider,sku=sku,guard=guard,attempt=attempt+1,max_attempts=max_attempts,deadline=deadline,observer=observer)
             raise DomainError(exc.code,'공급자가 요청을 거절했습니다. 설정 또는 공급자 사용량을 확인해 주세요.',exc.status) from None
         except Exception as exc:
             self.budget.uncertain(record['call_id'])
@@ -283,75 +289,19 @@ def has_metering():
 
 
 def _metered_call(client, kind, kwargs):
+    """OpenAI-shaped compatibility entry; the adapter keeps every byte unchanged.
+
+    New callers use `src.llm.gateway.chat/embed`, which return normalized
+    results. This wrapper exists for code that still expects SDK objects.
+    """
     active = _active.get()
     if active is None:
         raise DomainError('PROVIDER_CONTEXT_REQUIRED','외부 호출에는 인증 범위와 비용 관리가 필요합니다.',503)
-    model = kwargs['model']
-    sku = model
-    price = active.gateway.budget.policy.price('openai',sku)
-    kwargs = dict(kwargs)
-    if kind == 'chat':
-        # UTF-8 bytes plus bounded framing is conservative for standard text
-        # tokenization. Structured output schema is included, as it is billable.
-        cap = min(int(kwargs.get('max_completion_tokens',price['max_units'].get('output_tokens',0))),price['max_units'].get('output_tokens',0))
-        if cap <= 0:
-            raise DomainError('COST_BOUND_REQUIRED','출력 토큰 상한을 설정해 주세요.',503)
-        kwargs['max_completion_tokens'] = cap
-        prompt = {key:value for key,value in kwargs.items() if key in ('messages','response_format','tools')}
-        input_bound = len(json.dumps(prompt,ensure_ascii=False).encode('utf-8')) + 256
-        estimates = {'input_tokens':input_bound,'output_tokens':cap}
-    else:
-        inputs = kwargs['input']
-        if isinstance(inputs,str):
-            inputs = [inputs]
-        if not isinstance(inputs,list) or not all(isinstance(text,str) for text in inputs):
-            raise DomainError('PROVIDER_INPUT_INVALID','임베딩 입력은 문자열이어야 합니다.',422)
-        estimates = {'input_tokens':sum(len(text.encode('utf-8'))+16 for text in inputs)}
-    index = active.counters.get(kind,0)
-    active.counters[kind] = index+1
-    request_hash = hashlib.sha256(json.dumps(kwargs,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()).hexdigest()
-    key = f'{active.prefix}:{kind}:{index}'
-
-    def invoke():
-        # OpenAI's SDK normally retries invisibly. Clone with retries disabled
-        # for every attempt, including callers with a cached preconfigured client.
-        bounded = client.with_options(max_retries=0,timeout=45.0)
-        try:
-            response = bounded.chat.completions.create(**kwargs) if kind=='chat' else bounded.embeddings.create(**kwargs)
-        except Exception as exc:
-            from openai import APIConnectionError, APIStatusError
-            import httpx
-            if isinstance(exc,APIConnectionError) and isinstance(exc.__cause__,(httpx.ConnectError,httpx.ConnectTimeout)):
-                raise DefinitelyNotSent() from None
-            if isinstance(exc,APIStatusError) and 400 <= exc.status_code < 500:
-                if exc.status_code==429:
-                    try:
-                        delay=float(exc.response.headers.get('retry-after','0'))
-                    except (ValueError,TypeError):
-                        delay=0
-                    raise ProviderRejected('PROVIDER_RATE_LIMITED',retryable=True,retry_after=delay) from None
-                if exc.status_code in (401,403):
-                    raise ProviderRejected('PROVIDER_AUTH_FAILED') from None
-                raise ProviderRejected('PROVIDER_REQUEST_REJECTED',status=422) from None
-            # Read timeouts and 5xx may follow remote execution. No automatic
-            # retry without provider-supported lookup/idempotency evidence.
-            raise
-        usage = response.usage
-        if usage is None:
-            units = None
-        elif kind == 'chat':
-            units = {'input_tokens':usage.prompt_tokens,'output_tokens':usage.completion_tokens}
-        else:
-            units = {'input_tokens':usage.prompt_tokens}
-        return ProviderResult(response.model_dump(mode='json'),units)
-
-    value = active.gateway.run(active.context,kind,key,estimates,invoke,request_hash=request_hash,
-        sku=sku,guard=active.guard,deadline=active.deadline,max_attempts=3)
-    if kind == 'chat':
-        from openai.types.chat import ChatCompletion
-        return ChatCompletion.model_validate(value)
-    from openai.types import CreateEmbeddingResponse
-    return CreateEmbeddingResponse.model_validate(value)
+    from src.llm.gateway import metered_raw
+    from src.llm.openai_adapter import OpenAIAdapter
+    adapter = OpenAIAdapter()
+    value, _ = metered_raw(adapter, client, kind, kwargs)
+    return adapter.restore(kind, value)
 
 
 def chat_create(client, **kwargs):

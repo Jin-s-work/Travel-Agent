@@ -62,6 +62,13 @@ MIN_SIMILARITY = 0.20
 # 잘라내 "확인할 수 없습니다"로 오답 처리됐다. 예약 메일은 서로 형식이 비슷해
 # 유사도가 좁게 몰리므로, 2~3위까지는 근거로 넘기고 판단은 생성 단계에 맡긴다.
 RELATIVE_SIMILARITY_RATIO = 0.75
+# v2 '여행에 물어보기'(search.answer)의 벡터 hit 유사도 하한. 이 값 미만 hit는 근거에서
+# 빼고, 남는 근거가 없으면 생성하지 않고 거절한다. 기본 0.20은 위 legacy MIN_SIMILARITY
+# 측정값을 사전값으로 옮긴 것이다. v2 인덱스(활성 generation)와 실제 임베딩으로는 아직
+# 재측정하지 않았다 — 질문 평가셋 트랙이 근거를 보고서에 적고 다시 정해야 한다.
+# [대표 결정 대기] 값 자체와, 수동 입력 예약(document 없음)은 하한과 무관하게 근거에
+# 남기는 우회(그래서 거절은 수동 예약까지 0건일 때만) 두 가지.
+ANSWER_MIN_SIMILARITY = float(os.getenv("ANSWER_MIN_SIMILARITY", "0.20"))
 
 # --- 답변 생성 ---
 ANSWER_MODEL = os.getenv("ANSWER_MODEL", "gpt-5-mini")

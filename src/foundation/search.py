@@ -15,6 +15,9 @@ class SearchContext:
 
 _DETAIL_REQUEST = re.compile(r'환불|취소|수수료|규정|정책|체크인|체크아웃|몇\s*시|예약번호|확인번호|주소|집합\s*장소')
 _DATE_REFERENCE = re.compile(r'\d{4}-\d{2}-\d{2}|\d+\s*월\s*\d+\s*일|\d+\s*일\s*차|째\s*날|첫\s*날|마지막\s*날|그\s*날|당일')
+# search.facts() carries no party, so a generated head-count answer could never
+# be grounded: answer it from SQL without a paid generation call.
+_PARTY_REQUEST = re.compile(r'인원|몇\s*명')
 _ANAPHORIC_REFERENCE = re.compile(r'그거|그것|그건|그곳|그쪽|거기|아까|(?:그|해당|이)\s*(?:예약|호텔|숙소|투어|항공편)')
 
 
@@ -25,7 +28,8 @@ def resolve_day(question, trip, history=None, *, listing_only=True):
     intent suffix reuses only its date parsing for a detail question; it is never
     sent to a model or persisted as the user's question.
     """
-    from src.agent import daily_question_date
+    # LLM-free date parser; importing src.agent would load LangChain on the first /ask.
+    from src.foundation.dates import daily_question_date
     if listing_only and _DETAIL_REQUEST.search(question):
         return None
     if re.search(r'마지막\s*날', question) and (not listing_only or re.search(r'일정|예약|뭐',question)):
@@ -72,7 +76,29 @@ def _followup_target(history, bookings, trip, eligible_ids, dated_booking_ids):
 
 def _clarify_target():
     return {'answer':'어느 예약을 말씀하시는지 확인해 주세요. 장소·제공처 이름이나 예약번호를 알려주시면 해당 예약의 근거로 답할게요.',
-            'sources':[], 'tools_used':[]}
+            'sources':[], 'tools_used':[], 'grounding':'clarify', 'answer_type':'clarification'}
+
+
+def _tag(payload, grounding, answer_type):
+    """Every /ask branch says whether it generated text and how it was checked."""
+    return {**payload, 'grounding':grounding, 'answer_type':answer_type}
+
+
+def _next_actions(trip):
+    return [{'type':'upload_mail','label':'예약 메일 올리기'},
+            {'type':'ask_by_date','label':'날짜로 묻기','example':f"{trip['start_date']} 일정 알려줘"}]
+
+
+def _refusal(trip, answer):
+    return {'answer':answer,'sources':[],'tools_used':['search_bookings'],'next_actions':_next_actions(trip),
+            'grounding':'refused','answer_type':'refusal'}
+
+
+def _similar_enough(hit):
+    """Drop weak semantic hits; a hit without a score keeps the prior behaviour."""
+    from src import config
+    similarity = hit.get('similarity')
+    return similarity is None or float(similarity) >= config.ANSWER_MIN_SIMILARITY
 
 
 def source(booking, trip_id):
@@ -188,7 +214,7 @@ def _answer(repo, documents, context, question, history, generator, readers):
     day = resolve_day(question,trip,history)
     detail_day = resolve_day(question,trip,history,listing_only=False) if _DATE_REFERENCE.search(question) else None
     if _DATE_REFERENCE.search(question) and not (day or detail_day):
-        return {'answer':'여행 기간에 맞는 유효한 날짜 또는 N일차를 알려주세요.','sources':[],'tools_used':[]}
+        return _tag({'answer':'여행 기간에 맞는 유효한 날짜 또는 N일차를 알려주세요.','sources':[],'tools_used':[]}, 'clarify', 'clarification')
     if day:
         bookings = repo.list_bookings(context.user_id,context.trip_id,date_from=day,date_to=day)
         lines = [f'{day} 예약은 총 {len(bookings)}개입니다.']
@@ -196,7 +222,7 @@ def _answer(repo, documents, context, question, history, generator, readers):
         if cancelled:
             lines[0] += f' 취소된 예약 {cancelled}개가 포함되어 있습니다.'
         lines.extend(_daily_booking_line(row, day) for row in bookings)
-        return {'answer':'\n'.join(lines),'sources':[source(b,context.trip_id) for b in bookings],'tools_used':['bookings_on_date']}
+        return _tag({'answer':'\n'.join(lines),'sources':[source(b,context.trip_id) for b in bookings],'tools_used':['bookings_on_date']}, 'structured', 'listing')
     all_rows = repo.list_bookings(context.user_id,context.trip_id)
     eligible = repo.list_bookings(context.user_id,context.trip_id,date_from=detail_day,date_to=detail_day) if detail_day else all_rows
     from src.rag import detect_reservation_type
@@ -224,12 +250,13 @@ def _answer(repo, documents, context, question, history, generator, readers):
         rows = eligible
     elif basic:
         if not kind and not re.search(r'예약|일정|체크인|체크아웃|환불|취소|수수료|규정|정책|몇\s*시|인원|몇\s*명|주소|집합\s*장소', question):
-            return {'answer':'기본 분석에서는 날짜별 예약, 예약 시간·번호·주소와 원문 취소 규정을 확인할 수 있습니다. 필요한 예약 이름과 항목을 알려주세요.', 'sources':[], 'tools_used':['structured_bookings'], 'answer_mode':'structured'}
+            return _tag({'answer':'기본 분석에서는 날짜별 예약, 예약 시간·번호·주소와 원문 취소 규정을 확인할 수 있습니다. 필요한 예약 이름과 항목을 알려주세요.', 'sources':[], 'tools_used':['structured_bookings'], 'answer_mode':'structured'}, 'refused', 'refusal')
         rows = eligible
     else:
         docs = repo.list_documents(context.user_id,context.trip_id)
         active = [d['active_generation_id'] for d in docs if d.get('active_generation_id')]
         document_ids = set()
+        floor_rejected = False
         if active:
             operations=getattr(documents,'operations',None)
             if operations:
@@ -253,12 +280,18 @@ def _answer(repo, documents, context, question, history, generator, readers):
                     raise
             else:
                 hits = documents.vector(context.trip_id).search(question,top_k=5,where={'generation_id':{'$in':active}})
-            document_ids = {hit['metadata']['document_id'] for hit in hits}
+            kept = [hit for hit in hits if _similar_enough(hit)]
+            floor_rejected = bool(hits) and not kept
+            document_ids = {hit['metadata']['document_id'] for hit in kept}
         rows = [b for b in eligible if b.get('document_id') in document_ids or b.get('document_id') is None]
+        if not rows and floor_rejected:
+            # Manual rows stay eligible regardless of similarity (prior contract);
+            # only when nothing is left do weak semantic hits end in a refusal.
+            return _refusal(trip, '메일에서 확인하지 못했어요. 예약 메일을 올리거나 날짜로 물어봐 주세요.')
     if not rows:
-        return {'answer':'이 여행의 예약 자료에서 해당 정보를 찾지 못했습니다.','sources':[],'tools_used':['search_bookings']}
-    if basic or any(booking.get('time_conflicts') for booking in rows):
-        return {'answer':_structured_answer(question, rows),'sources':[source(b,context.trip_id) for b in rows], 'tools_used':['structured_bookings'], 'answer_mode':'structured'}
+        return _refusal(trip, '이 여행의 예약 자료에서 해당 정보를 찾지 못했습니다.')
+    if basic or _PARTY_REQUEST.search(question) or any(booking.get('time_conflicts') for booking in rows):
+        return _tag({'answer':_structured_answer(question, rows),'sources':[source(b,context.trip_id) for b in rows], 'tools_used':['structured_bookings'], 'answer_mode':'structured'}, 'structured', 'fact')
     # Pass only current effective facts, never stale raw chunk times or a tool instruction from mail.
     hits=[{'metadata':{**facts(b),'type':b.get('kind'),'source_file':b.get('source_file') or '직접 입력'},'document':json.dumps(facts(b),ensure_ascii=False),'similarity':1.0} for b in rows]
     from src.rag import generate
@@ -275,4 +308,31 @@ def _answer(repo, documents, context, question, history, generator, readers):
             result=operations.generate(context.user_id,context.trip_id,context.request_id,question,hits,guard)
     else:
         result = (generator or generate)(question,hits)
-    return {'answer':result,'sources':[source(b,context.trip_id) for b in rows],'tools_used':['search_bookings']}
+    return _checked_answer(question, rows, hits, result, context.trip_id)
+
+
+def _checked_answer(question, rows, hits, result, trip_id):
+    """Show generated text only when every atom is in this request's facts.
+
+    ``hits`` are the current SQL effective values just sent to the generator, so
+    a superseded original value or another trip's fact is ungrounded. Any
+    ungrounded atom replaces the text with the deterministic SQL answer, and so
+    does a model answer that is empty once its source lines are removed. Atom
+    text is never returned; only the count and the prompt identity are.
+
+    ``model_ungrounded_atoms`` counts atoms in the *model's* text, which is not
+    shown when it is above 0 (diagnostic: how often the model invents values).
+    The shown answer's ungrounded-atom count -- the gate metric -- is 0 by
+    construction for both ``verified`` and ``fallback``; do not sum this field
+    into a gate.
+    """
+    from src.config import NO_INFO_MESSAGE
+    from src.rag import ANSWER_PROMPT
+    from .grounding import check
+    verdict = check(result, hits)
+    payload = {'sources':[source(b,trip_id) for b in rows],'tools_used':['search_bookings'],
+               'model_ungrounded_atoms':len(verdict.ungrounded),'prompt':ANSWER_PROMPT.meta()}
+    if not verdict.verified or not verdict.text:
+        return _tag({**payload,'answer':_structured_answer(question, rows),'answer_mode':'structured'}, 'fallback', 'fact')
+    answer_type = 'refusal' if verdict.text.startswith(NO_INFO_MESSAGE) else 'generated'
+    return _tag({**payload,'answer':verdict.text}, 'verified', answer_type)
