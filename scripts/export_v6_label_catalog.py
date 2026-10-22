@@ -69,6 +69,63 @@ def counts(cities):
     return report
 
 
+# Fixed categories only: the error text itself can contain the host, user or
+# the whole connection string, so it is matched here and never printed.
+_FAILURE_KINDS = (
+    ('missing_env_value', ('keyerror',)),
+    ('dns', ('could not translate host name', 'nodename nor servname', 'name or service not known')),
+    ('timeout', ('timeout expired', 'timed out', 'connection timeout')),
+    ('network', ('network is unreachable', 'no route to host', 'connection refused', 'connection reset')),
+    ('auth', ('password authentication failed', 'authentication failed', 'no password supplied')),
+    ('tenant_or_project', ('tenant or user not found', 'tenant/user', 'enotfound', 'project is paused', 'paused',
+                           'does not exist')),
+    ('ssl', ('ssl', 'certificate', 'sslrootcert')),
+    ('too_many_connections', ('too many connections', 'max client connections', 'remaining connection slots')),
+)
+
+
+# Words that may appear in libpq/psycopg connection errors. Only these words are
+# ever printed (as a sorted set), so no host, user, password or URL can leak.
+_SAFE_WORDS = ('server', 'closed', 'unexpectedly', 'refused', 'reset', 'timeout', 'expired', 'unreachable',
+               'route', 'address', 'family', 'supported', 'assign', 'requested', 'permitted', 'operation',
+               'invalid', 'dsn', 'missing', 'sslmode', 'ssl', 'certificate', 'verify', 'root', 'file', 'exist',
+               'tenant', 'pooler', 'paused', 'password', 'authentication', 'fatal', 'receive', 'send', 'eof',
+               'translate', 'host', 'name', 'connection', 'failed', 'network', 'prepared', 'statement',
+               'circuit', 'breaker', 'too', 'many', 'clients', 'database', 'role', 'user', 'found', 'denied')
+
+
+def failure_words(error):
+    import re
+    words = set(re.findall(r'[a-z]+', (type(error).__name__ + ' ' + str(error)).lower()))
+    return sorted(words & set(_SAFE_WORDS))
+
+
+def target_shape(env):
+    """Non-secret shape of the configured target: direct host (IPv6-only on Supabase)
+    or pooler, port, sslmode. No host name, user or password is returned."""
+    try:
+        from urllib.parse import urlsplit, parse_qs
+        from dotenv import dotenv_values
+        from scripts.prepare_render_env import render_values
+        url = urlsplit(render_values(dotenv_values(env, interpolate=False), profile='openai', with_apify=True)['DATABASE_URL'])
+        host = (url.hostname or '').lower()
+        query = parse_qs(url.query)
+        return {'kind': 'pooler' if host.endswith('pooler.supabase.com') else
+                        'direct' if host.startswith('db.') and host.endswith('.supabase.co') else 'other',
+                'port': url.port, 'sslmode': (query.get('sslmode') or [None])[0],
+                'sslrootcert_set': bool(query.get('sslrootcert'))}
+    except Exception as error:
+        return {'unavailable': type(error).__name__}
+
+
+def failure_kind(error):
+    text = (type(error).__name__ + ' ' + str(error)).lower()
+    for kind, needles in _FAILURE_KINDS:
+        if any(needle in text for needle in needles):
+            return kind
+    return 'other'
+
+
 def read(env):
     from dotenv import dotenv_values
     from scripts.prepare_render_env import render_values, DB_CA_PATH
@@ -101,7 +158,9 @@ def main():
         report = read(args.env)
     except Exception as error:  # never echo connection strings or secrets
         print(json.dumps({'status': 'unavailable', 'reason': 'READ_ONLY_CATALOG_EXPORT_FAILED',
-                          'error_type': type(error).__name__, 'writes': 0}))
+                          'error_type': type(error).__name__, 'failure_kind': failure_kind(error),
+                          'failure_words': failure_words(error), 'target': target_shape(args.env),
+                          'sqlstate': getattr(error, 'sqlstate', None), 'writes': 0}))
         return 1
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')

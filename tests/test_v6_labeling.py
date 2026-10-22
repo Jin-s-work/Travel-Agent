@@ -482,3 +482,27 @@ def test_export_collect_reads_public_catalog_without_private_fields(service):
 
 
 from tests.test_foundation_api import service  # noqa: E402,F401  (real local SQLite app fixture)
+
+
+def test_export_failure_kind_names_a_category_never_the_message():
+    from scripts.export_v6_label_catalog import failure_kind
+    secret = 'postgresql://user:SECRETPASS@db.example.invalid:5432/postgres'
+    cases = {'could not translate host name "db.example.invalid"': 'dns',
+             'connection timeout expired': 'timeout',
+             'password authentication failed for user "user"': 'auth',
+             'FATAL: Tenant or user not found': 'tenant_or_project',
+             'FATAL:  (ENOTFOUND) tenant/user postgres.ref not found': 'tenant_or_project',
+             'Network is unreachable': 'network',
+             'something new': 'other'}
+    for message, kind in cases.items():
+        result = failure_kind(RuntimeError(f'{message} ({secret})'))
+        assert result == kind and 'SECRET' not in result
+
+
+def test_export_failure_words_come_only_from_the_fixed_vocabulary():
+    from scripts.export_v6_label_catalog import failure_words
+    error = RuntimeError('connection to server at "db.secretref.supabase.co" (2406:da1c::1), port 5432 failed: '
+                         'Network is unreachable; user=postgres.secretref password=SECRETPASS')
+    words = failure_words(error)
+    assert 'unreachable' in words and 'network' in words
+    assert not any(token in ' '.join(words) for token in ('secretref', 'SECRETPASS', '2406', 'postgres.'))
