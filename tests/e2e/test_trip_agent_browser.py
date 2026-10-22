@@ -78,15 +78,32 @@ def ask_agent(page):
 ALLOWED_POST = re.compile(r'/api/v2/trips/[^/]+/ask$|/auth/|/login|/logout|/session')
 
 
+# The screen's own UI-state autosave (tab, scroll, selected places; 700 ms after
+# any UI change, web/js/workspace.js). Not trip or itinerary data, and timing
+# dependent: scrolling the card into view could save it before the assertion
+# (intermittent CI failure 2026-10-22). Recorded separately, never ignored silently.
+UI_DRAFT_PUT = re.compile(r'/api/v2/trips/[^/]+/workspace-draft$')
+
+
+class Writes(list):
+    """Data writes; `ui_drafts` holds the workspace-draft autosaves kept out of it."""
+    def __init__(self):
+        super().__init__()
+        self.ui_drafts = []
+
+
 def watch_writes(page):
     """Every non-read request except the allow-listed POSTs (so a POST apply path is caught too)."""
-    writes = []
+    writes = Writes()
 
     def record(request):
         if request.method in ('GET', 'HEAD', 'OPTIONS'):
             return
         path = request.url.split('?', 1)[0]
         if request.method == 'POST' and ALLOWED_POST.search(path):
+            return
+        if request.method == 'PUT' and UI_DRAFT_PUT.search(path):
+            writes.ui_drafts.append(request.url)
             return
         writes.append((request.method, request.url))
     page.on('request', record)

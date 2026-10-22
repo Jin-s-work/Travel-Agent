@@ -127,7 +127,9 @@
 | `0fcc038` | 보고서·운영 문서·E06 캡처 + 보고서 대조에서 찾은 숫자·문구 정정 3곳(`evals/thresholds.json` note, `evals/mail/README.md`, `evals/agent/README.md`, `src/evals/agent.py` 보고서 문장) | 작업 트리 전체: 「최종 전체 시험」 절 |
 | `cf66ee3` | 후속: `provider_stopped` 평가 시나리오 `ps-01~03`(스크립트 단계 `provider_error`) · 간헐 409 시험 순서 수정 · 이 표·README 갱신 | 작업 트리 전체: 아래 「후속 시험」 |
 | `80b3903` | `search_mail` 임베딩이 에이전트 deadline 을 이어받음(`handlers.embed`·`fake_call`) + 회귀 시험 · 문서·MCP 주석 갱신 | 아래 「후속 시험 2」 |
-| 이 커밋(후속 3) | PostgreSQL 시험 실행 · `v6_data_coverage` 행 형식 수정 · v6 시험의 `tuple(row)`·SQLite 전용 보조 함수 정리 | 「PostgreSQL 시험」 + SQLite `make ci-python` 1894 passed · 30 skipped · 0 failed |
+| `f5b2641` | PostgreSQL 시험 실행 · `v6_data_coverage` 행 형식 수정 · v6 시험의 `tuple(row)`·SQLite 전용 보조 함수 정리 | 「PostgreSQL 시험」 + SQLite `make ci-python` 1894 passed · 30 skipped · 0 failed |
+| `c7689b5` | 상태표: push 와 원격 Actions 7/7 기록 | 원격 실행 `39702112410`: e2e 간헐 실패 1(아래) |
+| 이 커밋(후속 4) | e2e 쓰기 감시에서 UI 초안 자동 저장 분리 | 로컬 e2e 12/12 반복 통과 |
 
 한 커밋에 두 단계가 섞인 덩어리 3개(`src/foundation/db.py`·`src/storage/postgres.py`의 스키마 줄, `src/foundation/search.py`의 hook 줄)는 줄 단위로 나눴다. 평가 하네스는 2·3단계에 걸쳐 있어(agent 평가가 3단계 코드를 부른다) 3단계 뒤 별도 커밋으로 묶었다.
 
@@ -149,6 +151,8 @@
 | eval | 통과 |
 | e2e · postgres | 통과 |
 | python | 통과 |
+
+문서만 바꾼 `c7689b5` 의 실행 `39702112410` 은 `e2e` 1건 실패(나머지 6 job 통과)였다. 원인: `tests/e2e/test_trip_agent_browser.py` 의 쓰기 감시가 화면의 UI 상태 자동 저장(`PUT …/workspace-draft`, 탭·스크롤·선택 장소, UI 변경 700ms 뒤)을 데이터 쓰기로 셌다. 카드 스크롤이 저장을 일으켜 타이밍에 따라 단언 전에 들어갔다(일정 버전 단언은 그대로 통과 — 데이터 변경 없음). 로컬 재현 1/8. 이 끝점만 따로 기록(`writes.ui_drafts`)하고 데이터 쓰기 목록에서 뺐다. 수정 뒤 로컬 12/12 통과, `make e2e` 12 passed.
 
 ### PostgreSQL 시험 (2026-10-21, 후속 3)
 
