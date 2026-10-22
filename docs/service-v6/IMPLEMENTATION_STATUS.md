@@ -2,7 +2,7 @@
 
 > v6 단계별 구현의 단일 최신 상태표. 과거 보고서는 당시 사실을 보존하고, 이 표만 갱신한다.
 
-최종 갱신 2026-10-21 · 2·3·4단계 실행·최종 리뷰 반영 후(4단계는 라벨 대기에서 멈춤) · 기준 브랜치 `codex/private-beta-launch`. 이 기록 작성 시점 HEAD 5a4443a(1단계까지 커밋), **2·3·4단계 산출물은 이 기록 작성 시점(2026-10-21) 미커밋(작업 트리의 수정·미추적 파일)** · 같은 날 로컬 커밋 5개로 나눔(코드 4 + 문서 1, push 없음 — 목록은 IMPLEMENTATION_STATUS 「커밋」 절) · push·배포·live 유료 호출 없음
+최종 갱신 2026-10-21 · 2·3·4단계 실행·최종 리뷰 반영 후(4단계는 라벨 대기에서 멈춤) · 기준 브랜치 `codex/private-beta-launch`. 이 기록 작성 시점 HEAD 5a4443a(1단계까지 커밋), **2·3·4단계 산출물은 이 기록 작성 시점(2026-10-21) 미커밋(작업 트리의 수정·미추적 파일)** · 같은 날 로컬 커밋 5개로 나눔(코드 4 + 문서 1, push 없음 — 목록은 IMPLEMENTATION_STATUS 「커밋」 절) · push·배포·live 유료 호출 없음 · 2026-10-22: 대표가 `f5b2641` 까지 push, 원격 Actions 7/7 통과(「원격 CI」)
 
 **세 줄 요약**
 
@@ -106,7 +106,7 @@
 | 시간 상한 | 후속 커밋으로 search_mail 임베딩도 에이전트 deadline 25초를 이어받음 — 25초 뒤 새 전송·재시도 없음(회귀 시험 `test_search_mail_embedding_keeps_the_agent_deadline`). 남은 것: 그 직전에 나간 호출 하나는 최대 45초까지 기다림. MCP ask 120초는 서버 강제 상한 아님 | 4 |
 | 정산 뒤 오류 | 전송·정산 뒤 오류(parse_embed 실패)는 과금 확정이라 `provider_stopped`가 아닌 도구 오류로 남음 | 4 |
 
-1. 대표: push → Actions 6+1 job(`eval` 추가) 확인 ([출시 체크리스트](reports/RELEASE_CHECKLIST.md))
+1. ~~대표: push → Actions 6+1 job(`eval` 추가) 확인~~ — 완료(2026-10-22, 「원격 CI」). 이후 커밋도 push 는 대표가 한다([출시 체크리스트](reports/RELEASE_CHECKLIST.md))
 2. 대표: live 평가 — 메일 5건 ≤ 0.20 USD, 질문 10문항 ≤ 0.20 USD (명령은 [STAGE2.md](reports/STAGE2.md#대표에게-넘길-일)). 결과로 유사도 하한 확정
 3. 대표: 4단계 라벨 — 운영 DB 범위 확인 → 카탈로그 내보내기 → 질의 확정 → pool 동결 → 라벨(holdout 먼저). 그 뒤 "라벨 완료, 묶음 C 진행" ([LABELING.md](LABELING.md))
 4. 운영에서 에이전트·날씨·토큰을 켜기 전: `provider_stopped` 화면 문구 확인(replay 시나리오는 있음, live 미실행), 질문당 비용 상한 [가설] 확인, Open-Meteo 비상업 해당 여부, 토큰 허용 목록 재검토
@@ -138,6 +138,17 @@
 ### 후속 시험 2 (2026-10-21, 후속 2 커밋 직전 작업 트리)
 
 `make ci-python` 1894 passed · 30 skipped · 0 failed(6분 59초, 회귀 시험 1 추가) · `make ci-eval` gate pass(synthetic) · `GOING_E2E=1 make e2e` 12 passed. 새 시험은 옛 `handlers.py` 로 되돌리면 실패함을 확인. PostgreSQL 미실행.
+
+### 원격 CI (2026-10-22)
+
+대표가 `codex/private-beta-launch` 를 `df01153..f5b2641` 로 push 했다. GitHub Actions 실행 `39573172475`(커밋 `f5b2641`)의 job 7개가 모두 통과했다. 새 `eval` job 도 원격에서 처음 돌아 통과했다(키·유료 호출 없음, synthetic).
+
+| job | 결과 |
+| --- | --- |
+| safety · assets · js | 통과 |
+| eval | 통과 |
+| e2e · postgres | 통과 |
+| python | 통과 |
 
 ### PostgreSQL 시험 (2026-10-21, 후속 3)
 
