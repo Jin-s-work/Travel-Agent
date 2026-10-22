@@ -431,7 +431,8 @@ def qa_environment(workdir, fixture, policy_config, *, embedder=hash_embed):
     fixture_spend = reservation_spend(db)
     yield SimpleNamespace(db=db, repo=repo, documents=documents, jobs=jobs, generations=generations, budget=budget,
                           gateway=gateway, operations=operations, settings=settings, trips=trips,
-                          fixture_calls=fixture_spend['calls'], fixture_spend=fixture_spend, DomainError=DomainError)
+                          fixture_calls=fixture_spend['calls'], fixture_spend=fixture_spend, DomainError=DomainError,
+                          error_details={})
 
 
 def call_cost_micros(call):
@@ -602,6 +603,14 @@ def ask(env, item, request_id, *, generator=None):
         error = None
     except env.DomainError as exc:
         response, error = None, exc.code
+        if exc.code == 'SEARCH_REBUILDING':
+            # Which of the several SEARCH_REBUILDING sites fired: its fixed message
+            # and the exception class chain only (no values, no vectors, no text).
+            causes, cause = [], exc.__cause__
+            while cause is not None and len(causes) < 4:
+                causes.append(type(cause).__name__)
+                cause = cause.__cause__ or cause.__context__
+            env.error_details[item['id']] = {'message': exc.message, 'causes': causes}
     return response, error, round((time.perf_counter() - started) * 1000, 3)
 
 
@@ -936,6 +945,8 @@ def run(mode, *, fixture_path=FIXTURE_PATH, questions_path=QUESTIONS_PATH, repla
                     served = adapter.served[before:] if adapter is not None else []
                     row = score_item(env, item, mode, response, error, wall_ms, _calls_for(env, request_id), served,
                                      similarities=sink.get('hits', {}).get(item['id']))
+                    if item['id'] in env.error_details:
+                        row['error_detail'] = env.error_details[item['id']]
                     rows.append(row)
                 if adapter is not None:
                     adapter.current = None
@@ -1078,6 +1089,14 @@ def render_markdown(result) -> str:
                      f"{', '.join(row['missing_includes']) or '—'} | {', '.join(row['present_excludes']) or '—'} | {row['ungrounded_atoms']} | "
                      f"{', '.join(row['cross_trip_atoms']) or ('sources' if row['foreign_sources'] else '—')} | "
                      f"{_fmt(row.get('top_similarity'))} |")
+    details = [row for row in result['items'] if row.get('error_detail')]
+    if details:
+        lines += ['', '## 검색 복구 오류 원인 (진단)', '',
+                  '`SEARCH_REBUILDING` 이 어느 지점에서 났는지: 고정 메시지와 예외 클래스 이름만 적는다.', '',
+                  '| id | 메시지 | 원인 예외 |', '| --- | --- | --- |']
+        for row in details:
+            detail = row['error_detail']
+            lines.append(f"| {row['id']} | {detail['message']} | {' → '.join(detail['causes']) or '—'} |")
     lines.append('')
     return '\n'.join(lines)
 

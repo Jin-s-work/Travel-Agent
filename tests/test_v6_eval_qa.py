@@ -487,3 +487,25 @@ def test_cli_writes_synthetic_json_and_markdown(tmp_path):
     data = json.loads(out.read_text(encoding='utf-8'))
     assert data['synthetic'] is True and data['mode'] == 'local'
     assert '(synthetic)' in out.with_suffix('.md').read_text(encoding='utf-8')
+
+
+def test_search_rebuilding_records_which_site_fired_without_values(monkeypatch):
+    """A live run that hits SEARCH_REBUILDING records the fixed message and the
+    exception class chain, so the cause can be found without values or vectors."""
+    from types import SimpleNamespace
+    from src.evals import qa
+    from src.foundation.repository import DomainError
+    import src.foundation.search as search
+
+    def failing(*args, **kwargs):
+        try:
+            raise FileNotFoundError('synthetic missing collection file')
+        except FileNotFoundError as cause:
+            raise DomainError('SEARCH_REBUILDING', '검색 자료를 복구하고 있습니다.', 503) from cause
+    monkeypatch.setattr(search, 'answer', failing)
+    trip = SimpleNamespace(id='t1', owner='u1')
+    env = SimpleNamespace(trips={'A': trip}, repo=SimpleNamespace(get_trip=lambda user, trip_id: {'version': 1}),
+                          documents=None, DomainError=DomainError, error_details={})
+    response, error, _ = qa.ask(env, {'id': 'q1', 'trip': 'A', 'question': '?'}, 'req')
+    assert response is None and error == 'SEARCH_REBUILDING'
+    assert env.error_details == {'q1': {'message': '검색 자료를 복구하고 있습니다.', 'causes': ['FileNotFoundError']}}
