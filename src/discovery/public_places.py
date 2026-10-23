@@ -23,6 +23,20 @@ PROVIDER = 'openstreetmap'
 # Photon permits moderate project use; fixed endpoint, no fallback host rotation.
 ENDPOINT = 'https://photon.komoot.io/reverse'
 QUERY_VERSION = 'photon-reverse-v1'
+# The public Photon instance returns no `extra` (cuisine, opening_hours): Photon
+# fills it only when the server was imported with -extra-tags, and no request
+# parameter turns it on (measured 2026-10-23: 0/97 Tokyo places). Optional fix,
+# off by default: one Overpass lookup by the returned OSM ids per Photon call
+# (so at most GLOBAL_DAILY a day). Overpass's policy is under ~100 small queries
+# a day and identifying User-Agent; it discourages public apps relying on the
+# public instance, so turning this on is an operator decision. Measured
+# 2026-10-23: the public instance took ~30 s for one id (502/timeout through the
+# 8 s fetch), so enable this only with a fast self-hosted or paid endpoint
+# (OSM_OVERPASS_ENDPOINT); against the public one it would almost always fall back.
+OVERPASS_ENDPOINT = 'https://overpass-api.de/api/interpreter'
+OVERPASS_KEYS = ('cuisine', 'opening_hours', 'wheelchair', 'website', 'phone', 'diet:vegetarian', 'diet:vegan')
+OVERPASS_MAX_BYTES = 300_000
+OVERPASS_TIMEOUT_SECONDS = 8
 MAX_BYTES = 350_000
 MAX_CANDIDATES = 60
 DISPLAY_CANDIDATES = 12
@@ -175,7 +189,7 @@ def normalize_photon(payload, city, *, area=None, categories=None):
                 tags[target] = props[source]
         extra = props.get('extra')
         if isinstance(extra, dict):
-            for key in ('cuisine','opening_hours','wheelchair','website','phone'):
+            for key in ('cuisine','opening_hours','wheelchair','website','phone','diet:vegetarian','diet:vegan'):
                 if isinstance(extra.get(key), str):
                     tags[key] = extra[key]
         point = {'lat': coords[1], 'lon': coords[0]}
@@ -191,18 +205,89 @@ class FetchedPlaces(list):
     raw_count = None
     deduped_count = None
     rejected_count = None
+    enrichment = None
 
 
-def fetch(city,*,categories=None,area=None):
-    page = fetch_public(ENDPOINT + '?' + query(city,categories=categories,area=area), max_bytes=MAX_BYTES,
-                        timeout_seconds=15, max_redirects=0)
+def overpass_endpoint():
+    """OSM_OVERPASS_ENDPOINT overrides the public instance (https only, checked by fetch_public)."""
+    import os
+    return os.getenv('OSM_OVERPASS_ENDPOINT', '').strip() or OVERPASS_ENDPOINT
+
+
+def osm_enrichment_enabled():
+    """OSM_TAG_ENRICHMENT_ENABLED=1/true turns the Overpass tag lookup on. Off by default."""
+    import os
+    return os.getenv('OSM_TAG_ENRICHMENT_ENABLED', '').strip().lower() in {'1', 'true'}
+
+
+def overpass_tags(features, *, fetch_page=None):
+    """Tags Photon left out, from one Overpass lookup by OSM id.
+
+    Returns ({('N'|'W'|'R', id): {key: value}}, bytes received). Only
+    OVERPASS_KEYS are kept. Any failure returns ({}, 0): enrichment never
+    blocks or changes discovery beyond adding these tags.
+    """
+    from urllib.parse import quote
+    fetch_page = fetch_page or fetch_public  # looked up at call time (tests patch the module name)
+    wanted = {}
+    for feature in features if isinstance(features, list) else []:
+        props = feature.get('properties') if isinstance(feature, dict) else None
+        if not isinstance(props, dict) or isinstance(props.get('extra'), dict):
+            continue
+        kind, ident = props.get('osm_type'), props.get('osm_id')
+        if kind in ('N', 'W', 'R') and type(ident) is int and ident > 0:
+            wanted.setdefault(kind, set()).add(ident)
+    if not wanted:
+        return {}, 0
+    names = {'N': 'node', 'W': 'way', 'R': 'relation'}
+    body = ''.join(f"{names[k]}(id:{','.join(str(i) for i in sorted(v))});" for k, v in sorted(wanted.items()))
+    data = f'[out:json][timeout:{OVERPASS_TIMEOUT_SECONDS}];({body});out tags;'
+    try:
+        page = fetch_page(overpass_endpoint() + '?data=' + quote(data, safe=''), max_bytes=OVERPASS_MAX_BYTES,
+                          timeout_seconds=OVERPASS_TIMEOUT_SECONDS, max_redirects=0)
+        if page.mime != 'application/json':
+            return {}, 0
+        elements = json.loads(page.content).get('elements')
+    except Exception:  # noqa: BLE001 - optional enrichment; Photon result stands alone
+        return {}, 0
+    found = {}
+    for element in elements if isinstance(elements, list) else []:
+        if not isinstance(element, dict):
+            continue
+        kind = {'node': 'N', 'way': 'W', 'relation': 'R'}.get(element.get('type'))
+        tags = element.get('tags')
+        if kind and type(element.get('id')) is int and element['id'] in wanted.get(kind, ()) and isinstance(tags, dict):
+            kept = {key: tags[key] for key in OVERPASS_KEYS if isinstance(tags.get(key), str) and tags[key].strip()}
+            if kept:
+                found[(kind, element['id'])] = kept
+    return found, len(page.content)
+
+
+def fetch(city,*,categories=None,area=None,enrich=None,fetch_page=None):
+    fetch_page = fetch_page or fetch_public  # looked up at call time (tests patch the module name)
+    page = fetch_page(ENDPOINT + '?' + query(city,categories=categories,area=area), max_bytes=MAX_BYTES,
+                      timeout_seconds=15, max_redirects=0)
     if page.mime != 'application/json':
         raise FetchRejected('UNSUPPORTED_MIME')
     try:
         payload = json.loads(page.content)
     except (ValueError, UnicodeError):
         raise DomainError('PUBLIC_DISCOVERY_INVALID', '공개지도 응답을 읽을 수 없어요. 잠시 후 다시 찾아 주세요.', 503) from None
-    return normalize_photon(payload, city, area=area, categories=categories), len(page.content)
+    enrichment = None
+    if (osm_enrichment_enabled() if enrich is None else enrich) and isinstance(payload, dict):
+        extra, size = overpass_tags(payload.get('features'), fetch_page=fetch_page)
+        filled = 0
+        for feature in payload.get('features') or []:
+            props = feature.get('properties') if isinstance(feature, dict) else None
+            if isinstance(props, dict) and (props.get('osm_type'), props.get('osm_id')) in extra:
+                props['extra'] = extra[(props['osm_type'], props['osm_id'])]
+                filled += 1
+        enrichment = {'source': 'overpass', 'filled': filled, 'response_bytes': size}
+    places = normalize_photon(payload, city, area=area, categories=categories)
+    places.enrichment = enrichment
+    # The size guard and ledger keep counting the Photon response only;
+    # Overpass bytes are reported in `places.enrichment`.
+    return places, len(page.content)
 
 
 def is_public_candidate(candidate):

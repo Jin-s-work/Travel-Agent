@@ -35,6 +35,7 @@
 | `PHOTO_COLLECTION_ENABLED` | 의도대로 | 켜짐 | 1단계에서 생긴 이름. 사진 수집을 원치 않으면 `false` |
 | `ANSWER_MIN_SIMILARITY` | 비워 둠 | `0.20` | 2026-10-22 대표 결정 |
 | `MAIL_EXTRACTION_CHAIN`·`ANSWER_PROVIDER`·`EMBEDDING_PROVIDER`·`AGENT_PROVIDER` | 비워 둠 | `openai` | `anthropic`으로 두면 안 된다. SDK가 이미지에 없다 |
+| `OSM_TAG_ENRICHMENT_ENABLED` · `OSM_OVERPASS_ENDPOINT` | 비워 둠(`0`) | 꺼짐 | `767711c` 이후 추가. 공개 overpass-api.de 는 요청당 약 30초라 켜면 거의 항상 실패 후 기존 결과로 돌아간다. 빠른 자체·유료 주소가 생겼을 때만 켠다 |
 
 새 이름과 기본값은 `.env.example` 끝의 "v6 stages 2-4" 절에도 적었다. `scripts/prepare_render_env.py`는 이 이름들을 검증하지 않는다(`PERSONAL_TOKENS_ENABLED`·`WEATHER_ENABLED`만 `0`으로 넣는다).
 
