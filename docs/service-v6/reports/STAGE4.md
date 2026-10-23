@@ -145,7 +145,22 @@
 
 ### 묶음 C — 평가 실행과 결정
 
-**미실행** — 라벨 대기. `RECOMMENDATION_EVAL_V6.md`는 만들지 않았다.
+**사람 라벨: 미실행** (라벨 대기). `RECOMMENDATION_EVAL_V6.md`는 만들지 않았다.
+
+**AI 임시 평가 (2026-10-23, 도쿄만, 결정 근거 아님)** — 배포(`767711c`) 뒤 운영 추천 1회로 도쿄 후보가 100곳(공개 지도 97 + 승인 3)이 되어, 사람 라벨 전에 파이프라인과 데이터 상태를 보려고 AI 가 끝까지 돌렸다. 바르셀로나는 후보 3곳이라 빠졌다.
+
+| 단계 | 결과 |
+| --- | --- |
+| 질의 | 도쿄 30개에 AI 가 `human_query`·취향·예산을 써서 확정(사람용 `evals/recommendation/queries/v6-label-queries.json` 은 손대지 않음, 사본은 git 무시 폴더 `data/recommendation-labels/ai-2026-10-23/`) |
+| pool 동결 | 질의 20개 · 판정 390개. 현지어·유명 구획 10개는 두 모델 모두 그 구획에 결과가 없어 `NO_MODEL_RESULTS_IN_SECTION` |
+| 라벨 | AI 채점자 4명이 CLI 와 같은 블라인드 카드(모델·점수·순위 없음)로 0~3점. `label_source: ai_provisional` 로 저장 |
+| 평가 (`displayed`) | v5·v6 **top-5 가 20/20 질의에서 같다.** NDCG@5 개발 0.377 · 검증 0.425, P@5 0.325 · 0.30 — 두 모델 같은 값 |
+| 평가 (`items_only`) | 두 모델 모두 검증된 항목 0개 → 지표 0 (공개 지도 97곳은 모두 `needs_confirmation`) |
+| 승격 | 아님 — `NO_INDEPENDENT_HUMAN_LABELS` · `HOLDOUT_SUPPORT_INSUFFICIENT` · `NDCG_GAIN_BELOW_0.03_OR_UNMEASURED` 외 |
+
+- **왜 같은가:** 공개 지도 97곳의 OSM 태그가 모두 비어 있다(음식 종류 0 · 영업시간 0 · 태그 목록 0). Photon 응답에 `extra` 가 없었다. 그래서 v6 가 더한 신호(영업시간·취향 등)가 쓸 자료가 없어 두 모델이 같은 순서를 낸다. 요청 옵션으로 `extra` 를 받을 수 있는지는 [미확인].
+- **의미:** 지금 운영 자료로는 사람이 라벨을 달아도 v5·v6 차이를 잴 수 없다(같은 목록이라 어떤 라벨이든 같은 점수). 사람 라벨 전에 공개 지도 후보에 음식 종류·영업시간이 들어오게 하는 것이 먼저다.
+- 산출물(git 무시, OSM ODbL 자료 포함): `data/recommendation-labels/ai-2026-10-23/` 의 `queries-ai.json` · `pool-ai.json` · `labels-ai.json` · `eval-ai-displayed.*` · `eval-ai-items_only.*`. 공개 저장소라 올리지 않는다.
 
 ### 묶음 D — 피드백 루프 (S4-05)
 
