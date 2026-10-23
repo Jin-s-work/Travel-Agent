@@ -1,3 +1,4 @@
+// @ts-check
 /* Two evidence-led discovery experiences. All personal state remains session scoped. */
 (function(root,factory){const value=factory();if(typeof module==='object'&&module.exports)module.exports=value;else root.DiscoveryExperience=value;})(typeof window==='undefined'?globalThis:window,function(){
   'use strict';
@@ -30,10 +31,10 @@
   function filters(){return {minLocal:criteria.minLocal,maxKorean:criteria.maxKorean,ordering:criteria.ordering,discoveryMode:selected};}
   function restoreFilters(value){criteria={minLocal:safeNumber(value.minLocal,0.6),maxKorean:safeNumber(value.maxKorean,0.1),ordering:value.ordering==='nearby'?'nearby':'evidence'};if(modes[value.discoveryMode]){selected=value.discoveryMode;explicitMode=true;}}
   function restoreMode(mode){if(modes[mode]){selected=mode;explicitMode=true;}renderMode();}
-  function requestFilters(){return {review_language_filter:{required:true,apply_only_if_qualified:true,apply_to:['local_discovery'],min_local_share:criteria.minLocal,max_korean_share:criteria.maxKorean},rating_filter:{enabled:true,min_rating:Number(document.querySelector('#recommendationMinRating').value),min_count:Number(document.querySelector('#recommendationMinCount').value),apply_to:['local_discovery']},ordering_profile:criteria.ordering};}
+  function requestFilters(){return {review_language_filter:{required:true,apply_only_if_qualified:true,apply_to:['local_discovery'],min_local_share:criteria.minLocal,max_korean_share:criteria.maxKorean},rating_filter:{enabled:true,min_rating:Number(/** @type {HTMLInputElement} */(document.querySelector('#recommendationMinRating')).value),min_count:Number(/** @type {HTMLInputElement} */(document.querySelector('#recommendationMinCount')).value),apply_to:['local_discovery']},ordering_profile:criteria.ordering};}
   function restoreRequest(request){criteria={minLocal:safeNumber(request.review_language_filter?.min_local_share,0.6),maxKorean:safeNumber(request.review_language_filter?.max_korean_share,0.1),ordering:request.ordering_profile==='nearby'?'nearby':'evidence'};}
   function filterSummary(options){return criteria.ordering==='nearby'?'가까운 곳 우선':'여행 조건으로 찾고 있어요';}
-  function selectMode(type){if(!modes[type])return;explicitMode=true;selected=type;window.WorkspaceUX?.changed();ui.renderRecommendationResults();document.querySelector('#discoveryModes [aria-selected="true"]')?.focus({preventScroll:true});}
+  function selectMode(type){if(!modes[type])return;explicitMode=true;selected=type;window.WorkspaceUX?.changed();ui.renderRecommendationResults();/** @type {HTMLElement|null} */(document.querySelector('#discoveryModes [aria-selected="true"]'))?.focus({preventScroll:true});}
   const languagePresets={mostly:{label:'현지어 위주',minLocal:0.6,maxKorean:0.1},only:{label:'관측 리뷰 모두 현지어',minLocal:1,maxKorean:0}};
   function languagePreset(value){return Object.hasOwn(languagePresets,value)?{...languagePresets[value]}:null;}
   async function applyLanguagePreset(value){
@@ -47,7 +48,7 @@
     const tabs=[];for(const key of ['local_discovery','landmark']){const mode=modes[key],tab=ui.button('',()=>selectMode(key),'discovery-mode');tab.id='discovery-mode-'+key;tab.setAttribute('role','tab');tab.setAttribute('aria-selected',String(selected===key));tab.setAttribute('aria-controls','recommendationResults');tab.tabIndex=selected===key||selected==='reference'&&key==='local_discovery'?0:-1;tab.append(ui.make('strong','',mode.title),ui.make('span','hint',mode.note));tab.addEventListener('keydown',event=>{if(['ArrowRight','ArrowLeft','Home','End'].includes(event.key)){event.preventDefault();const order=['local_discovery','landmark'];selectMode(order[event.key==='Home'?0:event.key==='End'?1:(order.indexOf(key)+(event.key==='ArrowRight'?1:-1)+2)%2]);}});tabs.push(tab);host.append(tab);}if(focusId)tabs.find(t=>t.id===focusId)?.focus({preventScroll:true});
     const panel=document.querySelector('#recommendationResults');panel?.setAttribute('role','tabpanel');panel?.setAttribute('aria-labelledby',selected==='reference'?'showReferencePlaces':'discovery-mode-'+selected);
     const aux=document.querySelector('#showReferencePlaces');if(aux){aux.setAttribute('aria-pressed',String(selected==='reference'));aux.textContent='주변 장소 둘러보기';}
-    const support=document.querySelector('#discoveryCapability');support?.replaceChildren();if(!support)return;
+    const support=/** @type {HTMLElement|null} */(document.querySelector('#discoveryCapability'));support?.replaceChildren();if(!support)return;
     const city=ui.ensureDiscoveryDraft()?.conditions?.city,value=capabilityFor(capabilities,city),copy=capabilityState(value);
     support.hidden=selected!=='local_discovery';
     if(selected==='local_discovery'){

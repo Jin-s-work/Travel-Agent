@@ -232,8 +232,9 @@ PG 로 돌려서 찾은 것:
 
 ### v7 진입 (2026-10-23)
 
-- **브라우저 JS 타입 검사:** `typescript@7.0.2`(개발 의존성, 이미지 밖) · `tsconfig.json`(`// @ts-check` 붙은 파일만) · `types/web-globals.d.ts` · `make ci-types` 와 CI `js` job. 6개 파일 오류 0. 남은 파일 오류: `foundation.js` 61 · `home.js` 8 · `product.js` 7 · `discovery-experience.js` 4 · `workspace.js` 3 · `accommodations.js` 3 — 모두 DOM 형식 좁히기·추론 문제로, 실제 결함은 찾지 못했다.
+- **브라우저 JS 타입 검사:** `typescript@7.0.2`(개발 의존성, 이미지 밖) · `tsconfig.json`(`// @ts-check` 붙은 파일만) · `types/web-globals.d.ts` · `make ci-types` 와 CI `js` job. 같은 날 확대해 **화면 스크립트 12개 중 11개 오류 0**(DOM 형식 주석 16곳으로 오류 24건, `workspace.js` 오류 객체를 `Object.assign` 으로 만드는 동등 변경 1곳). 남은 것은 `foundation.js` 61 — 긴 한 줄 코드라 다음 단계로 미룸. 오류는 모두 DOM 형식 좁히기·추론 문제였고 실제 결함은 찾지 못했다.
 - **에이전트 live 평가 준비:** 운영 가격 파일 한도(0.25 USD)로는 시나리오 1개도 못 돌던 README 명령을 고치고, 평가 전용 `evals/agent/pricing-live-eval.json`(같은 단가, 한도 3 USD, 5 시나리오 최악 2.51 USD)을 더했다. 유료라 실행은 대표 선택.
+- **운영 깨우기:** 2026-10-23 대표가 cron-job.org 에 `/health/ready` 하루 1번 호출 등록(Supabase 무료 7일 정지 방지, 무료). 읽기 요청만으로 정지를 막는지는 [미확인] — 2026-11-13 까지 정지 경고 메일이 없으면 충분한 것으로 본다.
 - **v7 기획·제작:** [v7 기획](../service-v7/PLANNING_DRAFT.md). OSM 지역 파일로 만든 태그 표(무료, 실행 중 외부 호출 0)로 도쿄 후보 음식 종류 53% · v5·v6 top-5 차이 1/20(오프라인).
 
 ## 산출물

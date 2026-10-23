@@ -1,3 +1,4 @@
+// @ts-check
 /* Private, trip-scoped accommodation controls. No browser storage or automatic provider calls. */
 (() => {
   'use strict';
@@ -39,8 +40,8 @@
   function render(){
     if(!ui)return;
     for(const selector of ['#homeOrigin','#exploreOrigin']){
-      const host=document.querySelector(selector);if(!host)continue;
-      const prior=host.contains(document.activeElement)?document.activeElement.dataset.action:null;
+      const host=/** @type {HTMLElement|null} */(document.querySelector(selector));if(!host)continue;
+      const prior=host.contains(document.activeElement)?/** @type {HTMLElement} */(document.activeElement).dataset.action:null;
       host.replaceChildren();host.hidden=!active();if(!active())continue;
       const {make,button}=ui;const top=make('div','stay-summary-row'),copy=make('div','stay-summary-copy');
       const ready=context?.status==='ready'&&context.origin;
@@ -67,7 +68,7 @@
       if(ready){const shortcuts=make('div','actions stay-option-actions');const fast=button('숙소 근처 저녁',dinner,'secondary');fast.dataset.action='dinner';shortcuts.append(fast);options.append(shortcuts);if(selector!=='#exploreOrigin')actions.append(fast);}
       // Show distance controls only when useful, retaining explicit existing filters.
       if(selector==='#exploreOrigin'){const settings=button(draft?.conditions.distance_filter||draft?.conditions.radius_m!=null?'거리 조건 적용 중':'출발점·거리',()=>ui.openDialog('출발점과 거리',body=>body.append(options)),'text-button');settings.dataset.action='origin-options';actions.append(settings);}
-      if(prior)host.querySelector(`[data-action="${prior}"]`)?.focus({preventScroll:true});
+      if(prior)/** @type {HTMLElement|null} */(host.querySelector(`[data-action="${prior}"]`))?.focus({preventScroll:true});
     }
   }
   function editOrigin(){

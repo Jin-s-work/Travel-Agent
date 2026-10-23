@@ -1,3 +1,4 @@
+// @ts-check
 /* Recommendation-first home. Reads existing trip results; never creates a run on render. */
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.GoingHome=api;})(typeof window==='undefined'?globalThis:window,function(){
   'use strict';
@@ -12,14 +13,14 @@
     ui=context;
     document.getElementById('homeFindPlaces').addEventListener('click',()=>ui.setTab('explore'));
     document.getElementById('homeAskForm').addEventListener('submit',event=>{
-      event.preventDefault();const input=document.getElementById('homeQuestion');
+      event.preventDefault();const input=/** @type {HTMLTextAreaElement} */(document.getElementById('homeQuestion'));
       if(!input.value.trim()||!ui.state.trip||ui.state.asking)return;
-      document.getElementById('question').value=input.value;ui.setTab('ask');ui.submitQuestion(input.value).then(ok=>{if(ok)input.value='';});
+      /** @type {HTMLTextAreaElement} */(document.getElementById('question')).value=input.value;ui.setTab('ask');ui.submitQuestion(input.value).then(ok=>{if(ok)input.value='';});
     });
     const host=document.getElementById('homeAskSuggestions');
-    for(const question of ['첫날 예약을 모두 알려줘','체크아웃 시간은 언제야?','취소·환불 규정을 알려줘'])host.append(ui.button(question,()=>{document.getElementById('homeQuestion').value=question;document.getElementById('homeQuestion').focus();},'chip'));
+    for(const question of ['첫날 예약을 모두 알려줘','체크아웃 시간은 언제야?','취소·환불 규정을 알려줘'])host.append(ui.button(question,()=>{/** @type {HTMLTextAreaElement} */(document.getElementById('homeQuestion')).value=question;document.getElementById('homeQuestion').focus();},'chip'));
   }
-  function clear(){cardSignature=null;if(!ui)return;document.getElementById('homeQuestion').value='';document.getElementById('homeRecommendations').replaceChildren();}
+  function clear(){cardSignature=null;if(!ui)return;/** @type {HTMLTextAreaElement} */(document.getElementById('homeQuestion')).value='';document.getElementById('homeRecommendations').replaceChildren();}
   function render(){
     if(!ui)return;const {$,make,button,state}=ui,trip=state.trip;
     $('#homeDiscovery').hidden=!trip;$('#homeAssistant').hidden=!trip;
@@ -35,7 +36,7 @@
     const host=$('#homeRecommendations');
     const signature=JSON.stringify([state.epoch,trip.id,run?.run_id,items,state.discovery.bookmarks?.map(b=>[b.id,b.matched_place_id,b.input_kind,b.input_value,b.deleted_at]),[...(state.savingPlaces||[])]]);
     if(signature===cardSignature){if(items.length&&state.tab==='trip')window.DiscoveryFlow?.photos(items);return;}cardSignature=signature;
-    const focused=host.contains(document.activeElement)?document.activeElement:null,focusedId=focused?.closest('[data-place-id]')?.dataset.placeId,focusedLabel=focused?.getAttribute('aria-label')||focused?.textContent;
+    const focused=host.contains(document.activeElement)?document.activeElement:null,focusedId=/** @type {HTMLElement|null|undefined} */(focused?.closest('[data-place-id]'))?.dataset.placeId,focusedLabel=focused?.getAttribute('aria-label')||focused?.textContent;
     host.replaceChildren();
     for(const [kind,title] of [['local_discovery','현지어 리뷰'],['landmark','유명한 곳']]){const section=make('section','home-evidence-section');section.append(make('h3','',title));const group=make('div','home-evidence-grid');section.append(group);host.append(section);const entries=previewSections(run)[kind];if(!entries.length){const stateCopy=globalThis.DiscoveryExperience?.sectionStateCopy(kind,run?.result?.section_status?.[kind]||{});section.append(make('p','hint',stateCopy?.title||(kind==='local_discovery'?'이 도시의 현지어 리뷰를 준비하고 있어요.':'이 도시의 유명한 곳을 준비하고 있어요.')));}
     for(const item of entries){const card=make('article','home-place-card');card.dataset.placeId=item.place_id;card.append(ui.placePhotoGallery(item));

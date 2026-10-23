@@ -68,7 +68,7 @@
 
 | 안 | 상태 |
 | --- | --- |
-| ① 외부 스케줄러 | GitHub Actions `schedule` 은 기본 브랜치(`main`)에서만 돈다. 이 브랜치는 `main` 을 바꾸지 않으므로 쓸 수 없다. **무료 cron 서비스(cron-job.org 또는 UptimeRobot)에 대표가 가입해 `/health/ready` 를 하루 1번 등록**하는 것으로 남김. 코드 0 |
+| ① 외부 스케줄러 | GitHub Actions `schedule` 은 기본 브랜치(`main`)에서만 돌아 쓸 수 없었다. **2026-10-23 대표가 cron-job.org 에 `/health/ready` 하루 1번 호출을 등록했다(코드 0).** 성공 기준(3주 동안 Supabase 정지 경고 0통)은 2026-11-13 에 판정 |
 | ② OSM 태그 표 | **제작 완료(로컬).** `scripts/build_osm_tag_table.py`(pyosmium 4.3.1, 빌드 때만) → `src/discovery/osm_tags/{tokyo,barcelona}.json`(ODbL). 앱은 공개 지도 후보 저장 때 빈 태그만 채운다. 결과는 아래 |
 
 ②의 측정:

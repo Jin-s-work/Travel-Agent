@@ -1,3 +1,4 @@
+// @ts-check
 /* Explicit feedback and opt-in, best-effort exposure measurement. No offline queue. */
 (() => {
   'use strict';
@@ -15,12 +16,12 @@
   async function bind(){const n=serial;try{const p=await c.api('/product-preferences');if(n===serial)consent=p;}catch{} }
   async function emit(name,place,run=null,source=null){if(!consent?.analytics_enabled||!c.state.trip||document.visibilityState!=='visible'||!navigator.onLine)return;const epoch=c.state.epoch,path=base();try{await c.api(path+'/events',{method:'POST',body:{event_id:crypto.randomUUID(),event_name:name,place_id:place,run_id:run,source_id:source,client_at:new Date().toISOString(),schema_version:1}});}catch{/* Measurement never blocks personal functions and is not queued. */}return epoch===c.state.epoch;}
   function suspendExposure(){for(const timer of pending.values())clearTimeout(timer);pending.clear();observer?.disconnect();observer=null;}
-  function resumeExposure(){if(!c||document.visibilityState!=='visible'||$('#dialog')?.open)return;document.querySelectorAll('[data-product-place]').forEach(card=>observe(card,card.dataset.productPlace,card.dataset.productRun));}
+  function resumeExposure(){if(!c||document.visibilityState!=='visible'||$('#dialog')?.open)return;document.querySelectorAll('[data-product-place]').forEach((/** @type {HTMLElement} */ card)=>observe(card,card.dataset.productPlace,card.dataset.productRun));}
   function observe(card,place,run){
     if(!window.IntersectionObserver)return;
     card.dataset.productPlace=place;card.dataset.productRun=run;card.dataset.productEpoch=String(c.state.epoch);
     if(!observer)observer=new IntersectionObserver(entries=>{for(const e of entries){
-      const target=e.target,key=target.dataset.productRun+':'+target.dataset.productPlace;
+      const target=/** @type {HTMLElement} */(e.target),key=target.dataset.productRun+':'+target.dataset.productPlace;
       if(pending.has(target)){clearTimeout(pending.get(target));pending.delete(target);}
       if(!e.isIntersecting||e.intersectionRatio<.5||document.visibilityState!=='visible'||$('#dialog')?.open||seen.has(key))continue;
       pending.set(target,setTimeout(()=>{
