@@ -1,3 +1,4 @@
+// @ts-check
 /* Paging only reads the same run. No provider, mutation or ranking calls. */
 (function(root,factory){const value=factory();if(typeof module==='object'&&module.exports)module.exports=value;else root.RecommendationPages=value;})(typeof window==='undefined'?globalThis:window,function(){
   'use strict';let ui;

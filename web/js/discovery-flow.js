@@ -1,3 +1,4 @@
+// @ts-check
 /* A visit uses existing trip defaults. Only deliberate filter edits create a new run. */
 (function(root,factory){const value=factory();if(typeof module==='object'&&module.exports)module.exports=value;else root.DiscoveryFlow=value;})(typeof window==='undefined'?globalThis:window,function(){
   'use strict';

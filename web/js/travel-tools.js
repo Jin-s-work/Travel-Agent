@@ -1,3 +1,4 @@
+// @ts-check
 /* Supplemental private views. Server scope and expected versions remain authoritative. */
 (() => {
   'use strict';

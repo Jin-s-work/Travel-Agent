@@ -1,3 +1,4 @@
+// @ts-check
 /* Explicit snapshots only. IndexedDB staging never replaces a valid bundle until verified. */
 ((root) => {
   'use strict';

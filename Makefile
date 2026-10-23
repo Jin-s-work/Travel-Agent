@@ -37,7 +37,7 @@ clean:
 # --- CI: .github/workflows/ci.yml runs these same targets with PYTHON=python ---
 # Local `make ci` uses .venv. PostgreSQL runs only when TRAVEL_TEST_POSTGRES_DSN
 # points at a disposable loopback database (tests/postgres_plugin.py enforces it).
-.PHONY: ci ci-python ci-js ci-assets ci-postgres ci-safety e2e e2e-evidence
+.PHONY: ci ci-python ci-js ci-types ci-assets ci-postgres ci-safety e2e e2e-evidence
 PYTHON ?= .venv/bin/python
 # ZERO_SPEND is not set globally: tests drive metered fake providers and set ZERO_SPEND
 # themselves where they test it. CI holds no secrets, so no paid call can authenticate.
@@ -52,7 +52,7 @@ PG_PLUGIN_TESTS = tests/test_foundation_auth.py tests/test_foundation_api.py tes
 # These build their own PostgreSQL schema and must run without the plugin.
 PG_SELF_TESTS = tests/test_cloud_storage.py tests/test_postgres_migration_concurrency.py
 
-ci: ci-safety ci-assets ci-js ci-python ci-postgres ci-eval
+ci: ci-safety ci-assets ci-js ci-types ci-python ci-postgres ci-eval
 
 # The SQLite suite never sees the DSN; PostgreSQL suites run only in ci-postgres.
 ci-python:
@@ -60,6 +60,10 @@ ci-python:
 
 ci-js:
 	node --test tests/*.cjs
+
+# Browser JS type check without a build step: only files starting with // @ts-check (tsconfig.json).
+ci-types:
+	./node_modules/.bin/tsc -p tsconfig.json
 
 ci-assets:
 	$(PYTHON) scripts/version_web_assets.py --check

@@ -1,3 +1,4 @@
+// @ts-check
 /* Small context editor. The server owns date/stop resolution; drafts stay in this account's memory. */
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.SimpleDiscovery=api;})(typeof window==='undefined'?globalThis:window,function(){
   'use strict';

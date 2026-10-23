@@ -1,0 +1,14 @@
+{
+  "//": "Type-check browser JS without a build step. Only files that start with // @ts-check are checked (gradual adoption); make ci-types runs it.",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true,
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": false,
+    "skipLibCheck": true,
+    "types": []
+  },
+  "include": ["web/js/*.js", "types/*.d.ts"]
+}
