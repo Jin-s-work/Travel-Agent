@@ -138,7 +138,8 @@
 | `767711c` | v6 출시 체크리스트(`reports/RELEASE_CHECKLIST_V6.md`) · `.env.example` 에 v6 설정 11개 | 문서·예시 설정만 |
 | `6a53394` | 운영 배포 확인 기록 | 문서만 |
 | `3cfaa52` | 도쿄 AI 임시 평가 결과 기록(STAGE4 묶음 C) | 문서만, 산출물은 git 무시 · 원격 CI 7/7(`39888411489`) |
-| 이 커밋(후속 13) | 공개 지도 후보 태그 보강 선택 기능(Overpass, 기본 꺼짐) · 실측 기록 | 보강 시험 5 · 공개 탐색 시험 통과 |
+| `f8c80e9` | 공개 지도 후보 태그 보강 선택 기능(Overpass, 기본 꺼짐) · 실측 기록 | 보강 시험 5 · ci-python 1902 passed |
+| 이 커밋(후속 14) | 무료 경로: Overpass 실패 뒤 15분 건너뛰기 · 무료 대안 비교 기록 | 보강 시험 6 · ci-python 1903 passed |
 
 한 커밋에 두 단계가 섞인 덩어리 3개(`src/foundation/db.py`·`src/storage/postgres.py`의 스키마 줄, `src/foundation/search.py`의 hook 줄)는 줄 단위로 나눴다. 평가 하네스는 2·3단계에 걸쳐 있어(agent 평가가 3단계 코드를 부른다) 3단계 뒤 별도 커밋으로 묶었다.
 

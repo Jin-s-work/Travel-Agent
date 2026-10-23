@@ -7,9 +7,16 @@ import json
 from types import SimpleNamespace
 from urllib.parse import unquote
 
+import pytest
+
 from src.discovery import public_places as P
 
 CENTER = P.center('tokyo')
+
+
+@pytest.fixture(autouse=True)
+def _no_backoff(monkeypatch):
+    monkeypatch.setitem(P._overpass_state, 'backoff_until', 0.0)
 
 
 def feature(osm_id, name, *, value='restaurant', extra=None, kind='N', dlat=0.001):
@@ -99,3 +106,16 @@ def test_endpoint_can_point_at_a_self_hosted_overpass(monkeypatch):
     assert transport.urls[0].startswith('https://overpass.example.invalid/api/interpreter?data=')
     monkeypatch.delenv('OSM_OVERPASS_ENDPOINT')
     assert P.overpass_endpoint() == P.OVERPASS_ENDPOINT
+
+
+def test_a_failed_lookup_skips_overpass_for_the_backoff_window(monkeypatch):
+    clock = [1000.0]
+    monkeypatch.setattr('time.monotonic', lambda: clock[0])
+    failing = Transport(PHOTON, RuntimeError('synthetic 502'))
+    assert P.overpass_tags(PHOTON['features'], fetch_page=failing) == ({}, 0)
+    skipped = Transport(PHOTON, OVERPASS)
+    clock[0] += P.OVERPASS_BACKOFF_SECONDS - 1
+    assert P.overpass_tags(PHOTON['features'], fetch_page=skipped) == ({}, 0) and skipped.urls == []
+    clock[0] += 2
+    found, _ = P.overpass_tags(PHOTON['features'], fetch_page=skipped)
+    assert len(skipped.urls) == 1 and ('N', 101) in found

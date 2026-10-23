@@ -37,6 +37,11 @@ OVERPASS_ENDPOINT = 'https://overpass-api.de/api/interpreter'
 OVERPASS_KEYS = ('cuisine', 'opening_hours', 'wheelchair', 'website', 'phone', 'diet:vegetarian', 'diet:vegan')
 OVERPASS_MAX_BYTES = 300_000
 OVERPASS_TIMEOUT_SECONDS = 8
+# After a failed lookup, skip Overpass for this long (per process). A slow public
+# instance would otherwise cost every area OVERPASS_TIMEOUT_SECONDS and shrink
+# how many areas fit in the candidate-retrieval deadline.
+OVERPASS_BACKOFF_SECONDS = 900
+_overpass_state = {'backoff_until': 0.0}
 MAX_BYTES = 350_000
 MAX_CANDIDATES = 60
 DISPLAY_CANDIDATES = 12
@@ -228,7 +233,10 @@ def overpass_tags(features, *, fetch_page=None):
     blocks or changes discovery beyond adding these tags.
     """
     from urllib.parse import quote
+    import time
     fetch_page = fetch_page or fetch_public  # looked up at call time (tests patch the module name)
+    if time.monotonic() < _overpass_state['backoff_until']:
+        return {}, 0
     wanted = {}
     for feature in features if isinstance(features, list) else []:
         props = feature.get('properties') if isinstance(feature, dict) else None
@@ -246,9 +254,10 @@ def overpass_tags(features, *, fetch_page=None):
         page = fetch_page(overpass_endpoint() + '?data=' + quote(data, safe=''), max_bytes=OVERPASS_MAX_BYTES,
                           timeout_seconds=OVERPASS_TIMEOUT_SECONDS, max_redirects=0)
         if page.mime != 'application/json':
-            return {}, 0
+            raise ValueError('unexpected mime')
         elements = json.loads(page.content).get('elements')
     except Exception:  # noqa: BLE001 - optional enrichment; Photon result stands alone
+        _overpass_state['backoff_until'] = time.monotonic() + OVERPASS_BACKOFF_SECONDS
         return {}, 0
     found = {}
     for element in elements if isinstance(elements, list) else []:
