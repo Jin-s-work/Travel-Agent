@@ -139,7 +139,8 @@
 | `6a53394` | 운영 배포 확인 기록 | 문서만 |
 | `3cfaa52` | 도쿄 AI 임시 평가 결과 기록(STAGE4 묶음 C) | 문서만, 산출물은 git 무시 · 원격 CI 7/7(`39888411489`) |
 | `f8c80e9` | 공개 지도 후보 태그 보강 선택 기능(Overpass, 기본 꺼짐) · 실측 기록 | 보강 시험 5 · ci-python 1902 passed |
-| 이 커밋(후속 14) | 무료 경로: Overpass 실패 뒤 15분 건너뛰기 · 무료 대안 비교 기록 | 보강 시험 6 · ci-python 1903 passed |
+| `638beeb` | 무료 경로: Overpass 실패 뒤 15분 건너뛰기 · 무료 대안 비교 기록 | 보강 시험 6 · ci-python 1903 passed · 원격 CI 7/7(`39901228737`) · 운영 배포(대표, 2026-10-23) |
+| 이후 커밋(후속 15~17) | 브라우저 JS 타입 검사(`make ci-types`) · 에이전트 live 평가 준비 · v7 기획과 OSM 태그 표 | 아래 「v7 진입」 |
 
 한 커밋에 두 단계가 섞인 덩어리 3개(`src/foundation/db.py`·`src/storage/postgres.py`의 스키마 줄, `src/foundation/search.py`의 hook 줄)는 줄 단위로 나눴다. 평가 하네스는 2·3단계에 걸쳐 있어(agent 평가가 3단계 코드를 부른다) 3단계 뒤 별도 커밋으로 묶었다.
 
@@ -228,6 +229,12 @@ PG 로 돌려서 찾은 것:
 - **제품 코드 1건:** `scripts/v6_data_coverage.py` 가 행을 위치로 풀어(`for a, b, n in rows`) 앱의 PostgreSQL Row(dict)를 받으면 열 이름이 풀렸다(운영 `read()` 경로는 psycopg tuple 이라 영향 없었음). 행 형식과 무관한 `_values()` 로 고침 — PG·SQLite 모두 5 passed.
 - **시험 코드:** `tuple(row)` 비교 4곳(`plan_state`·`itinerary_row`·미리보기 행·실행 행). PG 에서는 열 이름끼리 비교돼 "질문 전후 일정 그대로" 같은 단언이 늘 참이었다(최종 리뷰 C1 과 같은 패턴). 열 이름 기준 값 비교로 고쳤다. `sqlite_master` 를 읽던 표 스냅숏 2곳은 백엔드별 표 목록으로, `ORDER BY rowid` 1곳은 API 가 준 generation id 로 바꿨다. 해당 시험은 SQLite·PG 모두 통과.
 - **남은 PG 실패 48건(설계상 SQLite 전용, 고친 뒤 재실행 49건에서 extraction_fallback 1건을 더 고친 값):** 평가 하네스 `src/evals/mail.py`·`agent.py`(임시 SQLite 세계, `rowid`·`sqlite_master`)를 쓰는 `test_v6_eval_*` 와, 예산 schema 를 `executescript` 로 직접 만드는 `test_v6_llm_gateway`·`test_v6_extraction_repair`. 앱 경로가 아니라 고치지 않았다.
+
+### v7 진입 (2026-10-23)
+
+- **브라우저 JS 타입 검사:** `typescript@7.0.2`(개발 의존성, 이미지 밖) · `tsconfig.json`(`// @ts-check` 붙은 파일만) · `types/web-globals.d.ts` · `make ci-types` 와 CI `js` job. 6개 파일 오류 0. 남은 파일 오류: `foundation.js` 61 · `home.js` 8 · `product.js` 7 · `discovery-experience.js` 4 · `workspace.js` 3 · `accommodations.js` 3 — 모두 DOM 형식 좁히기·추론 문제로, 실제 결함은 찾지 못했다.
+- **에이전트 live 평가 준비:** 운영 가격 파일 한도(0.25 USD)로는 시나리오 1개도 못 돌던 README 명령을 고치고, 평가 전용 `evals/agent/pricing-live-eval.json`(같은 단가, 한도 3 USD, 5 시나리오 최악 2.51 USD)을 더했다. 유료라 실행은 대표 선택.
+- **v7 기획·제작:** [v7 기획](../service-v7/PLANNING_DRAFT.md). OSM 지역 파일로 만든 태그 표(무료, 실행 중 외부 호출 0)로 도쿄 후보 음식 종류 53% · v5·v6 top-5 차이 1/20(오프라인).
 
 ## 산출물
 

@@ -119,3 +119,35 @@ def test_a_failed_lookup_skips_overpass_for_the_backoff_window(monkeypatch):
     clock[0] += 2
     found, _ = P.overpass_tags(PHOTON['features'], fetch_page=skipped)
     assert len(skipped.urls) == 1 and ('N', 101) in found
+
+
+def _table(monkeypatch, tmp_path, places):
+    (tmp_path / 'tokyo.json').write_text(json.dumps({'kind': 'osm_tag_table', 'places': places}), encoding='utf-8')
+    monkeypatch.setattr(P, 'TAG_TABLE_DIR', tmp_path)
+    P.tag_table.cache_clear()
+
+
+def test_offline_table_fills_missing_tags_and_photon_values_win(monkeypatch, tmp_path):
+    _table(monkeypatch, tmp_path, {'node/101': {'cuisine': 'ramen', 'opening_hours': 'Mo-Fr 11:00-15:00'},
+                                   'node/103': {'cuisine': 'tempura'}})
+    try:
+        places = P.normalize_photon(PHOTON, 'tokyo')
+        by_name = {p['name']: p for p in places}
+        assert by_name['Synthetic Ramen']['tags'] == ['ramen']
+        assert by_name['Synthetic Ramen']['observed_tags']['opening_hours'] == 'Mo-Fr 11:00-15:00'
+        assert by_name['Synthetic Sushi']['tags'] == ['sushi']  # Photon's own extra wins over the table
+        assert by_name['Synthetic Cafe']['tags'] == []          # not in the table: unchanged
+    finally:
+        P.tag_table.cache_clear()
+
+
+def test_no_table_changes_nothing_and_overpass_skips_ids_the_table_has(monkeypatch, tmp_path):
+    monkeypatch.setattr(P, 'TAG_TABLE_DIR', tmp_path / 'missing')
+    P.tag_table.cache_clear()
+    try:
+        assert P.tag_table('tokyo') == {}
+        transport = Transport(PHOTON, OVERPASS)
+        P.overpass_tags(PHOTON['features'], fetch_page=transport, known={'node/101': {'cuisine': 'ramen'}})
+        assert 'node(id:102);' in unquote(transport.urls[0])  # 101 comes from the table, 103 from Photon
+    finally:
+        P.tag_table.cache_clear()

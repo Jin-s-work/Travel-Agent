@@ -9,6 +9,7 @@ from datetime import datetime, timedelta, timezone
 import hashlib
 import json
 import math
+from functools import lru_cache
 from pathlib import Path
 from urllib.parse import urlencode
 from uuid import uuid4
@@ -37,6 +38,7 @@ OVERPASS_ENDPOINT = 'https://overpass-api.de/api/interpreter'
 OVERPASS_KEYS = ('cuisine', 'opening_hours', 'wheelchair', 'website', 'phone', 'diet:vegetarian', 'diet:vegan')
 OVERPASS_MAX_BYTES = 300_000
 OVERPASS_TIMEOUT_SECONDS = 8
+OSM_KINDS = {'N': 'node', 'W': 'way', 'R': 'relation'}
 # After a failed lookup, skip Overpass for this long (per process). A slow public
 # instance would otherwise cost every area OVERPASS_TIMEOUT_SECONDS and shrink
 # how many areas fit in the candidate-retrieval deadline.
@@ -167,6 +169,24 @@ def normalize(payload, city, *, area=None, categories=None):
     return output
 
 
+TAG_TABLE_DIR = Path(__file__).with_name('osm_tags')
+
+
+@lru_cache(maxsize=None)
+def tag_table(city):
+    """Offline OSM tags for one city ({'node/1': {'cuisine': ...}}), built by
+    scripts/build_osm_tag_table.py from a Geofabrik extract (ODbL). {} if none."""
+    path = TAG_TABLE_DIR / f'{city}.json'
+    if not path.is_file():
+        return {}
+    try:
+        doc = json.loads(path.read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        return {}
+    places = doc.get('places') if isinstance(doc, dict) and doc.get('kind') == 'osm_tag_table' else None
+    return places if isinstance(places, dict) else {}
+
+
 def normalize_photon(payload, city, *, area=None, categories=None):
     """Adapt documented GeoJSON only; reuse branch, radius and tag validation."""
     features = payload.get('features') if isinstance(payload, dict) else None
@@ -199,6 +219,10 @@ def normalize_photon(payload, city, *, area=None, categories=None):
                     tags[key] = extra[key]
         point = {'lat': coords[1], 'lon': coords[0]}
         kind = {'N':'node','W':'way','R':'relation'}.get(props.get('osm_type'))
+        # Photon (or Overpass) values win; the offline table fills only what is missing.
+        for key, value in (tag_table(city).get(f'{kind}/{props.get("osm_id")}') or {}).items():
+            if key in OVERPASS_KEYS and isinstance(value, str) and key not in tags:
+                tags[key] = value
         elements.append({'type':kind, 'id':props.get('osm_id'), **point, 'center':point, 'tags':tags})
     result=normalize({'elements':elements},city,area=area,categories=categories)
     result.rejected_count+=len(features)-len(elements)
@@ -225,7 +249,7 @@ def osm_enrichment_enabled():
     return os.getenv('OSM_TAG_ENRICHMENT_ENABLED', '').strip().lower() in {'1', 'true'}
 
 
-def overpass_tags(features, *, fetch_page=None):
+def overpass_tags(features, *, fetch_page=None, known=()):
     """Tags Photon left out, from one Overpass lookup by OSM id.
 
     Returns ({('N'|'W'|'R', id): {key: value}}, bytes received). Only
@@ -243,6 +267,8 @@ def overpass_tags(features, *, fetch_page=None):
         if not isinstance(props, dict) or isinstance(props.get('extra'), dict):
             continue
         kind, ident = props.get('osm_type'), props.get('osm_id')
+        if f'{OSM_KINDS.get(kind)}/{ident}' in known:
+            continue  # the offline table already has its tags
         if kind in ('N', 'W', 'R') and type(ident) is int and ident > 0:
             wanted.setdefault(kind, set()).add(ident)
     if not wanted:
@@ -284,7 +310,7 @@ def fetch(city,*,categories=None,area=None,enrich=None,fetch_page=None):
         raise DomainError('PUBLIC_DISCOVERY_INVALID', '공개지도 응답을 읽을 수 없어요. 잠시 후 다시 찾아 주세요.', 503) from None
     enrichment = None
     if (osm_enrichment_enabled() if enrich is None else enrich) and isinstance(payload, dict):
-        extra, size = overpass_tags(payload.get('features'), fetch_page=fetch_page)
+        extra, size = overpass_tags(payload.get('features'), fetch_page=fetch_page, known=tag_table(city))
         filled = 0
         for feature in payload.get('features') or []:
             props = feature.get('properties') if isinstance(feature, dict) else None
