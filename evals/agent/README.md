@@ -8,9 +8,11 @@ PYTHON_DOTENV_DISABLED=1 TRAVEL_TEST_POSTGRES_DSN= python -m src.evals.agent --m
 
 # live: 대표가 상한을 정해 직접 실행 (CI·시험은 실행하지 않음)
 PYTHON_DOTENV_DISABLED=1 OPENAI_API_KEY=... python -m src.evals.agent --mode live \
-    --max-cost-usd 0.50 --max-scenarios 5 --pricing deploy/render-supabase/pricing-openai.json \
+    --max-cost-usd 3.00 --max-scenarios 5 --pricing evals/agent/pricing-live-eval.json \
     --out data/eval_runs/agent-live.json            # 먼저 --dry-run 으로 예상 상한만 확인
 ```
+
+운영 가격 파일(`deploy/render-supabase/pricing-openai.json`)은 사용자 일일 한도가 0.25 USD 라, 최악 상한 기준으로 시나리오 1개(약 0.50 USD)도 통과하지 못한다(2026-10-23 dry-run). 그래서 같은 단가에 한도만 올린 평가 전용 파일 `evals/agent/pricing-live-eval.json`(3 USD)을 쓴다. 5 시나리오 최악 상한은 2.51 USD 이고(모든 단계가 출력 상한·모든 도구 출력이 크기 상한이라는 가정), 실제 비용은 이보다 훨씬 작을 것으로 보지만 [미확인]이다. 실행은 `min(--max-cost-usd, 파일 한도)` 에서 멈춘다. 임시 DB 에서 돌므로 운영 장부와 무관하다.
 
 결과는 `--out` 의 JSON(게이트용)과 같은 이름의 `.md`(사람용)다. 둘 다 `synthetic: true` 를 적는다.
 live 상한은 mail·qa 평가와 같은 규칙(`min(--max-cost-usd, 가격 파일 한도)`, `halted` 면 거부)이고, 원장·영수증은 `--out` 옆 `<이름>-work-<UTC 시각>/` 에 남는다(임시 디렉터리 아님, 결과 JSON 의 `workdir`).

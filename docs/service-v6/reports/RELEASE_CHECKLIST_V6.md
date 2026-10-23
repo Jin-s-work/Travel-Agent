@@ -101,10 +101,16 @@ PYTHON_DOTENV_DISABLED=1 ~/.venvs/travel-inbox-rag/bin/python scripts/export_v6_
 
 | 기능 | 켜기 전에 할 일 | 근거 |
 | --- | --- | --- |
-| 여행 에이전트 | agent live 평가(OpenAI strict schema 수용 확인 포함), `provider_stopped` 화면 문구 확인, 질문당 비용 상한(`AGENT_MAX_COST_MICROS`, 지금 값은 [가설]) 결정 | STAGE3.md, IMPLEMENTATION_STATUS.md |
+| 여행 에이전트 | ① agent live 평가 — 아래 명령(최악 2.51 USD, 대표가 키를 넣어 실행). OpenAI strict schema 수용과 실제 질문당 비용을 이걸로 잰다 ② `provider_stopped` 화면 — 별도 표시 없이 일반 답 말풍선에 "외부 호출 결과를 확인할 수 없거나 외부 호출이 멈춰 있어 끝까지 확인하지 못했어요. / 지금까지 도구로 확인한 결과만 아래에 남겨요. 잠시 뒤에 다시 물어봐 주세요."와 확인한 사실이 나온다(replay 시나리오 ps-01·02로 고정) ③ 질문당 비용 상한 `AGENT_MAX_COST_MICROS` 50,000(0.05 USD)은 [가설] — live 평가의 실제 질문당 비용을 보고 정한다 | STAGE3.md, evals/agent/README.md |
 | 날씨 | Open-Meteo 비상업 해당 여부, Render 공유 IP 한도 확인. 실내·실외 태그가 없어 "확인된 야외 제외"는 운영에서 작동하지 않는다 | STAGE3.md |
 | 개인 토큰·MCP | 토큰 허용 목록 재검토. 운영에서는 쓰지 않기로 결정됨 | PRD 결정 3 = A |
 | 저장 기반 취향 | 화면 토글이 없고 요청 필드 기본값이 꺼짐. 라벨 비교 뒤 결정 | STAGE4.md |
+
+에이전트 live 평가(대표 터미널, 키는 화면에 안 보이게 입력):
+
+```bash
+cd ~/Desktop/ChatGPT/travel-inbox-rag && read -s "OPENAI_API_KEY?OpenAI 키: " && export OPENAI_API_KEY && echo && PYTHON_DOTENV_DISABLED=1 ~/.venvs/travel-inbox-rag/bin/python -m src.evals.agent --mode live --max-cost-usd 3.00 --max-scenarios 5 --pricing evals/agent/pricing-live-eval.json --out data/eval_runs/agent-live.json; unset OPENAI_API_KEY
+```
 
 알려진 경계: 429 재시도가 있으면 에이전트 비용 장부가 질문당 상한을 넘을 수 있고(합성 재현 25000 → 31020), 이미 나간 호출 하나는 최대 45초까지 기다린다.
 
