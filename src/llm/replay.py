@@ -192,8 +192,8 @@ class RecordingAdapter:
     def __getattr__(self, attribute):
         return getattr(self.inner, attribute)
 
-    def send(self, client, kind, kwargs):
-        result = self.inner.send(client, kind, kwargs)
+    def send(self, client, kind, kwargs, **options):
+        result = self.inner.send(client, kind, kwargs, **options)
         if kind == 'chat':
             # This runs inside the metered send: the call is already paid for,
             # so a recording problem must never turn it into an unknown outcome.

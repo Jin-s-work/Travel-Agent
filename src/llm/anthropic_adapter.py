@@ -81,8 +81,10 @@ class AnthropicAdapter:
         prompt = {key: value for key, value in kwargs.items() if key in ('system', 'messages', 'output_config', 'tools')}
         return {'input_tokens': len(json.dumps(prompt, ensure_ascii=False).encode('utf-8')) + 256, 'output_tokens': cap}
 
-    def send(self, client, kind, kwargs) -> ProviderResult:
-        bounded = client.with_options(max_retries=0, timeout=45.0)
+    accepts_timeout = True  # the gateway shortens `timeout` to a scope's remaining deadline
+
+    def send(self, client, kind, kwargs, *, timeout=45.0) -> ProviderResult:
+        bounded = client.with_options(max_retries=0, timeout=timeout)
         try:
             response = bounded.messages.create(**kwargs)
         except Exception as exc:

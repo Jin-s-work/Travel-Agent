@@ -307,7 +307,7 @@ E06 fixture(`scripts/stage3_agent_fixture.py`)는 가짜 모델을 쓰고, 서�
 | 경계 | 내용 | 지금 상태 |
 | --- | --- | --- |
 | ~~비용 상한 장부 초과 (B3 뒤)~~ | **해결(2026-11-03).** 429 재시도가 있으면 `pending_reconciliation` 행의 예상비용까지 장부에 잡혀 장부상 합계가 상한을 넘을 수 있었다. 이제 루프가 chat 단계 동안 gateway guard 로 같은 단계의 재시도를 보내기 직전에 질문 비용을 다시 재고, 넘으면 그 재시도를 보내지 않고 해제한다(첫 시도는 기존 단계 전 검사 그대로)(`COST_BOUND_EXCEEDED` → `budget`) | 합성 재현: 상한 25000, 장부 31020, 실제 확정 10340 → 고친 뒤 장부 20680, 재시도 미전송(`test_a_429_retry_that_would_pass_the_question_ceiling_is_not_sent`) |
-| `search_mail` 과 deadline | 임베딩은 에이전트 deadline(25초)에 묶이지 않는다(시도당 45초, 429면 최대 3회) | MCP `ask` 120초도 엄밀한 상한이 아니다 (후속: 임베딩이 deadline 을 이어받도록 수정 — `IMPLEMENTATION_STATUS.md`) |
+| `search_mail` 과 deadline | 임베딩은 에이전트 deadline(25초)에 묶이지 않는다(시도당 45초, 429면 최대 3회) | MCP `ask` 120초도 엄밀한 상한이 아니다 (후속: 임베딩이 deadline 을 이어받도록 수정, 2026-11-03 호출당 timeout 도 남은 기한으로 줄임 — `IMPLEMENTATION_STATUS.md`) |
 | `provider_stopped` 평가 | B1 뒤 1단계 이후 chat 공급자 오류가 HTTP 오류에서 200 부분 답변으로 바뀌었다 | `evals/agent/scenarios.json` 에 시나리오 0개, 단위 시험만 (후속: `ps-01~03` 추가로 해소) |
 | 전송·정산 뒤 오류 | `parse_embed` 실패처럼 과금이 확정된 뒤의 오류 | 루프를 멈추지 않고 도구 오류로 남는다 |
 

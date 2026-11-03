@@ -201,6 +201,36 @@ def run_golden_calls(world, client, entry):
         return first.choices[0].message.content, second.choices[0].message.content, [item.embedding for item in vectors.data]
 
 
+def test_a_scope_deadline_shortens_the_per_attempt_timeout(tmp_path):
+    """An attempt sent near the deadline no longer waits the full 45 s (agent limit 25 s)."""
+    import time
+    from src.llm.gateway import call_timeout
+    assert call_timeout(None) is None
+    assert call_timeout(110.0, now=100.0) == 10.0
+    assert call_timeout(200.0, now=100.0) == 45.0
+    assert call_timeout(100.3, now=100.0) == 1.0  # floor for an attempt that is still sent
+    world = metered_world(tmp_path, OPENAI_GOLDEN_PRICES)
+    log = []
+    with metered_context(world.gateway, world.ctx, 'doc1:extract', deadline=time.time() + 8):
+        chat('answer', model='gpt-5-mini', messages=GOLDEN_MESSAGES, client_factory=lambda: openai_fake(log),
+             adapter=OpenAIAdapter())
+    timeouts = [kwargs['timeout'] for kind, kwargs in log if kind == 'opts']
+    assert len(timeouts) == 1 and 6 < timeouts[0] <= 8
+
+
+def test_adapters_pass_the_timeout_to_the_sdk_and_keep_45_by_default():
+    opts = []
+    usage = SimpleNamespace(input_tokens=1, output_tokens=1)
+    inner = SimpleNamespace(messages=SimpleNamespace(create=lambda **_: {'content': [], 'usage': usage}))
+    client = SimpleNamespace(with_options=lambda **kwargs: (opts.append(kwargs) or inner))
+    AnthropicAdapter().send(client, 'chat', {}, timeout=3.0)
+    AnthropicAdapter().send(client, 'chat', {})
+    assert opts == [{'max_retries': 0, 'timeout': 3.0}, {'max_retries': 0, 'timeout': 45.0}]
+    log = []
+    OpenAIAdapter().send(openai_fake(log), 'chat', {}, timeout=2.5)
+    assert log[0] == ('opts', {'max_retries': 0, 'timeout': 2.5})
+
+
 @pytest.mark.parametrize('entry', ['gateway', 'compat_chat_create'])
 def test_openai_adapter_request_hash_call_key_estimates_and_receipts_match_head(tmp_path, entry):
     world = metered_world(tmp_path, OPENAI_GOLDEN_PRICES)

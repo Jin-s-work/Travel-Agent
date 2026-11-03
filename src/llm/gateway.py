@@ -23,6 +23,30 @@ def _active():
     return active_var.get()
 
 
+CALL_TIMEOUT_SECONDS = 45.0      # the adapters' own per-attempt read limit
+MIN_CALL_TIMEOUT_SECONDS = 1.0   # floor: an attempt that is sent at all gets this long
+
+
+def call_timeout(deadline, now=None):
+    """Per-attempt timeout under a scope deadline (wall clock), None without one.
+
+    A call sent just before the deadline used to wait the full 45 seconds, so the
+    agent's 25-second limit could stretch to about 70. A read timeout after sending
+    still ends as an unknown outcome (cost kept, no retry), never as "not sent".
+    """
+    if deadline is None:
+        return None
+    remaining = deadline - (time.time() if now is None else now)
+    return max(MIN_CALL_TIMEOUT_SECONDS, min(CALL_TIMEOUT_SECONDS, remaining))
+
+
+def _send(adapter, client, kind, kwargs, deadline):
+    timeout = call_timeout(deadline)
+    if timeout is None or not getattr(adapter, 'accepts_timeout', False):
+        return adapter.send(client, kind, kwargs)
+    return adapter.send(client, kind, kwargs, timeout=timeout)
+
+
 def request_hash(kwargs) -> str:
     return hashlib.sha256(json.dumps(kwargs, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode()).hexdigest()
 
@@ -67,7 +91,7 @@ def metered_raw(adapter, client, kind, kwargs, *, call_suffix=None, operation=No
     info = {'provider': adapter.name, 'model': model, 'call_key': key, 'request_hash': digest,
             'operation': operation or kind, 'prompt': prompt}
     try:
-        value = active.gateway.run(active.context, kind, key, estimates, lambda: adapter.send(client, kind, kwargs),
+        value = active.gateway.run(active.context, kind, key, estimates, lambda: _send(adapter, client, kind, kwargs, active.deadline),
                                    request_hash=digest, provider=adapter.name, sku=sku, guard=active.guard,
                                    deadline=active.deadline, max_attempts=3, observer=observer)
     except DomainError as exc:

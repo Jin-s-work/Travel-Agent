@@ -88,7 +88,7 @@ claude mcp add going \
 
 ## 5. 도구 목록
 
-읽기 도구 7개는 `readOnlyHint=true`입니다. `ask_trip`은 여행 데이터를 바꾸지 않지만 답변 예산을 쓰고 재색인 작업을 예약할 수 있어 `readOnlyHint=false`, `idempotentHint=false`로 광고합니다(클라이언트가 확인 없이 자동 반복 실행하지 않도록). `ask_trip`의 응답 대기 시간은 120초(`ASK_TIMEOUT`)로, 에이전트 chat 경로의 최악 처리 시간(deadline 25초 + 공급자 호출 45초)보다 깁니다. `search_mail`의 임베딩도 에이전트 deadline을 이어받아 25초 뒤에는 새 전송·재시도를 하지 않으므로, 최악은 그 직전에 나간 호출 하나(최대 45초)를 기다리는 경우입니다. 다만 120초는 서버가 강제하는 상한이 아닙니다. 그래도 시간이 넘으면 `NETWORK_ERROR`(앱 미실행)가 아니라 `ASK_TIMEOUT`을 돌려줍니다 — 서버에서 답변이 계속 처리돼 비용이 들었을 수 있으니 같은 질문을 바로 다시 보내지 말고 앱에서 먼저 확인하세요.
+읽기 도구 7개는 `readOnlyHint=true`입니다. `ask_trip`은 여행 데이터를 바꾸지 않지만 답변 예산을 쓰고 재색인 작업을 예약할 수 있어 `readOnlyHint=false`, `idempotentHint=false`로 광고합니다(클라이언트가 확인 없이 자동 반복 실행하지 않도록). `ask_trip`의 응답 대기 시간은 120초(`ASK_TIMEOUT`)로, 에이전트 chat 경로의 최악 처리 시간보다 깁니다. chat 과 `search_mail`의 임베딩은 에이전트 deadline(25초)을 이어받아 25초 뒤에는 새 전송·재시도를 하지 않고, 이미 나간 호출의 대기 시간도 남은 시간으로 줄어듭니다(최소 1초). 그래서 공급자 대기는 deadline 을 약 1초 넘어서까지만 이어집니다. 다만 120초는 서버가 강제하는 상한이 아닙니다. 그래도 시간이 넘으면 `NETWORK_ERROR`(앱 미실행)가 아니라 `ASK_TIMEOUT`을 돌려줍니다 — 서버에서 답변이 계속 처리돼 비용이 들었을 수 있으니 같은 질문을 바로 다시 보내지 말고 앱에서 먼저 확인하세요.
 
 광고하는 입력 스키마는 `going_tools.TOOLS`의 스키마 그대로입니다(날짜 `pattern`, 길이 상한, `additionalProperties: false`). 서버도 같은 스키마로 다시 검사합니다.
 

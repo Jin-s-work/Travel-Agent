@@ -90,10 +90,12 @@ class OpenAIAdapter:
         return {'input_tokens': sum(len(text.encode('utf-8')) + 16 for text in inputs)}
 
     # --- transport ---
-    def send(self, client, kind, kwargs) -> ProviderResult:
+    accepts_timeout = True  # the gateway shortens `timeout` to a scope's remaining deadline
+
+    def send(self, client, kind, kwargs, *, timeout=45.0) -> ProviderResult:
         # OpenAI's SDK normally retries invisibly. Clone with retries disabled
         # for every attempt, including callers with a cached preconfigured client.
-        bounded = client.with_options(max_retries=0, timeout=45.0)
+        bounded = client.with_options(max_retries=0, timeout=timeout)
         try:
             response = bounded.chat.completions.create(**kwargs) if kind == 'chat' else bounded.embeddings.create(**kwargs)
         except Exception as exc:
