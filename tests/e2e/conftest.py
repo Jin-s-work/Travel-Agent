@@ -100,12 +100,16 @@ def pytest_runtest_makereport(item, call):
 @pytest.fixture
 def new_page(browser, request):
     contexts = []
+    # Chromium reports every blocked load or inline use as a console message.
+    violations = []
 
     def make(**options):
         context = browser.new_context(**{'viewport': {'width': 1280, 'height': 900}, 'locale': 'ko-KR', **options})
         context.tracing.start(screenshots=True, snapshots=True)
         contexts.append(context)
         page = context.new_page()
+        page.on('console', lambda message: violations.append(message.text)
+                if 'Content Security Policy' in message.text and 'csp-probe.invalid' not in message.text else None)
         page.set_default_timeout(20000)
         return page
 
@@ -120,6 +124,7 @@ def new_page(browser, request):
         else:
             context.tracing.stop()
         context.close()
+    assert not violations, 'Content-Security-Policy blocked: ' + ' | '.join(violations[:3])
 
 
 @pytest.fixture(scope='session')

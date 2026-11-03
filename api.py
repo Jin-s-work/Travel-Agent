@@ -10,6 +10,7 @@ import logging
 import time
 from contextlib import asynccontextmanager
 from pathlib import Path
+from urllib.parse import urlsplit
 from fastapi import FastAPI, Request, Depends
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, FileResponse
@@ -199,6 +200,14 @@ def create_app(settings=None, *, parser=None, embedder=None, vector_factory=None
                                    heartbeat_seconds=settings.job_heartbeat_seconds,shutdown_seconds=settings.job_shutdown_seconds)
     app.add_middleware(SessionMiddleware,secret_key=settings.session_secret or secrets.token_urlsafe(48),session_cookie='__Host-oidc' if settings.secure_cookie else 'travel_dev_oidc',max_age=600,same_site='lax',https_only=settings.secure_cookie)
     app.add_middleware(BoundedBody,maximum=settings.max_request_bytes)
+    # Screen scripts, styles and fonts are all same-origin with no inline code; place photos
+    # come only from Wikimedia (src/discovery/photos.py). The login form POST redirects to the
+    # OIDC provider, so form-action allows that origin.
+    provider=urlsplit(settings.oidc_metadata_url)
+    login_origin=' '+provider.scheme+'://'+provider.netloc if provider.scheme in {'http','https'} and provider.netloc else ''
+    content_policy=("default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' https://upload.wikimedia.org https://thumb.wikimedia.org; "
+                    "font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; "
+                    "frame-ancestors 'none'; form-action 'self'"+login_origin)
 
     @app.middleware('http')
     async def headers(request,call_next):
@@ -228,6 +237,9 @@ def create_app(settings=None, *, parser=None, embedder=None, vector_factory=None
         response.headers['X-Content-Type-Options']='nosniff'
         response.headers['Referrer-Policy']='strict-origin-when-cross-origin'
         response.headers['X-Frame-Options']='DENY'
+        # Downloads set a stricter sandbox policy of their own; keep it.
+        response.headers.setdefault('Content-Security-Policy',content_policy)
+        response.headers['Strict-Transport-Security']='max-age=31536000'
         if request.url.path.startswith('/api/'):
             response.headers['Cache-Control']='private, no-store'
             response.headers['Vary']='Cookie, Authorization'
