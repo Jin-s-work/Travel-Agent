@@ -142,7 +142,7 @@ def _open_attempts(ctx, call_key):
 
 @contextmanager
 def _ceiling_scope(ctx, prefixes, max_cost_micros):
-    """Re-check the question ceiling before every attempt the gateway sends.
+    """Re-check the question ceiling before every retry the gateway sends.
 
     The loop checks the ceiling once per step, but a 429 retry inside the step
     reserves a new attempt while the rejected one keeps its estimate pending, so
