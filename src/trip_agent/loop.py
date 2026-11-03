@@ -7,7 +7,8 @@ what could not be done. Every model call goes through the metered gateway.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from contextlib import contextmanager
+from dataclasses import dataclass, field, replace
 import json
 import os
 import time
@@ -128,6 +129,52 @@ def _step_reservation(model, messages, registry, limits, adapter):
         return None
 
 
+def _open_attempts(ctx, call_key):
+    """Attempts of one chat step that still count (not released). 0 when the ledger
+    cannot be read: the retry check is then skipped, as before it existed."""
+    try:
+        with ctx.repo.db.connect() as con:
+            return con.execute("SELECT count(*) FROM usage_reservations WHERE owner_id=? AND scope_id=? "
+                               "AND call_key=? AND state!='released'", (ctx.user_id, ctx.trip_id, call_key)).fetchone()[0]
+    except Exception:  # noqa: BLE001
+        return 0
+
+
+@contextmanager
+def _ceiling_scope(ctx, prefixes, max_cost_micros):
+    """Re-check the question ceiling before every attempt the gateway sends.
+
+    The loop checks the ceiling once per step, but a 429 retry inside the step
+    reserves a new attempt while the rejected one keeps its estimate pending, so
+    one step could book up to three reservations past the ceiling (ledger 31020
+    on a 25000 ceiling). The gateway runs `guard()` after reserving and before
+    sending; raising there releases that attempt unsent. Only retries are
+    checked: a step's first attempt keeps the loop's own pre-step rule.
+    """
+    from src.reliability.providers import _active
+    active = _active.get()
+    if active is None:
+        yield
+        return
+    inner = active.guard
+
+    def guard(*args, **kwargs):
+        if inner:
+            inner(*args, **kwargs)
+        step_key = prefixes[0] + 'chat:' + str(active.counters.get('chat', 1) - 1)
+        if _open_attempts(ctx, step_key) < 2:
+            return
+        cost = _question_cost(ctx, prefixes)
+        if cost is None or cost > max_cost_micros:
+            raise DomainError('COST_BOUND_EXCEEDED', '질문당 비용 상한에 도달해 다시 보내지 않았습니다.', 409)
+
+    token = _active.set(replace(active, guard=guard))  # same prefix and counters: call keys continue
+    try:
+        yield
+    finally:
+        _active.reset(token)
+
+
 def _stop_reason_for(code):
     """Where a gateway error (chat step or tool) ends the loop after a step; None = not a stop."""
     if code in BUDGET_STOP_CODES:
@@ -185,9 +232,10 @@ def run_agent(ctx: AgentContext, question: str, history, registry, *, model, lim
             stop = 'budget'
             break
         try:
-            result = chat('agent', model=model, messages=messages, tools=registry.specs(), adapter=adapter,
-                          limits=Limits(max_output_tokens=limits.max_output_tokens), prompt=prompt.meta(),
-                          operation='agent')
+            with _ceiling_scope(ctx, prefixes, limits.max_cost_micros):
+                result = chat('agent', model=model, messages=messages, tools=registry.specs(), adapter=adapter,
+                              limits=Limits(max_output_tokens=limits.max_output_tokens), prompt=prompt.meta(),
+                              operation='agent')
         except DomainError as error:
             # Before any step the router's own path would fail the same way,
             # so the error propagates unchanged ("same result as the router").

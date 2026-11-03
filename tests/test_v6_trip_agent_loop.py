@@ -8,7 +8,7 @@ from src.foundation.db import Database
 from src.foundation.repository import DomainError, Repository, utcnow
 from src.llm import ChatResult, ToolCall, Usage
 from src.reliability.budget import Budget, BudgetPolicy, CallContext
-from src.reliability.providers import ProviderGateway, ProviderResult, metered_context
+from src.reliability.providers import ProviderGateway, ProviderRejected, ProviderResult, metered_context
 from src.trip_agent.loop import AgentContext, AgentLimits, run_agent
 from src.trip_agent.registry import FORBIDDEN_TOOL_NAMES, Tool, ToolRegistry
 
@@ -190,6 +190,53 @@ def test_cost_ceiling_is_checked_against_the_next_reservation_not_only_spent(wor
                            limits=AgentLimits(max_cost_micros=25000))
     assert result.stop_reason == 'budget' and result.steps == 2 and len(adapter.requests) == 2
     assert result.cost_micros == 2 * per_step <= 25000
+
+
+class RateLimitedOnceAdapter(FullUsageAdapter):
+    """The second send (step 1's first attempt) gets a 429: its estimate stays pending."""
+
+    def __init__(self, script):
+        super().__init__(script)
+        self.attempts = 0
+
+    def send(self, client, kind, kwargs):
+        self.attempts += 1
+        if self.attempts == 2:
+            raise ProviderRejected('PROVIDER_RATE_LIMITED', retryable=True, status=429)
+        return super().send(client, kind, kwargs)
+
+
+def _run_with_429(world, max_cost):
+    db, gateway, ctx, call_ctx = world
+    gateway.sleeper = lambda delay: None
+    per_step = _priced(world, 10)
+    adapter = RateLimitedOnceAdapter([tool_turn(('list_things', '{"day": null}'))])
+    with metered_context(gateway, call_ctx, 'req1:agent'):
+        result = run_agent(ctx, '내일 일정 알려줘', [], ToolRegistry([echo_tool()]), model=MODEL, adapter=adapter,
+                           limits=AgentLimits(max_cost_micros=max_cost))
+    with db.connect() as con:
+        rows = con.execute("SELECT state, estimated_cost_micros, actual_cost_micros FROM usage_reservations "
+                           "WHERE call_key LIKE 'request:req1:agent:%' ORDER BY created_at, attempt").fetchall()
+    booked = sum(r['actual_cost_micros'] if r['state'] == 'settled' else r['estimated_cost_micros']
+                 for r in rows if r['state'] != 'released')
+    return result, adapter, per_step, [r['state'] for r in rows], booked
+
+
+def test_a_429_retry_that_would_pass_the_question_ceiling_is_not_sent(world):
+    """B3 남은 경계: 상한 25000, 단계당 10340. 1단계 429 뒤 재시도까지 보내면 장부 31020 이었다."""
+    result, adapter, per_step, states, booked = _run_with_429(world, 25000)
+    assert adapter.attempts == 2                       # the retry was reserved, checked, released unsent
+    assert result.stop_reason == 'budget' and result.steps == 1
+    assert states == ['settled', 'pending_reconciliation', 'released']
+    assert booked == result.cost_micros == 2 * per_step <= 25000
+
+
+def test_a_429_retry_within_the_question_ceiling_is_still_sent(world):
+    result, adapter, per_step, states, booked = _run_with_429(world, 40000)
+    assert adapter.attempts == 3                       # 429, then the retry went out and settled
+    assert states[:3] == ['settled', 'pending_reconciliation', 'settled']
+    assert result.stop_reason == 'budget' and result.steps == 2   # step 3 would need 41360
+    assert booked == result.cost_micros == 3 * per_step <= 40000
 
 
 def test_question_cost_counts_every_attempt_and_agent_search_embeddings(world):
